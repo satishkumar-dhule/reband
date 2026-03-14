@@ -30,6 +30,18 @@ async function ensureLinkedInColumn() {
   }
 }
 
+async function isUrlLive(postUrl, timeout = 8000) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    const response = await fetch(postUrl, { method: 'HEAD', signal: controller.signal });
+    clearTimeout(timeoutId);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 async function getLatestUnsharedPost() {
   // If specific URL provided, extract question_id and find that post
   if (specificUrl) {
@@ -46,16 +58,26 @@ async function getLatestUnsharedPost() {
       }
     }
   }
-  
-  // Get latest unshared post
+
+  // Fetch a batch of candidates and return the first one whose URL is live.
+  // This skips posts that exist in the DB but were never deployed to GitHub Pages.
   const result = await client.execute(`
-    SELECT * FROM blog_posts 
-    WHERE linkedin_shared_at IS NULL 
-    ORDER BY created_at DESC 
-    LIMIT 1
+    SELECT * FROM blog_posts
+    WHERE linkedin_shared_at IS NULL
+    ORDER BY created_at DESC
+    LIMIT 20
   `);
-  
-  return result.rows[0] || null;
+
+  for (const post of result.rows) {
+    const postUrl = `${BLOG_BASE_URL}/posts/${post.question_id}/${post.slug}/`;
+    const live = await isUrlLive(postUrl);
+    if (live) {
+      return post;
+    }
+    console.log(`   ⚠️  Skipping ${post.question_id} — URL not live: ${postUrl}`);
+  }
+
+  return null;
 }
 
 function generateExcerpt(intro, maxLength = 200) {
