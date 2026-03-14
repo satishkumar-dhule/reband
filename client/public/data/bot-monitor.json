@@ -20,12 +20,12 @@
     },
     {
       "botName": "processor",
-      "totalRuns": 3438,
-      "successfulRuns": 3362,
+      "totalRuns": 3441,
+      "successfulRuns": 3366,
       "totalCreated": 0,
-      "totalUpdated": 12609,
+      "totalUpdated": 12612,
       "totalDeleted": 0,
-      "lastRun": "2026-03-14T07:41:54.225Z"
+      "lastRun": "2026-03-14T08:31:06.361Z"
     },
     {
       "botName": "verifier",
@@ -39,16 +39,86 @@
   ],
   "runs": [
     {
-      "id": 3684,
+      "id": 3687,
       "botName": "processor",
-      "startedAt": "2026-03-14T07:41:54.225Z",
-      "completedAt": null,
-      "status": "running",
+      "startedAt": "2026-03-14T08:31:06.361Z",
+      "completedAt": "2026-03-14T08:31:06.837Z",
+      "status": "completed",
       "itemsProcessed": 0,
       "itemsCreated": 0,
       "itemsUpdated": 0,
       "itemsDeleted": 0,
-      "summary": null
+      "summary": {
+        "message": "Processor Bot completed",
+        "processed": 0,
+        "updated": 0,
+        "deleted": 0,
+        "skipped": 0,
+        "failed": 0,
+        "actionCounts": {}
+      }
+    },
+    {
+      "id": 3686,
+      "botName": "processor",
+      "startedAt": "2026-03-14T08:01:42.336Z",
+      "completedAt": "2026-03-14T08:01:42.690Z",
+      "status": "completed",
+      "itemsProcessed": 0,
+      "itemsCreated": 0,
+      "itemsUpdated": 0,
+      "itemsDeleted": 0,
+      "summary": {
+        "message": "Processor Bot completed",
+        "processed": 0,
+        "updated": 0,
+        "deleted": 0,
+        "skipped": 0,
+        "failed": 0,
+        "actionCounts": {}
+      }
+    },
+    {
+      "id": 3685,
+      "botName": "processor",
+      "startedAt": "2026-03-14T07:55:10.661Z",
+      "completedAt": "2026-03-14T07:55:11.099Z",
+      "status": "completed",
+      "itemsProcessed": 0,
+      "itemsCreated": 0,
+      "itemsUpdated": 0,
+      "itemsDeleted": 0,
+      "summary": {
+        "message": "Processor Bot completed",
+        "processed": 0,
+        "updated": 0,
+        "deleted": 0,
+        "skipped": 0,
+        "failed": 0,
+        "actionCounts": {}
+      }
+    },
+    {
+      "id": 3684,
+      "botName": "processor",
+      "startedAt": "2026-03-14T07:41:54.225Z",
+      "completedAt": "2026-03-14T07:43:58.875Z",
+      "status": "completed",
+      "itemsProcessed": 5,
+      "itemsCreated": 0,
+      "itemsUpdated": 3,
+      "itemsDeleted": 0,
+      "summary": {
+        "message": "Processor Bot completed",
+        "processed": 5,
+        "updated": 3,
+        "deleted": 0,
+        "skipped": 2,
+        "failed": 0,
+        "actionCounts": {
+          "polished": 5
+        }
+      }
     },
     {
       "id": 3683,
@@ -1000,66 +1070,6 @@
       "botName": "processor",
       "startedAt": "2026-03-13T11:54:13.373Z",
       "completedAt": "2026-03-13T11:54:13.874Z",
-      "status": "completed",
-      "itemsProcessed": 0,
-      "itemsCreated": 0,
-      "itemsUpdated": 0,
-      "itemsDeleted": 0,
-      "summary": {
-        "message": "Processor Bot completed",
-        "processed": 0,
-        "updated": 0,
-        "deleted": 0,
-        "skipped": 0,
-        "failed": 0,
-        "actionCounts": {}
-      }
-    },
-    {
-      "id": 3637,
-      "botName": "processor",
-      "startedAt": "2026-03-13T11:36:57.800Z",
-      "completedAt": "2026-03-13T11:36:58.323Z",
-      "status": "completed",
-      "itemsProcessed": 0,
-      "itemsCreated": 0,
-      "itemsUpdated": 0,
-      "itemsDeleted": 0,
-      "summary": {
-        "message": "Processor Bot completed",
-        "processed": 0,
-        "updated": 0,
-        "deleted": 0,
-        "skipped": 0,
-        "failed": 0,
-        "actionCounts": {}
-      }
-    },
-    {
-      "id": 3636,
-      "botName": "processor",
-      "startedAt": "2026-03-13T11:28:24.461Z",
-      "completedAt": "2026-03-13T11:28:24.813Z",
-      "status": "completed",
-      "itemsProcessed": 0,
-      "itemsCreated": 0,
-      "itemsUpdated": 0,
-      "itemsDeleted": 0,
-      "summary": {
-        "message": "Processor Bot completed",
-        "processed": 0,
-        "updated": 0,
-        "deleted": 0,
-        "skipped": 0,
-        "failed": 0,
-        "actionCounts": {}
-      }
-    },
-    {
-      "id": 3635,
-      "botName": "processor",
-      "startedAt": "2026-03-13T10:46:41.214Z",
-      "completedAt": "2026-03-13T10:46:41.695Z",
       "status": "completed",
       "itemsProcessed": 0,
       "itemsCreated": 0,
@@ -2180,6 +2190,33 @@
   ],
   "ledger": [
     {
+      "id": 26291,
+      "botName": "processor",
+      "action": "update",
+      "itemType": "question",
+      "itemId": "q-25414",
+      "reason": "Processed: polished",
+      "createdAt": "2026-03-14T07:43:56.716Z"
+    },
+    {
+      "id": 26290,
+      "botName": "processor",
+      "action": "update",
+      "itemType": "question",
+      "itemId": "q-25414",
+      "reason": "Processed: polished",
+      "createdAt": "2026-03-14T07:43:41.487Z"
+    },
+    {
+      "id": 26289,
+      "botName": "processor",
+      "action": "update",
+      "itemType": "question",
+      "itemId": "q-25415",
+      "reason": "Processed: polished",
+      "createdAt": "2026-03-14T07:43:29.512Z"
+    },
+    {
       "id": 26288,
       "botName": "processor",
       "action": "update",
@@ -3051,34 +3088,7 @@
       "itemId": "q-25465",
       "reason": "Processed: polished",
       "createdAt": "2026-03-14T07:00:35.350Z"
-    },
-    {
-      "id": 26191,
-      "botName": "processor",
-      "action": "update",
-      "itemType": "question",
-      "itemId": "q-25466",
-      "reason": "Processed: polished",
-      "createdAt": "2026-03-14T07:00:20.447Z"
-    },
-    {
-      "id": 26190,
-      "botName": "processor",
-      "action": "update",
-      "itemType": "question",
-      "itemId": "q-25466",
-      "reason": "Processed: polished",
-      "createdAt": "2026-03-14T06:59:50.321Z"
-    },
-    {
-      "id": 26189,
-      "botName": "processor",
-      "action": "update",
-      "itemType": "question",
-      "itemId": "q-25467",
-      "reason": "Processed: polished",
-      "createdAt": "2026-03-14T06:59:28.078Z"
     }
   ],
-  "generatedAt": "2026-03-14T07:43:02.858Z"
+  "generatedAt": "2026-03-14T08:45:41.072Z"
 }
