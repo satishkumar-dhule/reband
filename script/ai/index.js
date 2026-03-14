@@ -39,6 +39,7 @@ import citationBlogTemplate from './prompts/templates/citation-blog.js';
 import blogImageTemplate from './prompts/templates/blog-image.js';
 import illustrationSceneTemplate from './prompts/templates/illustration-scene.js';
 import certificationQuestionTemplate from './prompts/templates/certification-question.js';
+import linkedinPollMcqTemplate from './prompts/templates/linkedin-poll-mcq.js';
 
 // Template registry
 const templates = {
@@ -64,7 +65,8 @@ const templates = {
   'citationBlog': citationBlogTemplate,
   'blogImage': blogImageTemplate,
   'illustrationScene': illustrationSceneTemplate,
-  'certification-question': certificationQuestionTemplate
+  'certification-question': certificationQuestionTemplate,
+  'linkedinPollMcq': linkedinPollMcqTemplate
 };
 
 // Provider registry

@@ -16,10 +16,19 @@
  */
 
 import 'dotenv/config';
+import fs from 'node:fs';
 import { dbClient } from './utils.js';
+import ai from './ai/index.js';
+import { generateBlogPost } from './ai/graphs/blog-graph.js';
+
+function writeGitHubOutput(key, value) {
+  if (process.env.GITHUB_OUTPUT) {
+    try { fs.appendFileSync(process.env.GITHUB_OUTPUT, `${key}=${value}\n`); } catch {}
+  }
+}
 
 // Constants
-const LINKEDIN_API_URL = 'https://api.linkedin.com/v2/ugcPosts';
+const LINKEDIN_API_URL = 'https://api.linkedin.com/rest/posts';
 const API_TIMEOUT = 30000; // 30 seconds
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000; // 2 seconds
@@ -27,6 +36,32 @@ const MAX_POLL_QUESTION_LENGTH = 140;
 const MAX_POLL_OPTIONS = 4;
 const MIN_POLL_DURATION_HOURS = 1;
 const MAX_POLL_DURATION_HOURS = 168; // 7 days
+
+// Default channels to rotate through (absolute basics for core topics)
+const DEFAULT_CHANNELS = [
+  'sre',
+  'devops',
+  'aws',
+  'aws-saa',
+  'aws-devops-pro',
+  'aws-sysops',
+  'terraform',
+  'terraform-associate',
+  'kubernetes',
+  'docker-dca',
+  'linux',
+  'gcp-devops-engineer',
+  'llm-ops',
+  'generative-ai',
+  'aws-ml-specialty',
+  'aws-ai-practitioner',
+  'networking',
+  'security',
+  'system-design',
+];
+
+// Default difficulty when none specified
+const DEFAULT_DIFFICULTIES = ['beginner', 'intermediate'];
 
 // Environment variables
 const accessToken = process.env.LINKEDIN_ACCESS_TOKEN?.trim();
@@ -85,23 +120,35 @@ function parseQuestionRow(row) {
  */
 async function fetchQuestion() {
   console.log('🔍 Fetching question from database...');
-  
+
   let sql = 'SELECT * FROM questions WHERE status = "active"';
   const args = [];
-  
+
   if (questionId) {
     sql += ' AND id = ?';
     args.push(questionId);
   }
-  
+
   if (channel) {
+    // Explicit channel override
     sql += ' AND channel = ?';
     args.push(channel);
+  } else {
+    // Default: rotate across core topic channels
+    const placeholders = DEFAULT_CHANNELS.map(() => '?').join(', ');
+    sql += ` AND channel IN (${placeholders})`;
+    args.push(...DEFAULT_CHANNELS);
   }
-  
+
   if (difficulty) {
+    // Explicit difficulty override
     sql += ' AND difficulty = ?';
     args.push(difficulty);
+  } else {
+    // Default: beginner or intermediate only
+    const dPlaceholders = DEFAULT_DIFFICULTIES.map(() => '?').join(', ');
+    sql += ` AND difficulty IN (${dPlaceholders})`;
+    args.push(...DEFAULT_DIFFICULTIES);
   }
   
   // Get random question
@@ -118,62 +165,117 @@ async function fetchQuestion() {
   console.log(`   Channel: ${question.channel}`);
   console.log(`   Difficulty: ${question.difficulty}`);
   console.log(`   Question: ${question.question.substring(0, 100)}...`);
-  
+
   return question;
 }
 
-/**
- * Extract poll options from answer
- * Looks for multiple choice format in the answer
- */
-function extractPollOptions(answer) {
-  // Try to extract options from common formats:
-  // A) Option 1
-  // B) Option 2
-  // or
-  // 1. Option 1
-  // 2. Option 2
-  
-  const patterns = [
-    /^([A-D])\)\s*(.+?)(?=\n[A-D]\)|$)/gm,
-    /^([A-D])\.\s*(.+?)(?=\n[A-D]\.|$)/gm,
-    /^([1-4])\)\s*(.+?)(?=\n[1-4]\)|$)/gm,
-    /^([1-4])\.\s*(.+?)(?=\n[1-4]\.|$)/gm,
-  ];
-  
-  for (const pattern of patterns) {
-    const matches = [...answer.matchAll(pattern)];
-    if (matches.length >= 2 && matches.length <= MAX_POLL_OPTIONS) {
-      return matches.map(m => m[2].trim()).slice(0, MAX_POLL_OPTIONS);
-    }
-  }
-  
-  return null;
+function generateSlug(title) {
+  return title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').substring(0, 80);
 }
 
 /**
- * Format question for LinkedIn poll
+ * Look up a blog post for this question, generating one if missing
  */
-function formatPollContent(question) {
-  const options = extractPollOptions(question.answer);
-  
-  if (!options || options.length < 2) {
-    throw new Error('Question does not have valid multiple choice options');
+async function fetchBlogPostUrl(question) {
+  const qId = question.id;
+
+  // Check if blog post already exists
+  try {
+    const result = await dbClient.execute({
+      sql: 'SELECT slug FROM blog_posts WHERE question_id = ? LIMIT 1',
+      args: [qId]
+    });
+    if (result.rows.length > 0 && result.rows[0].slug) {
+      console.log(`   ✅ Blog post found: ${qId}`);
+      return { url: `https://openstackdaily.github.io/posts/${qId}/${result.rows[0].slug}/`, isNew: false };
+    }
+  } catch {
+    // blog_posts table query failed — continue to generate
   }
-  
-  // Truncate question if too long
-  let pollQuestion = question.question;
-  if (pollQuestion.length > MAX_POLL_QUESTION_LENGTH) {
-    pollQuestion = pollQuestion.substring(0, MAX_POLL_QUESTION_LENGTH - 3) + '...';
+
+  // No blog post — generate one now
+  console.log('   📝 No blog post found — generating one...');
+  try {
+    const blogResult = await generateBlogPost(question);
+
+    if (!blogResult.success || !blogResult.blogContent) {
+      console.log('   ⚠️ Blog generation skipped or failed:', blogResult.skipReason || blogResult.error);
+      return { url: null, isNew: false };
+    }
+
+    const { blogContent } = blogResult;
+    const slug = generateSlug(blogContent.title);
+    const now = new Date().toISOString();
+
+    await dbClient.execute({
+      sql: `INSERT OR IGNORE INTO blog_posts
+            (question_id, title, slug, introduction, sections, conclusion,
+             meta_description, channel, difficulty, tags, diagram, quick_reference,
+             glossary, real_world_example, fun_fact, sources, social_snippet,
+             diagram_type, diagram_label, images, svg_content, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        qId,
+        blogContent.title,
+        slug,
+        blogContent.introduction,
+        JSON.stringify(blogContent.sections || []),
+        blogContent.conclusion,
+        blogContent.metaDescription || null,
+        question.channel,
+        question.difficulty,
+        JSON.stringify(question.tags || []),
+        question.diagram || null,
+        JSON.stringify(blogContent.quickReference || []),
+        JSON.stringify(blogContent.glossary || []),
+        JSON.stringify(blogContent.realWorldExample || null),
+        blogContent.funFact || null,
+        JSON.stringify(blogContent.sources || []),
+        JSON.stringify(blogContent.socialSnippet || null),
+        blogContent.diagramType || null,
+        blogContent.diagramLabel || null,
+        JSON.stringify(blogContent.images || []),
+        JSON.stringify({}),
+        now
+      ]
+    });
+
+    console.log(`   ✅ Blog post saved: "${blogContent.title}"`);
+    const url = `https://openstackdaily.github.io/posts/${qId}/${slug}/`;
+    return { url, isNew: true };
+  } catch (err) {
+    console.warn('   ⚠️ Blog generation error:', err.message);
+    return { url: null, isNew: false };
   }
-  
-  // Create engaging intro text
-  const intro = `🎯 Quick Tech Quiz!\n\n${pollQuestion}\n\n💡 Test your knowledge and see how you compare with others!\n\n#TechInterview #${question.channel.replace(/[^a-zA-Z0-9]/g, '')} #CodingInterview`;
-  
+}
+
+/**
+ * Use AI to generate MCQ poll content from any question
+ */
+async function generatePollContent(question) {
+  console.log('🤖 Generating MCQ options with AI...');
+
+  const result = await ai.run('linkedinPollMcq', {
+    question: question.question,
+    answer: question.answer,
+    channel: question.channel,
+  });
+
+  if (!result || !result.pollQuestion || !Array.isArray(result.options) || result.options.length < 4) {
+    throw new Error('AI returned invalid MCQ structure');
+  }
+
+  // Enforce length limits
+  const pollQuestion = result.pollQuestion.substring(0, MAX_POLL_QUESTION_LENGTH);
+  const options = result.options.slice(0, MAX_POLL_OPTIONS).map(o => String(o).substring(0, 30));
+
+  console.log(`   Poll question: ${pollQuestion}`);
+  options.forEach((o, i) => console.log(`   ${i + 1}. ${o}${i === result.correctIndex ? ' (correct)' : ''}`));
+
   return {
-    text: intro,
+    text: result.introText || `🎯 Quick Tech Quiz!\n\n${pollQuestion}\n\n#TechInterview #CodingInterview`,
     question: pollQuestion,
-    options: options.slice(0, MAX_POLL_OPTIONS),
+    options,
   };
 }
 
@@ -231,62 +333,65 @@ async function parseLinkedInError(response) {
 /**
  * Publish poll to LinkedIn
  */
+/**
+ * Map poll duration hours to LinkedIn Posts API duration enum
+ */
+function pollDurationEnum(hours) {
+  if (hours <= 24) return 'ONE_DAY';
+  if (hours <= 72) return 'THREE_DAYS';
+  if (hours <= 168) return 'ONE_WEEK';
+  return 'TWO_WEEKS';
+}
+
 async function publishPollToLinkedIn(content) {
   console.log('\n📤 Publishing poll to LinkedIn...');
-  
-  // Calculate poll end time
-  const pollEndTime = Date.now() + (pollDuration * 60 * 60 * 1000);
-  
+
+  // LinkedIn Posts API (/rest/posts) supports POLL; UGC API does not
   const payload = {
     author: personUrn,
-    lifecycleState: 'PUBLISHED',
-    specificContent: {
-      'com.linkedin.ugc.ShareContent': {
-        shareCommentary: {
-          text: content.text
-        },
-        shareMediaCategory: 'POLL',
-        poll: {
-          question: content.question,
-          options: content.options.map(option => ({ text: option })),
-          settings: {
-            duration: {
-              durationInHours: pollDuration
-            }
-          }
+    commentary: content.text,
+    visibility: 'PUBLIC',
+    distribution: {
+      feedDistribution: 'MAIN_FEED',
+      targetEntities: [],
+      thirdPartyDistributionChannels: []
+    },
+    content: {
+      poll: {
+        question: content.question,
+        options: content.options.map(option => ({ text: option })),
+        settings: {
+          duration: pollDurationEnum(pollDuration)
         }
       }
     },
-    visibility: {
-      'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC'
-    }
+    lifecycleState: 'PUBLISHED',
+    isReshareDisabledByAuthor: false
   };
-  
+
   console.log('📋 Poll payload:');
   console.log(JSON.stringify(payload, null, 2));
-  
+
   const response = await fetchWithRetry(LINKEDIN_API_URL, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
+      'LinkedIn-Version': '202506',
       'X-Restli-Protocol-Version': '2.0.0'
     },
     body: JSON.stringify(payload)
   });
-  
+
   if (!response.ok) {
     const errorMsg = await parseLinkedInError(response);
     throw new Error(`LinkedIn API error (${response.status}): ${errorMsg}`);
   }
-  
-  const result = await response.json();
-  
-  if (!result.id) {
-    throw new Error('Invalid response: missing post ID');
-  }
-  
-  return result;
+
+  // Posts API returns 201 with the post URN in the Location header (no body)
+  const postUrn = response.headers.get('x-restli-id') || response.headers.get('location') || 'unknown';
+  console.log(`   Post URN: ${postUrn}`);
+  return { id: postUrn };
 }
 
 /**
@@ -302,8 +407,10 @@ async function main() {
   console.log('📊 LinkedIn Poll Publisher');
   console.log('═'.repeat(60));
   console.log(`Question ID: ${questionId || 'Random'}`);
-  console.log(`Channel: ${channel || 'Any'}`);
-  console.log(`Difficulty: ${difficulty || 'Any'}`);
+  const channelLabel = channel || 'Default (' + DEFAULT_CHANNELS.length + ' core channels)';
+  const difficultyLabel = difficulty || 'Default (' + DEFAULT_DIFFICULTIES.join('/') + ')';
+  console.log(`Channel: ${channelLabel}`);
+  console.log(`Difficulty: ${difficultyLabel}`);
   console.log(`Poll Duration: ${pollDuration} hours`);
   console.log(`Dry Run: ${dryRun}`);
   console.log('─'.repeat(60));
@@ -313,17 +420,30 @@ async function main() {
   
   // Fetch question
   const question = await fetchQuestion();
-  
-  // Format as poll
+
+  // Look up or generate blog post for this question
+  const { url: blogUrl, isNew: blogIsNew } = await fetchBlogPostUrl(question);
+  if (blogUrl) {
+    console.log(`   Blog post${blogIsNew ? ' (newly generated)' : ''}: ${blogUrl}`);
+  }
+
+  // Generate MCQ poll content via AI
   let pollContent;
   try {
-    pollContent = formatPollContent(question);
+    pollContent = await generatePollContent(question);
   } catch (error) {
-    console.error('❌ Failed to format poll:', error.message);
-    console.log('   This question is not suitable for a poll (no multiple choice options)');
+    console.error('❌ Failed to generate poll content:', error.message);
     process.exit(1);
   }
-  
+
+  // Append links to commentary
+  const PRACTICE_URL = 'https://open-interview.github.io/';
+  let links = '\n\n🎯 Practice more: ' + PRACTICE_URL;
+  if (blogUrl) {
+    links += '\n📖 Deep dive: ' + blogUrl;
+  }
+  pollContent.text = pollContent.text + links;
+
   console.log('\n📋 Poll content:');
   console.log('─'.repeat(50));
   console.log(pollContent.text);
@@ -349,11 +469,16 @@ async function main() {
     
     // Mark question as shared
     await markQuestionShared(question.id, linkedInResult.id);
+
+    writeGitHubOutput('posted', 'true');
+    writeGitHubOutput('linkedin_post_id', linkedInResult.id);
+    writeGitHubOutput('blog_generated', String(blogIsNew));
   } catch (error) {
     console.error('❌ Publish failed:', error.message);
+    writeGitHubOutput('posted', 'false');
     process.exit(1);
   }
-  
+
   console.log('\n' + '═'.repeat(60));
   console.log('🎉 Done!');
   console.log('═'.repeat(60));
