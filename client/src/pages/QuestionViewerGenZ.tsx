@@ -1,6 +1,6 @@
 /**
- * Gen Z Question Viewer - Immersive Learning
- * Pure black, neon accents, smooth animations
+ * Gen Z Question Viewer - Premium Pro Max Edition
+ * Claymorphism + Glassmorphism with stunning animations
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -31,8 +31,283 @@ import {
 } from '../lib/spaced-repetition';
 import {
   ChevronLeft, ChevronRight, Search, X, Bookmark, Share2,
-  Filter, Brain, RotateCcw, Check, Zap, ArrowRight
+  Filter, Brain, RotateCcw, Check, Zap, ArrowRight, Sparkles, Layers
 } from 'lucide-react';
+
+// Premium Styles - Design System Theme (Cyan/Purple/Pink)
+const premiumStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+  :root {
+    /* Design System Colors */
+    --color-accent-cyan: hsl(190, 100%, 50%);
+    --color-accent-cyan-light: hsl(190, 100%, 60%);
+    --color-accent-cyan-dark: hsl(190, 100%, 40%);
+    --color-accent-purple: hsl(270, 100%, 65%);
+    --color-accent-purple-light: hsl(270, 100%, 75%);
+    --color-accent-pink: hsl(330, 100%, 65%);
+    --color-accent-pink-light: hsl(330, 100%, 75%);
+    
+    /* Primary - Cyan */
+    --primary: var(--color-accent-cyan);
+    --primary-light: var(--color-accent-cyan-light);
+    --primary-glow: hsla(190, 100%, 50%, 0.4);
+    --secondary-glow: hsla(270, 100%, 65%, 0.3);
+    --tertiary-glow: hsla(330, 100%, 65%, 0.3);
+    
+    /* Glass - from design system */
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-highlight: rgba(255, 255, 255, 0.15);
+    --glass-strong-bg: rgba(255, 255, 255, 0.08);
+    --glass-strong-border: rgba(255, 255, 255, 0.15);
+    
+    /* Clay shadows */
+    --clay-shadow-light: rgba(255, 255, 255, 0.2);
+    --clay-shadow-dark: rgba(0, 0, 0, 0.35);
+    --clay-shadow-primary: hsla(190, 100%, 50%, 0.25);
+    --clay-shadow-purple: hsla(270, 100%, 65%, 0.25);
+    --clay-shadow-pink: hsla(330, 100%, 65%, 0.25);
+    
+    /* Semantic */
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --surface-elevated: hsl(0, 0%, 8%);
+  }
+
+  .font-display { font-family: 'Outfit', sans-serif; }
+  .font-body { font-family: 'DM Sans', sans-serif; }
+
+  /* Premium Glass Card - Design System */
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 var(--glass-highlight),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .glass-card-strong {
+    background: var(--glass-strong-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-strong-border);
+    border-radius: 24px;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 var(--glass-highlight);
+  }
+
+  /* Claymorphism Card */
+  .clay-card {
+    background: linear-gradient(145deg, hsl(0, 0%, 8%), hsl(0, 0%, 6.5%));
+    border-radius: 28px;
+    box-shadow: 
+      12px 12px 24px var(--clay-shadow-dark),
+      -8px -8px 20px var(--clay-shadow-light),
+      0 0 0 1px rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Claymorphism Button */
+  .clay-button {
+    background: linear-gradient(145deg, hsl(0, 0%, 10%), hsl(0, 0%, 7%));
+    border-radius: 16px;
+    box-shadow: 
+      6px 6px 12px var(--clay-shadow-dark),
+      -4px -4px 10px var(--clay-shadow-light),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .clay-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      8px 8px 16px var(--clay-shadow-dark),
+      -5px -5px 12px var(--clay-shadow-light),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .clay-button:active {
+    transform: translateY(0);
+    box-shadow: 
+      3px 3px 6px var(--clay-shadow-dark),
+      -2px -2px 5px var(--clay-shadow-light),
+      inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Primary Clay Button - Cyan/Purple Gradient */
+  .clay-button-primary {
+    background: linear-gradient(135deg, var(--color-accent-cyan), var(--color-accent-purple));
+    border-radius: 16px;
+    box-shadow: 
+      6px 6px 12px var(--clay-shadow-dark),
+      -4px -4px 10px var(--clay-shadow-light),
+      0 0 20px var(--clay-shadow-primary),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .clay-button-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      8px 8px 16px var(--clay-shadow-dark),
+      -5px -5px 12px var(--clay-shadow-light),
+      0 0 30px var(--clay-shadow-primary),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  /* Premium Progress Bar - Cyan/Purple/Pink */
+  .progress-glow {
+    background: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-purple), var(--color-accent-pink));
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+    box-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--secondary-glow);
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+  }
+
+  /* Animated Background - Design System Theme */
+  .animated-bg {
+    background: 
+      radial-gradient(ellipse at 20% 20%, hsla(190, 100%, 50%, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, hsla(270, 100%, 65%, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, hsl(0, 0%, 4%) 0%, hsl(0, 0%, 2%) 100%);
+  }
+
+  /* Floating Orbs - Cyan/Purple/Pink */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    pointer-events: none;
+    animation: float 20s infinite ease-in-out;
+  }
+
+  .orb-1 {
+    width: 400px;
+    height: 400px;
+    background: hsla(190, 100%, 50%, 0.12);
+    top: -100px;
+    right: -100px;
+    animation-delay: 0s;
+  }
+
+  .orb-2 {
+    width: 300px;
+    height: 300px;
+    background: hsla(270, 100%, 65%, 0.1);
+    bottom: -50px;
+    left: -50px;
+    animation-delay: -10s;
+  }
+
+  .orb-3 {
+    width: 250px;
+    height: 250px;
+    background: hsla(330, 100%, 65%, 0.08);
+    bottom: 20%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(30px, -30px) scale(1.05); }
+    50% { transform: translate(-20px, 20px) scale(0.95); }
+    75% { transform: translate(20px, 30px) scale(1.02); }
+  }
+
+  /* Question Card Entrance */
+  .question-card-enter {
+    animation: cardEntrance 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes cardEntrance {
+    0% { 
+      opacity: 0; 
+      transform: translateX(40px) scale(0.95); 
+    }
+    100% { 
+      opacity: 1; 
+      transform: translateX(0) scale(1); 
+    }
+  }
+
+  /* Badge Styles - Design System */
+  .badge-premium {
+    background: linear-gradient(135deg, hsla(190, 100%, 50%, 0.15), hsla(270, 100%, 65%, 0.15));
+    border: 1px solid hsla(190, 100%, 50%, 0.3);
+    box-shadow: 0 0 15px hsla(190, 100%, 50%, 0.15);
+    color: var(--color-accent-cyan);
+  }
+
+  /* Premium Input */
+  .premium-input {
+    background: hsl(0, 0%, 8%);
+    border: 1px solid hsl(0, 0%, 12%);
+    border-radius: 14px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .premium-input:focus {
+    border-color: var(--color-accent-cyan);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 3px hsla(190, 100%, 50%, 0.15);
+  }
+
+  /* Rating Buttons */
+  .rating-btn {
+    background: linear-gradient(145deg, hsl(0, 0%, 10%), hsl(0, 0%, 7%));
+    border: 1px solid hsl(0, 0%, 12%);
+    box-shadow: 
+      4px 4px 8px var(--clay-shadow-dark),
+      -3px -3px 6px var(--clay-shadow-light);
+    transition: all 0.2s ease;
+  }
+
+  .rating-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+      6px 6px 12px var(--clay-shadow-dark),
+      -4px -4px 8px var(--clay-shadow-light);
+  }
+
+  /* Swipe Indicator - Cyan/Purple */
+  .swipe-indicator {
+    background: linear-gradient(135deg, hsla(190, 100%, 50%, 0.2), hsla(270, 100%, 65%, 0.2));
+    backdrop-filter: blur(10px);
+    border: 1px solid hsla(190, 100%, 50%, 0.3);
+    box-shadow: 0 0 30px hsla(190, 100%, 50%, 0.2);
+  }
+
+  /* Scrollbar - Design System */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(0, 0%, 6%);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--color-accent-purple), var(--color-accent-cyan));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--color-accent-pink), var(--color-accent-purple));
+  }
+`;
 
 export default function QuestionViewerGenZ() {
   const [location, setLocation] = useLocation();
@@ -72,6 +347,7 @@ export default function QuestionViewerGenZ() {
   const [srsCard, setSrsCard] = useState<ReviewCard | null>(null);
   const [showRatingButtons, setShowRatingButtons] = useState(false);
   const [hasRated, setHasRated] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
   // Swipe gesture state
   const x = useMotionValue(0);
@@ -204,17 +480,25 @@ export default function QuestionViewerGenZ() {
 
   const nextQuestion = () => {
     if (currentIndex < totalQuestions - 1) {
-      setCurrentIndex(prev => prev + 1);
-      setMobileView('question');
-      onQuestionSwipe();
-      onQuestionView();
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex(prev => prev + 1);
+        setMobileView('question');
+        onQuestionSwipe();
+        onQuestionView();
+        setIsTransitioning(false);
+      }, 150);
     }
   };
 
   const prevQuestion = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
-      setMobileView('question');
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex(prev => prev - 1);
+        setMobileView('question');
+        setIsTransitioning(false);
+      }, 150);
     }
   };
 
@@ -284,7 +568,7 @@ export default function QuestionViewerGenZ() {
     // Swipe left (next question)
     if (info.offset.x < -threshold || velocity < -500) {
       setSwipeDirection('left');
-      Haptics.medium(); // Haptic feedback on swipe
+      Haptics.medium();
       trackHapticFeedback('medium', 'swipe_navigation_left');
       trackSwipeNavigation(
         page, 
@@ -302,7 +586,7 @@ export default function QuestionViewerGenZ() {
     // Swipe right (previous question)
     else if (info.offset.x > threshold || velocity > 500) {
       setSwipeDirection('right');
-      Haptics.medium(); // Haptic feedback on swipe
+      Haptics.medium();
       trackHapticFeedback('medium', 'swipe_navigation_right');
       trackSwipeNavigation(
         page, 
@@ -323,12 +607,58 @@ export default function QuestionViewerGenZ() {
     }
   };
 
+  // Stagger animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 300,
+        damping: 25,
+      },
+    },
+  };
+
   if (loading && !currentQuestion) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center pt-safe pb-safe">
+      <div className="min-h-screen animated-bg flex items-center justify-center pt-safe pb-safe relative overflow-hidden">
+        <style>{premiumStyles}</style>
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="orb orb-3" />
         <div className="text-center px-4">
-          <div className="text-6xl mb-4">⏳</div>
-          <p className="text-muted-foreground">Loading questions...</p>
+          <motion.div
+            animate={{ 
+              rotate: 360,
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ 
+              rotate: { duration: 2, repeat: Infinity, ease: "linear" },
+              scale: { duration: 1.5, repeat: Infinity }
+            }}
+            className="w-20 h-20 mx-auto mb-6 rounded-full"
+            style={{
+              background: 'linear-gradient(135deg, hsl(190, 100%, 50%), hsl(270, 100%, 65%))',
+              boxShadow: '0 0 40px hsla(190, 100%, 50%, 0.5), inset 0 2px 0 rgba(255,255,255,0.2)'
+            }}
+          >
+            <Layers className="w-10 h-10 mx-auto mt-5 text-white" />
+          </motion.div>
+          <p className="text-white/70 font-body text-lg">Loading questions...</p>
         </div>
       </div>
     );
@@ -336,16 +666,28 @@ export default function QuestionViewerGenZ() {
 
   if (error || !channel) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center pt-safe pb-safe">
+      <div className="min-h-screen animated-bg flex items-center justify-center pt-safe pb-safe relative overflow-hidden">
+        <style>{premiumStyles}</style>
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="orb orb-3" />
         <div className="text-center px-4">
-          <h2 className="text-xl md:text-2xl font-bold mb-2">Channel not found</h2>
-          <p className="text-sm md:text-base text-muted-foreground mb-4">The channel "{channelId}" doesn't exist.</p>
-          <button
-            onClick={() => setLocation('/channels')}
-            className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground font-bold rounded-full text-sm md:text-base"
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="glass-card p-8 max-w-md"
           >
-            Go to Channels
-          </button>
+            <h2 className="text-3xl font-display font-bold text-white mb-3">Channel not found</h2>
+            <p className="text-white/60 font-body mb-6">The channel "{channelId}" doesn't exist.</p>
+            <motion.button
+              onClick={() => setLocation('/channels')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="clay-button-primary px-8 py-4 text-white font-display font-bold"
+            >
+              Go to Channels
+            </motion.button>
+          </motion.div>
         </div>
       </div>
     );
@@ -355,7 +697,11 @@ export default function QuestionViewerGenZ() {
     const hasFilters = selectedSubChannel !== 'all' || selectedDifficulty !== 'all' || selectedCompany !== 'all';
     
     return (
-      <div className="min-h-screen bg-background text-foreground flex flex-col pt-safe">
+      <div className="min-h-screen animated-bg flex flex-col pt-safe relative overflow-hidden">
+        <style>{premiumStyles}</style>
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="orb orb-3" />
         <Header
           channel={channel}
           onBack={() => setLocation('/channels')}
@@ -365,23 +711,31 @@ export default function QuestionViewerGenZ() {
         />
         <div className="flex-1 flex items-center justify-center pb-safe">
           <div className="text-center px-4">
-            <div className="text-6xl mb-4">📝</div>
-            <h2 className="text-xl md:text-2xl font-bold mb-2">No questions found</h2>
-            <p className="text-sm md:text-base text-muted-foreground mb-4">
-              {hasFilters ? 'Try adjusting your filters.' : 'Check back soon for new content!'}
-            </p>
-            {hasFilters && (
-              <button
-                onClick={() => {
-                  setSelectedSubChannel('all');
-                  setSelectedDifficulty('all');
-                  setSelectedCompany('all');
-                }}
-                className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground font-bold rounded-full text-sm md:text-base"
-              >
-                Reset Filters
-              </button>
-            )}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="glass-card p-8 max-w-md"
+            >
+              <div className="text-7xl mb-4">📝</div>
+              <h2 className="text-2xl font-display font-bold text-white mb-2">No questions found</h2>
+              <p className="text-white/60 font-body mb-6">
+                {hasFilters ? 'Try adjusting your filters.' : 'Check back soon for new content!'}
+              </p>
+              {hasFilters && (
+                <motion.button
+                  onClick={() => {
+                    setSelectedSubChannel('all');
+                    setSelectedDifficulty('all');
+                    setSelectedCompany('all');
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="clay-button-primary px-6 py-3 text-white font-display font-bold"
+                >
+                  Reset Filters
+                </motion.button>
+              )}
+            </motion.div>
           </div>
         </div>
       </div>
@@ -396,13 +750,19 @@ export default function QuestionViewerGenZ() {
 
   return (
     <>
+      <style>{premiumStyles}</style>
       <SEOHead
         title={`${channel.name} - ${currentQuestion.question.substring(0, 60)}...`}
         description={currentQuestion.question}
         canonical={`https://open-interview.github.io/channel/${channelId}/${currentQuestion.id}`}
       />
 
-      <div className="min-h-screen bg-background text-foreground flex flex-col pt-safe">
+      <div className="min-h-screen animated-bg flex flex-col pt-safe relative overflow-hidden">
+        {/* Animated Background Orbs */}
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="orb orb-3" />
+
         {/* Header */}
         <Header
           channel={channel}
@@ -446,92 +806,18 @@ export default function QuestionViewerGenZ() {
           {/* Desktop Split View */}
           <div className="hidden lg:flex flex-1 overflow-hidden">
             {/* Question Panel */}
-            <div className="w-1/2 border-r border-border overflow-y-auto p-6 md:p-8">
-              <QuestionContent
-                question={currentQuestion}
-                questionNumber={currentIndex + 1}
-                totalQuestions={totalQuestions}
-                isMarked={isMarked}
-                isCompleted={isCompleted}
-                srsCard={srsCard}
-                showRatingButtons={showRatingButtons}
-                hasRated={hasRated}
-                onAddToSRS={handleAddToSRS}
-                onSRSRating={handleSRSRating}
-                onToggleMark={toggleMark}
-              />
-            </div>
-            {/* Answer Panel */}
-            <div 
-              className="w-1/2 overflow-y-auto p-6 md:p-8"
-              style={{
-                backgroundColor: isLightMode ? 'hsl(0 0% 100%)' : 'hsl(0 0% 0%)',
-                color: isLightMode ? 'hsl(0 0% 5%)' : 'hsl(0 0% 100%)'
-              }}
+            <motion.div 
+              className="w-1/2 border-r border-white/5 overflow-y-auto p-6 md:p-8"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4 }}
             >
-              <GenZAnswerPanel 
-                question={currentQuestion} 
-                isCompleted={isCompleted}
-              />
-            </div>
-          </div>
-
-          {/* Mobile Tab View */}
-          <div className="flex-1 flex flex-col lg:hidden overflow-hidden">
-            {/* Mobile Tabs */}
-            <div className="flex border-b border-border bg-background">
-              <button
-                onClick={() => setMobileView('question')}
-                className={`flex-1 py-3 md:py-4 text-sm font-bold transition-colors ${
-                  mobileView === 'question'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-muted-foreground'
-                }`}
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className={`${isTransitioning ? 'question-card-enter' : ''}`}
               >
-                Question
-              </button>
-              <button
-                onClick={() => setMobileView('answer')}
-                className={`flex-1 py-3 md:py-4 text-sm font-bold transition-colors ${
-                  mobileView === 'answer'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-muted-foreground'
-                }`}
-              >
-                Answer
-              </button>
-            </div>
-            
-            {/* Mobile Content with Swipe Gestures */}
-            <motion.div
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.2}
-              style={{ x, opacity }}
-              onDragEnd={handleDragEnd}
-              className="flex-1 overflow-y-auto p-4 md:p-6 pb-32 relative"
-            >
-              {/* Swipe Indicators */}
-              {swipeDirection === 'left' && (
-                <motion.div
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="absolute top-1/2 right-4 -translate-y-1/2 z-10 bg-primary/20 backdrop-blur-sm rounded-full p-4"
-                >
-                  <ChevronRight className="w-8 h-8 text-primary" />
-                </motion.div>
-              )}
-              {swipeDirection === 'right' && (
-                <motion.div
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="absolute top-1/2 left-4 -translate-y-1/2 z-10 bg-primary/20 backdrop-blur-sm rounded-full p-4"
-                >
-                  <ChevronLeft className="w-8 h-8 text-primary" />
-                </motion.div>
-              )}
-              
-              {mobileView === 'question' ? (
                 <QuestionContent
                   question={currentQuestion}
                   questionNumber={currentIndex + 1}
@@ -545,11 +831,141 @@ export default function QuestionViewerGenZ() {
                   onSRSRating={handleSRSRating}
                   onToggleMark={toggleMark}
                 />
+              </motion.div>
+            </motion.div>
+            
+            {/* Answer Panel */}
+            <motion.div 
+              className="w-1/2 overflow-y-auto p-6 md:p-8"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              style={{
+                backgroundColor: isLightMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.2)',
+              }}
+            >
+              <GenZAnswerPanel 
+                question={currentQuestion} 
+                isCompleted={isCompleted}
+              />
+            </motion.div>
+          </div>
+
+          {/* Mobile Tab View */}
+          <div className="flex-1 flex flex-col lg:hidden overflow-hidden">
+            {/* Mobile Tabs - Premium Glass Style */}
+            <div className="flex border-b border-white/5 bg-black/20 backdrop-blur-xl">
+              <motion.button
+                onClick={() => setMobileView('question')}
+                whileTap={{ scale: 0.97 }}
+                className={`flex-1 py-4 font-display font-semibold transition-all relative ${
+                  mobileView === 'question'
+                    ? 'text-white'
+                    : 'text-white/50'
+                }`}
+              >
+                <span className="relative z-10">Question</span>
+                {mobileView === 'question' && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute bottom-0 left-0 right-0 h-0.5"
+                    style={{
+                      background: 'linear-gradient(90deg, hsl(190, 100%, 50%), hsl(270, 100%, 65%))',
+                      boxShadow: '0 0 10px hsla(190, 100%, 50%, 0.5)',
+                    }}
+                  />
+                )}
+              </motion.button>
+              <motion.button
+                onClick={() => setMobileView('answer')}
+                whileTap={{ scale: 0.97 }}
+                className={`flex-1 py-4 font-display font-semibold transition-all relative ${
+                  mobileView === 'answer'
+                    ? 'text-white'
+                    : 'text-white/50'
+                }`}
+              >
+                <span className="relative z-10">Answer</span>
+                {mobileView === 'answer' && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute bottom-0 left-0 right-0 h-0.5"
+                    style={{
+                      background: 'linear-gradient(90deg, hsl(190, 100%, 50%), hsl(270, 100%, 65%))',
+                      boxShadow: '0 0 10px hsla(190, 100%, 50%, 0.5)',
+                    }}
+                  />
+                )}
+              </motion.button>
+            </div>
+            
+            {/* Mobile Content with Swipe Gestures */}
+            <motion.div
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              style={{ x, opacity }}
+              onDragEnd={handleDragEnd}
+              className="flex-1 overflow-y-auto p-4 md:p-6 pb-32 relative"
+            >
+              {/* Swipe Indicators */}
+              <AnimatePresence>
+                {swipeDirection === 'left' && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 50, scale: 0.8 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: 50, scale: 0.8 }}
+                    className="swipe-indicator absolute top-1/2 right-4 -translate-y-1/2 z-10 rounded-full p-4"
+                  >
+                    <ChevronRight className="w-8 h-8" style={{ color: 'hsl(190, 100%, 60%)' }} />
+                  </motion.div>
+                )}
+                {swipeDirection === 'right' && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -50, scale: 0.8 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: -50, scale: 0.8 }}
+                    className="swipe-indicator absolute top-1/2 left-4 -translate-y-1/2 z-10 rounded-full p-4"
+                  >
+                    <ChevronLeft className="w-8 h-8" style={{ color: 'hsl(190, 100%, 60%)' }} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
+              {mobileView === 'question' ? (
+                <motion.div
+                  key={`question-${currentQuestion.id}`}
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className={`${isTransitioning ? 'question-card-enter' : ''}`}
+                >
+                  <QuestionContent
+                    question={currentQuestion}
+                    questionNumber={currentIndex + 1}
+                    totalQuestions={totalQuestions}
+                    isMarked={isMarked}
+                    isCompleted={isCompleted}
+                    srsCard={srsCard}
+                    showRatingButtons={showRatingButtons}
+                    hasRated={hasRated}
+                    onAddToSRS={handleAddToSRS}
+                    onSRSRating={handleSRSRating}
+                    onToggleMark={toggleMark}
+                  />
+                </motion.div>
               ) : (
-                <GenZAnswerPanel 
-                  question={currentQuestion} 
-                  isCompleted={isCompleted}
-                />
+                <motion.div
+                  key={`answer-${currentQuestion.id}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <GenZAnswerPanel 
+                    question={currentQuestion} 
+                    isCompleted={isCompleted}
+                  />
+                </motion.div>
               )}
             </motion.div>
             
@@ -566,59 +982,72 @@ export default function QuestionViewerGenZ() {
           </div>
         </div>
 
-        {/* Navigation Footer */}
-        <div className="border-t border-border bg-background/95 backdrop-blur-xl p-3 md:p-4 pb-safe">
+        {/* Navigation Footer - Premium Claymorphism */}
+        <motion.div 
+          className="border-t border-white/5 bg-black/30 backdrop-blur-2xl p-3 md:p-4 pb-safe"
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 md:gap-4">
             {/* Previous */}
             <motion.button
               onClick={prevQuestion}
               disabled={currentIndex === 0}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 md:p-3 bg-muted/50 rounded-full disabled:opacity-30 disabled:cursor-not-allowed hover:bg-muted transition-colors flex-shrink-0"
+              className={`p-3 md:p-4 clay-button disabled:opacity-25 disabled:cursor-not-allowed disabled:transform-none flex-shrink-0`}
             >
-              <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-white/80" />
             </motion.button>
 
             {/* Progress */}
             <div className="flex-1 max-w-md min-w-0">
-              <div className="flex items-center gap-2 md:gap-3 mb-2">
-                <span className="text-xs md:text-sm font-bold text-primary whitespace-nowrap">
+              <div className="flex items-center gap-3 md:gap-4 mb-3">
+                <span className="text-sm md:text-base font-display font-bold whitespace-nowrap" style={{ color: 'hsl(190, 100%, 60%)' }}>
                   {currentIndex + 1} / {totalQuestions}
                 </span>
-                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden min-w-0">
+                <div className="flex-1 h-3 bg-white/10 rounded-full overflow-hidden min-w-0 relative">
+                  {/* Glow effect behind progress */}
+                  <div 
+                    className="absolute inset-0 blur-md"
+                    style={{
+                      background: 'linear-gradient(90deg, hsl(190, 100%, 50%), hsl(270, 100%, 65%))',
+                      opacity: 0.5,
+                    }}
+                  />
                   <motion.div
-                    className="h-full bg-gradient-to-r from-primary to-cyan-500"
+                    className="h-full progress-glow rounded-full relative"
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
                   />
                 </div>
-                <span className="text-xs md:text-sm font-bold whitespace-nowrap">{progress}%</span>
+                <span className="text-sm md:text-base font-display font-bold text-white/70 whitespace-nowrap">{progress}%</span>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
               <motion.button
                 onClick={toggleMark}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.08, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className={`p-2 md:p-3 rounded-full transition-colors ${
+                className={`p-3 md:p-4 clay-button transition-all ${
                   isMarked
-                    ? 'bg-gradient-to-r from-[#ffd700] to-[#ff8c00] text-black'
-                    : 'bg-muted/50 hover:bg-muted'
+                    ? 'text-yellow-400'
+                    : 'text-white/60 hover:text-yellow-300'
                 }`}
               >
-                <Bookmark className="w-4 h-4 md:w-5 md:h-5" fill={isMarked ? 'currentColor' : 'none'} />
+                <Bookmark className="w-5 h-5 md:w-6 md:h-6" fill={isMarked ? 'currentColor' : 'none'} />
               </motion.button>
               <motion.button
                 onClick={handleShare}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.08, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="hidden sm:block p-2 md:p-3 bg-muted/50 rounded-full hover:bg-muted transition-colors"
+                className="hidden sm:block p-3 md:p-4 clay-button text-white/60 hover:text-white"
               >
-                <Share2 className="w-4 h-4 md:w-5 md:h-5" />
+                <Share2 className="w-5 h-5 md:w-6 md:h-6" />
               </motion.button>
             </div>
 
@@ -626,14 +1055,14 @@ export default function QuestionViewerGenZ() {
             <motion.button
               onClick={nextQuestion}
               disabled={currentIndex === totalQuestions - 1}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 md:p-3 bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground rounded-full disabled:opacity-30 disabled:cursor-not-allowed font-bold flex-shrink-0"
+              className="p-3 md:p-4 clay-button-primary text-white font-display font-bold flex-shrink-0 disabled:opacity-25 disabled:cursor-not-allowed disabled:transform-none"
             >
-              <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+              <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
             </motion.button>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <UnifiedSearch isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} />
@@ -652,19 +1081,19 @@ export default function QuestionViewerGenZ() {
         onAction={(action, data) => {
           switch (action) {
             case 'nextQuestion':
-              handleNext();
+              nextQuestion();
               break;
             case 'previousQuestion':
-              handlePrevious();
+              prevQuestion();
               break;
             case 'showAnswer':
-              setShowAnswer(true);
+              setMobileView('answer');
               break;
             case 'hideAnswer':
-              setShowAnswer(false);
+              setMobileView('question');
               break;
             case 'bookmark':
-              handleBookmark();
+              toggleMark();
               break;
             case 'addToSRS':
               handleAddToSRS();
@@ -677,7 +1106,7 @@ export default function QuestionViewerGenZ() {
               break;
             case 'filterByDifficulty':
               if (data?.difficulty) {
-                setDifficultyFilter(data.difficulty);
+                setSelectedDifficulty(data.difficulty);
               }
               break;
             case 'filterBySubChannel':
@@ -686,8 +1115,9 @@ export default function QuestionViewerGenZ() {
               }
               break;
             case 'clearFilters':
-              setDifficultyFilter('all');
+              setSelectedDifficulty('all');
               setSelectedSubChannel('all');
+              setSelectedCompany('all');
               break;
           }
         }}
@@ -709,26 +1139,33 @@ export default function QuestionViewerGenZ() {
   );
 }
 
-// Header Component
+// Header Component - Premium Design
 function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progress, onToggleFilters, hasFilters }: any) {
   return (
-    <header className="border-b border-border bg-background/95 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-3 md:px-4 py-3 md:py-4">
-        <div className="flex items-center justify-between gap-2 md:gap-4">
+    <motion.header 
+      className="border-b border-white/5 bg-black/20 backdrop-blur-xl"
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="max-w-7xl mx-auto px-3 md:px-6 py-4 md:py-5">
+        <div className="flex items-center justify-between gap-3 md:gap-6">
           {/* Left */}
-          <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+          <div className="flex items-center gap-3 md:gap-4 min-w-0 flex-1">
             <motion.button
               onClick={onBack}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
+              className="p-2.5 md:p-3 clay-button flex-shrink-0"
             >
-              <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-white/80" />
             </motion.button>
             <div className="min-w-0 flex-1">
-              <h1 className="font-bold text-sm md:text-lg truncate">{channel.name}</h1>
+              <h1 className="font-display font-bold text-lg md:text-xl text-white truncate">
+                {channel.name}
+              </h1>
               {totalQuestions > 0 && (
-                <p className="text-xs text-muted-foreground truncate">
+                <p className="text-xs md:text-sm text-white/50 font-body truncate">
                   Question {currentIndex + 1} of {totalQuestions}
                 </p>
               )}
@@ -736,102 +1173,164 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
           </div>
 
           {/* Right */}
-          <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+            {/* Progress Ring */}
+            {progress !== undefined && (
+              <div className="relative w-10 h-10 md:w-12 md:h-12 hidden sm:block">
+                <svg className="w-full h-full -rotate-90">
+                  <circle
+                    cx="20"
+                    cy="20"
+                    r="16"
+                    stroke="rgba(255,255,255,0.1)"
+                    strokeWidth="3"
+                    fill="none"
+                  />
+                  <motion.circle
+                    cx="20"
+                    cy="20"
+                    r="16"
+                    stroke="url(#progressGradient)"
+                    strokeWidth="3"
+                    fill="none"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: progress / 100 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                  />
+                  <defs>
+                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="hsl(190, 100%, 50%)" />
+                      <stop offset="100%" stopColor="hsl(270, 100%, 65%)" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-display font-bold text-white">
+                  {progress}%
+                </span>
+              </div>
+            )}
+            
             {onToggleFilters && (
               <motion.button
                 onClick={onToggleFilters}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.08, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className={`p-2 rounded-lg transition-colors ${
+                className={`p-2.5 md:p-3 transition-all ${
                   hasFilters
-                    ? 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground'
-                    : 'hover:bg-muted'
+                    ? 'clay-button-primary'
+                    : 'clay-button text-white/70 hover:text-white'
                 }`}
               >
-                <Filter className="w-4 h-4 md:w-5 md:h-5" />
+                <Filter className="w-5 h-5 md:w-6 md:h-6" />
               </motion.button>
             )}
             <motion.button
               onClick={onSearch}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 hover:bg-muted rounded-lg transition-colors"
+              className="p-2.5 md:p-3 clay-button text-white/70 hover:text-white"
             >
-              <Search className="w-4 h-4 md:w-5 md:h-5" />
+              <Search className="w-5 h-5 md:w-6 md:h-6" />
             </motion.button>
           </div>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 }
 
-// Filters Panel
+// Filters Panel - Premium Glassmorphism
 function FiltersPanel({ channel, selectedSubChannel, selectedDifficulty, selectedCompany, companiesWithCounts, onSubChannelChange, onDifficultyChange, onCompanyChange, onClose }: any) {
   return (
     <motion.div
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: 'auto', opacity: 1 }}
       exit={{ height: 0, opacity: 0 }}
-      className="border-b border-border bg-muted/50 backdrop-blur-xl overflow-hidden"
+      transition={{ duration: 0.3 }}
+      className="border-b border-white/5 bg-black/30 backdrop-blur-2xl overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-6">
-        <div className="flex items-center justify-between mb-3 md:mb-4">
-          <h3 className="font-bold text-base md:text-lg">Filters</h3>
-          <button onClick={onClose} className="p-2 hover:bg-muted rounded-lg transition-colors">
-            <X className="w-4 h-4 md:w-5 md:h-5" />
-          </button>
-        </div>
+      <div className="max-w-7xl mx-auto px-3 md:px-6 py-5 md:py-7">
+        <motion.div 
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="flex items-center justify-between mb-4 md:mb-6"
+        >
+          <h3 className="font-display font-bold text-lg text-white flex items-center gap-2">
+            <Sparkles className="w-5 h-5" style={{ color: 'hsl(190, 100%, 60%)' }} />
+            Filters
+          </h3>
+          <motion.button 
+            onClick={onClose} 
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2 clay-button text-white/60 hover:text-white"
+          >
+            <X className="w-5 h-5" />
+          </motion.button>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {/* Sub-channels */}
           {channel.subChannels && channel.subChannels.length > 1 && (
-            <div>
-              <label className="text-xs md:text-sm font-semibold text-muted-foreground mb-2 block">Topic</label>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
+              <label className="text-xs md:text-sm font-display font-semibold text-white/60 mb-3 block">Topic</label>
               <select
                 value={selectedSubChannel}
                 onChange={(e) => onSubChannelChange(e.target.value)}
-                className="w-full px-3 md:px-4 py-2 md:py-3 bg-muted/50 border border-border rounded-xl text-sm md:text-base text-foreground focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-3 premium-input text-white font-body text-sm md:text-base focus:outline-none"
               >
                 {channel.subChannels.map((sc: any) => (
-                  <option key={sc.id} value={sc.id}>{sc.name}</option>
+                  <option key={sc.id} value={sc.id} className="bg-gray-900">{sc.name}</option>
                 ))}
               </select>
-            </div>
+            </motion.div>
           )}
 
           {/* Difficulty */}
-          <div>
-            <label className="text-xs md:text-sm font-semibold text-muted-foreground mb-2 block">Difficulty</label>
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.15 }}
+          >
+            <label className="text-xs md:text-sm font-display font-semibold text-white/60 mb-3 block">Difficulty</label>
             <select
               value={selectedDifficulty}
               onChange={(e) => onDifficultyChange(e.target.value)}
-              className="w-full px-3 md:px-4 py-2 md:py-3 bg-muted/50 border border-border rounded-xl text-sm md:text-base text-foreground focus:outline-none focus:border-primary transition-colors"
+              className="w-full px-4 py-3 premium-input text-white font-body text-sm md:text-base focus:outline-none"
             >
-              <option value="all">All Levels</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
+              <option value="all" className="bg-gray-900">All Levels</option>
+              <option value="beginner" className="bg-gray-900">Beginner</option>
+              <option value="intermediate" className="bg-gray-900">Intermediate</option>
+              <option value="advanced" className="bg-gray-900">Advanced</option>
             </select>
-          </div>
+          </motion.div>
 
           {/* Company */}
           {companiesWithCounts.length > 0 && (
-            <div>
-              <label className="text-xs md:text-sm font-semibold text-muted-foreground mb-2 block">Company</label>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <label className="text-xs md:text-sm font-display font-semibold text-white/60 mb-3 block">Company</label>
               <select
                 value={selectedCompany}
                 onChange={(e) => onCompanyChange(e.target.value)}
-                className="w-full px-3 md:px-4 py-2 md:py-3 bg-muted/50 border border-border rounded-xl text-sm md:text-base text-foreground focus:outline-none focus:border-primary transition-colors"
+                className="w-full px-4 py-3 premium-input text-white font-body text-sm md:text-base focus:outline-none"
               >
-                <option value="all">All Companies</option>
+                <option value="all" className="bg-gray-900">All Companies</option>
                 {companiesWithCounts.map((c: any) => (
-                  <option key={c.company} value={c.company}>
+                  <option key={c.company} value={c.company} className="bg-gray-900">
                     {c.company} ({c.count})
                   </option>
                 ))}
               </select>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
@@ -839,138 +1338,200 @@ function FiltersPanel({ channel, selectedSubChannel, selectedDifficulty, selecte
   );
 }
 
-// Question Content
+// Question Content - Premium Claymorphism Cards
 function QuestionContent({ question, questionNumber, totalQuestions, isMarked, isCompleted, srsCard, showRatingButtons, hasRated, onAddToSRS, onSRSRating, onToggleMark }: any) {
+  // Local animation variants for this component
+  const contentContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const contentItemVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 300,
+        damping: 25,
+      },
+    },
+  };
+
   return (
-    <div className="space-y-4 md:space-y-6">
+    <motion.div 
+      variants={contentContainerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-5 md:space-y-7"
+    >
       {/* Meta */}
-      <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-        <span className="px-2 md:px-3 py-1 bg-gradient-to-r from-primary/20 to-cyan-500/20 border border-primary/30 rounded-full text-xs font-bold text-primary">
+      <motion.div 
+        variants={contentContainerVariants}
+        className="flex items-center gap-2 md:gap-3 flex-wrap"
+      >
+        <motion.span 
+          variants={contentItemVariants}
+          className="badge-premium px-3 md:px-4 py-1.5 rounded-full text-xs font-display font-bold"
+        >
           {question.difficulty}
-        </span>
+        </motion.span>
         {question.company && (
-          <span className="px-2 md:px-3 py-1 bg-muted/50 border border-border rounded-full text-xs font-bold">
+          <motion.span 
+            variants={contentItemVariants}
+            className="px-3 md:px-4 py-1.5 glass-card rounded-full text-xs font-display font-bold text-white/70"
+          >
             {question.company}
-          </span>
+          </motion.span>
         )}
         {isCompleted && (
-          <span className="px-2 md:px-3 py-1 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-full text-xs font-bold text-green-500">
-            ✓ Completed
-          </span>
+          <motion.span 
+            variants={contentItemVariants}
+            className="px-3 md:px-4 py-1.5 rounded-full text-xs font-display font-bold text-emerald-400 flex items-center gap-1.5"
+            style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.15))',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              boxShadow: '0 0 15px rgba(16, 185, 129, 0.15)',
+            }}
+          >
+            <Check className="w-3 h-3" />
+            Completed
+          </motion.span>
         )}
         
         {/* SRS Status Badge */}
         {srsCard && !showRatingButtons && !hasRated && (
-          <span 
-            className={`px-2 md:px-3 py-1 rounded-full text-xs font-bold border ${
+          <motion.span 
+            variants={contentItemVariants}
+            className={`px-3 md:px-4 py-1.5 rounded-full text-xs font-display font-bold border ${
               getMasteryColor(srsCard.easeFactor)
             }`}
           >
             {getMasteryLabel(srsCard.easeFactor)}
-          </span>
+          </motion.span>
         )}
-      </div>
+      </motion.div>
 
       {/* Question */}
-      <div>
-        <h2 className="text-2xl md:text-3xl lg:text-4xl font-black mb-3 md:mb-4 leading-tight">
+      <motion.div variants={contentItemVariants}>
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-black text-white leading-tight">
           {question.question}
         </h2>
-      </div>
+      </motion.div>
 
       {/* Action Buttons Row */}
-      <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+      <motion.div 
+        variants={contentContainerVariants}
+        className="flex items-center gap-3 md:gap-4 flex-wrap"
+      >
         {/* Bookmark Button */}
         <motion.button
+          variants={contentItemVariants}
           onClick={onToggleMark}
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
-          className={`px-3 md:px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center gap-1.5 md:gap-2 ${
+          className={`px-4 md:px-5 py-2.5 rounded-xl font-display font-semibold text-sm transition-all flex items-center gap-2 ${
             isMarked
-              ? 'bg-gradient-to-r from-[#ffd700]/20 to-[#ff0080]/20 border border-[#ffd700]/30 text-[#ffd700]'
-              : 'bg-muted/50 border border-border text-muted-foreground hover:border-[#ffd700]/30 hover:text-[#ffd700]'
+              ? 'text-yellow-400'
+              : 'glass-card text-white/70 hover:text-white hover:bg-white/10'
           }`}
         >
-          <Bookmark className={`w-3 h-3 md:w-4 md:h-4 ${isMarked ? 'fill-current' : ''}`} />
+          <Bookmark className={`w-4 h-4 md:w-5 md:h-4 ${isMarked ? 'fill-current' : ''}`} />
           <span className="hidden sm:inline">{isMarked ? 'Bookmarked' : 'Bookmark'}</span>
         </motion.button>
 
         {/* SRS Button or Rating Buttons */}
         {hasRated ? (
-          <span className="px-3 md:px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-xl text-xs md:text-sm font-bold text-green-400 flex items-center gap-1.5 md:gap-2">
-            <Check className="w-3 h-3 md:w-4 md:h-4" />
+          <motion.span 
+            variants={contentItemVariants}
+            className="px-4 md:px-5 py-2.5 rounded-xl text-sm font-display font-semibold text-emerald-400 flex items-center gap-2"
+            style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1))',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
+            }}
+          >
+            <Check className="w-4 h-4" />
             <span className="hidden sm:inline">Review Recorded</span>
-          </span>
+          </motion.span>
         ) : showRatingButtons && srsCard ? (
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-muted-foreground mr-1 md:mr-2 hidden sm:inline">Rate your confidence:</span>
-            <motion.button
-              onClick={() => onSRSRating('again')}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-2 md:px-3 py-1.5 bg-red-500/20 border border-red-500/30 rounded-lg text-xs font-bold text-red-400 hover:bg-red-500/30 transition-all flex items-center gap-1"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span className="hidden sm:inline">Again</span>
-            </motion.button>
-            <motion.button
-              onClick={() => onSRSRating('hard')}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-2 md:px-3 py-1.5 bg-orange-500/20 border border-orange-500/30 rounded-lg text-xs font-bold text-orange-400 hover:bg-orange-500/30 transition-all flex items-center gap-1"
-            >
-              <Brain className="w-3 h-3" />
-              <span className="hidden sm:inline">Hard</span>
-            </motion.button>
-            <motion.button
-              onClick={() => onSRSRating('good')}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-2 md:px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg text-xs font-bold text-green-400 hover:bg-green-500/30 transition-all flex items-center gap-1"
-            >
-              <Check className="w-3 h-3" />
-              <span className="hidden sm:inline">Good</span>
-            </motion.button>
-            <motion.button
-              onClick={() => onSRSRating('easy')}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-2 md:px-3 py-1.5 bg-blue-500/20 border border-blue-500/30 rounded-lg text-xs font-bold text-blue-400 hover:bg-blue-500/30 transition-all flex items-center gap-1"
-            >
-              <Zap className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="hidden sm:inline">Easy</span>
-            </motion.button>
-          </div>
+          <motion.div 
+            variants={contentItemVariants}
+            className="flex items-center gap-2 flex-wrap"
+          >
+            <span className="text-xs text-white/50 font-body mr-2 hidden sm:inline">Rate your confidence:</span>
+            {[
+              { rating: 'again', color: 'red', icon: RotateCcw },
+              { rating: 'hard', color: 'orange', icon: Brain },
+              { rating: 'good', color: 'green', icon: Check },
+              { rating: 'easy', color: 'cyan', icon: Zap },
+            ].map(({ rating, color, icon: Icon }) => (
+              <motion.button
+                key={rating}
+                onClick={() => onSRSRating(rating as ConfidenceRating)}
+                whileHover={{ scale: 1.08, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className={`rating-btn px-3 md:px-4 py-2 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 ${
+                  color === 'red' ? 'text-red-400' :
+                  color === 'orange' ? 'text-orange-400' :
+                  color === 'green' ? 'text-green-400' : ''
+                }`}
+                style={color === 'cyan' ? { color: 'hsl(190, 100%, 60%)' } : undefined}
+              >
+                <Icon className="w-3 h-3" />
+                <span className="hidden sm:inline capitalize">{rating}</span>
+              </motion.button>
+            ))}
+          </motion.div>
         ) : (
           <motion.button
+            variants={contentItemVariants}
             onClick={onAddToSRS}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="px-3 md:px-4 py-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-xl text-xs md:text-sm font-bold text-purple-400 hover:bg-purple-500/30 transition-all flex items-center gap-1.5 md:gap-2"
+            className="px-4 md:px-5 py-2.5 rounded-xl font-display font-semibold text-sm flex items-center gap-2"
+            style={{
+              color: 'hsl(270, 100%, 75%)',
+              background: 'linear-gradient(135deg, hsla(270, 100%, 65%, 0.15), hsla(270, 100%, 55%, 0.1))',
+              border: '1px solid hsla(270, 100%, 65%, 0.25)',
+              boxShadow: '0 0 20px hsla(270, 100%, 65%, 0.1)',
+            }}
           >
-            <Brain className="w-3 h-3 md:w-4 md:h-4" />
+            <Brain className="w-4 h-4 md:w-5 md:h-4" />
             <span className="hidden sm:inline">Add to SRS</span>
           </motion.button>
         )}
 
         {/* Flagging Button */}
-        <QuestionFeedback questionId={question.id} />
-      </div>
+        <motion.div variants={contentItemVariants}>
+          <QuestionFeedback questionId={question.id} />
+        </motion.div>
+      </motion.div>
 
       {/* Tags */}
       {question.tags && question.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {question.tags.map((tag: string) => (
-            <span
+        <motion.div 
+          variants={contentContainerVariants}
+          className="flex flex-wrap gap-2"
+        >
+          {question.tags.map((tag: string, index: number) => (
+            <motion.span
               key={tag}
-              className="px-2 md:px-3 py-1 bg-muted/50 rounded-full text-xs text-muted-foreground"
+              variants={contentItemVariants}
+              className="px-3 md:px-4 py-1.5 glass-card rounded-full text-xs text-white/50 font-body"
             >
               #{tag}
-            </span>
+            </motion.span>
           ))}
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
-

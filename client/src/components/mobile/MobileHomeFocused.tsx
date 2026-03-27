@@ -455,7 +455,7 @@ function QuickQuizCard({
               <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-primary animate-pulse" />
             </div>
             <div>
-              <h2 className="font-semibold sm:text-lg">Loading quiz...</h2>
+              <h2 className="font-semibold sm:text-lg">Loading quiz…</h2>
               <p className="text-xs sm:text-sm text-muted-foreground">Preparing questions</p>
             </div>
           </div>
@@ -521,6 +521,7 @@ function QuickQuizCard({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10 }}
                   className={`text-xs font-bold ${creditChange > 0 ? 'text-green-400' : 'text-red-400'}`}
+                  aria-live="polite"
                 >
                   {creditChange > 0 ? '+' : ''}{creditChange}
                 </motion.span>
@@ -531,9 +532,10 @@ function QuickQuizCard({
                 {correctCount}/{totalAnswered} correct
               </span>
             )}
-            <button 
+            <button
               onClick={handleRefresh}
               className="p-1 sm:p-1.5 hover:bg-muted rounded transition-colors"
+              aria-label="Refresh"
             >
               <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
             </button>
@@ -889,6 +891,7 @@ function ChannelCard({
           setConfirmingUnsubscribe(true);
         }}
         className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 border border-border opacity-60 group-hover:opacity-100 hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all"
+        aria-label="Unsubscribe"
         title="Unsubscribe"
       >
         <X className="w-3.5 h-3.5" />
@@ -997,6 +1000,7 @@ function ChannelRow({
           setConfirmingUnsubscribe(true);
         }}
         className="p-1.5 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors flex-shrink-0"
+        aria-label="Unsubscribe"
         title="Unsubscribe"
       >
         <X className="w-4 h-4" />
@@ -1066,6 +1070,7 @@ function QuickLinksCompact({ onNavigate }: { onNavigate: (path: string) => void 
       <button
         onClick={() => onNavigate('/badges')}
         className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+        aria-label="Badges"
         title="Badges"
       >
         <Award className="w-4 h-4 text-yellow-500" />
@@ -1073,6 +1078,7 @@ function QuickLinksCompact({ onNavigate }: { onNavigate: (path: string) => void 
       <button
         onClick={() => onNavigate('/bookmarks')}
         className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+        aria-label="Bookmarks"
         title="Bookmarks"
       >
         <BookOpen className="w-4 h-4 text-blue-500" />
@@ -1080,6 +1086,7 @@ function QuickLinksCompact({ onNavigate }: { onNavigate: (path: string) => void 
       <button
         onClick={() => onNavigate('/tests')}
         className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+        aria-label="Tests"
         title="Tests"
       >
         <Target className="w-4 h-4 text-green-500" />
@@ -1087,6 +1094,7 @@ function QuickLinksCompact({ onNavigate }: { onNavigate: (path: string) => void 
       <button
         onClick={() => onNavigate('/stats')}
         className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+        aria-label="Stats"
         title="Stats"
       >
         <Activity className="w-4 h-4 text-purple-500" />

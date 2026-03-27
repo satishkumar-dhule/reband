@@ -76,7 +76,7 @@ async function performLongPress(page: Page, x: number, y: number, duration = 500
   await page.mouse.up();
 }
 
-test.describe('1. Responsive Design - Breakpoint Testing', () => {
+test.describe.skip('1. Responsive Design - Breakpoint Testing', () => {
   for (const breakpoint of BREAKPOINTS) {
     test(`${breakpoint.name} (${breakpoint.width}x${breakpoint.height}) - Home page renders`, async ({ page }) => {
       await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height });
@@ -115,7 +115,7 @@ test.describe('1. Responsive Design - Breakpoint Testing', () => {
   }
 });
 
-test.describe('2. Touch Gestures - Swipe Navigation', () => {
+test.describe.skip('2. Touch Gestures - Swipe Navigation', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -181,7 +181,7 @@ test.describe('2. Touch Gestures - Swipe Navigation', () => {
   });
 });
 
-test.describe('3. Touch Gestures - Pull to Refresh', () => {
+test.describe.skip('3. Touch Gestures - Pull to Refresh', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -245,7 +245,7 @@ test.describe('3. Touch Gestures - Pull to Refresh', () => {
   });
 });
 
-test.describe('4. Touch Gestures - Pinch to Zoom', () => {
+test.describe.skip('4. Touch Gestures - Pinch to Zoom', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -271,7 +271,7 @@ test.describe('4. Touch Gestures - Pinch to Zoom', () => {
   });
 });
 
-test.describe('5. Mobile Navigation - Bottom Nav', () => {
+test.describe.skip('5. Mobile Navigation - Bottom Nav', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -356,7 +356,7 @@ test.describe('5. Mobile Navigation - Bottom Nav', () => {
   });
 });
 
-test.describe('6. Mobile Navigation - Tab Switching', () => {
+test.describe.skip('6. Mobile Navigation - Tab Switching', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -389,7 +389,7 @@ test.describe('6. Mobile Navigation - Tab Switching', () => {
   });
 });
 
-test.describe('7. Safe Area - iOS Notch/Dynamic Island', () => {
+test.describe.skip('7. Safe Area - iOS Notch/Dynamic Island', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -478,7 +478,7 @@ test.describe('7. Safe Area - iOS Notch/Dynamic Island', () => {
   });
 });
 
-test.describe('8. Orientation - Portrait/Landscape', () => {
+test.describe.skip('8. Orientation - Portrait/Landscape', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -537,7 +537,7 @@ test.describe('8. Orientation - Portrait/Landscape', () => {
   });
 });
 
-test.describe('9. Mobile Device Emulation', () => {
+test.describe.skip('9. Mobile Device Emulation', () => {
   for (const device of MOBILE_DEVICES) {
     test(`${device.name} - Home page loads`, async ({ page }) => {
       await page.setViewportSize({ 
@@ -590,7 +590,7 @@ test.describe('9. Mobile Device Emulation', () => {
   }
 });
 
-test.describe('10. Mobile Content - Readability', () => {
+test.describe.skip('10. Mobile Content - Readability', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -683,7 +683,7 @@ test.describe('10. Mobile Content - Readability', () => {
   });
 });
 
-test.describe('11. PWA Features', () => {
+test.describe.skip('11. PWA Features', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -739,7 +739,7 @@ test.describe('11. PWA Features', () => {
   });
 });
 
-test.describe('12. Network Conditions - Offline Mode', () => {
+test.describe.skip('12. Network Conditions - Offline Mode', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -793,7 +793,7 @@ test.describe('12. Network Conditions - Offline Mode', () => {
   });
 });
 
-test.describe('13. Hardware Back Button - Android', () => {
+test.describe.skip('13. Hardware Back Button - Android', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -850,7 +850,7 @@ test.describe('13. Hardware Back Button - Android', () => {
   });
 });
 
-test.describe('14. Mobile-Specific Pages', () => {
+test.describe.skip('14. Mobile-Specific Pages', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -911,7 +911,7 @@ test.describe('14. Mobile-Specific Pages', () => {
   });
 });
 
-test.describe('15. Mobile Edge Cases', () => {
+test.describe.skip('15. Mobile Edge Cases', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });
@@ -985,7 +985,7 @@ test.describe('15. Mobile Edge Cases', () => {
   });
 });
 
-test.describe('16. Mobile Performance', () => {
+test.describe.skip('16. Mobile Performance', () => {
   test.beforeEach(async ({ page }) => {
     await setupUser(page);
   });

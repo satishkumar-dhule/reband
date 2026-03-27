@@ -207,21 +207,21 @@ const confidenceLevels = [
   { id: 'easy', label: 'Easy', color: 'from-blue-500 to-cyan-500', emoji: '🚀', interval: 7 }
 ];
 
-// Diagram section with error handling
+// Diagram section with error handling - uses design system glass-card
 function DiagramSection({ diagram }: { diagram: string }) {
   const [renderSuccess, setRenderSuccess] = useState<boolean | null>(null);
   
   if (renderSuccess === false) return null;
   
   return (
-    <div className="p-6 bg-muted/50 backdrop-blur-xl rounded-[24px] border border-border">
+    <div className="p-6 glass-card rounded-[24px]">
       <div className="flex items-center gap-2 mb-4">
-        <div className="p-2 bg-purple-500/20 rounded-lg">
-          <Eye className="w-5 h-5 text-purple-400" />
+        <div className="p-2 rounded-lg" style={{ background: 'hsla(270, 100%, 65%, 0.2)' }}>
+          <Eye className="w-5 h-5" style={{ color: 'var(--color-accent-purple-light)' }} />
         </div>
-        <span className="text-sm font-bold text-purple-400 uppercase tracking-wider">Diagram</span>
+        <span className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--color-accent-purple-light)' }}>Diagram</span>
       </div>
-      <div className="bg-background/30 rounded-xl p-4 overflow-x-auto">
+      <div className="rounded-xl p-4 overflow-x-auto" style={{ background: 'rgba(0, 0, 0, 0.3)' }}>
         <EnhancedMermaid 
           chart={diagram} 
           onRenderResult={(success) => setRenderSuccess(success)}
@@ -295,7 +295,7 @@ export default function ReviewSessionGenZ() {
             <p className="text-muted-foreground mb-6">You've reviewed all cards for today</p>
             <button
               onClick={() => setLocation('/')}
-              className="px-8 py-4 bg-gradient-to-r from-primary to-cyan-500 rounded-[16px] font-bold text-black"
+              className="btn-primary"
             >
               Back to Home
             </button>
@@ -321,6 +321,7 @@ export default function ReviewSessionGenZ() {
             <div className="flex items-center justify-between mb-8">
               <button
                 onClick={() => setLocation('/')}
+                aria-label="Go back"
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -329,7 +330,7 @@ export default function ReviewSessionGenZ() {
 
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
-                  <Flame className="w-5 h-5 text-orange-500" />
+                  <Flame className="w-5 h-5 text-orange-500" aria-hidden="true" />
                   <span className="font-bold">{streak}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -345,11 +346,12 @@ export default function ReviewSessionGenZ() {
                 <span className="text-muted-foreground">Progress</span>
                 <span className="font-bold">{progress}%</span>
               </div>
-              <div className="h-3 bg-muted rounded-full overflow-hidden">
+              <div className="h-3 rounded-full overflow-hidden reduced-motion-safe" style={{ background: 'var(--color-base-elevated)' }}>
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
-                  className="h-full bg-gradient-to-r from-primary to-cyan-500"
+                  className="h-full"
+                  style={{ background: 'var(--gradient-primary)' }}
                 />
               </div>
             </div>
@@ -365,18 +367,18 @@ export default function ReviewSessionGenZ() {
                 className="relative w-full overflow-hidden"
                 style={{ maxWidth: '100%' }}
               >
-                {/* Question Card */}
-                <div className="p-8 bg-muted/50 backdrop-blur-xl rounded-[32px] border border-border min-h-[400px] flex flex-col w-full overflow-hidden"
+                {/* Question Card - uses design system glass-card */}
+                <div className="p-8 glass-card rounded-[32px] min-h-[400px] flex flex-col w-full overflow-hidden"
                      style={{ maxWidth: '100%' }}>
                   {/* Tags */}
                   <div className="flex items-center gap-2 mb-6">
-                    <span className="px-3 py-1 bg-[#00ff88]/20 text-primary rounded-full text-xs font-bold uppercase">
+                    <span className="badge badge-primary">
                       {currentCard.channel}
                     </span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                      currentCard.difficulty === 'beginner' ? 'bg-green-500/20 text-green-500' :
-                      currentCard.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-500' :
-                      'bg-red-500/20 text-red-500'
+                    <span className={`badge ${
+                      currentCard.difficulty === 'beginner' ? 'badge-success' :
+                      currentCard.difficulty === 'intermediate' ? 'badge-warning' :
+                      'badge-error'
                     }`}>
                       {currentCard.difficulty}
                     </span>
@@ -404,13 +406,14 @@ export default function ReviewSessionGenZ() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="p-4 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-[20px] backdrop-blur-sm"
+                            className="p-4 rounded-[20px] glass-card"
+                            style={{ border: '1px solid hsla(190, 100%, 50%, 0.3)' }}
                           >
                             <div className="flex items-center gap-2 mb-2">
-                              <Zap className="w-4 h-4 text-cyan-400" />
-                              <span className="text-xs font-bold text-cyan-400 uppercase">TL;DR</span>
+                              <Zap className="w-4 h-4" style={{ color: 'var(--color-accent-cyan-light)' }} />
+                              <span className="text-xs font-bold uppercase" style={{ color: 'var(--color-accent-cyan-light)' }}>TL;DR</span>
                             </div>
-                            <p className="text-sm text-[#e0e0e0]">{currentCard.tldr}</p>
+                            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{currentCard.tldr}</p>
                           </motion.div>
                         )}
 
@@ -419,12 +422,12 @@ export default function ReviewSessionGenZ() {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.15 }}
-                          className="p-6 bg-muted/50 backdrop-blur-xl rounded-[24px] border border-border"
+                          className="p-6 glass-card rounded-[24px]"
                         >
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
-                              <Sparkles className="w-5 h-5 text-primary" />
-                              <span className="font-bold text-primary">Answer</span>
+                              <Sparkles className="w-5 h-5" style={{ color: 'var(--color-accent-cyan)' }} />
+                              <span className="font-bold" style={{ color: 'var(--color-accent-cyan)' }}>Answer</span>
                             </div>
                             <ListenButton 
                               text={`${currentCard.answer}${currentCard.explanation ? '. ' + currentCard.explanation : ''}`}
@@ -432,7 +435,7 @@ export default function ReviewSessionGenZ() {
                               size="sm"
                             />
                           </div>
-                          <p className="text-lg text-foreground leading-relaxed">
+                          <p className="text-lg leading-relaxed" style={{ color: 'var(--color-text-primary)' }}>
                             {currentCard.answer}
                           </p>
                         </motion.div>
@@ -443,11 +446,12 @@ export default function ReviewSessionGenZ() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.18 }}
-                            className="p-6 bg-gradient-to-br from-pink-500/10 to-purple-500/10 border border-pink-500/30 rounded-[24px] backdrop-blur-sm"
+                            className="p-6 rounded-[24px] glass-card"
+                            style={{ border: '1px solid hsla(330, 100%, 65%, 0.3)' }}
                           >
                             <div className="flex items-center gap-2 mb-4">
-                              <Check className="w-5 h-5 text-pink-400" />
-                              <span className="font-bold text-pink-400 uppercase text-sm">Code Interpretation</span>
+                              <Check className="w-5 h-5" style={{ color: 'var(--color-accent-pink-light)' }} />
+                              <span className="font-bold uppercase text-sm" style={{ color: 'var(--color-accent-pink-light)' }}>Code Interpretation</span>
                             </div>
                             <div className="prose prose-invert max-w-none">
                               <ReactMarkdown
@@ -459,7 +463,7 @@ export default function ReviewSessionGenZ() {
                                     
                                     if (isInline) {
                                       return (
-                                        <code className="px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded text-sm font-mono">
+                                        <code className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'hsla(190, 100%, 50%, 0.2)', color: 'var(--color-accent-cyan-light)' }}>
                                           {children}
                                         </code>
                                       );
@@ -473,7 +477,7 @@ export default function ReviewSessionGenZ() {
                                           customStyle={{ 
                                             margin: 0, 
                                             padding: '1.5rem',
-                                            background: '#0a0a0a',
+                                            background: 'var(--color-base-dark)',
                                             fontSize: '0.9rem',
                                           }}
                                         >
@@ -483,16 +487,16 @@ export default function ReviewSessionGenZ() {
                                     );
                                   },
                                   p({ children }) {
-                                    return <p className="mb-3 text-[#e0e0e0] leading-relaxed">{children}</p>;
+                                    return <p className="mb-3 leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{children}</p>;
                                   },
                                   h1({ children }) {
-                                    return <h1 className="text-xl font-bold mb-3 mt-4 text-foreground">{children}</h1>;
+                                    return <h1 className="text-xl font-bold mb-3 mt-4" style={{ color: 'var(--color-text-primary)' }}>{children}</h1>;
                                   },
                                   h2({ children }) {
-                                    return <h2 className="text-lg font-bold mb-2 mt-4 text-foreground">{children}</h2>;
+                                    return <h2 className="text-lg font-bold mb-2 mt-4" style={{ color: 'var(--color-text-primary)' }}>{children}</h2>;
                                   },
                                   strong({ children }) {
-                                    return <strong className="font-bold text-foreground">{children}</strong>;
+                                    return <strong className="font-bold" style={{ color: 'var(--color-text-primary)' }}>{children}</strong>;
                                   },
                                   ul({ children }) {
                                     return <ul className="space-y-2 mb-3">{children}</ul>;
@@ -502,8 +506,8 @@ export default function ReviewSessionGenZ() {
                                   },
                                   li({ children }) {
                                     return (
-                                      <li className="flex gap-2 text-[#e0e0e0]">
-                                        <span className="text-pink-400 mt-1">•</span>
+                                      <li className="flex gap-2" style={{ color: 'var(--color-text-secondary)' }}>
+                                        <span className="mt-1" style={{ color: 'var(--color-accent-pink-light)' }}>•</span>
                                         <span className="flex-1">{children}</span>
                                       </li>
                                     );
@@ -533,11 +537,11 @@ export default function ReviewSessionGenZ() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.25 }}
-                            className="p-6 bg-muted/50 backdrop-blur-xl rounded-[24px] border border-border"
+                            className="p-6 glass-card rounded-[24px]"
                           >
                             <div className="flex items-center gap-2 mb-4">
-                              <Brain className="w-5 h-5 text-orange-400" />
-                              <span className="font-bold text-orange-400 uppercase text-sm">Explanation</span>
+                              <Brain className="w-5 h-5" style={{ color: 'var(--color-warning-light)' }} />
+                              <span className="font-bold uppercase text-sm" style={{ color: 'var(--color-warning-light)' }}>Explanation</span>
                             </div>
                             <div className="prose prose-invert max-w-none">
                               <ReactMarkdown
@@ -549,7 +553,7 @@ export default function ReviewSessionGenZ() {
                                     
                                     if (isInline) {
                                       return (
-                                        <code className="px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded text-sm font-mono">
+                                        <code className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'hsla(190, 100%, 50%, 0.2)', color: 'var(--color-accent-cyan-light)' }}>
                                           {children}
                                         </code>
                                       );
@@ -563,7 +567,7 @@ export default function ReviewSessionGenZ() {
                                           customStyle={{ 
                                             margin: 0, 
                                             padding: '1.5rem',
-                                            background: '#0a0a0a',
+                                            background: 'var(--color-base-dark)',
                                             fontSize: '0.9rem',
                                           }}
                                         >
@@ -573,24 +577,24 @@ export default function ReviewSessionGenZ() {
                                     );
                                   },
                                   p({ children }) {
-                                    return <p className="mb-3 text-[#e0e0e0] leading-relaxed">{children}</p>;
+                                    return <p className="mb-3 leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{children}</p>;
                                   },
                                   h1({ children }) {
-                                    return <h1 className="text-xl font-bold mb-3 mt-4 text-foreground">{children}</h1>;
+                                    return <h1 className="text-xl font-bold mb-3 mt-4" style={{ color: 'var(--color-text-primary)' }}>{children}</h1>;
                                   },
                                   h2({ children }) {
-                                    return <h2 className="text-lg font-bold mb-2 mt-4 text-foreground">{children}</h2>;
+                                    return <h2 className="text-lg font-bold mb-2 mt-4" style={{ color: 'var(--color-text-primary)' }}>{children}</h2>;
                                   },
                                   strong({ children }) {
-                                    return <strong className="font-bold text-foreground">{children}</strong>;
+                                    return <strong className="font-bold" style={{ color: 'var(--color-text-primary)' }}>{children}</strong>;
                                   },
                                   ul({ children }) {
                                     return <ul className="space-y-2 mb-3">{children}</ul>;
                                   },
                                   li({ children }) {
                                     return (
-                                      <li className="flex gap-2 text-[#e0e0e0]">
-                                        <span className="text-primary mt-1">•</span>
+                                      <li className="flex gap-2" style={{ color: 'var(--color-text-secondary)' }}>
+                                        <span className="mt-1" style={{ color: 'var(--color-accent-cyan)' }}>•</span>
                                         <span className="flex-1">{children}</span>
                                       </li>
                                     );
@@ -610,12 +614,12 @@ export default function ReviewSessionGenZ() {
                 {/* Actions */}
                 <div className="mt-6">
                   {!showAnswer ? (
-                    // Reveal Answer Button
+                    // Reveal Answer Button - uses design system btn-primary with glow
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={handleRevealAnswer}
-                      className="w-full py-6 bg-gradient-to-r from-primary to-cyan-500 rounded-[20px] font-bold text-xl text-black flex items-center justify-center gap-3"
+                      className="btn-primary w-full py-6 rounded-[20px] text-xl flex items-center justify-center gap-3 glow-hover-cyan"
                     >
                       <Eye className="w-6 h-6" />
                       Tap to reveal answer
@@ -633,7 +637,8 @@ export default function ReviewSessionGenZ() {
                             whileHover={{ scale: 1.05, y: -4 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleConfidence(level.id)}
-                            className={`p-4 bg-gradient-to-br ${level.color} rounded-[16px] font-bold text-foreground`}
+                            className="p-4 rounded-[16px] font-bold"
+                            style={{ background: `linear-gradient(135deg, var(--color-${level.id === 'again' ? 'error' : level.id === 'hard' ? 'warning' : level.id === 'good' ? 'success' : 'info'}) 0%, var(--color-${level.id === 'again' ? 'error-light' : level.id === 'hard' ? 'warning-light' : level.id === 'good' ? 'success-light' : 'info-light'}) 100%)` }}
                           >
                             <div className="text-2xl mb-1">{level.emoji}</div>
                             <div className="text-sm">{level.label}</div>
@@ -657,17 +662,17 @@ export default function ReviewSessionGenZ() {
               </motion.div>
             </AnimatePresence>
 
-            {/* Stats Footer */}
+            {/* Stats Footer - uses design system glass-card */}
             <div className="mt-8 grid grid-cols-3 gap-4 w-full" style={{ maxWidth: '100%' }}>
-              <div className="p-4 bg-muted/50 rounded-[16px] text-center">
+              <div className="p-4 glass-card rounded-[16px] text-center">
                 <div className="text-2xl font-black">{cards.length}</div>
                 <div className="text-xs text-muted-foreground">Total Cards</div>
               </div>
-              <div className="p-4 bg-muted/50 rounded-[16px] text-center">
+              <div className="p-4 glass-card rounded-[16px] text-center">
                 <div className="text-2xl font-black">{reviewedCount}</div>
                 <div className="text-xs text-muted-foreground">Reviewed</div>
               </div>
-              <div className="p-4 bg-muted/50 rounded-[16px] text-center">
+              <div className="p-4 glass-card rounded-[16px] text-center">
                 <div className="text-2xl font-black">{cards.length - reviewedCount}</div>
                 <div className="text-xs text-muted-foreground">Remaining</div>
               </div>

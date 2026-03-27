@@ -4,7 +4,7 @@
  */
 
 import { useLocation } from 'wouter';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useCredits } from '../../context/CreditsContext';
 import {
   Home, BookOpen, Award, Mic, Code, Target, Zap,
@@ -28,6 +28,7 @@ const navItems = [
 export function GenZSidebar() {
   const [location, setLocation] = useLocation();
   const { balance, formatCredits } = useCredits();
+  const prefersReducedMotion = useReducedMotion();
 
   const level = Math.floor(balance / 100);
 
@@ -84,8 +85,8 @@ export function GenZSidebar() {
           return (
             <motion.button
               key={item.path}
-              whileHover={{ x: 4 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={prefersReducedMotion ? undefined : { x: 4 }}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
               onClick={() => setLocation(item.path)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all ${
                 isActive
@@ -110,8 +111,8 @@ export function GenZSidebar() {
               return (
                 <motion.button
                   key={item.path}
-                  whileHover={{ x: 4 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={prefersReducedMotion ? undefined : { x: 4 }}
+                  whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                   onClick={() => setLocation(item.path)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all ${
                     isActive
@@ -143,8 +144,8 @@ export function GenZSidebar() {
               return (
                 <motion.button
                   key={item.path}
-                  whileHover={{ x: 4 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={prefersReducedMotion ? undefined : { x: 4 }}
+                  whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                   onClick={() => setLocation(item.path)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all ${
                     isActive
@@ -176,8 +177,8 @@ export function GenZSidebar() {
               return (
                 <motion.button
                   key={item.path}
-                  whileHover={{ x: 4 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={prefersReducedMotion ? undefined : { x: 4 }}
+                  whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                   onClick={() => setLocation(item.path)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all ${
                     isActive
@@ -196,8 +197,8 @@ export function GenZSidebar() {
 
       {/* Credits Footer */}
       <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
+        whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
         onClick={() => setLocation('/profile')}
         className="m-4 p-4 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-[16px] flex items-center gap-3"
       >

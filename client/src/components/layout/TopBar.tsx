@@ -24,6 +24,7 @@ export function TopBar({ onMenuClick, onSearchClick, title, showBackButton }: To
         <div className="flex items-center gap-4">
           <button
             onClick={onMenuClick}
+            aria-label="Menu"
             className="p-2 hover:bg-muted rounded-lg transition-colors lg:hidden"
           >
             <Menu className="w-5 h-5" />
@@ -42,7 +43,7 @@ export function TopBar({ onMenuClick, onSearchClick, title, showBackButton }: To
           >
             <Search className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
             <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors hidden sm:block">
-              Search questions...
+              Search questions…
             </span>
             <kbd className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 text-xs text-muted-foreground bg-background rounded border border-border ml-auto">
               <span className="text-xs">⌘</span>K

@@ -242,6 +242,7 @@ export function Onboarding() {
                     key={channel.id}
                     type="button"
                     onClick={() => toggleChannel(channel.id)}
+                    aria-label={isExcluded ? `Include ${channel.name} channel` : `Exclude ${channel.name} channel`}
                     className={`
                       p-4 border rounded-lg text-left transition-all relative group
                       ${isExcluded 

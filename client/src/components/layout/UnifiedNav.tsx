@@ -1,6 +1,7 @@
 /**
- * Unified Navigation Component - Gen Z Edition
- * Pure Black, Neon Accents, Glassmorphism
+ * Unified Navigation Component
+ * Design System: Gen Z Dark Theme with Neon Green Accents
+ * Uses glassmorphism, glow effects, and consistent theming
  * 
  * Navigation Structure:
  * - Home: Dashboard
@@ -10,7 +11,7 @@
  */
 
 import { useLocation } from 'wouter';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Home,
   GraduationCap,
@@ -29,9 +30,7 @@ import {
   Search,
   User,
   Info,
-  Brain,
-  Sparkles,
-  Zap
+  Brain
 } from 'lucide-react';
 import { useCredits } from '../../context/CreditsContext';
 import { useSidebar } from '../../context/SidebarContext';
@@ -102,6 +101,7 @@ export function MobileBottomNav() {
   const { balance, formatCredits } = useCredits();
   const { preferences } = useUserPreferences();
   const [showMenu, setShowMenu] = useState<string | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const activeSection = getActiveSection(location);
 
@@ -145,7 +145,8 @@ export function MobileBottomNav() {
 
   return (
     <>
-      {/* Backdrop Overlay */}
+      <style>{`@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }`}</style>
+      {/* Backdrop Overlay - Glassmorphism */}
       <AnimatePresence>
         {showMenu && (
           <motion.div
@@ -158,7 +159,7 @@ export function MobileBottomNav() {
         )}
       </AnimatePresence>
 
-      {/* REVAMPED: Full-screen Submenu with better UX */}
+      {/* Full-screen Submenu with Premium UX */}
       <AnimatePresence>
         {showMenu && currentSubNav.length > 0 && (
           <motion.div
@@ -166,7 +167,8 @@ export function MobileBottomNav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-50 bg-background border-t border-border rounded-t-[32px] shadow-2xl overflow-hidden lg:hidden max-h-[80vh] flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-50 glass-card border-t border-border rounded-t-[32px] shadow-2xl overflow-hidden lg:hidden max-h-[80vh] flex flex-col"
+            style={{ background: 'hsl(0 0% 6% / 0.95)' }}
           >
             {/* Drag Handle */}
             <div className="flex justify-center pt-3 pb-2">
@@ -186,8 +188,9 @@ export function MobileBottomNav() {
                      'Track your progress'}
                   </p>
                 </div>
-                <button 
+                <button
                   onClick={() => setShowMenu(null)}
+                  aria-label="Close submenu"
                   className="w-10 h-10 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -215,18 +218,18 @@ export function MobileBottomNav() {
                     className={cn(
                       "w-full flex items-center gap-4 p-4 rounded-[20px] transition-all relative overflow-hidden",
                       isActive 
-                        ? "bg-gradient-to-br from-primary/20 to-cyan-500/20 border-2 border-primary/50" 
+                        ? "bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30" 
                         : "bg-muted/50 hover:bg-muted border-2 border-transparent",
-                      isVoice && !isActive && "bg-gradient-to-br from-primary/10 to-cyan-500/10 border-primary/20"
+                      isVoice && !isActive && "bg-gradient-to-br from-primary/10 to-primary/5 border-primary/10"
                     )}
                   >
-                    {/* Icon */}
+                    {/* Icon - Glow effect for active state */}
                     <div className={cn(
                       "w-14 h-14 rounded-[16px] flex items-center justify-center flex-shrink-0 transition-all",
                       isActive 
-                        ? "bg-gradient-to-br from-primary to-cyan-500 shadow-lg shadow-primary/30" 
+                        ? "bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30" 
                         : isVoice 
-                          ? "bg-gradient-to-br from-primary/30 to-cyan-500/30"
+                          ? "bg-gradient-to-br from-primary/20 to-primary/10"
                           : "bg-background"
                     )}>
                       <Icon className={cn(
@@ -275,10 +278,13 @@ export function MobileBottomNav() {
         )}
       </AnimatePresence>
 
-      {/* REVAMPED: Bottom Navigation Bar - Cleaner, More Accessible */}
-      {/* iPhone 13 FIX: Keep at bottom-0, add pb-safe to push content inside nav up */}
+      {/* Bottom Navigation Bar - Premium Glassmorphism */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden pb-safe">
-        <div className="bg-background/95 backdrop-blur-xl border-t border-border shadow-2xl">
+        <div className="glass-card border-t border-border shadow-2xl" style={{ 
+          background: 'hsl(0 0% 6% / 0.95)',
+          backdropFilter: 'blur(24px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(200%)'
+        }}>
           <div className="flex items-center justify-around h-16 px-2 max-w-md mx-auto">
             {mainNavItems.map((item) => {
               const isActive = activeSection === item.id;
@@ -296,24 +302,28 @@ export function MobileBottomNav() {
                   )}
                   aria-label={item.label}
                 >
-                  {/* Active Indicator */}
+                  {/* Active Indicator - Neon Green Glow */}
                   {(isActive || isMenuOpen) && (
                     <motion.div
                       layoutId="mobile-nav-indicator"
-                      className="absolute top-0 w-12 h-1 bg-gradient-to-r from-primary to-cyan-500 rounded-full"
+                      className="absolute top-0 w-12 h-1 rounded-full"
+                      style={{ 
+                        background: 'hsl(150 100% 50%)',
+                        boxShadow: '0 0 20px hsl(150 100% 50% / 0.5)'
+                      }}
                       transition={{ type: "spring", bounce: 0.3, duration: 0.5 }}
                     />
                   )}
                   
                   {/* Icon Container */}
-                  <motion.div 
-                    whileTap={{ scale: 0.9 }}
+                  <motion.div
+                    whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
                     className={cn(
                       "w-12 h-12 rounded-[16px] flex items-center justify-center transition-all",
                       item.highlight
                         ? isActive || isMenuOpen
-                          ? "bg-gradient-to-br from-primary to-cyan-500 shadow-lg shadow-primary/50" 
-                          : "bg-gradient-to-br from-primary/20 to-cyan-500/20"
+                          ? "bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/50" 
+                          : "bg-gradient-to-br from-primary/20 to-primary/10"
                         : isActive || isMenuOpen 
                           ? "bg-primary/15" 
                           : "bg-transparent"
@@ -379,18 +389,32 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
             "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 group overflow-hidden",
             isCollapsed && "justify-center px-2",
             active 
-              ? "bg-primary/15 text-primary" 
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              ? "text-primary" 
+              : "text-muted-foreground hover:text-foreground"
           )}
+          style={active ? {
+            background: 'hsl(150 100% 50% / 0.1)',
+            border: '1px solid hsl(150 100% 50% / 0.15)'
+          } : {
+            background: 'transparent'
+          }}
         >
           <div className={cn(
             "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors",
             active 
-              ? "bg-primary text-primary-foreground" 
+              ? "text-primary-foreground" 
               : isVoice
-                ? "bg-primary/20 text-primary"
-                : "bg-transparent group-hover:bg-muted"
-          )}>
+                ? "text-primary"
+                : "text-muted-foreground group-hover:text-foreground"
+          )}
+          style={active ? {
+            background: 'hsl(150 100% 50%)',
+            boxShadow: '0 0 12px hsl(150 100% 50% / 0.3)'
+          } : isVoice ? {
+            background: 'hsl(150 100% 50% / 0.15)'
+          } : {
+            background: 'transparent'
+          }}>
             <Icon className="w-4 h-4" />
           </div>
           
@@ -412,7 +436,7 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
           )}
         </button>
         
-        {/* Tooltip */}
+        {/* Tooltip - Glassmorphism */}
         <AnimatePresence>
           {showTooltip && (
             <motion.div
@@ -421,7 +445,15 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
               exit={{ opacity: 0, x: -4 }}
               className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50"
             >
-              <div className="bg-popover border border-border rounded-lg shadow-xl px-3 py-1.5 whitespace-nowrap flex items-center gap-2">
+              <div 
+                className="rounded-lg shadow-xl px-3 py-1.5 whitespace-nowrap flex items-center gap-2"
+                style={{ 
+                  background: 'hsl(0 0% 8% / 0.95)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                  border: '1px solid hsl(0 0% 15%)'
+                }}
+              >
                 <span className="text-sm font-medium">{item.label}</span>
                 {item.badge && (
                   <span className={cn(
@@ -442,10 +474,13 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
   };
 
   const SectionHeader = ({ icon: Icon, label }: { icon: React.ElementType; label: string }) => {
-    if (isCollapsed) return <div className="h-px bg-border/50 my-3 mx-2" />;
+    if (isCollapsed) return <div className="h-px my-3 mx-2" style={{ background: 'hsl(0 0% 15% / 0.5)' }} />;
     
     return (
-      <div className="flex items-center gap-2 px-3 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+      <div 
+        className="flex items-center gap-2 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider"
+        style={{ color: 'hsl(0 0% 45%)' }}
+      >
         <Icon className="w-3.5 h-3.5" />
         <span>{label}</span>
       </div>
@@ -454,17 +489,24 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
 
   return (
     <aside className={cn(
-      "fixed left-0 top-0 bottom-0 bg-card/95 backdrop-blur-xl border-r border-border z-40 flex flex-col transition-all duration-200 overflow-hidden",
+      "fixed left-0 top-0 bottom-0 z-40 flex flex-col transition-all duration-200 overflow-hidden",
       isCollapsed ? "w-16" : "w-64"
-    )}>
+    )}
+    style={{ 
+      background: 'hsl(0 0% 6% / 0.95)',
+      backdropFilter: 'blur(24px) saturate(200%)',
+      WebkitBackdropFilter: 'blur(24px) saturate(200%)',
+      borderRight: '1px solid hsl(0 0% 12%)'
+    }}>
       {/* Header with Logo and Collapse Toggle */}
       <div className="h-14 flex items-center justify-between px-3 border-b border-border">
-        <button 
-          onClick={() => setLocation('/')} 
+        <button
+          onClick={() => setLocation('/')}
+          aria-label="Go to home"
           className={cn("flex items-center gap-2.5", isCollapsed && "justify-center w-full")}
         >
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center shrink-0">
-            <Mic className="w-4 h-4 text-white" />
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shrink-0 shadow-lg" style={{ boxShadow: '0 0 20px hsl(150 100% 50% / 0.3)' }}>
+            <Mic className="w-4 h-4 text-primary-foreground" />
           </div>
           {!isCollapsed && (
             <div className="text-left">
@@ -477,6 +519,7 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
         {!isCollapsed && (
           <button
             onClick={toggleSidebar}
+            aria-label="Collapse sidebar"
             className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
             title="Collapse sidebar"
           >
@@ -490,6 +533,7 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
         <div className="px-2 py-2">
           <button
             onClick={toggleSidebar}
+            aria-label="Expand sidebar"
             className="w-full p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
             title="Expand sidebar"
           >
@@ -502,16 +546,24 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
       <div className={cn("px-2 py-2", isCollapsed && "px-1")}>
         <button
           onClick={onSearchClick}
+          aria-label="Search"
           className={cn(
-            "w-full flex items-center gap-2 px-3 py-2 bg-muted/50 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors overflow-hidden",
+            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors overflow-hidden",
             isCollapsed && "justify-center px-2"
           )}
+          style={{
+            background: 'hsl(0 0% 10% / 0.5)',
+            border: '1px solid hsl(0 0% 12%)'
+          }}
         >
           <Search className="w-4 h-4 shrink-0" />
           {!isCollapsed && (
             <>
               <span className="text-sm flex-1 text-left truncate">Search</span>
-              <kbd className="text-[10px] px-1.5 py-0.5 bg-background rounded border border-border font-mono shrink-0">⌘K</kbd>
+              <kbd className="text-[10px] px-1.5 py-0.5 rounded font-mono shrink-0" style={{ 
+                background: 'hsl(0 0% 8%)',
+                border: '1px solid hsl(0 0% 15%)'
+              }}>⌘K</kbd>
             </>
           )}
         </button>
@@ -519,7 +571,7 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
 
       {/* Navigation */}
       <nav className={cn(
-        "flex-1 overflow-y-auto overflow-x-hidden px-2 py-1",
+        "flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 custom-scrollbar",
         isCollapsed && "px-1"
       )}>
         {/* Home */}
@@ -542,10 +594,15 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
       <div className={cn("p-2 border-t border-border", isCollapsed && "p-1")}>
         <button
           onClick={() => setLocation('/profile')}
+          aria-label="View credits"
           className={cn(
-            "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/20 transition-colors overflow-hidden",
+            "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors overflow-hidden",
             isCollapsed && "justify-center px-1.5"
           )}
+          style={{
+            background: 'hsl(45 100% 50% / 0.1)',
+            border: '1px solid hsl(45 100% 50% / 0.2)'
+          }}
         >
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shrink-0">
             <Coins className="w-4 h-4 text-white" />
@@ -553,7 +610,7 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
           {!isCollapsed && (
             <div className="flex-1 text-left min-w-0">
               <div className="text-[10px] text-muted-foreground">Credits</div>
-              <div className="text-sm font-bold text-amber-500 truncate">{formatCredits(balance)}</div>
+              <div className="text-sm font-bold truncate" style={{ color: 'hsl(45 100% 60%)' }}>{formatCredits(balance)}</div>
             </div>
           )}
         </button>
@@ -577,20 +634,39 @@ export function UnifiedMobileHeader({ title, showBack, onSearchClick }: UnifiedM
   const { balance, formatCredits } = useCredits();
 
   return (
-    <header className="sticky top-0 z-40 lg:hidden bg-card/90 backdrop-blur-xl border-b border-border pt-safe">
+    <header 
+      className="sticky top-0 z-40 lg:hidden pt-safe"
+      style={{ 
+        background: 'hsl(0 0% 6% / 0.95)',
+        backdropFilter: 'blur(24px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(200%)',
+        borderBottom: '1px solid hsl(0 0% 12%)'
+      }}
+    >
       <div className="flex items-center justify-between h-14 px-3">
         {/* Left: Back or Logo */}
         <div className="flex items-center gap-2 min-w-0 flex-1">
           {showBack ? (
             <button
               onClick={() => window.history.back()}
-              className="w-9 h-9 flex items-center justify-center rounded-[12px] bg-muted/50 hover:bg-muted transition-colors"
+              aria-label="Go back"
+              className="w-9 h-9 flex items-center justify-center rounded-[12px] transition-colors"
+              style={{
+                background: 'hsl(0 0% 10% / 0.5)',
+                border: '1px solid hsl(0 0% 12%)'
+              }}
             >
               <ChevronLeft className="w-5 h-5 text-foreground" strokeWidth={2} />
             </button>
           ) : (
-            <button onClick={() => setLocation('/')} className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center shadow-lg shadow-primary/30">
+            <button onClick={() => setLocation('/')} aria-label="Go to home" className="flex items-center gap-2">
+              <div 
+                className="w-8 h-8 rounded-[10px] flex items-center justify-center shadow-lg"
+                style={{ 
+                  background: 'linear-gradient(135deg, hsl(150 100% 50%) 0%, hsl(150 100% 40%))',
+                  boxShadow: '0 0 20px hsl(150 100% 50% / 0.3)'
+                }}
+              >
                 <Brain className="w-4 h-4 text-primary-foreground" strokeWidth={2.5} />
               </div>
               <div>
@@ -607,19 +683,29 @@ export function UnifiedMobileHeader({ title, showBack, onSearchClick }: UnifiedM
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
-          {/* Credits - Neon Pill */}
+          {/* Credits - Gold Pill */}
           <button
             onClick={() => setLocation('/profile')}
-            className="flex items-center gap-1 px-2 py-1.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-[10px]"
+            aria-label="View credits"
+            className="flex items-center gap-1 px-2 py-1.5 rounded-[10px] transition-colors"
+            style={{
+              background: 'hsl(45 100% 50% / 0.15)',
+              border: '1px solid hsl(45 100% 50% / 0.25)'
+            }}
           >
-            <Coins className="w-3.5 h-3.5 text-amber-400" strokeWidth={2.5} />
-            <span className="text-xs font-bold text-amber-400">{formatCredits(balance)}</span>
+            <Coins className="w-3.5 h-3.5" strokeWidth={2.5} style={{ color: 'hsl(45 100% 60%)' }} />
+            <span className="text-xs font-bold" style={{ color: 'hsl(45 100% 60%)' }}>{formatCredits(balance)}</span>
           </button>
 
           {/* Search */}
           <button
             onClick={onSearchClick}
-            className="w-9 h-9 flex items-center justify-center rounded-[12px] bg-muted/50 hover:bg-muted transition-colors"
+            aria-label="Search"
+            className="w-9 h-9 flex items-center justify-center rounded-[12px] transition-colors"
+            style={{
+              background: 'hsl(0 0% 10% / 0.5)',
+              border: '1px solid hsl(0 0% 12%)'
+            }}
           >
             <Search className="w-4 h-4 text-foreground" strokeWidth={2} />
           </button>

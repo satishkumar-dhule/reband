@@ -27,6 +27,8 @@ export function VisitCounter({
       <img 
         src="https://hits.sh/devprep-io.github.io.svg?style=flat&label=&color=6366f1&labelColor=transparent"
         alt="Visit count"
+        width={80}
+        height={20}
         className="h-5"
         loading="lazy"
       />

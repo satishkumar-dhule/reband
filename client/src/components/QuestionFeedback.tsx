@@ -139,9 +139,10 @@ export function QuestionFeedback({ questionId, className = '' }: QuestionFeedbac
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+        aria-label="Flag question for review"
         title="Flag question for review"
       >
-        <Flag className="w-4 h-4" />
+        <Flag className="w-4 h-4" aria-hidden="true" />
       </button>
 
       <AnimatePresence>

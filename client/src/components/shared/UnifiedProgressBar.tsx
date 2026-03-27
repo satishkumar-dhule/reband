@@ -32,7 +32,7 @@ export function UnifiedProgressBar({
 
   return (
     <div className={cn('w-full py-2', className)}>
-      <div className="relative h-1.5 bg-secondary/30 rounded-full overflow-hidden">
+      <div className="relative h-1.5 bg-secondary/30 rounded-full overflow-hidden" role="progressbar" aria-valuenow={current} aria-valuemax={total}>
         {/* Background glow */}
         <motion.div
           className={cn(

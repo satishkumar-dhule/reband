@@ -185,7 +185,7 @@ export function PullToRefresh({
           aria-label="Refresh content"
         >
           <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+          <span>{isRefreshing ? 'Refreshing…' : 'Refresh'}</span>
         </button>
       </div>
       

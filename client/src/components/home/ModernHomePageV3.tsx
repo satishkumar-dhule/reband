@@ -263,7 +263,7 @@ export function ModernHomePageV3() {
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
                         transition={{ duration: 1, delay: i * 0.1 }}
-                        className="h-full bg-[#238636] rounded-full"
+                        className="h-full bg-[#238636] rounded-full motion-reduce:transition-none"
                       />
                     </div>
 
@@ -306,7 +306,7 @@ export function ModernHomePageV3() {
                             initial={{ width: 0 }}
                             animate={{ width: `${path.progress}%` }}
                             transition={{ duration: 1, delay: i * 0.2 }}
-                            className={`h-full ${path.color} rounded-full`}
+                            className={`h-full ${path.color} rounded-full motion-reduce:transition-none`}
                           />
                         </div>
                       </div>

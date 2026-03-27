@@ -1,16 +1,15 @@
 /**
- * Gen Z Channels Page - Completely Redesigned
- * Glassmorphism, Animated Gradients, Premium Features
+ * Channels Page - DevPrep Design System
+ * Dark theme with cyan/purple/pink accents
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
-import { allChannelsConfig, categories } from '../lib/channels-config';
+import { allChannelsConfig } from '../lib/channels-config';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useChannelStats } from '../hooks/use-stats';
-import { useProgress } from '../hooks/use-progress';
 import { SEOHead } from '../components/SEOHead';
 import {
   Search, Check, Plus, Sparkles, TrendingUp, ChevronRight,
@@ -73,59 +72,186 @@ const categoryIcons: Record<string, any> = {
   'ui-ux': Layout,
 };
 
-const categoryColors: Record<string, { bg: string; border: string; text: string; gradient: string }> = {
-  'frontend': { bg: 'from-pink-500/20', border: 'border-pink-500/30', text: 'text-pink-400', gradient: 'from-pink-500 via-rose-500 to-red-500' },
-  'backend': { bg: 'from-blue-500/20', border: 'border-blue-500/30', text: 'text-blue-400', gradient: 'from-blue-500 via-cyan-500 to-teal-500' },
-  'devops': { bg: 'from-amber-500/20', border: 'border-amber-500/30', text: 'text-amber-400', gradient: 'from-amber-500 via-orange-500 to-yellow-500' },
-  'database': { bg: 'from-purple-500/20', border: 'border-purple-500/30', text: 'text-purple-400', gradient: 'from-purple-500 via-violet-500 to-fuchsia-500' },
-  'mobile': { bg: 'from-emerald-500/20', border: 'border-emerald-500/30', text: 'text-emerald-400', gradient: 'from-emerald-500 via-green-500 to-teal-500' },
-  'security': { bg: 'from-red-500/20', border: 'border-red-500/30', text: 'text-red-400', gradient: 'from-red-500 via-orange-500 to-amber-500' },
-  'ai-ml': { bg: 'from-cyan-500/20', border: 'border-cyan-500/30', text: 'text-cyan-400', gradient: 'from-cyan-500 via-sky-500 to-blue-500' },
-  'system-design': { bg: 'from-violet-500/20', border: 'border-violet-500/30', text: 'text-violet-400', gradient: 'from-violet-500 via-purple-500 to-pink-500' },
-  'general': { bg: 'from-gray-500/20', border: 'border-gray-500/30', text: 'text-gray-400', gradient: 'from-gray-500 via-slate-500 to-zinc-500' },
-  'algorithms': { bg: 'from-lime-500/20', border: 'border-lime-500/30', text: 'text-lime-400', gradient: 'from-lime-500 via-green-500 to-emerald-500' },
-  'behavioral': { bg: 'from-indigo-500/20', border: 'border-indigo-500/30', text: 'text-indigo-400', gradient: 'from-indigo-500 via-blue-500 to-cyan-500' },
-  'ui-ux': { bg: 'from-fuchsia-500/20', border: 'border-fuchsia-500/30', text: 'text-fuchsia-400', gradient: 'from-fuchsia-500 via-pink-500 to-rose-500' },
+// Dark theme category colors using design system
+const categoryColors: Record<string, { bg: string; border: string; text: string; accent: string }> = {
+  'frontend': { 
+    bg: 'bg-pink-500/10', 
+    border: 'border-pink-500/30', 
+    text: 'text-pink-400', 
+    accent: 'hsl(330, 100%, 65%)'
+  },
+  'backend': { 
+    bg: 'bg-cyan-500/10', 
+    border: 'border-cyan-500/30', 
+    text: 'text-cyan-400', 
+    accent: 'hsl(190, 100%, 50%)'
+  },
+  'devops': { 
+    bg: 'bg-amber-500/10', 
+    border: 'border-amber-500/30', 
+    text: 'text-amber-400', 
+    accent: 'hsl(38, 92%, 50%)'
+  },
+  'database': { 
+    bg: 'bg-purple-500/10', 
+    border: 'border-purple-500/30', 
+    text: 'text-purple-400', 
+    accent: 'hsl(270, 100%, 65%)'
+  },
+  'mobile': { 
+    bg: 'bg-emerald-500/10', 
+    border: 'border-emerald-500/30', 
+    text: 'text-emerald-400', 
+    accent: 'hsl(142, 76%, 36%)'
+  },
+  'security': { 
+    bg: 'bg-red-500/10', 
+    border: 'border-red-500/30', 
+    text: 'text-red-400', 
+    accent: 'hsl(0, 84%, 60%)'
+  },
+  'ai-ml': { 
+    bg: 'bg-cyan-500/10', 
+    border: 'border-cyan-500/30', 
+    text: 'text-cyan-400', 
+    accent: 'hsl(190, 100%, 50%)'
+  },
+  'system-design': { 
+    bg: 'bg-violet-500/10', 
+    border: 'border-violet-500/30', 
+    text: 'text-violet-400', 
+    accent: 'hsl(270, 100%, 65%)'
+  },
+  'general': { 
+    bg: 'bg-gray-500/10', 
+    border: 'border-gray-500/30', 
+    text: 'text-gray-400', 
+    accent: 'hsl(0, 0%, 75%)'
+  },
+  'algorithms': { 
+    bg: 'bg-lime-500/10', 
+    border: 'border-lime-500/30', 
+    text: 'text-lime-400', 
+    accent: 'hsl(82, 76%, 55%)'
+  },
+  'behavioral': { 
+    bg: 'bg-indigo-500/10', 
+    border: 'border-indigo-500/30', 
+    text: 'text-indigo-400', 
+    accent: 'hsl(239, 84%, 67%)'
+  },
+  'ui-ux': { 
+    bg: 'bg-fuchsia-500/10', 
+    border: 'border-fuchsia-500/30', 
+    text: 'text-fuchsia-400', 
+    accent: 'hsl(291, 84%, 65%)'
+  },
 };
 
 const difficultyConfig = {
-  beginner: { label: 'Beginner', color: 'text-emerald-400', bg: 'bg-emerald-500/20', border: 'border-emerald-500/30' },
-  intermediate: { label: 'Intermediate', color: 'text-amber-400', bg: 'bg-amber-500/20', border: 'border-amber-500/30' },
-  advanced: { label: 'Advanced', color: 'text-red-400', bg: 'bg-red-500/20', border: 'border-red-500/30' },
+  beginner: { 
+    label: 'Beginner', 
+    color: 'text-emerald-400', 
+    bg: 'bg-emerald-500/10', 
+    border: 'border-emerald-500/30',
+    accent: 'hsl(142, 76%, 46%)'
+  },
+  intermediate: { 
+    label: 'Intermediate', 
+    color: 'text-amber-400', 
+    bg: 'bg-amber-500/10', 
+    border: 'border-amber-500/30',
+    accent: 'hsl(38, 92%, 50%)'
+  },
+  advanced: { 
+    label: 'Advanced', 
+    color: 'text-red-400', 
+    bg: 'bg-red-500/10', 
+    border: 'border-red-500/30',
+    accent: 'hsl(0, 84%, 60%)'
+  },
 };
 
 function AnimatedGradientHeader() {
   return (
-    <div className="relative overflow-hidden rounded-3xl mb-8">
-      <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600" />
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-0 -left-40 w-80 h-80 bg-white/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse delay-700" />
-      </div>
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
+    <div className="relative overflow-hidden rounded-[2rem] mb-10">
+      {/* Dark base with gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-base-dark)] via-[var(--color-base-card)] to-[var(--color-base-darker)]" />
       
-      <div className="relative px-8 py-12">
+      {/* Animated gradient orbs using design system colors */}
+      <div className="absolute inset-0 opacity-30">
+        <motion.div 
+          animate={{ 
+            x: [0, 30, 0],
+            y: [0, -20, 0],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl" 
+          style={{ background: 'rgba(6, 182, 212, 0.3)' }}
+        />
+        <motion.div 
+          animate={{ 
+            x: [0, -40, 0],
+            y: [0, 30, 0],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute bottom-0 right-0 w-[30rem] h-[30rem] rounded-full blur-3xl" 
+          style={{ background: 'rgba(139, 92, 246, 0.2)' }}
+        />
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-3xl" 
+          style={{ background: 'rgba(236, 72, 153, 0.2)' }}
+        />
+      </div>
+      
+      {/* Pattern Overlay */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+      
+      {/* Glass morphism card layer */}
+      <div className="absolute inset-4 rounded-[2.5rem] bg-white/5 backdrop-blur-sm border border-white/10" />
+      
+      <div className="relative px-10 py-14">
         <div className="flex items-center justify-between">
           <div>
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-3 mb-3"
+              className="flex items-center gap-3 mb-4"
             >
-              <span className="px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white/90 text-sm font-bold flex items-center gap-2">
+              <span 
+                className="px-5 py-2 rounded-full text-sm font-bold flex items-center gap-2"
+                style={{ 
+                  background: 'linear-gradient(135deg, hsl(190, 100%, 50%, 0.2) 0%, hsl(270, 100%, 65%, 0.2) 100%)',
+                  border: '1px solid hsl(190, 100%, 50%, 0.3)',
+                  color: 'hsl(190, 100%, 60%)'
+                }}
+              >
                 <Crown className="w-4 h-4" />
                 PRO MAX
               </span>
-              <span className="px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-white/70 text-sm font-medium flex items-center gap-2">
+              <span 
+                className="px-5 py-2 rounded-full text-sm font-semibold flex items-center gap-2"
+                style={{ 
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: 'hsl(0, 0%, 75%)'
+                }}
+              >
                 <Sparkles className="w-4 h-4" />
-                30 AI Agents
+                Learning Platform
               </span>
             </motion.div>
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-bold text-white mb-3"
+              className="text-5xl md:text-6xl font-bold mb-4"
+              style={{ color: 'hsl(0, 0%, 98%)' }}
             >
               Explore Channels
             </motion.h1>
@@ -133,7 +259,8 @@ function AnimatedGradientHeader() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-white/80 text-lg max-w-xl"
+              className="text-xl max-w-xl leading-relaxed"
+              style={{ color: 'hsl(0, 0%, 75%)' }}
             >
               Unlock premium learning paths with AI-powered assistance. Track your progress and master new skills.
             </motion.p>
@@ -145,12 +272,34 @@ function AnimatedGradientHeader() {
             className="hidden lg:block"
           >
             <div className="relative">
-              <div className="w-32 h-32 bg-gradient-to-br from-white/30 to-white/10 rounded-3xl backdrop-blur-xl flex items-center justify-center border border-white/20">
-                <Rocket className="w-16 h-16 text-white" />
+              {/* Multiple shadow layers using design system */}
+              <div className="absolute inset-0 rounded-[2.5rem] blur-xl" style={{ background: 'hsl(190, 100%, 50%, 0.2)' }} />
+              <div className="absolute inset-0 rounded-[2.5rem)]" style={{ background: 'linear-gradient(135deg, hsl(190, 100%, 50%, 0.1) 0%, hsl(330, 100%, 65%, 0.1) 100%)' }} />
+              <div 
+                className="relative w-40 h-40 rounded-[2.5rem] backdrop-blur-xl flex items-center justify-center border"
+                style={{ 
+                  background: 'linear-gradient(135deg, hsl(190, 100%, 50%, 0.15) 0%, hsl(270, 100%, 65%, 0.15) 100%)',
+                  borderColor: 'hsl(190, 100%, 50%, 0.3)',
+                  boxShadow: '0 0 40px hsl(190, 100%, 50%, 0.2)'
+                }}
+              >
+                <Rocket className="w-20 h-20" style={{ color: 'hsl(190, 100%, 60%)' }} />
               </div>
-              <div className="absolute -top-2 -right-2 w-10 h-10 bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Star className="w-5 h-5 text-white fill-white" />
-              </div>
+              <motion.div 
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, -5, 0],
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute -top-3 -right-3 w-14 h-14 rounded-2xl flex items-center justify-center border-2"
+                style={{ 
+                  background: 'linear-gradient(135deg, hsl(330, 100%, 65%) 0%, hsl(270, 100%, 65%) 100%)',
+                  borderColor: 'white',
+                  boxShadow: '0 0 20px hsl(330, 100%, 65%, 0.5)'
+                }}
+              >
+                <Star className="w-6 h-6 text-white fill-white" />
+              </motion.div>
             </div>
           </motion.div>
         </div>
@@ -174,21 +323,42 @@ function ModernSearchBar({
 
   return (
     <motion.div 
-      className="relative mb-8"
+      className="relative mb-10"
       animate={{ scale: isFocused ? 1.01 : 1 }}
     >
-      <div className={`absolute inset-0 rounded-2xl transition-all duration-300 ${
-        isFocused 
-          ? 'bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-fuchsia-500/20 blur-xl' 
-          : 'bg-gradient-to-r from-gray-500/10 to-gray-500/5 blur-xl'
-      }`} />
+      {/* Glow effect using design system colors */}
+      <div 
+        className={`absolute inset-0 rounded-3xl transition-all duration-500 ${
+          isFocused ? 'blur-2xl scale-105' : 'blur-xl'
+        }`}
+        style={{ 
+          background: isFocused 
+            ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(139, 92, 246, 0.15) 50%, rgba(236, 72, 153, 0.15) 100%)'
+            : 'linear-gradient(135deg, hsl(0, 0%, 12%) 0%, hsl(0, 0%, 8%) 100%)'
+        }}
+      />
       
-      <div className="relative flex items-center gap-3">
-        <div className={`flex-1 relative rounded-2xl transition-all duration-300 ${
-          isFocused ? 'ring-2 ring-violet-500/30' : ''
-        }`}>
-          <div className="absolute left-5 top-1/2 -translate-y-1/2">
-            <Search className={`w-5 h-5 transition-colors ${isFocused ? 'text-violet-400' : 'text-muted-foreground'}`} />
+      {/* Search Bar Container */}
+      <div className="relative flex items-center gap-4">
+        <div 
+          className={`flex-1 relative rounded-2xl transition-all duration-300`}
+          style={{ 
+            boxShadow: isFocused ? '0 0 0 4px rgba(6, 182, 212, 0.2)' : 'none'
+          }}
+        >
+          {/* Inner shadow */}
+          <div 
+            className="absolute inset-0 rounded-2xl"
+            style={{ 
+              background: 'hsl(0, 0%, 8%)',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)'
+            }} 
+          />
+          <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10">
+            <Search 
+              className="w-5 h-5 transition-colors" 
+              style={{ color: isFocused ? 'hsl(190, 100%, 50%)' : 'hsl(0, 0%, 53%)' }} 
+            />
           </div>
           <input
             type="text"
@@ -197,29 +367,43 @@ function ModernSearchBar({
             onChange={(e) => onChange(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="w-full pl-14 pr-4 py-4 bg-card/80 backdrop-blur-xl border border-border rounded-2xl text-base focus:outline-none focus:border-violet-500/50 transition-all"
+            className="relative w-full pl-14 pr-4 py-5 rounded-2xl text-base focus:outline-none transition-all"
+            style={{ 
+              background: 'hsl(0, 0%, 6.5%)',
+              border: '1px solid hsl(0, 0%, 12%)',
+              color: 'hsl(0, 0%, 98%)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+            }}
           />
           {value && (
             <button
               onClick={() => onChange('')}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted transition-colors"
+              className="absolute right-5 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-colors z-10"
+              style={{ background: 'hsl(0, 0%, 12%)' }}
             >
-              <X className="w-4 h-4 text-muted-foreground" />
+              <X className="w-4 h-4" style={{ color: 'hsl(0, 0%, 53%)' }} />
             </button>
           )}
         </div>
         
+        {/* Voice Button */}
         <motion.button
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
           onClick={onVoiceClick}
-          className={`p-4 rounded-2xl border transition-all duration-300 ${
-            voiceActive
-              ? 'bg-violet-500/20 border-violet-500/50 shadow-lg shadow-violet-500/20'
-              : 'bg-card/80 backdrop-blur-xl border-border hover:border-violet-500/30'
-          }`}
+          className="p-5 rounded-2xl border transition-all"
+          style={{ 
+            background: voiceActive 
+              ? 'linear-gradient(135deg, hsl(330, 100%, 65%) 0%, hsl(270, 100%, 65%) 100%)'
+              : 'hsl(0, 0%, 8%)',
+            borderColor: voiceActive ? 'hsl(330, 100%, 65%)' : 'hsl(0, 0%, 18%)',
+            boxShadow: voiceActive ? '0 0 20px hsl(330, 100%, 65%, 0.3)' : '0 4px 12px rgba(0,0,0,0.3)'
+          }}
         >
-          <Mic className={`w-5 h-5 transition-colors ${voiceActive ? 'text-violet-400' : 'text-muted-foreground'}`} />
+          <Mic 
+            className="w-5 h-5 transition-colors" 
+            style={{ color: voiceActive ? 'white' : 'hsl(0, 0%, 75%)' }} 
+          />
         </motion.button>
       </div>
     </motion.div>
@@ -249,29 +433,41 @@ function CategoryTabs({
   ];
 
   return (
-    <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="flex gap-3 mb-10 overflow-x-auto pb-3 scrollbar-hide">
       {tabItems.map((tab) => {
         const isSelected = selected === tab.id;
         const count = tab.id ? counts[tab.id] : Object.values(counts).reduce((a, b) => a + b, 0);
+        const colors = tab.id ? categoryColors[tab.id] : null;
         
         return (
           <motion.button
             key={tab.id || 'all'}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.97 }}
             onClick={() => onChange(tab.id)}
-            className={`relative px-5 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition-all ${
-              isSelected
-                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-violet-500/25'
-                : 'bg-card/80 backdrop-blur-xl border border-border hover:bg-muted hover:border-violet-500/30'
-            }`}
+            className="relative px-6 py-3 rounded-2xl font-bold text-sm whitespace-nowrap transition-all"
+            style={{ 
+              background: isSelected 
+                ? 'linear-gradient(135deg, hsl(190, 100%, 50%) 0%, hsl(270, 100%, 65%) 100%)'
+                : 'hsl(0, 0%, 8%)',
+              border: `1px solid ${isSelected ? 'hsl(190, 100%, 50%, 0.5)' : 'hsl(0, 0%, 18%)'}`,
+              color: isSelected ? 'white' : 'hsl(0, 0%, 75%)',
+              boxShadow: isSelected ? '0 0 20px hsl(190, 100%, 50%, 0.3)' : '0 4px 12px rgba(0,0,0,0.2)'
+            }}
           >
-            <span className="flex items-center gap-2">
-              <tab.icon className="w-4 h-4" />
+            <span className="flex items-center gap-2.5">
+              <tab.icon 
+                className="w-4 h-4" 
+                style={{ color: isSelected ? 'white' : (colors?.text || 'hsl(0, 0%, 53%)') }} 
+              />
               {tab.name}
-              <span className={`px-2 py-0.5 rounded-full text-xs ${
-                isSelected ? 'bg-white/20' : 'bg-muted'
-              }`}>
+              <span 
+                className="px-2.5 py-0.5 rounded-full text-xs font-bold"
+                style={{ 
+                  background: isSelected ? 'rgba(255,255,255,0.2)' : 'hsl(0, 0%, 12%)',
+                  color: isSelected ? 'white' : 'hsl(0, 0%, 53%)'
+                }}
+              >
                 {count}
               </span>
             </span>
@@ -307,47 +503,111 @@ function ChannelCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03, duration: 0.3 }}
-      whileHover={{ y: -4 }}
+      transition={{ delay: index * 0.05, duration: 0.4 }}
+      whileHover={{ y: -8 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="relative group"
     >
-      {/* Glassmorphism Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-card via-card to-violet-950/10 rounded-3xl border border-border/50" />
-      <div className={`absolute inset-0 bg-gradient-to-br ${colors.bg} via-transparent to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+      {/* Card Base - Dark theme */}
+      <div 
+        className="absolute inset-0 rounded-[2rem]"
+        style={{ 
+          background: 'hsl(0, 0%, 6.5%)',
+          boxShadow: '0 20px 40px -12px rgba(0,0,0,0.5)',
+          border: '1px solid hsl(0, 0%, 12%)'
+        }}
+      />
       
-      {/* Animated Border Glow */}
-      <div className="absolute inset-0 rounded-3xl p-[1px] bg-gradient-to-r from-transparent via-violet-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-violet-500/0 via-violet-500/50 to-violet-500/0 animate-pulse" />
+      {/* Hover glow effect */}
+      <motion.div 
+        className="absolute inset-0 rounded-[2rem] opacity-0 transition-opacity duration-500"
+        style={{ 
+          background: `linear-gradient(135deg, ${colors.accent}10 0%, transparent 100%)`,
+          boxShadow: `0 0 40px ${colors.accent}20`
+        }}
+        animate={{ 
+          opacity: isHovered ? 1 : 0,
+        }}
+      />
+      
+      {/* Animated border glow on hover */}
+      <div 
+        className="absolute inset-0 rounded-[2rem] p-[1.5px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ 
+          background: `linear-gradient(135deg, ${colors.accent}50 0%, ${colors.accent}20 50%, ${colors.accent}50 100%)`
+        }}
+      >
+        <div className="absolute inset-0 rounded-[2rem]" />
       </div>
 
-      <div className="relative p-6 space-y-5">
+      {/* Inner highlight */}
+      <div 
+        className="absolute inset-x-4 top-4 h-1/3 rounded-[2rem] opacity-30" 
+        style={{ 
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%)'
+        }}
+      />
+
+      <div className="relative p-7 space-y-5">
         {/* Header Section */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4 flex-1">
+            {/* Icon Container with gradient */}
             <motion.div 
-              className={`w-16 h-16 bg-gradient-to-br ${colors.gradient} rounded-2xl flex items-center justify-center shadow-lg`}
-              animate={{ scale: isHovered ? 1.1 : 1 }}
+              className="w-18 h-18 p-1 rounded-2xl"
+              style={{ 
+                background: `linear-gradient(135deg, ${colors.accent} 0%, hsl(270, 100%, 65%) 100%)`
+              }}
+              animate={{ 
+                scale: isHovered ? 1.1 : 1,
+                rotate: isHovered ? [0, 3, -3, 0] : 0,
+              }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             >
-              <IconComponent className="w-8 h-8 text-white" strokeWidth={1.5} />
+              <div 
+                className="w-full h-full rounded-xl flex items-center justify-center"
+                style={{ 
+                  background: 'rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(10px)'
+                }}
+              >
+                <IconComponent 
+                  className="w-9 h-9 text-white drop-shadow-md" 
+                  strokeWidth={1.5} 
+                />
+              </div>
             </motion.div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-xl font-bold text-foreground truncate group-hover:text-violet-400 transition-colors">
+              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                <h3 
+                  className="text-xl font-bold truncate transition-colors"
+                  style={{ 
+                    color: isHovered ? colors.accent : 'hsl(0, 0%, 98%)'
+                  }}
+                >
                   {channel.name}
                 </h3>
                 {channel.isPremium && (
-                  <span className="px-2 py-0.5 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full text-xs font-bold text-black flex items-center gap-1">
+                  <span 
+                    className="px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1"
+                    style={{ 
+                      background: 'linear-gradient(135deg, hsl(330, 100%, 65%) 0%, hsl(270, 100%, 65%) 100%)',
+                      color: 'white',
+                      boxShadow: '0 0 15px hsl(330, 100%, 65%, 0.4)'
+                    }}
+                  >
                     <Crown className="w-3 h-3" />
                     PRO
                   </span>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground line-clamp-2">
+              <p 
+                className="text-sm line-clamp-2 leading-relaxed"
+                style={{ color: 'hsl(0, 0%, 53%)' }}
+              >
                 {channel.description}
               </p>
             </div>
@@ -355,22 +615,38 @@ function ChannelCard({
           
           {/* Lock Icon for Unsubscribed */}
           {!isSubscribed && (
-            <div className="p-2 rounded-xl bg-muted/50">
-              <Lock className="w-4 h-4 text-muted-foreground" />
+            <div 
+              className="p-2.5 rounded-xl"
+              style={{ background: 'hsl(0, 0%, 12%)' }}
+            >
+              <Lock className="w-4 h-4" style={{ color: 'hsl(0, 0%, 35%)' }} />
             </div>
           )}
         </div>
 
         {/* Badges Row */}
         <div className="flex flex-wrap gap-2">
-          <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${colors.bg} ${colors.border} ${colors.text} border flex items-center gap-1.5`}>
+          <span 
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 ${colors.bg} ${colors.border} ${colors.text} border`}
+            style={{ borderColor: colors.accent }}
+          >
             {channel.category}
           </span>
-          <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${difficulty.bg} ${difficulty.border} ${difficulty.color} border flex items-center gap-1.5`}>
+          <span 
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 ${difficulty.bg} ${difficulty.border} ${difficulty.color}`}
+            style={{ borderColor: difficulty.accent }}
+          >
             <Target className="w-3 h-3" />
             {difficulty.label}
           </span>
-          <span className="px-3 py-1 rounded-lg text-xs font-semibold bg-muted/50 border border-border text-muted-foreground flex items-center gap-1.5">
+          <span 
+            className="px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"
+            style={{ 
+              background: 'hsl(0, 0%, 12%)',
+              border: '1px solid hsl(0, 0%, 18%)',
+              color: 'hsl(0, 0%, 53%)'
+            }}
+          >
             <BookOpen className="w-3 h-3" />
             {questionCount} Qs
           </span>
@@ -378,24 +654,51 @@ function ChannelCard({
 
         {/* Progress Visualization */}
         {isSubscribed && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-emerald-400" />
+              <span 
+                className="flex items-center gap-2 font-medium"
+                style={{ color: 'hsl(0, 0%, 53%)' }}
+              >
+                <TrendingUp className="w-4 h-4" style={{ color: 'hsl(142, 76%, 46%)' }} />
                 Progress
               </span>
-              <span className="font-bold text-foreground">{progress}%</span>
+              <span 
+                className="font-bold"
+                style={{ color: 'hsl(0, 0%, 98%)' }}
+              >
+                {progress}%
+              </span>
             </div>
-            <div className="relative h-3 bg-muted/50 rounded-full overflow-hidden">
+            {/* Progress Bar */}
+            <div 
+              className="relative h-4 rounded-full overflow-hidden"
+              style={{ 
+                background: 'hsl(0, 0%, 12%)',
+                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)'
+              }}
+            >
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500"
+                className="absolute inset-y-0 left-0 rounded-full"
+                style={{ 
+                  background: 'linear-gradient(135deg, hsl(190, 100%, 50%) 0%, hsl(270, 100%, 65%) 50%, hsl(330, 100%, 65%) 100%)'
+                }}
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+              {/* Shine effect */}
+              <div 
+                className="absolute inset-0 animate-shimmer"
+                style={{ 
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)'
+                }}
+              />
             </div>
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div 
+              className="flex items-center justify-between text-xs font-medium"
+              style={{ color: 'hsl(0, 0%, 35%)' }}
+            >
               <span>{completed.length} completed</span>
               <span>{questionCount - completed.length} remaining</span>
             </div>
@@ -404,16 +707,28 @@ function ChannelCard({
 
         {/* Stats for Unsubscribed */}
         {!isSubscribed && (
-          <div className="flex items-center gap-4 py-3 px-4 bg-muted/30 rounded-xl">
+          <div 
+            className="flex items-center gap-5 py-4 px-5 rounded-2xl"
+            style={{ 
+              background: 'hsl(0, 0%, 8%)',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+            }}
+          >
             <div className="flex items-center gap-2">
-              <Flame className="w-4 h-4 text-orange-400" />
-              <span className="text-sm text-muted-foreground">
+              <Flame className="w-4 h-4" style={{ color: 'hsl(330, 100%, 65%)' }} />
+              <span 
+                className="text-sm font-medium"
+                style={{ color: 'hsl(0, 0%, 53%)' }}
+              >
                 {Math.floor(Math.random() * 50 + 20)}% complete
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-blue-400" />
-              <span className="text-sm text-muted-foreground">
+              <Users className="w-4 h-4" style={{ color: 'hsl(190, 100%, 50%)' }} />
+              <span 
+                className="text-sm font-medium"
+                style={{ color: 'hsl(0, 0%, 53%)' }}
+              >
                 {Math.floor(Math.random() * 500 + 100)} learning
               </span>
             </div>
@@ -421,16 +736,20 @@ function ChannelCard({
         )}
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3 pt-2">
+        <div className="flex items-center gap-3 pt-3">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onToggleSubscribe}
-            className={`flex-1 px-5 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-              isSubscribed
-                ? 'bg-muted/80 border border-border hover:bg-muted'
-                : 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40'
-            }`}
+            className="flex-1 px-6 py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2"
+            style={{ 
+              background: isSubscribed 
+                ? 'hsl(0, 0%, 12%)'
+                : 'linear-gradient(135deg, hsl(190, 100%, 50%) 0%, hsl(270, 100%, 65%) 100%)',
+              border: `2px solid ${isSubscribed ? 'hsl(0, 0%, 18%)' : 'hsl(190, 100%, 50%, 0.5)'}`,
+              color: isSubscribed ? 'hsl(0, 0%, 75%)' : 'white',
+              boxShadow: isSubscribed ? 'none' : '0 0 20px hsl(190, 100%, 50%, 0.3)'
+            }}
           >
             {isSubscribed ? (
               <>
@@ -447,20 +766,30 @@ function ChannelCard({
 
           {isSubscribed ? (
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
               onClick={onNavigate}
-              className="p-3.5 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 rounded-xl border border-violet-500/30 hover:border-violet-500/50 transition-all"
+              className="p-4 rounded-2xl border-2 transition-all"
+              style={{ 
+                background: 'linear-gradient(135deg, hsl(190, 100%, 50%, 0.1) 0%, hsl(270, 100%, 65%, 0.1) 100%)',
+                borderColor: 'hsl(190, 100%, 50%, 0.3)',
+                boxShadow: '0 0 15px hsl(190, 100%, 50%, 0.2)'
+              }}
             >
-              <ChevronRight className="w-5 h-5 text-violet-400" />
+              <ChevronRight className="w-5 h-5" style={{ color: 'hsl(190, 100%, 50%)' }} />
             </motion.button>
           ) : (
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.08, rotate: -5 }}
               whileTap={{ scale: 0.95 }}
-              className="p-3.5 bg-muted/50 rounded-xl border border-border hover:border-amber-500/30 transition-all"
+              className="p-4 rounded-2xl border-2 transition-all"
+              style={{ 
+                background: 'hsl(0, 0%, 8%)',
+                borderColor: 'hsl(0, 0%, 18%)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+              }}
             >
-              <Sparkles className="w-5 h-5 text-amber-400" />
+              <Sparkles className="w-5 h-5" style={{ color: 'hsl(330, 100%, 65%)' }} />
             </motion.button>
           )}
         </div>
@@ -476,32 +805,70 @@ function EmptyState({ onClearFilters }: { onClearFilters: () => void }) {
       animate={{ opacity: 1, y: 0 }}
       className="col-span-full"
     >
-      <div className="relative overflow-hidden rounded-3xl bg-card/50 border border-border p-12 text-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/5" />
+      <div 
+        className="relative overflow-hidden rounded-[2rem] p-14 text-center"
+        style={{ 
+          background: 'hsl(0, 0%, 6.5%)',
+          border: '1px solid hsl(0, 0%, 12%)',
+          boxShadow: '0 20px 40px -12px rgba(0,0,0,0.5)'
+        }}
+      >
+        {/* Gradient background effects */}
+        <div 
+          className="absolute inset-0 opacity-30" 
+          style={{ 
+            background: 'linear-gradient(135deg, hsl(190, 100%, 50%, 0.1) 0%, hsl(270, 100%, 65%, 0.1) 100%)'
+          }} 
+        />
+        <div 
+          className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl" 
+          style={{ background: 'hsl(190, 100%, 50%, 0.1)' }} 
+        />
+        <div 
+          className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl" 
+          style={{ background: 'hsl(270, 100%, 65%, 0.1)' }} 
+        />
+        
         <div className="relative">
-          <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center border border-violet-500/30">
-            <Search className="w-10 h-10 text-violet-400" />
+          <div 
+            className="w-28 h-28 mx-auto mb-6 rounded-[2rem] flex items-center justify-center border"
+            style={{ 
+              background: 'linear-gradient(135deg, hsl(190, 100%, 50%, 0.1) 0%, hsl(270, 100%, 65%, 0.1) 100%)',
+              borderColor: 'hsl(190, 100%, 50%, 0.3)',
+              boxShadow: '0 0 30px hsl(190, 100%, 50%, 0.2)'
+            }}
+          >
+            <Search className="w-12 h-12" style={{ color: 'hsl(190, 100%, 50%)' }} />
           </div>
-          <h3 className="text-2xl font-bold mb-2">No channels found</h3>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+          <h3 
+            className="text-3xl font-bold mb-3"
+            style={{ color: 'hsl(0, 0%, 98%)' }}
+          >
+            No channels found
+          </h3>
+          <p 
+            className="mb-8 max-w-md mx-auto text-lg leading-relaxed"
+            style={{ color: 'hsl(0, 0%, 53%)' }}
+          >
             Try adjusting your search or filters to discover amazing learning channels
           </p>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={onClearFilters}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/25 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold transition-all"
+            style={{ 
+              background: 'linear-gradient(135deg, hsl(190, 100%, 50%) 0%, hsl(270, 100%, 65%) 100%)',
+              color: 'white',
+              boxShadow: '0 0 20px hsl(190, 100%, 50%, 0.3)'
+            }}
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-5 h-5" />
             Clear Filters
-          </button>
+          </motion.button>
         </div>
       </div>
     </motion.div>
-  );
-}
-
-function SkeletonCard() {
-  return (
-    <div className="h-72 rounded-3xl bg-muted/30 animate-pulse border border-border" />
   );
 }
 
@@ -512,7 +879,6 @@ export default function AllChannelsGenZ() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [voiceActive, setVoiceActive] = useState(false);
-  const [showPremiumPopup, setShowPremiumPopup] = useState(false);
 
   const questionCounts: Record<string, number> = {};
   stats.forEach(s => { questionCounts[s.id] = s.total; });
@@ -544,21 +910,38 @@ export default function AllChannelsGenZ() {
   return (
     <>
       <SEOHead
-        title="Browse Channels - DevPrep Pro Max 🚀"
-        description="Explore all topics and start learning. Powered by 30 AI Agents."
+        title="Browse Channels - DevPrep Pro Max"
+        description="Explore all topics and start learning with DevPrep."
         canonical="https://open-interview.github.io/channels"
       />
 
       <AppLayout>
-        <div className="min-h-screen bg-background text-foreground">
-          <div className="max-w-7xl mx-auto pb-12 px-4">
+        <div 
+          className="min-h-screen"
+          style={{ 
+            background: 'linear-gradient(180deg, hsl(0, 0%, 0%) 0%, hsl(0, 0%, 8%) 100%)'
+          }}
+        >
+          <div className="max-w-7xl mx-auto pb-16 px-5 pt-6">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-              <button onClick={() => navigate('/')} className="hover:text-foreground transition-colors">
+            <div 
+              className="flex items-center gap-2.5 text-sm mb-8 font-medium"
+              style={{ color: 'hsl(0, 0%, 53%)' }}
+            >
+              <button 
+                onClick={() => navigate('/')} 
+                className="hover:underline transition-colors"
+                style={{ color: 'hsl(190, 100%, 50%)' }}
+              >
                 Home
               </button>
               <span>/</span>
-              <span className="text-foreground font-medium">Channels</span>
+              <span 
+                className="font-bold"
+                style={{ color: 'hsl(0, 0%, 98%)' }}
+              >
+                Channels
+              </span>
             </div>
 
             {/* Animated Gradient Header */}
@@ -580,18 +963,31 @@ export default function AllChannelsGenZ() {
             />
 
             {/* Results Count */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h2 
+                  className="text-2xl font-bold"
+                  style={{ color: 'hsl(0, 0%, 98%)' }}
+                >
                   {selectedCategory ? `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Channels` : 'All Channels'}
                 </h2>
-                <span className="px-3 py-1 bg-violet-500/20 text-violet-400 rounded-full text-sm font-semibold">
+                <span 
+                  className="px-4 py-1.5 rounded-full text-sm font-bold"
+                  style={{ 
+                    background: 'hsl(190, 100%, 50%, 0.1)',
+                    border: '1px solid hsl(190, 100%, 50%, 0.3)',
+                    color: 'hsl(190, 100%, 50%)'
+                  }}
+                >
                   {filteredChannels.length}
                 </span>
               </div>
               {subscribedCount > 0 && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                <div 
+                  className="flex items-center gap-2.5 text-sm font-medium"
+                  style={{ color: 'hsl(0, 0%, 53%)' }}
+                >
+                  <CheckCircle className="w-5 h-5" style={{ color: 'hsl(142, 76%, 46%)' }} />
                   <span>{subscribedCount} subscribed</span>
                 </div>
               )}
@@ -603,7 +999,12 @@ export default function AllChannelsGenZ() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 onClick={clearFilters}
-                className="mb-6 px-4 py-2 bg-muted/50 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors flex items-center gap-2"
+                className="mb-8 px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all"
+                style={{ 
+                  background: 'hsl(0, 0%, 8%)',
+                  border: '1px solid hsl(0, 0%, 18%)',
+                  color: 'hsl(0, 0%, 53%)'
+                }}
               >
                 <X className="w-4 h-4" />
                 Clear all filters
@@ -611,7 +1012,7 @@ export default function AllChannelsGenZ() {
             )}
 
             {/* Channels Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <AnimatePresence mode="popLayout">
                 {filteredChannels.length === 0 ? (
                   <EmptyState onClearFilters={clearFilters} />
@@ -649,6 +1050,24 @@ export default function AllChannelsGenZ() {
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        
+        /* Smooth scroll behavior */
+        html {
+          scroll-behavior: smooth;
+        }
+        
+        /* Enhanced focus states */
+        input:focus, button:focus {
+          outline: none;
+        }
+        
+        /* Line clamp utility */
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
       `}</style>
     </>

@@ -21,7 +21,6 @@ interface Role {
   name: string;
   description: string;
   icon: any;
-  color: string;
   channels: string[];
 }
 
@@ -31,7 +30,6 @@ const roles: Role[] = [
     name: 'Frontend Developer',
     description: 'React, JavaScript, CSS, and modern web development',
     icon: Layout,
-    color: 'from-blue-500 to-cyan-500',
     channels: ['frontend', 'react', 'javascript', 'css', 'html']
   },
   {
@@ -39,7 +37,6 @@ const roles: Role[] = [
     name: 'Backend Engineer',
     description: 'Node.js, Python, databases, and APIs',
     icon: Server,
-    color: 'from-green-500 to-emerald-500',
     channels: ['backend', 'nodejs', 'python', 'database', 'api']
   },
   {
@@ -47,7 +44,6 @@ const roles: Role[] = [
     name: 'Full Stack Developer',
     description: 'End-to-end development with React and Node.js',
     icon: Code,
-    color: 'from-purple-500 to-pink-500',
     channels: ['frontend', 'backend', 'database', 'api']
   },
   {
@@ -55,7 +51,6 @@ const roles: Role[] = [
     name: 'DevOps Engineer',
     description: 'Cloud infrastructure, containers, and CI/CD',
     icon: Cloud,
-    color: 'from-orange-500 to-red-500',
     channels: ['devops', 'docker', 'kubernetes', 'aws', 'ci-cd']
   },
   {
@@ -63,7 +58,6 @@ const roles: Role[] = [
     name: 'Data Engineer',
     description: 'Data pipelines, SQL, and analytics',
     icon: Database,
-    color: 'from-indigo-500 to-purple-500',
     channels: ['database', 'sql', 'python', 'data-engineering']
   },
   {
@@ -71,7 +65,6 @@ const roles: Role[] = [
     name: 'ML Engineer',
     description: 'Machine learning, AI, and data science',
     icon: Brain,
-    color: 'from-rose-500 to-pink-500',
     channels: ['python', 'ml', 'ai', 'data-science']
   }
 ];
@@ -82,6 +75,18 @@ const steps = [
   { id: 3, title: 'Set Goals', description: 'Define your learning objectives' },
   { id: 4, title: 'Ready to Go', description: 'Start your journey' }
 ];
+
+const getRoleGradient = (roleId: string): string => {
+  const gradients: Record<string, string> = {
+    frontend: 'linear-gradient(135deg, hsl(210 100% 50%) 0%, hsl(190 100% 50%) 100%)',
+    backend: 'linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(160 76% 46%) 100%)',
+    fullstack: 'linear-gradient(135deg, hsl(270 100% 65%) 0%, hsl(330 100% 65%) 100%)',
+    devops: 'linear-gradient(135deg, hsl(25 92% 50%) 0%, hsl(0 84% 60%) 100%)',
+    data: 'linear-gradient(135deg, hsl(240 100% 65%) 0%, hsl(270 100% 65%) 100%)',
+    ml: 'linear-gradient(135deg, hsl(350 85% 65%) 0%, hsl(330 100% 65%) 100%)'
+  };
+  return gradients[roleId] || 'var(--gradient-primary)';
+};
 
 export default function OnboardingPage() {
   const [, setLocation] = useLocation();
@@ -126,7 +131,7 @@ export default function OnboardingPage() {
       />
 
       <AppLayout>
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="min-h-screen" style={{ background: 'var(--color-base-dark)', color: 'var(--color-text-primary)' }}>
           <div className="max-w-4xl mx-auto px-6 py-12">
             {/* Progress Steps */}
             <div className="mb-12">
@@ -135,24 +140,41 @@ export default function OnboardingPage() {
                   <div key={step.id} className="flex items-center">
                     <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold transition-all ${
                       currentStep > step.id
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'gradient-text'
                         : currentStep === step.id
-                          ? 'bg-primary/20 text-primary border-2 border-primary'
-                          : 'bg-muted text-muted-foreground'
-                    }`}>
+                          ? 'border-2'
+                          : ''
+                    }`}
+                    style={{
+                      background: currentStep > step.id 
+                        ? 'var(--gradient-primary)' 
+                        : currentStep === step.id 
+                          ? 'rgba(0,0,0,0.2)' 
+                          : 'var(--color-base-elevated)',
+                      color: currentStep > step.id || currentStep === step.id
+                        ? 'white' 
+                        : 'var(--color-text-tertiary)',
+                      borderColor: currentStep === step.id 
+                        ? 'var(--color-accent-cyan)' 
+                        : 'transparent'
+                    }}>
                       {currentStep > step.id ? <Check className="w-5 h-5" /> : step.id}
                     </div>
                     {index < steps.length - 1 && (
-                      <div className={`w-12 md:w-24 h-0.5 mx-2 transition-all ${
-                        currentStep > step.id ? 'bg-primary' : 'bg-muted'
-                      }`} />
+                      <div className={`w-12 md:w-24 h-0.5 mx-2 transition-all`}
+                        style={{
+                          background: currentStep > step.id 
+                            ? 'var(--gradient-primary)' 
+                            : 'var(--color-border-subtle)'
+                        }}
+                      />
                     )}
                   </div>
                 ))}
               </div>
               <div className="text-center">
-                <h2 className="text-xl font-bold">{steps[currentStep - 1].title}</h2>
-                <p className="text-muted-foreground">{steps[currentStep - 1].description}</p>
+                <h2 className="font-bold" style={{ fontSize: 'var(--text-xl)' }}>{steps[currentStep - 1].title}</h2>
+                <p style={{ color: 'var(--color-text-tertiary)' }}>{steps[currentStep - 1].description}</p>
               </div>
             </div>
 
@@ -167,51 +189,59 @@ export default function OnboardingPage() {
                   className="space-y-8"
                 >
                   <div className="text-center space-y-4">
-                    <div className="w-24 h-24 mx-auto bg-gradient-to-br from-primary to-cyan-500 rounded-full flex items-center justify-center">
-                      <Rocket className="w-12 h-12 text-black" />
+                    <div className="w-24 h-24 mx-auto rounded-full flex items-center justify-center animate-pulse-glow" style={{ background: 'var(--gradient-primary)' }}>
+                      <Rocket className="w-12 h-12" style={{ color: 'white' }} aria-hidden="true" />
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-black">
-                      Welcome to <span className="bg-gradient-to-r from-primary to-cyan-500 bg-clip-text text-transparent">DevPrep</span>
+                    <h1 className="font-black" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.75rem)' }}>
+                      Welcome to <span className="gradient-text">DevPrep</span>
                     </h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                    <p className="max-w-2xl mx-auto" style={{ fontSize: 'var(--text-xl)', color: 'var(--color-text-tertiary)' }}>
                       Your personal AI-powered interview preparation assistant. Let's set up your learning journey in just a few steps.
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-                    <div className="p-6 bg-muted/50 rounded-2xl border border-border">
-                      <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center mb-4">
-                        <BookOpen className="w-6 h-6 text-primary" />
+                    <div className="glass-card" style={{ borderRadius: 'var(--radius-xl)', padding: 'var(--space-xl)' }}>
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: 'hsla(190, 100%, 50%, 0.15)' }}>
+                        <BookOpen className="w-6 h-6" style={{ color: 'var(--color-accent-cyan)' }} />
                       </div>
-                      <h3 className="font-bold text-lg mb-2">Learn</h3>
-                      <p className="text-muted-foreground">Access thousands of questions across multiple topics</p>
+                      <h3 className="font-bold mb-2" style={{ fontSize: 'var(--text-lg)' }}>Learn</h3>
+                      <p style={{ color: 'var(--color-text-tertiary)' }}>Access thousands of questions across multiple topics</p>
                     </div>
-                    <div className="p-6 bg-muted/50 rounded-2xl border border-border">
-                      <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-4">
-                        <Target className="w-6 h-6 text-cyan-500" />
+                    <div className="glass-card" style={{ borderRadius: 'var(--radius-xl)', padding: 'var(--space-xl)' }}>
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: 'hsla(190, 100%, 50%, 0.15)' }}>
+                        <Target className="w-6 h-6" style={{ color: 'var(--color-accent-cyan)' }} />
                       </div>
-                      <h3 className="font-bold text-lg mb-2">Practice</h3>
-                      <p className="text-muted-foreground">Voice interviews, coding challenges, and more</p>
+                      <h3 className="font-bold mb-2" style={{ fontSize: 'var(--text-lg)' }}>Practice</h3>
+                      <p style={{ color: 'var(--color-text-tertiary)' }}>Voice interviews, coding challenges, and more</p>
                     </div>
-                    <div className="p-6 bg-muted/50 rounded-2xl border border-border">
-                      <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-4">
-                        <Trophy className="w-6 h-6 text-emerald-500" />
+                    <div className="glass-card" style={{ borderRadius: 'var(--radius-xl)', padding: 'var(--space-xl)' }}>
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: 'hsla(142, 76%, 46%, 0.15)' }}>
+                        <Trophy className="w-6 h-6" style={{ color: 'var(--color-success-light)' }} />
                       </div>
-                      <h3 className="font-bold text-lg mb-2">Achieve</h3>
-                      <p className="text-muted-foreground">Track progress and earn badges</p>
+                      <h3 className="font-bold mb-2" style={{ fontSize: 'var(--text-lg)' }}>Achieve</h3>
+                      <p style={{ color: 'var(--color-text-tertiary)' }}>Track progress and earn badges</p>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-center gap-4 pt-8">
                     <button
                       onClick={() => setLocation('/')}
-                      className="px-6 py-3 text-muted-foreground hover:text-foreground transition-colors"
+                      className="transition-fast focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-cyan)]"
+                      style={{ 
+                        padding: '0.75rem 1.5rem', 
+                        color: 'var(--color-text-tertiary)',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
                     >
                       Skip for now
                     </button>
                     <button
                       onClick={() => setCurrentStep(2)}
-                      className="px-8 py-3 bg-gradient-to-r from-primary to-cyan-500 rounded-xl font-bold text-black hover:scale-105 transition-transform flex items-center gap-2"
+                      className="btn-primary glow-hover-cyan flex items-center gap-2"
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     >
                       Get Started <ArrowRight className="w-5 h-5" />
                     </button>
@@ -228,8 +258,8 @@ export default function OnboardingPage() {
                   className="space-y-6"
                 >
                   <div className="text-center mb-8">
-                    <h2 className="text-3xl font-black mb-2">Choose Your Career Path</h2>
-                    <p className="text-muted-foreground">Select the role you're preparing for</p>
+                    <h2 className="font-black mb-2" style={{ fontSize: 'var(--text-3xl)' }}>Choose Your Career Path</h2>
+                    <p style={{ color: 'var(--color-text-tertiary)' }}>Select the role you're preparing for</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -241,19 +271,20 @@ export default function OnboardingPage() {
                         <button
                           key={role.id}
                           onClick={() => setSelectedRole(role.id)}
-                          className={`p-6 rounded-2xl border-2 text-left transition-all ${
-                            isSelected
-                              ? 'border-primary bg-primary/10'
-                              : 'border-border hover:border-primary/50'
-                          }`}
+                          className={`p-6 text-left transition-all card-premium ${isSelected ? 'glow-cyan' : ''}`}
+                          style={{
+                            borderRadius: 'var(--radius-xl)',
+                            border: `2px solid ${isSelected ? 'var(--color-accent-cyan)' : 'var(--color-border-subtle)'}`,
+                            background: isSelected ? 'hsla(190, 100%, 50%, 0.08)' : 'var(--color-base-card)'
+                          }}
                         >
-                          <div className={`w-12 h-12 bg-gradient-to-br ${role.color} rounded-xl flex items-center justify-center mb-4`}>
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4`} style={{ background: getRoleGradient(role.id) }}>
                             <Icon className="w-6 h-6 text-white" />
                           </div>
-                          <h3 className="font-bold text-lg mb-1">{role.name}</h3>
-                          <p className="text-sm text-muted-foreground">{role.description}</p>
+                          <h3 className="font-bold mb-1" style={{ fontSize: 'var(--text-lg)' }}>{role.name}</h3>
+                          <p className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>{role.description}</p>
                           {isSelected && (
-                            <div className="mt-4 flex items-center gap-2 text-primary">
+                            <div className="mt-4 flex items-center gap-2" style={{ color: 'var(--color-accent-cyan)' }}>
                               <Check className="w-5 h-5" />
                               <span className="font-semibold">Selected</span>
                             </div>
@@ -266,7 +297,14 @@ export default function OnboardingPage() {
                   <div className="flex items-center justify-between pt-8">
                     <button
                       onClick={() => setCurrentStep(1)}
-                      className="px-6 py-3 text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
+                      className="flex items-center gap-2 transition-fast"
+                      style={{ 
+                        padding: '0.75rem 1.5rem', 
+                        color: 'var(--color-text-tertiary)',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
                     >
                       <ArrowLeft className="w-5 h-5" /> Back
                     </button>
@@ -281,7 +319,14 @@ export default function OnboardingPage() {
                         }
                       }}
                       disabled={!selectedRole}
-                      className="px-8 py-3 bg-gradient-to-r from-primary to-cyan-500 rounded-xl font-bold text-black hover:scale-105 transition-transform flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      className="btn-primary glow-hover-cyan flex items-center gap-2"
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.5rem',
+                        opacity: selectedRole ? 1 : 0.5,
+                        cursor: selectedRole ? 'pointer' : 'not-allowed'
+                      }}
                     >
                       Continue <ArrowRight className="w-5 h-5" />
                     </button>
@@ -298,12 +343,12 @@ export default function OnboardingPage() {
                   className="space-y-6"
                 >
                   <div className="text-center mb-8">
-                    <h2 className="text-3xl font-black mb-2">Select Topics to Focus On</h2>
-                    <p className="text-muted-foreground">Choose the areas you want to practice</p>
+                    <h2 className="font-black mb-2" style={{ fontSize: 'var(--text-3xl)' }}>Select Topics to Focus On</h2>
+                    <p style={{ color: 'var(--color-text-tertiary)' }}>Choose the areas you want to practice</p>
                   </div>
 
-                  <div className="p-4 bg-primary/10 rounded-xl border border-primary/30 mb-6">
-                    <div className="flex items-center gap-2 text-primary">
+                  <div className="p-4 rounded-xl mb-6 glass-card" style={{ border: '1px solid hsla(190, 100%, 50%, 0.3)' }}>
+                    <div className="flex items-center gap-2" style={{ color: 'var(--color-accent-cyan)' }}>
                       <Zap className="w-5 h-5" />
                       <span className="font-semibold">Recommended for {roles.find(r => r.id === selectedRole)?.name}</span>
                     </div>
@@ -317,15 +362,15 @@ export default function OnboardingPage() {
                         <button
                           key={channel.id}
                           onClick={() => toggleChannel(channel.id)}
-                          className={`p-4 rounded-xl border text-left transition-all ${
-                            isSelected
-                              ? 'border-primary bg-primary/10'
-                              : 'border-border hover:border-primary/50'
-                          }`}
+                          className="p-4 rounded-xl text-left transition-all"
+                          style={{
+                            border: `1px solid ${isSelected ? 'var(--color-accent-cyan)' : 'var(--color-border-subtle)'}`,
+                            background: isSelected ? 'hsla(190, 100%, 50%, 0.08)' : 'var(--color-base-card)'
+                          }}
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-semibold">{channel.name}</span>
-                            {isSelected && <Check className="w-5 h-5 text-primary" />}
+                            {isSelected && <Check className="w-5 h-5" style={{ color: 'var(--color-accent-cyan)' }} />}
                           </div>
                         </button>
                       );
@@ -335,14 +380,28 @@ export default function OnboardingPage() {
                   <div className="flex items-center justify-between pt-8">
                     <button
                       onClick={() => setCurrentStep(2)}
-                      className="px-6 py-3 text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
+                      className="flex items-center gap-2 transition-fast"
+                      style={{ 
+                        padding: '0.75rem 1.5rem', 
+                        color: 'var(--color-text-tertiary)',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
                     >
                       <ArrowLeft className="w-5 h-5" /> Back
                     </button>
                     <button
                       onClick={handleComplete}
                       disabled={selectedChannels.length === 0}
-                      className="px-8 py-3 bg-gradient-to-r from-primary to-cyan-500 rounded-xl font-bold text-black hover:scale-105 transition-transform flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      className="btn-primary glow-hover-cyan flex items-center gap-2"
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.5rem',
+                        opacity: selectedChannels.length > 0 ? 1 : 0.5,
+                        cursor: selectedChannels.length > 0 ? 'pointer' : 'not-allowed'
+                      }}
                     >
                       Complete Setup <Sparkles className="w-5 h-5" />
                     </button>
@@ -358,36 +417,37 @@ export default function OnboardingPage() {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-8 text-center"
                 >
-                  <div className="w-32 h-32 mx-auto bg-gradient-to-br from-primary to-cyan-500 rounded-full flex items-center justify-center animate-pulse">
-                    <Trophy className="w-16 h-16 text-black" />
+                  <div className="w-32 h-32 mx-auto rounded-full flex items-center justify-center animate-pulse-glow" style={{ background: 'var(--gradient-primary)' }}>
+                    <Trophy className="w-16 h-16" style={{ color: 'white' }} />
                   </div>
 
                   <div>
-                    <h2 className="text-4xl font-black mb-4">You're All Set!</h2>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                    <h2 className="font-black mb-4" style={{ fontSize: 'var(--text-4xl)' }}>You're All Set!</h2>
+                    <p className="max-w-2xl mx-auto" style={{ fontSize: 'var(--text-xl)', color: 'var(--color-text-tertiary)' }}>
                       Your personalized learning path is ready. Start practicing and land your dream job!
                     </p>
                   </div>
 
                   <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mt-8">
                     <div className="text-center">
-                      <div className="text-3xl font-black text-primary">{selectedChannels.length}</div>
-                      <div className="text-sm text-muted-foreground">Topics</div>
+                      <div className="font-black gradient-text" style={{ fontSize: 'var(--text-3xl)' }}>{selectedChannels.length}</div>
+                      <div className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>Topics</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-3xl font-black text-cyan-500">{roles.find(r => r.id === selectedRole)?.name.split(' ')[0]}</div>
-                      <div className="text-sm text-muted-foreground">Focus</div>
+                      <div className="font-black" style={{ fontSize: 'var(--text-3xl)', color: 'var(--color-accent-cyan)' }}>{roles.find(r => r.id === selectedRole)?.name.split(' ')[0]}</div>
+                      <div className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>Focus</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-3xl font-black text-emerald-500">30+</div>
-                      <div className="text-sm text-muted-foreground">AI Agents</div>
+                      <div className="font-black" style={{ fontSize: 'var(--text-3xl)', color: 'var(--color-success-light)' }}>20+</div>
+                      <div className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>Channels</div>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-center gap-4 pt-8">
                     <button
                       onClick={() => setLocation('/')}
-                      className="px-8 py-3 bg-gradient-to-r from-primary to-cyan-500 rounded-xl font-bold text-black hover:scale-105 transition-transform flex items-center gap-2"
+                      className="btn-primary glow-hover-cyan flex items-center gap-2"
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     >
                       Start Learning <ChevronRight className="w-5 h-5" />
                     </button>

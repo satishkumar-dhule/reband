@@ -205,7 +205,7 @@ export default function TestSessionGenZ() {
                     <span className="font-bold">{test.passingScore}%</span>
                   </div>
                   {progress && !isExpired && (
-                    <div className="flex justify-between p-2 bg-[#00ff88]/10 rounded border border-primary/30">
+                    <div className="flex justify-between p-2 bg-primary/10 rounded border border-primary/30">
                       <span className="text-muted-foreground">Your Best</span>
                       <span className="font-bold text-primary">{progress.bestScore}%</span>
                     </div>
@@ -244,7 +244,7 @@ export default function TestSessionGenZ() {
                 </span>
                 <div className="h-1 w-20 bg-muted rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#00ff88] transition-all"
+                    className="h-full bg-primary transition-all"
                     style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
                   />
                 </div>
@@ -267,15 +267,15 @@ export default function TestSessionGenZ() {
                     <div className="flex items-center gap-2 mb-3">
                       <span className={`px-2 py-0.5 text-[10px] uppercase rounded ${
                         currentQuestion.type === 'multiple' 
-                          ? 'bg-[#ff0080]/20 text-[#ff0080]' 
-                          : 'bg-[#00d4ff]/20 text-cyan-500'
+                          ? 'bg-destructive/20 text-destructive' 
+                          : 'bg-cyan-500/20 text-cyan-400'
                       }`}>
                         {currentQuestion.type === 'multiple' ? 'Select all that apply' : 'Single choice'}
                       </span>
                       <span className={`px-2 py-0.5 text-[10px] uppercase rounded ${
-                        currentQuestion.difficulty === 'beginner' ? 'bg-[#00ff88]/20 text-primary' :
-                        currentQuestion.difficulty === 'intermediate' ? 'bg-[#ffd700]/20 text-[#ffd700]' :
-                        'bg-[#ff0080]/20 text-[#ff0080]'
+                        currentQuestion.difficulty === 'beginner' ? 'bg-primary/20 text-primary' :
+                        currentQuestion.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-destructive/20 text-destructive'
                       }`}>
                         {currentQuestion.difficulty}
                       </span>
@@ -297,22 +297,22 @@ export default function TestSessionGenZ() {
                             disabled={showFeedback !== null}
                             className={`w-full p-4 text-left border rounded-lg transition-all ${
                               showCorrect
-                                ? 'border-primary bg-[#00ff88]/20'
+                                ? 'border-primary bg-primary/20'
                                 : showWrong
-                                ? 'border-[#ff0080] bg-[#ff0080]/20'
+                                ? 'border-destructive bg-destructive/20'
                                 : isSelected
-                                ? 'border-primary bg-[#00ff88]/10'
+                                ? 'border-primary bg-primary/10'
                                 : 'border-border hover:border-primary/50'
                             } ${showFeedback ? 'cursor-default' : ''}`}
                           >
                             <div className="flex items-start gap-3">
                               <div className={`w-6 h-6 ${isMultiple ? 'rounded-md' : 'rounded-full'} border-2 flex items-center justify-center flex-shrink-0 ${
                                 showCorrect
-                                  ? 'border-primary bg-[#00ff88]'
+                                  ? 'border-primary bg-primary'
                                   : showWrong
-                                  ? 'border-[#ff0080] bg-[#ff0080]'
+                                  ? 'border-destructive bg-destructive'
                                   : isSelected 
-                                  ? 'border-primary bg-[#00ff88]' 
+                                  ? 'border-primary bg-primary' 
                                   : 'border-white/30'
                               }`}>
                                 {showCorrect && <Check className="w-4 h-4 text-black" />}
@@ -404,17 +404,17 @@ export default function TestSessionGenZ() {
               <GenZCard className="p-8">
                 <div className="text-center">
                   <div className={`w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 ${
-                    result.passed ? 'bg-[#00ff88]/20' : 'bg-[#ff0080]/20'
+                    result.passed ? 'bg-primary/20' : 'bg-destructive/20'
                   }`}>
                     {result.passed ? (
                       <Trophy className="w-12 h-12 text-primary" />
                     ) : (
-                      <XCircle className="w-12 h-12 text-[#ff0080]" />
+                      <XCircle className="w-12 h-12 text-destructive" />
                     )}
                   </div>
                   
                   <div className="text-6xl font-black text-foreground mb-2">{result.score}%</div>
-                  <p className={`text-xl font-semibold mb-8 ${result.passed ? 'text-primary' : 'text-[#ff0080]'}`}>
+                  <p className={`text-xl font-semibold mb-8 ${result.passed ? 'text-primary' : 'text-destructive'}`}>
                     {result.passed ? 'Passed!' : 'Not Passed'}
                   </p>
                   
@@ -424,7 +424,7 @@ export default function TestSessionGenZ() {
                       <div className="text-xs text-muted-foreground">Correct</div>
                     </div>
                     <div className="bg-background/50 rounded-xl p-4">
-                      <div className="text-2xl font-bold text-[#ff0080]">{result.total - result.correct}</div>
+                      <div className="text-2xl font-bold text-destructive">{result.total - result.correct}</div>
                       <div className="text-xs text-muted-foreground">Incorrect</div>
                     </div>
                   </div>

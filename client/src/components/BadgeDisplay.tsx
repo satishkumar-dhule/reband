@@ -59,8 +59,11 @@ export function BadgeRing({ progress, size = 'md', showProgress = true, onClick 
   
   return (
     <div
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
       className={`flex flex-col items-center ${onClick ? 'cursor-pointer active:scale-95 transition-transform' : ''}`}
       onClick={onClick}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
       style={{ width: s.ring }}
     >
       {/* Ring container - use relative positioning */}

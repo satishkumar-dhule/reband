@@ -75,6 +75,7 @@ export function SwipeHint({ onDismiss }: SwipeHintProps) {
             <button
               onClick={handleDismiss}
               className="ml-2 p-1 text-muted-foreground hover:text-foreground"
+              aria-label="Dismiss hint"
             >
               <X className="w-4 h-4" />
             </button>

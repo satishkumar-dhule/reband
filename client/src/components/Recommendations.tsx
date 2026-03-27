@@ -209,6 +209,7 @@ export function Recommendations({
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg hover:bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3] transition-colors"
+            aria-label="Close recommendations"
           >
             <X className="w-4 h-4" />
           </button>

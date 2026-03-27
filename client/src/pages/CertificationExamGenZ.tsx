@@ -388,6 +388,7 @@ function SetupScreen({
         <div className="text-center mb-8">
           <button
             onClick={onBack}
+            aria-label="Go back"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -566,6 +567,7 @@ function ActiveExam({
             <div className="flex items-center gap-3">
               <button
                 onClick={onExit}
+                aria-label="Exit exam"
                 className="p-1.5 hover:bg-muted rounded-lg transition-colors"
                 title="Exit and save progress"
               >
@@ -682,6 +684,7 @@ function ActiveExam({
           </span>
           <button
             onClick={onToggleFlag}
+            aria-label="Flag question"
             className={`ml-auto p-1.5 rounded-lg transition-colors ${
               isFlagged ? 'bg-amber-500/10 text-amber-500' : 'hover:bg-muted text-muted-foreground'
             }`}

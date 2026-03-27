@@ -13,12 +13,13 @@ import {
   Trophy, Lock, Sparkles, Home
 } from 'lucide-react';
 
+// Design system tier colors - dark theme with cyan/purple/pink accents
 const tierColors = {
-  bronze: 'from-[#cd7f32] to-[#8b4513]',
-  silver: 'from-[#c0c0c0] to-[#808080]',
-  gold: 'from-[#ffd700] to-[#ff8c00]',
-  platinum: 'from-[#e5e4e2] to-[#b0b0b0]',
-  diamond: 'from-[#b9f2ff] to-cyan-500'
+  bronze: 'from-cyan-500/80 to-purple-500/80',
+  silver: 'from-slate-300 to-slate-500',
+  gold: 'from-cyan-400 to-purple-400',
+  platinum: 'from-purple-400 to-pink-400',
+  diamond: 'from-cyan-300 to-pink-300'
 };
 
 export default function BadgesGenZ() {
@@ -94,7 +95,7 @@ export default function BadgesGenZ() {
               <h1 className="text-6xl md:text-7xl font-black">
                 Your
                 <br />
-                <span className="bg-gradient-to-r from-[#ffd700] to-[#ff8c00] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                   achievements
                 </span>
               </h1>
@@ -115,7 +116,7 @@ export default function BadgesGenZ() {
                   initial={{ width: 0 }}
                   animate={{ width: `${stats.percentage}%` }}
                   transition={{ duration: 1, delay: 0.2 }}
-                  className="h-full bg-gradient-to-r from-[#ffd700] to-[#ff8c00]"
+                  className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"
                 />
               </div>
             </motion.div>
@@ -131,7 +132,7 @@ export default function BadgesGenZ() {
                 onClick={() => setSelectedCategory(null)}
                 className={`px-6 py-3 rounded-full font-semibold transition-all ${
                   !selectedCategory
-                    ? 'bg-gradient-to-r from-[#ffd700] to-[#ff8c00] text-black'
+                    ? 'bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white'
                     : 'bg-muted/50 border border-border hover:bg-muted'
                 }`}
               >
@@ -143,7 +144,7 @@ export default function BadgesGenZ() {
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-6 py-3 rounded-full font-semibold transition-all capitalize ${
                     selectedCategory === cat
-                      ? 'bg-gradient-to-r from-[#ffd700] to-[#ff8c00] text-black'
+                      ? 'bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white'
                       : 'bg-muted/50 border border-border hover:bg-muted'
                   }`}
                 >
@@ -169,18 +170,18 @@ export default function BadgesGenZ() {
                     whileHover={{ scale: isUnlocked ? 1.05 : 1 }}
                     className={`relative p-6 backdrop-blur-xl rounded-[24px] border transition-all ${
                       isUnlocked
-                        ? 'bg-muted/50 border-border'
-                        : 'bg-muted/20 border-border/50 opacity-50'
+                        ? 'bg-muted/30 border-white/10 hover:border-purple-500/30'
+                        : 'bg-muted/10 border-white/5 opacity-50'
                     }`}
                   >
                     {/* Badge Icon */}
-                    <div className={`w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                    <div className={`w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center shadow-lg ${
                       isUnlocked
-                        ? `bg-gradient-to-br ${tierColors[badge.tier as keyof typeof tierColors] || tierColors.bronze}`
-                        : 'bg-muted'
+                        ? `bg-gradient-to-br ${tierColors[badge.tier as keyof typeof tierColors] || tierColors.bronze} shadow-cyan-500/20`
+                        : 'bg-muted/50'
                     }`}>
                       {isUnlocked ? (
-                        <Trophy className="w-10 h-10 text-foreground" strokeWidth={2.5} />
+                        <Trophy className="w-10 h-10 text-white" strokeWidth={2.5} />
                       ) : (
                         <Lock className="w-10 h-10 text-muted-foreground" />
                       )}
@@ -202,20 +203,20 @@ export default function BadgesGenZ() {
                           <div className="text-xs text-muted-foreground">
                             {currentProgress}/{target}
                           </div>
-                          <div className="h-1 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-primary to-cyan-500"
-                              style={{ width: `${Math.min((currentProgress / target) * 100, 100)}%` }}
-                            />
-                          </div>
+                           <div className="h-1 bg-muted rounded-full overflow-hidden">
+                             <div
+                               className="h-full bg-gradient-to-r from-cyan-500 to-purple-500"
+                               style={{ width: `${Math.min((currentProgress / target) * 100, 100)}%` }}
+                             />
+                           </div>
                         </div>
                       )}
 
                       {/* Tier Badge */}
                       <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold capitalize ${
                         isUnlocked
-                          ? `bg-gradient-to-r ${tierColors[badge.tier as keyof typeof tierColors] || tierColors.bronze} text-foreground`
-                          : 'bg-muted text-muted-foreground'
+                          ? `bg-gradient-to-r ${tierColors[badge.tier as keyof typeof tierColors] || tierColors.bronze} text-white`
+                          : 'bg-muted/50 text-muted-foreground'
                       }`}>
                         {badge.tier}
                       </div>
@@ -231,11 +232,11 @@ export default function BadgesGenZ() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="mt-12 p-8 bg-gradient-to-br from-primary/20 to-cyan-500/20 backdrop-blur-xl rounded-[24px] border border-primary/30"
+                className="mt-12 p-8 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 backdrop-blur-xl rounded-[24px] border border-purple-500/20"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <Sparkles className="w-6 h-6 text-primary" />
-                  <h2 className="text-2xl font-bold">Almost There!</h2>
+                  <Sparkles className="w-6 h-6 text-cyan-400" />
+                  <h2 className="text-2xl font-bold text-white">Almost There!</h2>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -247,11 +248,11 @@ export default function BadgesGenZ() {
                     return (
                       <div
                         key={badge.id}
-                        className="p-4 bg-muted/50 rounded-[16px] border border-border"
+                        className="p-4 bg-muted/30 rounded-[16px] border border-white/10"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center">
-                            <Trophy className="w-6 h-6 text-primary" />
+                          <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-full flex items-center justify-center">
+                            <Trophy className="w-6 h-6 text-cyan-400" />
                           </div>
                           <div className="flex-1">
                             <div className="font-bold mb-1">{badge.name}</div>
@@ -260,7 +261,7 @@ export default function BadgesGenZ() {
                             </div>
                             <div className="h-1 bg-muted rounded-full overflow-hidden mt-2">
                               <div
-                                className="h-full bg-gradient-to-r from-primary to-cyan-500"
+                                className="h-full bg-gradient-to-r from-cyan-500 to-purple-500"
                                 style={{ width: `${Math.min((currentProgress / target) * 100, 100)}%` }}
                               />
                             </div>

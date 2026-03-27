@@ -105,13 +105,13 @@ export default function Bookmarks() {
   const getDifficultyConfig = (difficulty: string) => {
     switch (difficulty) {
       case 'beginner':
-        return { icon: Zap, color: 'text-green-500', bg: 'bg-green-500/10', label: 'Easy' };
+        return { icon: Zap, color: 'text-[var(--color-success)]', bg: 'bg-[var(--color-success)]/10', borderColor: 'border-[var(--color-success)]/30', label: 'Easy' };
       case 'intermediate':
-        return { icon: Target, color: 'text-yellow-500', bg: 'bg-yellow-500/10', label: 'Medium' };
+        return { icon: Target, color: 'text-[var(--color-warning)]', bg: 'bg-[var(--color-warning)]/10', borderColor: 'border-[var(--color-warning)]/30', label: 'Medium' };
       case 'advanced':
-        return { icon: Flame, color: 'text-red-500', bg: 'bg-red-500/10', label: 'Hard' };
+        return { icon: Flame, color: 'text-[var(--color-error)]', bg: 'bg-[var(--color-error)]/10', borderColor: 'border-[var(--color-error)]/30', label: 'Hard' };
       default:
-        return { icon: Target, color: 'text-muted-foreground', bg: 'bg-muted', label: 'Unknown' };
+        return { icon: Target, color: 'text-[var(--color-text-tertiary)]', bg: 'bg-[var(--color-base-elevated)]', borderColor: 'border-[var(--color-border-subtle)]', label: 'Unknown' };
     }
   };
 
@@ -127,12 +127,12 @@ export default function Bookmarks() {
           {/* Header */}
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 sm:p-3 rounded-xl bg-primary/10">
-                <Bookmark className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              <div className="p-2 sm:p-3 rounded-xl bg-[var(--color-accent-cyan)]/10">
+                <Bookmark className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-accent-cyan)]" />
               </div>
               <div>
-                <h1 className="text-lg sm:text-2xl font-bold">Bookmarks</h1>
-                <p className="text-xs sm:text-sm text-muted-foreground">
+                <h1 className="text-lg sm:text-2xl font-bold text-[var(--color-text-primary)]">Bookmarks</h1>
+                <p className="text-xs sm:text-sm text-[var(--color-text-tertiary)]">
                   {bookmarkedQuestions.length} saved question{bookmarkedQuestions.length !== 1 ? 's' : ''}
                 </p>
               </div>
@@ -146,7 +146,9 @@ export default function Bookmarks() {
               <select
                 value={filterChannel}
                 onChange={(e) => setFilterChannel(e.target.value)}
-                className="px-3 py-1.5 sm:py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                autoComplete="off"
+                aria-label="Filter by channel"
+                className="px-3 py-1.5 sm:py-2 bg-[var(--color-base-elevated)] border border-[var(--color-border-subtle)] rounded-lg text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-cyan)]/50"
               >
                 <option value="all">All Channels</option>
                 {channelsWithBookmarks.map(channel => (
@@ -160,7 +162,9 @@ export default function Bookmarks() {
               <select
                 value={filterDifficulty}
                 onChange={(e) => setFilterDifficulty(e.target.value)}
-                className="px-3 py-1.5 sm:py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                autoComplete="off"
+                aria-label="Filter by difficulty"
+                className="px-3 py-1.5 sm:py-2 bg-[var(--color-base-elevated)] border border-[var(--color-border-subtle)] rounded-lg text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-cyan)]/50"
               >
                 <option value="all">All Difficulties</option>
                 <option value="beginner">Easy</option>
@@ -172,7 +176,7 @@ export default function Bookmarks() {
               {(filterChannel !== 'all' || filterDifficulty !== 'all') && (
                 <button
                   onClick={() => { setFilterChannel('all'); setFilterDifficulty('all'); }}
-                  className="px-3 py-1.5 sm:py-2 text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  className="px-3 py-1.5 sm:py-2 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] flex items-center gap-1"
                 >
                   <X className="w-3 h-3" /> Clear
                 </button>
@@ -199,7 +203,7 @@ export default function Bookmarks() {
             />
           ) : filteredQuestions.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No questions match your filters</p>
+              <p className="text-[var(--color-text-tertiary)]">No questions match your filters</p>
             </div>
           ) : (
             /* Question list */
@@ -216,11 +220,11 @@ export default function Bookmarks() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.03 }}
                     onClick={() => goToQuestion(question)}
-                    className="bg-card border border-border rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:border-primary/30 transition-colors cursor-pointer"
+                    className="bg-[var(--color-base-card)] border border-[var(--color-border-subtle)] rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:border-[var(--color-accent-cyan)]/30 transition-colors cursor-pointer"
                   >
                     <div className="flex items-start gap-3">
                       {/* Channel icon */}
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary flex-shrink-0 hidden sm:flex">
+                      <div className="p-2 rounded-lg bg-[var(--color-accent-cyan)]/10 text-[var(--color-accent-cyan)] flex-shrink-0 hidden sm:flex">
                         {channelIcons[question.channelId] || channelIcons.default}
                       </div>
 
@@ -228,15 +232,15 @@ export default function Bookmarks() {
                       <div className="flex-1 min-w-0">
                         {/* Meta row */}
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                          <span className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">
+                          <span className="text-[10px] sm:text-xs text-[var(--color-text-tertiary)] uppercase tracking-wider">
                             {question.channelId.split('-').join(' ')}
                           </span>
-                          <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] sm:text-xs ${diffConfig.bg} ${diffConfig.color}`}>
+                          <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] sm:text-xs border ${diffConfig.bg} ${diffConfig.color} ${diffConfig.borderColor}`}>
                             <DiffIcon className="w-3 h-3" />
                             {diffConfig.label}
                           </span>
                           {isCompleted && (
-                            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] sm:text-xs bg-green-500/10 text-green-500">
+                            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] sm:text-xs bg-[var(--color-success)]/10 text-[var(--color-success)] border border-[var(--color-success)]/30">
                               <CheckCircle className="w-3 h-3" />
                               Done
                             </span>
@@ -244,22 +248,22 @@ export default function Bookmarks() {
                         </div>
 
                         {/* Question text */}
-                        <h3 className="font-medium text-foreground text-sm sm:text-base line-clamp-2 mb-2">
+                        <h3 className="font-medium text-[var(--color-text-primary)] text-sm sm:text-base line-clamp-2 mb-2">
                           {question.question}
                         </h3>
 
                         {/* Companies */}
                         {question.companies && question.companies.length > 0 && (
                           <div className="flex items-center gap-1.5 mb-2">
-                            <Building2 className="w-3 h-3 text-muted-foreground" />
+                            <Building2 className="w-3 h-3 text-[var(--color-text-tertiary)]" />
                             <div className="flex flex-wrap gap-1">
                               {question.companies.slice(0, 3).map((company, i) => (
-                                <span key={i} className="text-[10px] text-muted-foreground">
+                                <span key={i} className="text-[10px] text-[var(--color-text-tertiary)]">
                                   {company}{i < Math.min(question.companies!.length, 3) - 1 ? ',' : ''}
                                 </span>
                               ))}
                               {question.companies.length > 3 && (
-                                <span className="text-[10px] text-muted-foreground">
+                                <span className="text-[10px] text-[var(--color-text-tertiary)]">
                                   +{question.companies.length - 3}
                                 </span>
                               )}
@@ -272,17 +276,17 @@ export default function Bookmarks() {
                       <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                         <button
                           onClick={(e) => { e.stopPropagation(); removeBookmark(question); }}
-                          className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                          title="Remove bookmark"
+                          className="p-2 text-[var(--color-text-tertiary)] hover:text-[var(--color-error)] hover:bg-[var(--color-error)]/10 rounded-lg transition-colors"
+                          aria-label="Remove bookmark"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); goToQuestion(question); }}
-                          className="p-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg transition-colors"
-                          title="Go to question"
+                          className="p-2 bg-[var(--color-accent-cyan)]/10 text-[var(--color-accent-cyan)] hover:bg-[var(--color-accent-cyan)]/20 rounded-lg transition-colors"
+                          aria-label="Go to question"
                         >
-                          <Play className="w-4 h-4" fill="currentColor" />
+                          <Play className="w-4 h-4 fill-current" />
                         </button>
                       </div>
                     </div>

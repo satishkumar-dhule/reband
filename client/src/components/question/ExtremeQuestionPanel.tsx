@@ -153,14 +153,15 @@ export function ExtremeQuestionPanel({
   const DifficultyIcon = difficultyConfig.icon;
 
   return (
-    <div 
-      className="w-full h-full flex flex-col relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/20"
+    <button 
+      className="w-full h-full flex flex-col relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/20 text-left"
       data-testid="extreme-question-panel"
       onClick={onTapQuestion}
+      type="button"
     >
       {/* Animated Background Particles */}
       {showParticles && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20 motion-reduce:hidden" aria-hidden="true">
           {[...Array(10)].map((_, i) => (
             <motion.div
               key={i}
@@ -241,7 +242,8 @@ export function ExtremeQuestionPanel({
                     <button
                       key={btn.rating}
                       onClick={(e) => { e.stopPropagation(); handleSRSRate(btn.rating); }}
-                      className="w-5 h-5 flex items-center justify-center rounded text-[10px] hover:bg-muted transition-all"
+                      className="w-8 h-8 min-w-[32px] min-h-[32px] flex items-center justify-center rounded text-[10px] hover:bg-muted transition-all"
+                      aria-label={`Rate ${btn.rating}`}
                     >
                       {btn.label}
                     </button>
@@ -250,7 +252,8 @@ export function ExtremeQuestionPanel({
               ) : !hasRated && !showRatingButtons ? (
                 <button
                   onClick={(e) => { e.stopPropagation(); handleAddToSRS(); }}
-                  className="px-2 py-0.5 bg-primary hover:bg-primary/90 text-primary-foreground text-[9px] font-bold rounded transition-all"
+                  className="px-2 py-0.5 bg-primary hover:bg-primary/90 text-primary-foreground text-[9px] font-bold rounded transition-all min-w-[32px] min-h-[32px]"
+                  aria-label="Add to review"
                 >
                   +
                 </button>
@@ -367,6 +370,6 @@ export function ExtremeQuestionPanel({
           </p>
         </motion.div>
       </div>
-    </div>
+    </button>
   );
 }

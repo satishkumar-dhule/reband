@@ -255,12 +255,12 @@ export function GenZHomePage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4 md:p-6 relative overflow-hidden pt-safe pb-safe">
         {/* Animated background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-cyan-500/10" />
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-cyan-500/10 motion-reduce:animate-none" />
+        <div className="absolute inset-0" aria-hidden="true">
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 bg-white rounded-full"
+              className="absolute w-1 h-1 bg-white rounded-full motion-reduce:animate-none"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -530,7 +530,7 @@ export function GenZHomePage() {
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${(xpInLevel / xpForNextLevel) * 100}%` }}
-                  className="h-full bg-gradient-to-r from-primary to-cyan-500"
+                  className="h-full bg-gradient-to-r from-primary to-cyan-500 motion-reduce:transition-none"
                 />
               </div>
             </div>
@@ -627,12 +627,13 @@ export function GenZHomePage() {
                                     <p className="text-xs md:text-sm text-muted-foreground mt-0.5 line-clamp-1">{path.description}</p>
                                   </div>
                                 </div>
-                                <motion.button
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  onClick={() => removeActivePath(path.id)}
-                                  className="px-2 md:px-3 py-1 md:py-1.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-[8px] text-[10px] md:text-xs font-semibold transition-all flex-shrink-0"
-                                >
+                                 <motion.button
+                                   whileHover={{ scale: 1.05 }}
+                                   whileTap={{ scale: 0.95 }}
+                                   onClick={() => removeActivePath(path.id)}
+                                   className="px-2 md:px-3 py-1 md:py-1.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-[8px] text-[10px] md:text-xs font-semibold transition-all flex-shrink-0"
+                                   aria-label="Remove"
+                                 >
                                   Remove
                                 </motion.button>
                               </div>
@@ -807,7 +808,7 @@ export function GenZHomePage() {
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${resumePath.progress * 100}%` }}
-                        className="h-full bg-gradient-to-r from-amber-500 to-orange-500"
+                        className="h-full bg-gradient-to-r from-amber-500 to-orange-500 motion-reduce:transition-none"
                       />
                     </div>
                   </div>

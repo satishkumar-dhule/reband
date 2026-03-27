@@ -82,6 +82,7 @@ function CodeSnippet({ code, language = 'bash' }: { code: string; language?: str
       <button
         onClick={handleCopy}
         className="absolute top-2 right-2 p-1.5 bg-muted rounded opacity-0 group-hover:opacity-100 transition-opacity"
+        aria-label="Copy to clipboard"
       >
         {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
       </button>
@@ -430,7 +431,6 @@ export default function About() {
                         onKeyDown={(e) => e.key === 'Enter' && handleTerminalCommand(currentCommand)}
                         className="flex-1 bg-transparent text-green-400 outline-none"
                         placeholder="Type a command..."
-                        autoFocus
                       />
                     </div>
                   </div>

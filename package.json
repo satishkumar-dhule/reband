@@ -127,6 +127,7 @@
     "test:codegen": "playwright codegen http://localhost:5001",
     "test:smoke": "playwright test e2e/smoke/unified-smoke.spec.ts --project=chromium-desktop",
     "test:smoke:ci": "playwright test e2e/smoke/unified-smoke.spec.ts",
+    "test:api": "playwright test -c playwright.api.config.ts",
     "test:core": "playwright test e2e/comprehensive/core-flows.spec.ts --project=chromium-desktop",
     "test:full": "./scripts/run-e2e-tests.sh",
     "test:bottom-nav": "playwright test e2e/visual/bottom-nav-icon-fix.spec.ts",

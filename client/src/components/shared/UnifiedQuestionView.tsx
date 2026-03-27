@@ -327,6 +327,7 @@ export function UnifiedQuestionView({
                 onClick={handlePrevious}
                 disabled={questionNumber === 1 || isTransitioning}
                 whileTap={{ scale: 0.92 }}
+                aria-label="Previous question"
                 className={cn(
                   'flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl',
                   'bg-secondary/60 hover:bg-secondary transition-all duration-200',
@@ -344,6 +345,7 @@ export function UnifiedQuestionView({
                 <motion.button
                   onClick={handleAnswerToggle}
                   whileTap={{ scale: 0.95 }}
+                  aria-label={internalShowAnswer ? "Hide answer" : "Show answer"}
                   className={cn(
                     'flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 min-h-[44px] h-11 sm:h-12 rounded-xl',
                     'bg-gradient-to-r font-medium transition-all duration-200',
@@ -372,6 +374,7 @@ export function UnifiedQuestionView({
                   <motion.button
                     onClick={handleBookmark}
                     whileTap={{ scale: 0.92 }}
+                    aria-label="Bookmark question"
                     animate={isBookmarkAnimating ? {
                       scale: [1, 1.2, 1],
                       rotate: [0, -10, 10, 0]
@@ -401,6 +404,7 @@ export function UnifiedQuestionView({
                 onClick={handleNext}
                 disabled={questionNumber === totalQuestions || isTransitioning}
                 whileTap={{ scale: 0.92 }}
+                aria-label="Next question"
                 className={cn(
                   'flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl',
                   'bg-gradient-to-r transition-all duration-200',

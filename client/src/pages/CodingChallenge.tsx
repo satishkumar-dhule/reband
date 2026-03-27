@@ -539,18 +539,20 @@ export default function CodingChallenge() {
               {/* Search Bar */}
               <div className="relative mb-6">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
+                  <input
                   type="text"
                   placeholder="Search challenges by name, category, or tag..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-10 py-3 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                   data-testid="search-input"
+                  aria-label="Search challenges"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Clear search"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -979,6 +981,7 @@ export default function CodingChallenge() {
                       className="p-2 min-w-[32px] min-h-[32px] hover:bg-muted/30 rounded transition-colors flex items-center justify-center"
                       title="Copy code"
                       data-testid="copy-btn"
+                      aria-label="Copy code"
                     >
                       {copied ? (
                         <Check className="w-4 h-4 text-green-500" />
@@ -991,6 +994,7 @@ export default function CodingChallenge() {
                       className="p-2 min-w-[32px] min-h-[32px] hover:bg-muted/30 rounded transition-colors flex items-center justify-center"
                       title="Reset code"
                       data-testid="reset-btn"
+                      aria-label="Reset code"
                     >
                       <RotateCcw className="w-4 h-4 text-muted-foreground" />
                     </button>

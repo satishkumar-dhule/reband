@@ -192,6 +192,7 @@ export default function LearningPaths() {
                 placeholder="Search learning paths..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search learning paths"
                 className="w-full pl-12 pr-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
@@ -207,6 +208,7 @@ export default function LearningPaths() {
             <div className="flex items-center justify-between mb-4">
               <button
                 onClick={() => setShowFilters(!showFilters)}
+                aria-expanded={showFilters}
                 className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-foreground hover:bg-muted transition-colors"
               >
                 <Filter className="w-4 h-4" />
@@ -308,7 +310,7 @@ export default function LearningPaths() {
           {loading && (
             <div className="text-center py-12">
               <div className="inline-block w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-4 text-muted-foreground">Loading learning paths...</p>
+              <p className="mt-4 text-muted-foreground">Loading learning paths…</p>
             </div>
           )}
 

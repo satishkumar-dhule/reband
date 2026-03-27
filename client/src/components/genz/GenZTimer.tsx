@@ -54,13 +54,14 @@ export function GenZTimer({ duration, onComplete, showProgress = true }: GenZTim
           duration: 1,
           repeat: isCritical ? Infinity : 0,
         }}
-        className={`flex items-center gap-2 px-4 py-2 rounded-[12px] border ${
+        className={`flex items-center gap-2 px-4 py-2 rounded-[12px] border motion-reduce:animate-none ${
           isCritical
             ? 'bg-red-500/20 border-red-500/50'
             : isLowTime
             ? 'bg-orange-500/20 border-orange-500/50'
             : 'bg-muted/50 border-border'
         }`}
+        aria-live="polite"
       >
         <Clock className={`w-5 h-5 ${isCritical ? 'text-red-500' : isLowTime ? 'text-orange-500' : 'text-primary'}`} />
         <span className={`font-mono text-xl font-bold ${isCritical ? 'text-red-500' : isLowTime ? 'text-orange-500' : 'text-foreground'}`}>

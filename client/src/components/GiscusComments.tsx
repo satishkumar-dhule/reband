@@ -88,14 +88,14 @@ export function GiscusComments({ questionId }: GiscusCommentsProps) {
       >
         <div className="flex items-center gap-2">
           <div className="p-1 rounded-md bg-primary/10 group-hover:bg-primary/20 transition-colors">
-            <MessageCircle className="w-3.5 h-3.5 text-primary" />
+            <MessageCircle className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
           </div>
           <div className="text-left">
             <span className="text-xs font-medium text-foreground">Discussion</span>
             <p className="text-[10px] text-muted-foreground">Ask questions or share insights</p>
           </div>
         </div>
-        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
       </button>
 
       {isOpen && (
@@ -111,7 +111,7 @@ export function GiscusComments({ questionId }: GiscusCommentsProps) {
               {isLoading && (
                 <div className="flex flex-col items-center justify-center py-4 gap-1.5">
                   <Loader2 className="w-4 h-4 text-primary animate-spin" />
-                  <span className="text-[10px] text-muted-foreground">Loading discussion...</span>
+                   <span className="text-[10px] text-muted-foreground">Loading discussion…</span>
                 </div>
               )}
               <div 

@@ -50,7 +50,7 @@ export function RecordingControls({
       {state === 'recording' && (
         <button
           onClick={onStop}
-          className="flex items-center gap-2 px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors animate-pulse"
+          className="flex items-center gap-2 px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors animate-pulse motion-reduce:animate-none"
         >
           <Square className="w-5 h-5" />
           Stop Recording

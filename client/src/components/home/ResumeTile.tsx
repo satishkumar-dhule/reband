@@ -62,6 +62,7 @@ export function ResumeTile({ session, onResume, onAbandon }: ResumeTileProps) {
           }}
           className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-destructive/10 rounded flex-shrink-0"
           title="Abandon session"
+          aria-label="Abandon path"
         >
           <X className="w-4 h-4 text-muted-foreground hover:text-destructive" />
         </button>
@@ -78,7 +79,7 @@ export function ResumeTile({ session, onResume, onAbandon }: ResumeTileProps) {
             initial={{ width: 0 }}
             animate={{ width: `${session.progress}%` }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="h-full rounded-full"
+            className="h-full rounded-full motion-reduce:transition-none"
             style={{ backgroundColor: session.color }}
           />
         </div>

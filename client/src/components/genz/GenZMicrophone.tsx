@@ -33,7 +33,7 @@ export function GenZMicrophone({
               repeat: Infinity,
               ease: 'easeInOut',
             }}
-            className="absolute w-32 h-32 rounded-full bg-gradient-to-r from-red-500 to-pink-500"
+            className="absolute w-32 h-32 rounded-full bg-gradient-to-r from-red-500 to-pink-500 motion-reduce:animate-none"
           />
           <motion.div
             animate={{
@@ -46,7 +46,7 @@ export function GenZMicrophone({
               ease: 'easeInOut',
               delay: 0.5,
             }}
-            className="absolute w-28 h-28 rounded-full bg-gradient-to-r from-red-500 to-pink-500"
+            className="absolute w-28 h-28 rounded-full bg-gradient-to-r from-red-500 to-pink-500 motion-reduce:animate-none"
           />
         </>
       )}
@@ -55,6 +55,7 @@ export function GenZMicrophone({
       <motion.button
         onClick={isRecording ? onStop : onStart}
         disabled={disabled}
+        aria-label="Toggle microphone"
         whileHover={{ scale: disabled ? 1 : 1.1 }}
         whileTap={{ scale: disabled ? 1 : 0.9 }}
         animate={{
@@ -94,7 +95,7 @@ export function GenZMicrophone({
             transition={{ duration: 1.5, repeat: Infinity }}
             className="w-2 h-2 bg-red-500 rounded-full"
           />
-          Recording...
+          Recording…
         </motion.div>
       )}
     </div>

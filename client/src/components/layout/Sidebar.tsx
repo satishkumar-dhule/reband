@@ -3,11 +3,20 @@ import { useLocation } from "wouter";
 import {
   Home, BookOpen, Bookmark, BarChart2,
   Mic, Code, RotateCcw, User, Brain,
-  Sparkles, Zap, Bot, Cpu, Layers, Gauge, Settings,
-  ChevronDown, ChevronRight, LogOut, Bell,
+  Sparkles, Settings,
+  ChevronDown, LogOut, Bell,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { ThemeToggle } from "../ThemeToggle";
+
+const COLORS = {
+  primary: "hsl(190 100% 50%)",
+  secondary: "hsl(270 100% 65%)",
+  accent: "hsl(330 100% 65%)",
+  success: "hsl(142 76% 36%)",
+  warning: "hsl(38 92% 50%)",
+  error: "hsl(0 84% 60%)",
+};
 
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
@@ -20,256 +29,278 @@ const navItems = [
   { icon: User, label: "Profile", path: "/profile" },
 ];
 
-const agentCategories = [
-  { icon: Zap, label: "UI/UX", count: 5, gradient: "from-purple-500/20 via-violet-500/10 to-fuchsia-500/20", border: "border-purple-500/30", glow: "shadow-purple-500/20" },
-  { icon: Cpu, label: "Database", count: 5, gradient: "from-blue-500/20 via-cyan-500/10 to-teal-500/20", border: "border-blue-500/30", glow: "shadow-blue-500/20" },
-  { icon: Sparkles, label: "Google", count: 5, gradient: "from-pink-500/20 via-rose-500/10 to-red-500/20", border: "border-pink-500/30", glow: "shadow-pink-500/20" },
-  { icon: Layers, label: "DevOps", count: 5, gradient: "from-amber-500/20 via-orange-500/10 to-yellow-500/20", border: "border-amber-500/30", glow: "shadow-amber-500/20" },
-  { icon: Gauge, label: "AI/ML", count: 5, gradient: "from-emerald-500/20 via-green-500/10 to-teal-500/20", border: "border-emerald-500/30", glow: "shadow-emerald-500/20" },
-  { icon: Settings, label: "System", count: 5, gradient: "from-slate-500/20 via-zinc-500/10 to-neutral-500/20", border: "border-slate-500/30", glow: "shadow-slate-500/20" },
-];
-
-function AgentStatusBadge() {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div 
-      className="relative group"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-primary/10 via-emerald-500/10 to-primary/10 border border-primary/20 backdrop-blur-sm">
-        <div className="relative">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-emerald-500 flex items-center justify-center shadow-lg shadow-primary/30 animate-pulse">
-            <Bot className="w-4 h-4 text-white" />
-          </div>
-          <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-background animate-ping" />
-        </div>
-        <div className="flex-1">
-          <span className="text-xs font-bold text-foreground">30 AI Agents Active</span>
-          <div className="flex items-center gap-1 mt-0.5">
-            <span className="flex gap-0.5">
-              {[...Array(3)].map((_, i) => (
-                <span 
-                  key={i}
-                  className="w-1 h-1 rounded-full bg-primary animate-bounce"
-                  style={{ animationDelay: `${i * 0.15}s` }}
-                />
-              ))}
-            </span>
-          </div>
-        </div>
-        <span className="px-2.5 py-1 text-[10px] font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 text-black rounded-full flex items-center gap-1 shadow-lg shadow-amber-500/30">
-          <Sparkles className="w-3 h-3" />
-          PRO MAX
-        </span>
-      </div>
-      
-      {/* Hover expansion */}
-      <div className={cn(
-        "absolute top-full left-0 right-0 mt-2 p-3 rounded-xl bg-card/95 backdrop-blur-xl border border-border/50 shadow-2xl transition-all duration-300 overflow-hidden",
-        isHovered ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
-      )}>
-        <div className="grid grid-cols-2 gap-2">
-          {agentCategories.slice(0, 4).map((cat) => (
-            <div key={cat.label} className={cn(
-              "flex items-center gap-2 p-2 rounded-lg bg-gradient-to-br border",
-              cat.gradient, cat.border
-            )}>
-              <cat.icon className="w-3.5 h-3.5 text-foreground" />
-              <span className="text-[10px] font-medium text-foreground">{cat.label}</span>
-              <span className="ml-auto text-[9px] text-muted-foreground">{cat.count}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function CollapsibleSection({ 
   title, 
   icon: Icon, 
   children, 
   defaultOpen = true,
-  gradient = "from-primary/10 to-transparent"
 }: { 
   title: string; 
   icon: any; 
   children: React.ReactNode; 
   defaultOpen?: boolean;
-  gradient?: string;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-b border-border/20 pb-3">
+    <div className="border-b border-[hsl(0_0%_12%)] pb-3">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider hover:text-foreground transition-colors group"
+        aria-expanded={isOpen}
+        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[hsl(0_0%_53%)] uppercase tracking-wider hover:text-[hsl(0_0%_98%)] transition-colors group"
       >
-        <Icon className="w-3.5 h-3.5 text-primary/70 group-hover:text-primary transition-colors" />
+        <Icon 
+          className="w-3.5 h-3.5 transition-all duration-300" 
+          style={{ color: isOpen ? COLORS.primary : undefined }}
+        />
         <span className="flex-1 text-left">{title}</span>
-        <ChevronDown className={cn(
-          "w-3.5 h-3.5 transition-transform duration-200",
-          isOpen ? "rotate-0" : "-rotate-90"
-        )} />
+        <ChevronDown 
+          className={cn(
+            "w-3.5 h-3.5 transition-transform duration-300",
+            isOpen ? "rotate-0" : "-rotate-90"
+          )} 
+        />
       </button>
-      <div className={cn(
-        "space-y-1 overflow-hidden transition-all duration-300",
-        isOpen ? "mt-2 opacity-100" : "mt-0 opacity-0 h-0"
-      )}>
+      <div 
+        className={cn(
+          "space-y-1.5 overflow-hidden transition-all duration-300 ease-out",
+          isOpen ? "mt-2.5 opacity-100" : "mt-0 opacity-0 h-0"
+        )}
+      >
         {children}
       </div>
     </div>
   );
 }
 
+function NavItem({ 
+  item, 
+  isActive, 
+  onClick,
+  delay 
+}: { 
+  item: typeof navItems[0]; 
+  isActive: boolean; 
+  onClick: () => void;
+  delay: number;
+}) {
+  const Icon = item.icon;
+  
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 group",
+        isActive
+          ? "text-[hsl(0_0%_98%)]"
+          : "text-[hsl(0_0%_75%)] hover:text-[hsl(0_0%_98%)]"
+      )}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {isActive && (
+        <div 
+          className="absolute inset-0 rounded-xl blur-sm"
+          style={{ 
+            background: 'linear-gradient(135deg, hsla(190, 100%, 50%, 0.15) 0%, hsla(270, 100%, 65%, 0.08) 100%)',
+            boxShadow: '0 0 20px hsla(190, 100%, 50%, 0.2), inset 0 0 20px hsla(190, 100%, 50%, 0.08)'
+          }}
+        />
+      )}
+      
+      <div 
+        className={cn(
+          "absolute inset-0 rounded-xl transition-all duration-300",
+          isActive 
+            ? "bg-gradient-to-r from-primary/15 via-transparent to-transparent opacity-100" 
+            : "bg-gradient-to-r from-[hsl(0_0%_12%)] via-transparent to-transparent opacity-0 group-hover:opacity-100"
+        )}
+      />
+      
+      <div 
+        className={cn(
+          "relative z-10 p-1.5 rounded-lg transition-all duration-300 border",
+          isActive 
+            ? "border-[hsla(190,100%,50%,0.3)] shadow-lg"
+            : "border-transparent group-hover:border-[hsla(0,0%,53%,0.2)] group-hover:shadow-md"
+        )}
+        style={isActive ? { 
+          background: 'linear-gradient(135deg, hsla(190, 100%, 50%, 0.2) 0%, hsla(270, 100%, 65%, 0.1) 100%)',
+          boxShadow: '0 4px 12px hsla(190, 100%, 50%, 0.2)'
+        } : {}}
+      >
+        <Icon
+          className={cn(
+            "w-4 h-4 shrink-0 transition-all duration-300",
+            isActive ? "drop-shadow-sm" : ""
+          )}
+          style={isActive ? { 
+            color: COLORS.primary,
+            strokeWidth: 2.5
+          } : {}}
+        />
+      </div>
+      
+      <span className="relative z-10">{item.label}</span>
+      
+      {isActive && (
+        <span 
+          className="ml-auto relative z-10 w-1.5 h-1.5 rounded-full animate-pulse"
+          style={{ 
+            backgroundColor: COLORS.primary,
+            boxShadow: '0 0 10px hsla(190, 100%, 50%, 0.8), 0 0 20px hsla(190, 100%, 50%, 0.5)'
+          }}
+        />
+      )}
+    </button>
+  );
+}
+
 export function Sidebar() {
   const [location, setLocation] = useLocation();
-  const [agentsExpanded, setAgentsExpanded] = useState(true);
 
   const isActive = (path: string) =>
     path === "/" ? location === "/" : location.startsWith(path);
 
   return (
-    <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-76 flex-col border-r border-border/50 bg-gradient-to-b from-background via-background/95 to-background z-50">
-      {/* Gradient accent lines */}
-      <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-primary/30 via-transparent to-primary/30" />
-      <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-accent/20 via-transparent to-accent/20" />
+    <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-[300px] flex-col border-r border-[hsl(0_0%_12%)] bg-gradient-to-b from-[hsl(0_0%_0%)] via-[hsl(0_0%_2%)] to-[hsl(0_0%_0%)] z-50">
+      <style>{`@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }`}</style>
+      <div 
+        className="absolute top-0 left-0 w-full h-64 pointer-events-none opacity-30"
+        style={{
+          background: 'radial-gradient(ellipse 80% 50% at 20% -20%, hsla(190, 100%, 50%, 0.2) 0%, transparent 70%)',
+        }}
+      />
       
-      {/* Logo Section */}
+      <div 
+        className="absolute top-0 left-0 w-px h-full"
+        style={{
+          background: 'linear-gradient(to bottom, hsla(190, 100%, 50%, 0.4) 0%, transparent 20%, transparent 80%, hsla(190, 100%, 50%, 0.4) 100%)'
+        }}
+      />
+      <div 
+        className="absolute top-0 right-0 w-px h-full"
+        style={{
+          background: 'linear-gradient(to bottom, hsla(0, 0%, 18%, 0.8) 0%, transparent 20%, transparent 80%, hsla(0, 0%, 18%, 0.8) 100%)'
+        }}
+      />
+      
       <button
         onClick={() => setLocation("/")}
-        className="flex items-center gap-3 px-5 py-5 border-b border-border/30 hover:bg-gradient-to-r hover:from-primary/5 hover:to-transparent transition-all duration-300 group"
+        className="relative flex items-center gap-3 px-5 py-5 border-b border-[hsl(0_0%_12%)] hover:bg-gradient-to-r hover:from-[hsla(190,100%,50%,0.05)] hover:to-transparent transition-all duration-300 group"
       >
+        <div 
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: 'linear-gradient(90deg, hsla(190, 100%, 50%, 0.08) 0%, transparent 100%)'
+          }}
+        />
+        
         <div className="relative">
-          <div className="w-12 h-12 bg-gradient-to-br from-primary via-emerald-500 to-accent rounded-xl flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-all duration-300 group-hover:scale-105">
-            <Brain className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
+          <div 
+            className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+            style={{ 
+              background: 'linear-gradient(135deg, hsl(190 100% 50%) 0%, hsl(270 100% 65%) 50%, hsl(330 100% 65%) 100%)',
+              boxShadow: '0 4px 20px hsla(190, 100%, 50%, 0.3), 0 8px 30px hsla(190, 100%, 50%, 0.15)'
+            }}
+          >
+            <Brain className="w-6 h-6 text-white" strokeWidth={2.5} />
           </div>
-          <div className="absolute -inset-1 bg-gradient-to-br from-primary to-emerald-500 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity" />
+          <div 
+            className="absolute -inset-1 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity"
+            style={{
+              background: 'linear-gradient(135deg, hsl(190 100% 50%) 0%, hsl(330 100% 65%) 100%)'
+            }}
+          />
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-bold text-lg text-foreground flex items-center gap-2">
+        
+        <div className="flex-1 min-w-0 relative z-10">
+          <div className="font-bold text-lg text-[hsl(0_0%_98%)] flex items-center gap-2">
             DevPrep Ultra
-            <span className="px-2 py-0.5 text-[9px] font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 text-black rounded-lg flex items-center gap-0.5 shadow-lg shadow-amber-500/20">
+            <span 
+              className="px-2 py-0.5 text-[9px] font-bold rounded-lg flex items-center gap-0.5 shadow-lg"
+              style={{ 
+                background: 'linear-gradient(135deg, hsl(190 100% 50%) 0%, hsl(270 100% 65%) 50%, hsl(330 100% 65%) 100%)',
+                color: '#000',
+                boxShadow: '0 2px 10px hsla(190, 100%, 50%, 0.3)'
+              }}
+            >
               <Sparkles className="w-2.5 h-2.5" />
               PRO MAX
             </span>
           </div>
-          <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
-            <Bot className="w-3 h-3 text-primary" />
-            <span>30 AI Agents Powered</span>
-            <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+          <div className="text-xs text-[hsl(0_0%_53%)] mt-0.5">
+            Your Learning Platform
           </div>
         </div>
       </button>
 
-      {/* Agent Status */}
-      <div className="px-4 py-4">
-        <AgentStatusBadge />
-      </div>
-
-      {/* Main Navigation */}
       <nav className="flex-1 px-3 py-2 overflow-y-auto">
         <CollapsibleSection title="Main Menu" icon={Settings} defaultOpen={true}>
-          {navItems.map((item, i) => {
-            const Icon = item.icon;
-            const active = isActive(item.path);
-            return (
-              <button
-                key={item.path}
-                onClick={() => setLocation(item.path)}
-                className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative overflow-hidden",
-                  active
-                    ? "bg-gradient-to-r from-primary/20 via-primary/10 to-transparent border-l-[3px] border-primary text-foreground shadow-sm shadow-primary/15"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50 border-l-[3px] border-transparent"
-                )}
-                style={{ animationDelay: `${i * 0.03}s` }}
-              >
-                {/* Hover glow */}
-                <div className={cn(
-                  "absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-                  active && "opacity-100"
-                )} />
-                
-                <div className={cn(
-                  "p-1.5 rounded-lg transition-all duration-200 relative z-10",
-                  active ? "bg-primary/25 shadow-sm shadow-primary/20" : "bg-muted/50 group-hover:bg-muted"
-                )}>
-                  <Icon
-                    className={cn("w-4 h-4 shrink-0", active ? "text-primary drop-shadow-sm" : "")}
-                    strokeWidth={active ? 2.5 : 2}
-                  />
-                </div>
-                <span className="relative z-10">{item.label}</span>
-                {active && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-sm shadow-primary animate-pulse relative z-10" />
-                )}
-              </button>
-            );
-          })}
+          {navItems.map((item, i) => (
+            <NavItem
+              key={item.path}
+              item={item}
+              isActive={isActive(item.path)}
+              onClick={() => setLocation(item.path)}
+              delay={i * 50}
+            />
+          ))}
         </CollapsibleSection>
-
-        {/* Agent Categories */}
-        <div className="mt-4">
-          <CollapsibleSection 
-            title="Active Agents" 
-            icon={Bot} 
-            defaultOpen={agentsExpanded}
-            gradient="from-primary/20 to-emerald-500/10"
-          >
-            <div className="grid grid-cols-2 gap-2">
-              {agentCategories.map((cat, i) => (
-                <button
-                  key={cat.label}
-                  onClick={() => setLocation("/channels")}
-                  className={cn(
-                    "flex flex-col items-center gap-1 p-3 rounded-xl bg-gradient-to-br border transition-all duration-300 hover:scale-105 cursor-pointer hover:shadow-lg",
-                    cat.gradient, cat.border, cat.glow
-                  )}
-                  style={{ animationDelay: `${i * 0.05}s` }}
-                >
-                  <div className="p-1.5 rounded-lg bg-background/50">
-                    <cat.icon className="w-4 h-4 text-foreground" />
-                  </div>
-                  <span className="text-[10px] font-semibold text-foreground">{cat.label}</span>
-                  <span className="text-[9px] text-muted-foreground">{cat.count} agents</span>
-                </button>
-              ))}
-            </div>
-          </CollapsibleSection>
-        </div>
       </nav>
 
-      {/* User Profile Section */}
-      <div className="px-3 py-3 border-t border-border/30">
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-muted/50 via-muted/30 to-transparent hover:from-muted/70 transition-colors cursor-pointer group">
-          <div className="relative">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
-              <User className="w-5 h-5 text-white" />
+      <div className="px-3 py-3 border-t border-[hsl(0_0%_12%)]">
+        <div className="relative p-3 rounded-xl overflow-hidden group">
+          <div 
+            className="absolute inset-0 bg-gradient-to-r from-[hsla(270,100%,65%,0.1)] via-[hsla(270,100%,65%,0.05)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          />
+          
+          <div className="relative flex items-center gap-3">
+            <div className="relative">
+              <div 
+                className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-105"
+                style={{ 
+                  background: 'linear-gradient(135deg, hsl(270 100% 65%) 0%, hsl(270 100% 75%) 50%, hsl(330 100% 65%) 100%)',
+                  boxShadow: '0 4px 15px hsla(270, 100%, 65%, 0.25)'
+                }}
+              >
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <span 
+                className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[hsl(0_0%_0%)]"
+                style={{ backgroundColor: COLORS.success, boxShadow: '0 0 8px hsla(142, 76%, 36%, 0.8)' }}
+              />
             </div>
-            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-foreground truncate">Guest User</div>
-            <div className="text-xs text-muted-foreground">Pro Member</div>
-          </div>
-          <div className="flex items-center gap-1">
-            <button className="p-1.5 rounded-lg hover:bg-muted transition-colors">
-              <Bell className="w-4 h-4 text-muted-foreground" />
-            </button>
-            <button className="p-1.5 rounded-lg hover:bg-muted transition-colors">
-              <LogOut className="w-4 h-4 text-muted-foreground" />
-            </button>
+            
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-[hsl(0_0%_98%)] truncate">Guest User</div>
+              <div className="text-xs text-[hsl(0_0%_53%)] flex items-center gap-1">
+                <span 
+                  className="px-1.5 py-0.5 rounded text-[9px] font-semibold"
+                  style={{ 
+                    background: 'linear-gradient(135deg, hsl(190 100% 50%) 0%, hsl(270 100% 65%) 100%)',
+                    color: '#fff'
+                  }}
+                >
+                  PRO
+                </span>
+                Member
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1">
+              <button aria-label="Notifications" className="p-2 rounded-lg hover:bg-[hsl(0_0%_8%)] transition-colors group/btn">
+                <Bell className="w-4 h-4 text-[hsl(0_0%_53%)] group-hover/btn:text-[hsl(0_0%_98%)] transition-colors" />
+              </button>
+              <button aria-label="Log out" className="p-2 rounded-lg hover:bg-[hsl(0_0%_8%)] transition-colors group/btn">
+                <LogOut className="w-4 h-4 text-[hsl(0_0%_53%)] group-hover/btn:text-[hsl(0_0%_98%)] transition-colors" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="px-4 py-3 border-t border-border/30 flex items-center justify-between">
-        <span className="text-xs text-muted-foreground flex items-center gap-2">
+      <div className="px-4 py-3 border-t border-[hsl(0_0%_12%)] flex items-center justify-between">
+        <span className="text-xs text-[hsl(0_0%_53%)] flex items-center gap-2">
           <Settings className="w-3 h-3" />
           Theme
         </span>

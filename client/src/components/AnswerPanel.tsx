@@ -284,16 +284,17 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
         </div>
         <button
           onClick={handleCopy}
+          aria-label="Copy code"
           className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded transition-colors"
         >
           {copied ? (
             <>
-              <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
+              <Check aria-hidden="true" className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
               <span className="text-green-500">Copied</span>
             </>
           ) : (
             <>
-              <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
+              <Copy aria-hidden="true" className="w-3 h-3 sm:w-4 sm:h-4" />
               <span>Copy</span>
             </>
           )}
@@ -372,7 +373,7 @@ function TabbedMediaPanel({
   if (availableTabs.length === 0 && !hasTldr && !hasEli5 && !hasVideo && diagramRenderSuccess === null) {
     return (
       <div className="rounded-xl sm:rounded-2xl border border-border bg-card p-4 text-center text-muted-foreground text-sm">
-        Loading...
+        Loading…
       </div>
     );
   }
@@ -388,10 +389,12 @@ function TabbedMediaPanel({
   return (
     <div className="rounded-lg sm:rounded-xl border border-white/10 bg-black/40 backdrop-blur-sm overflow-hidden">
       {/* Tab Headers */}
-      <div className="flex border-b border-white/10 bg-black/20">
+      <div className="flex border-b border-white/10 bg-black/20" role="tablist">
         {availableTabs.map((tab) => (
           <button
             key={tab}
+            role="tab"
+            aria-selected={activeTab === tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs sm:text-sm font-medium transition-all relative ${
               activeTab === tab 
@@ -427,7 +430,7 @@ function TabbedMediaPanel({
               transition={{ duration: 0.2 }}
               className="flex items-start gap-2"
             >
-              <Lightbulb className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+              <Lightbulb aria-hidden="true" className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
               <p className="text-sm text-foreground/90 leading-relaxed">{renderWithInlineCode(question.answer)}</p>
             </motion.div>
           )}
@@ -456,7 +459,7 @@ function TabbedMediaPanel({
               transition={{ duration: 0.2 }}
               className="flex items-start gap-2"
             >
-              <span className="text-base flex-shrink-0">🧒</span>
+              <span aria-hidden="true" className="text-base flex-shrink-0">🧒</span>
               <p className="text-sm text-foreground/90 leading-relaxed">{renderWithInlineCode(question.eli5 || '')}</p>
             </motion.div>
           )}

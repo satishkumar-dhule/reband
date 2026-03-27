@@ -180,6 +180,7 @@ export default function CertificationsGenZ() {
                 <input
                   type="text"
                   placeholder="Search certifications..."
+                  aria-label="Search certifications"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-12 md:pl-16 pr-4 md:pr-6 py-4 md:py-6 bg-muted/50 backdrop-blur-xl border border-border rounded-[20px] md:rounded-[24px] text-base md:text-xl focus:outline-none focus:border-primary transition-all"
@@ -305,6 +306,7 @@ export default function CertificationsGenZ() {
                         {isStarted && (
                           <button
                             onClick={() => navigate(`/channel/${cert.id}`)}
+                            aria-label="View certification"
                             className="px-4 md:px-6 py-2.5 md:py-3 bg-muted/50 hover:bg-muted rounded-[14px] md:rounded-[16px] border border-border transition-all"
                           >
                             <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
