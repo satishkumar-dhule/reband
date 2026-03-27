@@ -1,6 +1,6 @@
 /**
  * Unified API Service
- * Centralized API client with consistent error handling and caching
+ * Calls the Express server API (SQLite-backed), not static JSON files.
  */
 
 import type {
@@ -15,53 +15,32 @@ import type {
 } from '../types';
 
 // ============================================
-// CONFIGURATION
-// ============================================
-const DATA_BASE = import.meta.env.BASE_URL + 'data';
-
-// ============================================
-// CACHE MANAGEMENT
+// CACHE
 // ============================================
 class CacheManager<T> {
   private cache = new Map<string, T>();
-  private ttl: number;
-  private timestamps = new Map<string, number>();
-
-  constructor(ttlMs: number = Infinity) {
-    this.ttl = ttlMs;
-  }
 
   get(key: string): T | undefined {
-    const timestamp = this.timestamps.get(key);
-    if (timestamp && Date.now() - timestamp > this.ttl) {
-      this.cache.delete(key);
-      this.timestamps.delete(key);
-      return undefined;
-    }
     return this.cache.get(key);
   }
 
   set(key: string, value: T): void {
     this.cache.set(key, value);
-    this.timestamps.set(key, Date.now());
   }
 
   has(key: string): boolean {
-    return this.get(key) !== undefined;
+    return this.cache.has(key);
   }
 
   clear(): void {
     this.cache.clear();
-    this.timestamps.clear();
   }
 
   delete(key: string): void {
     this.cache.delete(key);
-    this.timestamps.delete(key);
   }
 }
 
-// Cache instances
 const channelDataCache = new CacheManager<ChannelData>();
 const statsCache = new CacheManager<ChannelDetailedStats[]>();
 const questionsCache = new CacheManager<Question>();
@@ -81,64 +60,59 @@ class ApiError extends Error {
 }
 
 async function fetchJson<T>(url: string): Promise<T> {
-  try {
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new ApiError(
-        `HTTP ${response.status}: ${response.statusText}`,
-        response.status,
-        url
-      );
-    }
-    
-    return response.json();
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
+  const response = await fetch(url);
+  if (!response.ok) {
     throw new ApiError(
-      error instanceof Error ? error.message : 'Network error',
-      0,
+      `HTTP ${response.status}: ${response.statusText}`,
+      response.status,
       url
     );
   }
+  return response.json();
 }
 
 // ============================================
 // CHANNEL SERVICE
 // ============================================
 export const ChannelService = {
-  /**
-   * Get all channels with question counts
-   */
   async getAll(): Promise<ChannelStats[]> {
-    return fetchJson<ChannelStats[]>(`${DATA_BASE}/channels.json`);
+    const data = await fetchJson<{ id: string; questionCount: number }[]>('/api/channels');
+    return data;
   },
 
-  /**
-   * Get channel data (questions, subchannels, companies, stats)
-   */
   async getData(channelId: string): Promise<ChannelData> {
     const cached = channelDataCache.get(channelId);
     if (cached) return cached;
 
-    const data = await fetchJson<ChannelData>(`${DATA_BASE}/${channelId}.json`);
+    const [questions, subChannels, companies] = await Promise.all([
+      fetchJson<Question[]>(`/api/questions/${channelId}`).catch(() => [] as Question[]),
+      fetchJson<string[]>(`/api/subchannels/${channelId}`).catch(() => [] as string[]),
+      fetchJson<string[]>(`/api/companies/${channelId}`).catch(() => [] as string[]),
+    ]);
+
+    const stats = {
+      total: questions.length,
+      beginner: questions.filter(q => q.difficulty === 'beginner').length,
+      intermediate: questions.filter(q => q.difficulty === 'intermediate').length,
+      advanced: questions.filter(q => q.difficulty === 'advanced').length,
+    };
+
+    const data: ChannelData = { questions, subChannels, companies, stats };
     channelDataCache.set(channelId, data);
+
+    // Also cache individual questions
+    for (const q of questions) {
+      questionsCache.set(q.id, q);
+    }
+
     return data;
   },
 
-  /**
-   * Get subchannels for a channel
-   */
   async getSubChannels(channelId: string): Promise<string[]> {
     const data = await this.getData(channelId);
     return data.subChannels;
   },
 
-  /**
-   * Get companies for a channel
-   */
   async getCompanies(channelId: string): Promise<string[]> {
     const data = await this.getData(channelId);
     return data.companies;
@@ -149,24 +123,16 @@ export const ChannelService = {
 // QUESTION SERVICE
 // ============================================
 export const QuestionService = {
-  /**
-   * Get questions for a channel with optional filters
-   */
-  async getByChannel(
-    channelId: string,
-    filters: QuestionFilters = {}
-  ): Promise<Question[]> {
+  async getByChannel(channelId: string, filters: QuestionFilters = {}): Promise<Question[]> {
     const data = await ChannelService.getData(channelId);
     let questions = data.questions;
 
     if (filters.subChannel && filters.subChannel !== 'all') {
       questions = questions.filter(q => q.subChannel === filters.subChannel);
     }
-
     if (filters.difficulty && filters.difficulty !== 'all') {
       questions = questions.filter(q => q.difficulty === filters.difficulty);
     }
-
     if (filters.company && filters.company !== 'all') {
       questions = questions.filter(q => q.companies?.includes(filters.company!));
     }
@@ -174,87 +140,39 @@ export const QuestionService = {
     return questions;
   },
 
-  /**
-   * Get a single question by ID
-   */
   async getById(questionId: string): Promise<Question> {
-    // Check cache first
     const cached = questionsCache.get(questionId);
     if (cached) return cached;
 
-    // Search through all channels
-    const channels = await ChannelService.getAll();
-    
-    for (const channel of channels) {
-      try {
-        const data = await ChannelService.getData(channel.id);
-        const question = data.questions.find(q => q.id === questionId);
-        if (question) {
-          questionsCache.set(questionId, question);
-          return question;
-        }
-      } catch {
-        // Channel file might not exist, continue
-      }
-    }
-
-    throw new ApiError(`Question not found: ${questionId}`, 404, questionId);
+    const question = await fetchJson<Question>(`/api/question/${questionId}`);
+    questionsCache.set(questionId, question);
+    return question;
   },
 
-  /**
-   * Get a random question
-   */
   async getRandom(channel?: string, difficulty?: string): Promise<Question> {
-    let questions: Question[] = [];
-
-    if (channel && channel !== 'all') {
-      const data = await ChannelService.getData(channel);
-      questions = data.questions;
-    } else {
-      const channels = await ChannelService.getAll();
-      for (const ch of channels) {
-        try {
-          const data = await ChannelService.getData(ch.id);
-          questions.push(...data.questions);
-        } catch {
-          // Continue if channel fails
-        }
-      }
-    }
-
-    if (difficulty && difficulty !== 'all') {
-      questions = questions.filter(q => q.difficulty === difficulty);
-    }
-
-    if (questions.length === 0) {
-      throw new ApiError('No questions found', 404, 'random');
-    }
-
-    const randomIndex = Math.floor(Math.random() * questions.length);
-    return questions[randomIndex];
+    const params = new URLSearchParams();
+    if (channel && channel !== 'all') params.set('channel', channel);
+    if (difficulty && difficulty !== 'all') params.set('difficulty', difficulty);
+    return fetchJson<Question>(`/api/question/random?${params}`);
   },
 
-  /**
-   * Search questions by text
-   */
-  async search(query: string, limit: number = 50): Promise<Question[]> {
+  async search(query: string, limit: number = 20): Promise<Question[]> {
+    if (!query.trim()) return [];
     const channels = await ChannelService.getAll();
     const results: Question[] = [];
-    const lowerQuery = query.toLowerCase();
+    const q = query.toLowerCase();
 
-    for (const channel of channels) {
-      if (results.length >= limit) break;
-      
+    for (const ch of channels) {
       try {
-        const data = await ChannelService.getData(channel.id);
-        const matches = data.questions.filter(q =>
-          q.question.toLowerCase().includes(lowerQuery) ||
-          q.answer.toLowerCase().includes(lowerQuery) ||
-          q.tags.some(t => t.toLowerCase().includes(lowerQuery))
+        const data = await ChannelService.getData(ch.id);
+        const matches = data.questions.filter(question =>
+          question.question.toLowerCase().includes(q) ||
+          question.tags?.some(t => t.toLowerCase().includes(q))
         );
         results.push(...matches);
+        if (results.length >= limit) break;
       } catch {
-        // Continue if channel fails
+        // skip
       }
     }
 
@@ -266,148 +184,59 @@ export const QuestionService = {
 // STATS SERVICE
 // ============================================
 export const StatsService = {
-  /**
-   * Get detailed stats for all channels
-   */
   async getAll(): Promise<ChannelDetailedStats[]> {
     const cached = statsCache.get('all');
     if (cached) return cached;
 
-    const channels = await ChannelService.getAll();
-    const stats: ChannelDetailedStats[] = [];
-
-    for (const channel of channels) {
-      try {
-        const data = await ChannelService.getData(channel.id);
-        stats.push({
-          id: channel.id,
-          total: data.stats.total,
-          beginner: data.stats.beginner,
-          intermediate: data.stats.intermediate,
-          advanced: data.stats.advanced,
-          newThisWeek: (data.stats as any).newThisWeek || 0,
-        });
-      } catch {
-        // Skip if channel fails
-      }
-    }
-
-    statsCache.set('all', stats);
-    return stats;
-  },
-};
-
-// ============================================
-// CODING CHALLENGE SERVICE
-// ============================================
-export const CodingService = {
-  /**
-   * Get all coding challenges with optional filters
-   */
-  async getAll(filters: CodingFilters = {}): Promise<CodingChallenge[]> {
-    const data = await fetchJson<CodingChallenge[]>(`${DATA_BASE}/coding-challenges.json`);
-    let challenges = data;
-
-    if (filters.difficulty && filters.difficulty !== 'all') {
-      challenges = challenges.filter(c => c.difficulty === filters.difficulty);
-    }
-
-    if (filters.category && filters.category !== 'all') {
-      challenges = challenges.filter(c => c.category === filters.category);
-    }
-
-    return challenges;
-  },
-
-  /**
-   * Get a single coding challenge by ID
-   */
-  async getById(id: string): Promise<CodingChallenge> {
-    const challenges = await this.getAll();
-    const challenge = challenges.find(c => c.id === id);
-    
-    if (!challenge) {
-      throw new ApiError(`Challenge not found: ${id}`, 404, id);
-    }
-    
-    return challenge;
-  },
-
-  /**
-   * Get a random coding challenge
-   */
-  async getRandom(difficulty?: string): Promise<CodingChallenge> {
-    const challenges = await this.getAll({ difficulty });
-    
-    if (challenges.length === 0) {
-      throw new ApiError('No challenges found', 404, 'random');
-    }
-
-    const randomIndex = Math.floor(Math.random() * challenges.length);
-    return challenges[randomIndex];
-  },
-
-  /**
-   * Get coding challenge statistics
-   */
-  async getStats(): Promise<CodingStats> {
-    const challenges = await this.getAll();
-    
-    const stats: CodingStats = {
-      total: challenges.length,
-      byDifficulty: { easy: 0, medium: 0 },
-      byCategory: {},
-    };
-
-    for (const challenge of challenges) {
-      if (challenge.difficulty === 'beginner') {
-        stats.byDifficulty.easy++;
-      } else if (challenge.difficulty === 'intermediate') {
-        stats.byDifficulty.medium++;
-      }
-
-      stats.byCategory[challenge.category] = 
-        (stats.byCategory[challenge.category] || 0) + 1;
-    }
-
-    return stats;
-  },
-};
-
-// ============================================
-// BLOG POST SERVICE
-// ============================================
-interface BlogPostInfo {
-  title: string;
-  slug: string;
-  url: string;
-}
-
-const blogPostsCache = new CacheManager<Record<string, BlogPostInfo>>();
-
-export const BlogService = {
-  /**
-   * Get all blog posts mapping (question_id -> blog post info)
-   */
-  async getAll(): Promise<Record<string, BlogPostInfo>> {
-    const cached = blogPostsCache.get('all');
-    if (cached) return cached;
-
     try {
-      const data = await fetchJson<Record<string, BlogPostInfo>>(`${DATA_BASE}/blog-posts.json`);
-      blogPostsCache.set('all', data);
+      const data = await fetchJson<ChannelDetailedStats[]>('/api/stats');
+      statsCache.set('all', data);
       return data;
     } catch {
-      return {};
+      return [];
+    }
+  },
+};
+
+// ============================================
+// CODING SERVICE
+// ============================================
+export const CodingService = {
+  async getAll(filters: CodingFilters = {}): Promise<CodingChallenge[]> {
+    const params = new URLSearchParams();
+    if (filters.difficulty) params.set('difficulty', filters.difficulty);
+    if (filters.category) params.set('category', filters.category);
+    try {
+      return fetchJson<CodingChallenge[]>(`/api/coding/challenges?${params}`);
+    } catch {
+      return [];
     }
   },
 
-  /**
-   * Get blog post info for a specific question ID
-   */
-  async getByQuestionId(questionId: string): Promise<BlogPostInfo | null> {
-    const posts = await this.getAll();
-    return posts[questionId] || null;
+  async getById(id: string): Promise<CodingChallenge> {
+    return fetchJson<CodingChallenge>(`/api/coding/challenge/${id}`);
+  },
+
+  async getRandom(difficulty?: string): Promise<CodingChallenge> {
+    const params = new URLSearchParams();
+    if (difficulty) params.set('difficulty', difficulty);
+    return fetchJson<CodingChallenge>(`/api/coding/random?${params}`);
+  },
+
+  async getStats(): Promise<CodingStats> {
+    return fetchJson<CodingStats>('/api/coding/stats');
+  },
+};
+
+// ============================================
+// BLOG SERVICE (stub - no server endpoint)
+// ============================================
+export const BlogService = {
+  async getAll(): Promise<Record<string, { title: string; slug: string; url: string }>> {
+    return {};
+  },
+  async getByQuestionId(_questionId: string) {
+    return null;
   },
 };
 
@@ -415,19 +244,12 @@ export const BlogService = {
 // CACHE UTILITIES
 // ============================================
 export const CacheUtils = {
-  /**
-   * Clear all caches
-   */
   clearAll(): void {
     channelDataCache.clear();
     statsCache.clear();
     questionsCache.clear();
-    blogPostsCache.clear();
   },
 
-  /**
-   * Preload all channel data for search functionality
-   */
   async preloadAll(): Promise<void> {
     const channels = await ChannelService.getAll();
     await Promise.all(

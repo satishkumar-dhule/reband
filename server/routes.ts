@@ -69,7 +69,7 @@ export async function registerRoutes(
       const { channelId } = req.params;
       const { subChannel, difficulty } = req.query;
 
-      let sql = "SELECT id, difficulty, sub_channel as subChannel FROM questions WHERE channel = ?";
+      let sql = "SELECT * FROM questions WHERE channel = ? AND status != 'deleted'";
       const args: any[] = [channelId];
 
       if (subChannel && subChannel !== "all") {
@@ -82,8 +82,10 @@ export async function registerRoutes(
         args.push(difficulty);
       }
 
+      sql += " ORDER BY created_at ASC";
+
       const result = await client.execute({ sql, args });
-      res.json(result.rows);
+      res.json(result.rows.map(parseQuestion));
     } catch (error) {
       console.error("Error fetching questions:", error);
       res.status(500).json({ error: "Failed to fetch questions" });

@@ -1,93 +1,46 @@
-/**
- * Mobile-First App Layout
- * Uses unified navigation for consistent experience
- */
-
-import { useState, useEffect } from 'react';
-import { GenZSidebar } from './GenZSidebar';
-import { MobileBottomNav, UnifiedMobileHeader } from './UnifiedNav';
-import { UnifiedSearch } from '../UnifiedSearch';
-import { ThemeToggle } from '../ThemeToggle';
-import { cn } from '../../lib/utils';
+import { ReactNode } from "react";
+import { Sidebar } from "./Sidebar";
+import { MobileNav } from "./MobileNav";
+import { MobileHeader } from "./MobileHeader";
 
 interface AppLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
   title?: string;
   fullWidth?: boolean;
   hideNav?: boolean;
   showBackOnMobile?: boolean;
 }
 
-export function AppLayout({ 
-  children, 
-  title, 
-  fullWidth = false, 
+export function AppLayout({
+  children,
+  title,
+  fullWidth = false,
   hideNav = false,
-  showBackOnMobile = false 
+  showBackOnMobile = false,
 }: AppLayoutProps) {
-  const [searchOpen, setSearchOpen] = useState(false);
-
-  // Handle keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setSearchOpen(true);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   if (hideNav) {
-    return (
-      <>
-        {children}
-        {/* Theme Toggle - Always visible */}
-        <ThemeToggle />
-      </>
-    );
+    return <>{children}</>;
   }
 
   return (
-    <div className="min-h-screen min-h-dvh bg-background overflow-x-hidden w-full">
-      {/* Desktop Sidebar - hidden on mobile */}
-      <div className="hidden lg:block">
-        <GenZSidebar />
-      </div>
+    <div className="min-h-screen bg-background flex">
+      <Sidebar />
 
-      {/* Mobile Header - visible only on mobile */}
-      <UnifiedMobileHeader 
-        title={title}
-        showBack={showBackOnMobile}
-        onSearchClick={() => setSearchOpen(true)}
-      />
+      <div className="flex-1 lg:ml-64 flex flex-col min-w-0">
+        <MobileHeader title={title} showBack={showBackOnMobile} />
 
-      {/* Main content area - fixed padding for Gen Z sidebar */}
-      <div className="lg:pl-64 w-full overflow-x-hidden">
-        {/* Page content with bottom padding for mobile nav + safe area */}
-        {/* iPhone 13 FIX: mobile-content-padding accounts for nav (64px) + padding (16px) + safe area */}
-        <main className={`
-          mobile-content-padding lg:pb-4 w-full overflow-x-hidden
-          ${fullWidth ? '' : 'max-w-7xl mx-auto px-3 lg:px-6 py-3 lg:py-6'}
-        `}>
+        <main
+          className={`flex-1 ${
+            fullWidth
+              ? "pb-24 lg:pb-6"
+              : "max-w-5xl mx-auto w-full px-4 lg:px-8 py-4 lg:py-8 pb-28 lg:pb-8"
+          }`}
+        >
           {children}
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav />
-
-      {/* Footer - Hidden but provides landmark for accessibility */}
-      <footer className="sr-only" role="contentinfo">
-        Code Reels - Technical Interview Preparation Platform
-      </footer>
-
-      {/* Theme Toggle - Floating button */}
-      <ThemeToggle />
-
-      {/* Search Modal */}
-      <UnifiedSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      <MobileNav />
     </div>
   );
 }

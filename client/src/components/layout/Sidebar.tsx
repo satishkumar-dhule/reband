@@ -1,259 +1,72 @@
-/**
- * Sidebar Navigation
- * Clean, minimal design with smooth transitions
- */
-
-import { useState } from 'react';
-import { useLocation } from 'wouter';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useUserPreferences } from '../../context/UserPreferencesContext';
-import { useChannelStats } from '../../hooks/use-stats';
-import { useProgress } from '../../hooks/use-progress';
+import { useLocation } from "wouter";
 import {
-  Home, Search, BarChart2, Trophy, Target, Bot, Settings,
-  ChevronLeft, ChevronRight, Plus, Sparkles, BookOpen, Menu, X,
-  Cpu, Terminal, Layout, Database, Activity, GitBranch, Server,
-  Layers, Smartphone, Shield, Brain, Workflow, Box, Cloud, Code,
-  Network, MessageCircle, Users, Eye, FileText, CheckCircle, Monitor, Zap, Gauge, Bookmark, History
-} from 'lucide-react';
+  Home, BookOpen, Bookmark, BarChart2,
+  Mic, Code, RotateCcw, User, Brain,
+} from "lucide-react";
+import { cn } from "../../lib/utils";
+import { ThemeToggle } from "../ThemeToggle";
 
-const iconMap: Record<string, React.ReactNode> = {
-  'cpu': <Cpu className="w-5 h-5" />,
-  'terminal': <Terminal className="w-5 h-5" />,
-  'layout': <Layout className="w-5 h-5" />,
-  'database': <Database className="w-5 h-5" />,
-  'activity': <Activity className="w-5 h-5" />,
-  'infinity': <GitBranch className="w-5 h-5" />,
-  'server': <Server className="w-5 h-5" />,
-  'layers': <Layers className="w-5 h-5" />,
-  'smartphone': <Smartphone className="w-5 h-5" />,
-  'shield': <Shield className="w-5 h-5" />,
-  'brain': <Brain className="w-5 h-5" />,
-  'workflow': <Workflow className="w-5 h-5" />,
-  'box': <Box className="w-5 h-5" />,
-  'cloud': <Cloud className="w-5 h-5" />,
-  'code': <Code className="w-5 h-5" />,
-  'network': <Network className="w-5 h-5" />,
-  'message-circle': <MessageCircle className="w-5 h-5" />,
-  'users': <Users className="w-5 h-5" />,
-  'sparkles': <Sparkles className="w-5 h-5" />,
-  'eye': <Eye className="w-5 h-5" />,
-  'file-text': <FileText className="w-5 h-5" />,
-  'chart': <Activity className="w-5 h-5" />,
-  'check-circle': <CheckCircle className="w-5 h-5" />,
-  'monitor': <Monitor className="w-5 h-5" />,
-  'zap': <Zap className="w-5 h-5" />,
-  'gauge': <Gauge className="w-5 h-5" />
-};
+const navItems = [
+  { icon: Home, label: "Home", path: "/" },
+  { icon: BookOpen, label: "Channels", path: "/channels" },
+  { icon: Mic, label: "Voice Practice", path: "/voice-interview" },
+  { icon: Code, label: "Coding", path: "/coding" },
+  { icon: RotateCcw, label: "SRS Review", path: "/review" },
+  { icon: BarChart2, label: "Stats", path: "/stats" },
+  { icon: Bookmark, label: "Bookmarks", path: "/bookmarks" },
+  { icon: User, label: "Profile", path: "/profile" },
+];
 
-interface SidebarProps {
-  isOpen: boolean;
-  onToggle: () => void;
-  onSearch: () => void;
-}
-
-export function Sidebar({ isOpen, onToggle, onSearch }: SidebarProps) {
+export function Sidebar() {
   const [location, setLocation] = useLocation();
-  const { getSubscribedChannels } = useUserPreferences();
-  const { stats } = useChannelStats();
-  const subscribedChannels = getSubscribedChannels();
 
-  const questionCounts: Record<string, number> = {};
-  stats.forEach(s => { questionCounts[s.id] = s.total; });
-
-  const navItems = [
-    { id: 'home', icon: <Home className="w-5 h-5" />, label: 'Home', path: '/' },
-    { id: 'search', icon: <Search className="w-5 h-5" />, label: 'Search', action: onSearch },
-    { id: 'channels', icon: <Plus className="w-5 h-5" />, label: 'Channels', path: '/channels' },
-    { id: 'bookmarks', icon: <Bookmark className="w-5 h-5" />, label: 'Saved', path: '/bookmarks' },
-    { id: 'history', icon: <History className="w-5 h-5" />, label: 'History', path: '/history' },
-    { id: 'coding', icon: <Code className="w-5 h-5" />, label: 'Coding', path: '/coding' },
-    { id: 'stats', icon: <BarChart2 className="w-5 h-5" />, label: 'Stats', path: '/stats' },
-    { id: 'badges', icon: <Trophy className="w-5 h-5" />, label: 'Badges', path: '/badges' },
-    { id: 'tests', icon: <Target className="w-5 h-5" />, label: 'Tests', path: '/tests' },
-    { id: 'bots', icon: <Bot className="w-5 h-5" />, label: 'Bot Activity', path: '/bot-activity' },
-    { id: 'docs', icon: <BookOpen className="w-5 h-5" />, label: 'Docs', path: '/docs' },
-    { id: 'new', icon: <Sparkles className="w-5 h-5" />, label: "What's New", path: '/whats-new' },
-    { id: 'about', icon: <FileText className="w-5 h-5" />, label: 'About', path: '/about' },
-  ];
-
-  const isActive = (path?: string) => path && location === path;
+  const isActive = (path: string) =>
+    path === "/" ? location === "/" : location.startsWith(path);
 
   return (
-    <>
-      {/* Desktop overlay when sidebar is expanded */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 z-40 hidden lg:block"
-            onClick={onToggle}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar - Completely hidden on mobile, visible collapsed on desktop */}
-      <aside
-        className={`
-          fixed left-0 top-0 h-full bg-card border-r border-border z-50
-          flex-col transition-all duration-300 ease-in-out
-          hidden lg:flex
-          ${isOpen ? 'w-[280px]' : 'w-[72px]'}
-        `}
+    <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-64 flex-col border-r border-border bg-background z-50">
+      <button
+        onClick={() => setLocation("/")}
+        className="flex items-center gap-3 px-5 py-4 border-b border-border hover:bg-muted/50 transition-colors text-left"
       >
-        {/* Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-border">
-          <AnimatePresence mode="wait">
-            {isOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-2"
-              >
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                  <Code className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <span className="font-bold text-lg">Code Reels</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <button
-            onClick={onToggle}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
-          >
-            {isOpen ? <ChevronLeft className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
+          <Brain className="w-5 h-5 text-primary-foreground" strokeWidth={2.5} />
         </div>
+        <div>
+          <div className="font-bold text-sm text-foreground">Code Reels</div>
+          <div className="text-xs text-muted-foreground">Interview Prep</div>
+        </div>
+      </button>
 
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-2">
-          <div className="space-y-1">
-            {navItems.map(item => (
-              <button
-                key={item.id}
-                onClick={() => item.path ? setLocation(item.path) : item.action?.()}
-                className={`
-                  w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all
-                  ${isActive(item.path) 
-                    ? 'bg-primary/10 text-primary' 
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }
-                `}
-              >
-                {item.icon}
-                <AnimatePresence mode="wait">
-                  {isOpen && (
-                    <motion.span
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: 'auto' }}
-                      exit={{ opacity: 0, width: 0 }}
-                      className="text-sm font-medium whitespace-nowrap overflow-hidden"
-                    >
-                      {item.label}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </button>
-            ))}
-          </div>
+      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const active = isActive(item.path);
+          return (
+            <button
+              key={item.path}
+              onClick={() => setLocation(item.path)}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                active
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              <Icon
+                className={cn("w-4 h-4 shrink-0", active ? "text-primary" : "")}
+                strokeWidth={active ? 2.5 : 2}
+              />
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
 
-          {/* Subscribed Channels */}
-          {subscribedChannels.length > 0 && (
-            <div className="mt-6 pt-4 border-t border-border">
-              <AnimatePresence mode="wait">
-                {isOpen && (
-                  <motion.h3
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider"
-                  >
-                    Your Channels
-                  </motion.h3>
-                )}
-              </AnimatePresence>
-              <div className="space-y-1">
-                {subscribedChannels.slice(0, isOpen ? 10 : 5).map(channel => (
-                  <ChannelItem
-                    key={channel.id}
-                    channel={channel}
-                    isOpen={isOpen}
-                    isActive={location.includes(`/channel/${channel.id}`)}
-                    questionCount={questionCounts[channel.id] || 0}
-                    onClick={() => setLocation(`/channel/${channel.id}`)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </nav>
-      </aside>
-    </>
-  );
-}
-
-function ChannelItem({ 
-  channel, 
-  isOpen, 
-  isActive, 
-  questionCount,
-  onClick 
-}: { 
-  channel: any; 
-  isOpen: boolean; 
-  isActive: boolean;
-  questionCount: number;
-  onClick: () => void;
-}) {
-  const { completed } = useProgress(channel.id);
-  // Cap at 100% - completed can exceed questionCount if questions were recategorized
-  const progress = questionCount > 0 ? Math.min(100, Math.round((completed.length / questionCount) * 100)) : 0;
-
-  return (
-    <button
-      onClick={onClick}
-      className={`
-        w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all group
-        ${isActive 
-          ? 'bg-primary/10 text-primary' 
-          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-        }
-      `}
-    >
-      <div className="relative shrink-0">
-        {iconMap[channel.icon] || <Cpu className="w-5 h-5" />}
-        {/* Small progress dot indicator */}
-        {progress > 0 && progress < 100 && (
-          <div 
-            className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary"
-            title={`${progress}% complete`}
-          />
-        )}
-        {progress === 100 && (
-          <div 
-            className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500"
-            title="Completed"
-          />
-        )}
+      <div className="px-4 py-3 border-t border-border flex items-center justify-between">
+        <span className="text-xs text-muted-foreground">Appearance</span>
+        <ThemeToggle />
       </div>
-      <AnimatePresence mode="wait">
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, width: 0 }}
-            animate={{ opacity: 1, width: 'auto' }}
-            exit={{ opacity: 0, width: 0 }}
-            className="flex-1 min-w-0 text-left"
-          >
-            <div className="text-sm font-medium truncate">{channel.name}</div>
-            <div className="text-xs text-muted-foreground">
-              {completed.length}/{questionCount} • {progress}%
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </button>
+    </aside>
   );
 }
