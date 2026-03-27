@@ -12,6 +12,8 @@ id = "artifacts/devprep"
 [deployment]
 router = "application"
 deploymentTarget = "autoscale"
+run = ["node", "./dist/index.cjs"]
+build = ["npm", "run", "build"]
 
 [deployment.postBuild]
 args = ["pnpm", "store", "prune"]
@@ -33,13 +35,13 @@ args = "Start application"
 name = "Start application"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "NODE_ENV=development TURSO_DATABASE_URL=file:local.db PORT=5173 tsx server/index.ts"
-waitForPort = 5173
-
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "NODE_ENV=development npx tsx server/index.ts"
+waitForPort = 5000
 
 [agent]
 stack = "PNPM_WORKSPACE"
@@ -61,6 +63,10 @@ externalPort = 6000
 localPort = 4096
 externalPort = 3000
 exposeLocalhost = true
+
+[[ports]]
+localPort = 5000
+externalPort = 8000
 
 [[ports]]
 localPort = 5001

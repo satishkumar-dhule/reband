@@ -14,8 +14,9 @@ A technical interview prep platform with 1000+ questions, swipe-based learning, 
 
 The app runs via the "Start application" workflow:
 ```
-NODE_ENV=development TURSO_DATABASE_URL=file:local.db PORT=5173 tsx server/index.ts
+NODE_ENV=development npx tsx server/index.ts
 ```
+The server listens on port 5000 (or `$PORT` env variable). In development it uses Vite as middleware to serve the frontend.
 
 ## Key Files
 
