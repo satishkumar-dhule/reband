@@ -1,0 +1,83 @@
+modules = ["nodejs-20", "web", "python-3.12"]
+
+[[artifacts]]
+id = "artifacts/api-server"
+
+[[artifacts]]
+id = "artifacts/mockup-sandbox"
+
+[[artifacts]]
+id = "artifacts/devprep"
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "NODE_ENV=development TURSO_DATABASE_URL=file:local.db PORT=5173 tsx server/index.ts"
+waitForPort = 5173
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
+
+[nix]
+channel = "stable-25_05"
+packages = ["glib", "nss", "nspr", "atk", "cups", "dbus", "libdrm", "xorg.libX11", "xorg.libXcomposite", "xorg.libXdamage", "xorg.libXext", "xorg.libXfixes", "xorg.libXrandr", "libgbm", "libxkbcommon", "pango", "cairo", "alsa-lib", "gh", "chromium", "chromium-xorg-conf", "firefox", "firefox-esr"]
+
+[[ports]]
+localPort = 3001
+externalPort = 6000
+
+[[ports]]
+localPort = 4096
+externalPort = 3000
+exposeLocalhost = true
+
+[[ports]]
+localPort = 5173
+externalPort = 80
+
+[[ports]]
+localPort = 5174
+externalPort = 8080
+
+[[ports]]
+localPort = 5175
+
+[[ports]]
+localPort = 5176
+
+[[ports]]
+localPort = 5177
+
+[[ports]]
+localPort = 9999

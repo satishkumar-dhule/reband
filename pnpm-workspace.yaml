@@ -1,5 +1,7 @@
 packages:
-  - 'packages/*'
+  - packages/*
 
 ignoredBuiltDependencies:
+  - bufferutil
+  - esbuild
   - sharp
