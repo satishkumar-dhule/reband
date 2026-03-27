@@ -11,14 +11,15 @@ import { SEOHead } from '../components/SEOHead';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useCredits } from '../context/CreditsContext';
 import { getAllQuestions } from '../lib/data';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import {
-  User, Settings, Zap, Trophy, Target, Sparkles,
-  Volume2, VolumeX, Shuffle, Eye, Moon, Sun
+  User, Settings, Zap, Trophy, Target, Sparkles, Home,
+  Volume2, Shuffle, Eye, ChevronRight, Bell, Shield
 } from 'lucide-react';
 
 export default function ProfileGenZ() {
   const [, setLocation] = useLocation();
-  const { preferences, updatePreferences } = useUserPreferences();
+  const { preferences, toggleShuffleQuestions, togglePrioritizeUnvisited, toggleHideCertifications } = useUserPreferences();
   const { balance } = useCredits();
   const [totalCompleted, setTotalCompleted] = useState(0);
 
@@ -41,6 +42,7 @@ export default function ProfileGenZ() {
 
   const level = Math.floor(balance / 100);
   const xpInLevel = balance % 100;
+  const progressPercent = xpInLevel;
 
   return (
     <>
@@ -51,28 +53,43 @@ export default function ProfileGenZ() {
       />
 
       <AppLayout>
-        {/* iPhone 13 FIX: Ensure content fits within viewport with safe areas */}
-        <div className="min-h-screen bg-background text-foreground overflow-x-hidden w-full">
-          <div className="max-w-4xl mx-auto px-6 py-12 w-full" style={{ maxWidth: '100vw' }}>
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">
+                <Home className="w-4 h-4" />
+                <span className="ml-1">Home</span>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Profile</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        <div className="min-h-screen bg-background text-foreground overflow-x-hidden w-full pb-12">
+          <div className="max-w-4xl mx-auto w-full">
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center space-y-6 mb-12"
+              className="space-y-6 mb-8"
             >
               {/* Avatar */}
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-primary to-cyan-500 rounded-full flex items-center justify-center relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary to-cyan-500 rounded-full blur-2xl opacity-50" />
-                <User className="w-16 h-16 text-black relative z-10" strokeWidth={2.5} />
-              </div>
-
-              <div>
-                <h1 className="text-4xl font-black mb-2">Level {level}</h1>
-                <p className="text-muted-foreground">{balance} XP • {totalCompleted} completed</p>
+              <div className="flex items-center gap-6">
+                <div className="w-24 h-24 bg-gradient-to-br from-primary to-cyan-500 rounded-full flex items-center justify-center relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary to-cyan-500 rounded-full blur-2xl opacity-50" />
+                  <User className="w-12 h-12 text-black relative z-10" strokeWidth={2.5} />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-black">Level {level}</h1>
+                  <p className="text-muted-foreground">{balance} XP • {totalCompleted} completed</p>
+                </div>
               </div>
 
               {/* Level Progress */}
-              <div className="max-w-md mx-auto">
+              <div>
                 <div className="flex items-center justify-between text-sm mb-2">
                   <span className="text-muted-foreground">Level {level}</span>
                   <span className="text-muted-foreground">Level {level + 1}</span>
@@ -80,7 +97,7 @@ export default function ProfileGenZ() {
                 <div className="h-3 bg-muted rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${xpInLevel}%` }}
+                    animate={{ width: `${progressPercent}%` }}
                     transition={{ duration: 1 }}
                     className="h-full bg-gradient-to-r from-primary to-cyan-500"
                   />
@@ -92,14 +109,14 @@ export default function ProfileGenZ() {
             </motion.div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-4 mb-12 w-full" style={{ maxWidth: '100%' }}>
+            <div className="grid grid-cols-3 gap-4 mb-8 w-full">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
-                className="p-6 bg-gradient-to-br from-primary/20 to-cyan-500/20 backdrop-blur-xl rounded-[20px] border border-primary/30 text-center"
+                className="p-5 bg-gradient-to-br from-primary/20 to-cyan-500/20 backdrop-blur-xl rounded-[20px] border border-primary/30 text-center"
               >
-                <Zap className="w-8 h-8 text-primary mx-auto mb-2" />
+                <Zap className="w-7 h-7 text-primary mx-auto mb-2" />
                 <div className="text-2xl font-black">{balance}</div>
                 <div className="text-xs text-muted-foreground">Total XP</div>
               </motion.div>
@@ -108,9 +125,9 @@ export default function ProfileGenZ() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="p-6 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-[20px] border border-purple-500/30 text-center"
+                className="p-5 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-[20px] border border-purple-500/30 text-center"
               >
-                <Trophy className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                <Trophy className="w-7 h-7 text-purple-400 mx-auto mb-2" />
                 <div className="text-2xl font-black">{level}</div>
                 <div className="text-xs text-muted-foreground">Level</div>
               </motion.div>
@@ -119,9 +136,9 @@ export default function ProfileGenZ() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3 }}
-                className="p-6 bg-gradient-to-br from-[#ffd700]/20 to-[#ff8c00]/20 backdrop-blur-xl rounded-[20px] border border-[#ffd700]/30 text-center"
+                className="p-5 bg-gradient-to-br from-[#ffd700]/20 to-[#ff8c00]/20 backdrop-blur-xl rounded-[20px] border border-[#ffd700]/30 text-center"
               >
-                <Target className="w-8 h-8 text-[#ffd700] mx-auto mb-2" />
+                <Target className="w-7 h-7 text-[#ffd700] mx-auto mb-2" />
                 <div className="text-2xl font-black">{totalCompleted}</div>
                 <div className="text-xs text-muted-foreground">Completed</div>
               </motion.div>
@@ -132,17 +149,19 @@ export default function ProfileGenZ() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="space-y-6 w-full overflow-hidden"
-              style={{ maxWidth: '100%' }}
+              className="space-y-6 w-full"
             >
-              <h2 className="text-3xl font-black flex items-center gap-3">
-                <Settings className="w-8 h-8" />
+              <h2 className="text-2xl font-black flex items-center gap-3">
+                <Settings className="w-7 h-7" />
                 Settings
               </h2>
 
               {/* Learning Preferences */}
-              <div className="p-6 bg-muted/50 backdrop-blur-xl rounded-[24px] border border-border space-y-4 w-full overflow-hidden" style={{ maxWidth: '100%' }}>
-                <h3 className="text-xl font-bold mb-4">Learning Preferences</h3>
+              <div className="p-6 bg-muted/50 backdrop-blur-xl rounded-[24px] border border-border space-y-6 w-full">
+                <h3 className="text-lg font-bold flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  Learning Preferences
+                </h3>
 
                 {/* Shuffle Questions */}
                 <div className="flex items-center justify-between">
@@ -154,7 +173,7 @@ export default function ProfileGenZ() {
                     </div>
                   </div>
                   <button
-                    onClick={() => updatePreferences({ shuffleQuestions: !preferences.shuffleQuestions })}
+                    onClick={toggleShuffleQuestions}
                     className={`w-14 h-8 rounded-full transition-all ${
                       preferences.shuffleQuestions !== false
                         ? 'bg-gradient-to-r from-primary to-cyan-500'
@@ -177,7 +196,7 @@ export default function ProfileGenZ() {
                     </div>
                   </div>
                   <button
-                    onClick={() => updatePreferences({ prioritizeUnvisited: !preferences.prioritizeUnvisited })}
+                    onClick={togglePrioritizeUnvisited}
                     className={`w-14 h-8 rounded-full transition-all ${
                       preferences.prioritizeUnvisited !== false
                         ? 'bg-gradient-to-r from-primary to-cyan-500'
@@ -190,52 +209,94 @@ export default function ProfileGenZ() {
                   </button>
                 </div>
 
-                {/* Auto-play TTS */}
+                {/* Hide Certifications */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Volume2 className="w-5 h-5 text-purple-400" />
+                    <Shield className="w-5 h-5 text-purple-400" />
                     <div>
-                      <div className="font-semibold">Auto-play Audio</div>
-                      <div className="text-sm text-muted-foreground">Automatically read questions</div>
+                      <div className="font-semibold">Hide Certifications</div>
+                      <div className="text-sm text-muted-foreground">Show certification content</div>
                     </div>
                   </div>
                   <button
-                    onClick={() => updatePreferences({ autoPlayTTS: !preferences.autoPlayTTS })}
+                    onClick={toggleHideCertifications}
                     className={`w-14 h-8 rounded-full transition-all ${
-                      preferences.autoPlayTTS
-                        ? 'bg-gradient-to-r from-primary to-cyan-500'
-                        : 'bg-muted'
+                      preferences.hideCertifications
+                        ? 'bg-muted'
+                        : 'bg-gradient-to-r from-primary to-cyan-500'
                     }`}
                   >
                     <div className={`w-6 h-6 bg-white rounded-full transition-transform ${
-                      preferences.autoPlayTTS ? 'translate-x-7' : 'translate-x-1'
+                      preferences.hideCertifications ? 'translate-x-1' : 'translate-x-7'
                     }`} />
                   </button>
                 </div>
               </div>
 
               {/* Quick Actions */}
-              <div className="grid grid-cols-2 gap-4 w-full" style={{ maxWidth: '100%' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setLocation('/badges')}
-                  className="p-6 bg-gradient-to-br from-[#ffd700]/20 to-[#ff8c00]/20 backdrop-blur-xl rounded-[20px] border border-[#ffd700]/30 text-left"
+                  className="p-5 bg-gradient-to-br from-[#ffd700]/20 to-[#ff8c00]/20 backdrop-blur-xl rounded-[20px] border border-[#ffd700]/30 text-left flex items-center justify-between group"
                 >
-                  <Trophy className="w-8 h-8 text-[#ffd700] mb-3" />
-                  <div className="font-bold">Achievements</div>
-                  <div className="text-sm text-muted-foreground">View your badges</div>
+                  <div className="flex items-center gap-4">
+                    <Trophy className="w-8 h-8 text-[#ffd700]" />
+                    <div>
+                      <div className="font-bold">Achievements</div>
+                      <div className="text-sm text-muted-foreground">View your badges</div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
                 </motion.button>
 
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setLocation('/stats')}
-                  className="p-6 bg-gradient-to-br from-primary/20 to-cyan-500/20 backdrop-blur-xl rounded-[20px] border border-primary/30 text-left"
+                  className="p-5 bg-gradient-to-br from-primary/20 to-cyan-500/20 backdrop-blur-xl rounded-[20px] border border-primary/30 text-left flex items-center justify-between group"
                 >
-                  <Sparkles className="w-8 h-8 text-primary mb-3" />
-                  <div className="font-bold">Statistics</div>
-                  <div className="text-sm text-muted-foreground">View your progress</div>
+                  <div className="flex items-center gap-4">
+                    <Sparkles className="w-8 h-8 text-primary" />
+                    <div>
+                      <div className="font-bold">Statistics</div>
+                      <div className="text-sm text-muted-foreground">View your progress</div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setLocation('/learning-paths')}
+                  className="p-5 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-[20px] border border-purple-500/30 text-left flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-4">
+                    <Target className="w-8 h-8 text-purple-400" />
+                    <div>
+                      <div className="font-bold">Learning Paths</div>
+                      <div className="text-sm text-muted-foreground">Choose your career</div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setLocation('/channels')}
+                  className="p-5 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-xl rounded-[20px] border border-emerald-500/30 text-left flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-4">
+                    <Shield className="w-8 h-8 text-emerald-400" />
+                    <div>
+                      <div className="font-bold">Channels</div>
+                      <div className="text-sm text-muted-foreground">Browse topics</div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
                 </motion.button>
               </div>
             </motion.div>

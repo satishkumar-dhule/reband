@@ -245,6 +245,209 @@ html.genz-light body,
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
+/* UI/UX Pro Max Theme - Midnight */
+.pro-midnight {
+  --background: hsl(220 30% 8%);
+  --foreground: hsl(0 0% 95%);
+  --card: hsl(220 25% 12%);
+  --card-foreground: hsl(0 0% 95%);
+  --popover: hsl(220 25% 12%);
+  --popover-foreground: hsl(0 0% 95%);
+  --primary: hsl(45 100% 60%);
+  --primary-foreground: hsl(0 0% 10%);
+  --secondary: hsl(220 20% 18%);
+  --secondary-foreground: hsl(0 0% 95%);
+  --muted: hsl(220 15% 18%);
+  --muted-foreground: hsl(0 0% 60%);
+  --accent: hsl(45 100% 60%);
+  --accent-foreground: hsl(0 0% 10%);
+  --destructive: hsl(0 84% 50%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(220 20% 22%);
+  --input: hsl(220 20% 22%);
+  --ring: hsl(45 100% 60%);
+  --radius: 16px;
+  --accent-gold: hsl(45 100% 60%);
+  --accent-diamond: hsl(200 100% 80%);
+  --gradient: linear-gradient(135deg, hsl(45 100% 60%) 0%, hsl(200 100% 70%) 100%);
+  --gradient-subtle: linear-gradient(135deg, hsla(45, 100%, 60%, 0.1) 0%, hsla(200, 100%, 70%, 0.1) 100%);
+  --shadow-glow: 0 0 40px hsla(45, 100%, 60%, 0.2);
+}
+
+/* UI/UX Pro Max Theme - Aurora */
+.pro-aurora {
+  --background: hsl(260 30% 10%);
+  --foreground: hsl(0 0% 95%);
+  --card: hsl(260 25% 15%);
+  --card-foreground: hsl(0 0% 95%);
+  --popover: hsl(260 25% 15%);
+  --popover-foreground: hsl(0 0% 95%);
+  --primary: hsl(170 100% 60%);
+  --primary-foreground: hsl(0 0% 10%);
+  --secondary: hsl(260 20% 20%);
+  --secondary-foreground: hsl(0 0% 95%);
+  --muted: hsl(260 15% 20%);
+  --muted-foreground: hsl(0 0% 65%);
+  --accent: hsl(290 100% 65%);
+  --accent-foreground: hsl(0 0% 10%);
+  --destructive: hsl(0 84% 50%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(260 20% 25%);
+  --input: hsl(260 20% 25%);
+  --ring: hsl(170 100% 60%);
+  --radius: 16px;
+  --accent-green: hsl(170 100% 60%);
+  --accent-purple: hsl(290 100% 65%);
+  --gradient: linear-gradient(135deg, hsl(170 100% 60%) 0%, hsl(290 100% 65%) 50%, hsl(320 100% 65%) 100%);
+  --gradient-subtle: linear-gradient(135deg, hsla(170, 100%, 60%, 0.1) 0%, hsla(290, 100%, 65%, 0.1) 100%);
+  --shadow-glow: 0 0 50px hsla(170, 100%, 60%, 0.25);
+}
+
+/* UI/UX Pro Max Theme - Obsidian */
+.pro-obsidian {
+  --background: hsl(0 0% 3%);
+  --foreground: hsl(0 0% 90%);
+  --card: hsl(0 0% 8%);
+  --card-foreground: hsl(0 0% 90%);
+  --popover: hsl(0 0% 8%);
+  --popover-foreground: hsl(0 0% 90%);
+  --primary: hsl(0 0% 80%);
+  --primary-foreground: hsl(0 0% 10%);
+  --secondary: hsl(0 0% 12%);
+  --secondary-foreground: hsl(0 0% 90%);
+  --muted: hsl(0 0% 12%);
+  --muted-foreground: hsl(0 0% 50%);
+  --accent: hsl(0 0% 60%);
+  --accent-foreground: hsl(0 0% 10%);
+  --destructive: hsl(0 84% 50%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(0 0% 15%);
+  --input: hsl(0 0% 15%);
+  --ring: hsl(0 0% 80%);
+  --radius: 12px;
+  --accent-platinum: hsl(0 0% 80%);
+  --accent-diamond: hsl(200 100% 85%);
+  --gradient: linear-gradient(135deg, hsl(0 0% 80%) 0%, hsl(200 100% 85%) 100%);
+  --gradient-subtle: linear-gradient(135deg, hsla(0, 0%, 80%, 0.05) 0%, hsla(200, 100%, 85%, 0.05) 100%);
+  --shadow-glow: 0 0 30px hsla(0, 0%, 80%, 0.15);
+}
+
+/* UI/UX Pro Max Theme - Sapphire */
+.pro-sapphire {
+  --background: hsl(220 35% 10%);
+  --foreground: hsl(0 0% 95%);
+  --card: hsl(220 30% 15%);
+  --card-foreground: hsl(0 0% 95%);
+  --popover: hsl(220 30% 15%);
+  --popover-foreground: hsl(0 0% 95%);
+  --primary: hsl(210 100% 55%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(220 25% 20%);
+  --secondary-foreground: hsl(0 0% 95%);
+  --muted: hsl(220 20% 20%);
+  --muted-foreground: hsl(0 0% 60%);
+  --accent: hsl(210 100% 55%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(0 84% 50%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(220 25% 25%);
+  --input: hsl(220 25% 25%);
+  --ring: hsl(210 100% 55%);
+  --radius: 14px;
+  --accent-sapphire: hsl(210 100% 55%);
+  --accent-silver: hsl(0 0% 75%);
+  --gradient: linear-gradient(135deg, hsl(210 100% 55%) 0%, hsl(0 0% 75%) 100%);
+  --gradient-subtle: linear-gradient(135deg, hsla(210, 100%, 55%, 0.1) 0%, hsla(0, 0%, 75%, 0.1) 100%);
+  --shadow-glow: 0 0 40px hsla(210, 100%, 55%, 0.2);
+}
+
+/* UI/UX Pro Max Theme - Emerald */
+.pro-emerald {
+  --background: hsl(150 25% 10%);
+  --foreground: hsl(0 0% 95%);
+  --card: hsl(150 20% 15%);
+  --card-foreground: hsl(0 0% 95%);
+  --popover: hsl(150 20% 15%);
+  --popover-foreground: hsl(0 0% 95%);
+  --primary: hsl(150 80% 45%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(150 15% 20%);
+  --secondary-foreground: hsl(0 0% 95%);
+  --muted: hsl(150 15% 20%);
+  --muted-foreground: hsl(0 0% 60%);
+  --accent: hsl(150 80% 45%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(0 84% 50%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(150 15% 25%);
+  --input: hsl(150 15% 25%);
+  --ring: hsl(150 80% 45%);
+  --radius: 14px;
+  --accent-emerald: hsl(150 80% 45%);
+  --accent-platinum: hsl(0 0% 70%);
+  --gradient: linear-gradient(135deg, hsl(150 80% 45%) 0%, hsl(0 0% 70%) 100%);
+  --gradient-subtle: linear-gradient(135deg, hsla(150, 80%, 45%, 0.1) 0%, hsla(0, 0%, 70%, 0.1) 100%);
+  --shadow-glow: 0 0 40px hsla(150, 80%, 45%, 0.2);
+}
+
+/* UI/UX Pro Max Theme - Ruby */
+.pro-ruby {
+  --background: hsl(350 25% 10%);
+  --foreground: hsl(0 0% 95%);
+  --card: hsl(350 20% 15%);
+  --card-foreground: hsl(0 0% 95%);
+  --popover: hsl(350 20% 15%);
+  --popover-foreground: hsl(0 0% 95%);
+  --primary: hsl(350 80% 55%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(350 15% 20%);
+  --secondary-foreground: hsl(0 0% 95%);
+  --muted: hsl(350 15% 20%);
+  --muted-foreground: hsl(0 0% 60%);
+  --accent: hsl(350 80% 55%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(0 84% 50%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(350 15% 25%);
+  --input: hsl(350 15% 25%);
+  --ring: hsl(350 80% 55%);
+  --radius: 14px;
+  --accent-ruby: hsl(350 80% 55%);
+  --accent-rosegold: hsl(330 40% 65%);
+  --gradient: linear-gradient(135deg, hsl(350 80% 55%) 0%, hsl(330 40% 65%) 100%);
+  --gradient-subtle: linear-gradient(135deg, hsla(350, 80%, 55%, 0.1) 0%, hsla(330, 40%, 65%, 0.1) 100%);
+  --shadow-glow: 0 0 40px hsla(350, 80%, 55%, 0.2);
+}
+
+/* UI/UX Pro Max Theme - Amethyst */
+.pro-amethyst {
+  --background: hsl(270 25% 12%);
+  --foreground: hsl(0 0% 95%);
+  --card: hsl(270 20% 18%);
+  --card-foreground: hsl(0 0% 95%);
+  --popover: hsl(270 20% 18%);
+  --popover-foreground: hsl(0 0% 95%);
+  --primary: hsl(270 60% 65%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(270 15% 25%);
+  --secondary-foreground: hsl(0 0% 95%);
+  --muted: hsl(270 15% 25%);
+  --muted-foreground: hsl(0 0% 65%);
+  --accent: hsl(270 60% 65%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(0 84% 50%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(270 15% 30%);
+  --input: hsl(270 15% 30%);
+  --ring: hsl(270 60% 65%);
+  --radius: 14px;
+  --accent-amethyst: hsl(270 60% 65%);
+  --accent-pearl: hsl(0 0% 85%);
+  --gradient: linear-gradient(135deg, hsl(270 60% 65%) 0%, hsl(0 0% 85%) 100%);
+  --gradient-subtle: linear-gradient(135deg, hsla(270, 60%, 65%, 0.1) 0%, hsla(0, 0%, 85%, 0.1) 100%);
+  --shadow-glow: 0 0 40px hsla(270, 60%, 65%, 0.2);
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -304,7 +507,128 @@ html.genz-light body,
   }
 }
 
-/* ===== PREMIUM UI ENHANCEMENTS ===== */
+/* ===== PRO MAX PREMIUM THEME ===== */
+:root {
+  /* Pro Max Premium Gradients */
+  --gradient-pro-midnight: linear-gradient(135deg, hsl(220 30% 8%) 0%, hsl(260 25% 12%) 50%, hsl(220 30% 8%) 100%);
+  --gradient-pro-aurora: linear-gradient(135deg, hsl(260 30% 10%) 0%, hsl(170 100% 60%) 50%, hsl(290 100% 65%) 100%);
+  --gradient-pro-gold: linear-gradient(135deg, hsl(45 100% 60%) 0%, hsl(30 100% 50%) 100%);
+  --gradient-pro-diamond: linear-gradient(135deg, hsl(200 100% 80%) 0%, hsl(180 100% 70%) 50%, hsl(200 100% 80%) 100%);
+  
+  /* Premium Shadows */
+  --shadow-premium: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --shadow-premium-sm: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+  --shadow-premium-glow: 0 0 60px hsla(150, 100%, 50%, 0.15);
+  --shadow-premium-glow-amber: 0 0 40px hsla(45, 100%, 60%, 0.2);
+  --shadow-premium-glow-cyan: 0 0 40px hsla(190, 100%, 50%, 0.2);
+  --shadow-premium-glow-purple: 0 0 40px hsla(270, 100%, 65%, 0.2);
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(20px) saturate(180%);
+  
+  /* Premium Borders */
+  --border-premium: 1px solid rgba(255, 255, 255, 0.08);
+  --border-premium-hover: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Pro Max Card Effects */
+.pro-max-card {
+  background: linear-gradient(145deg, hsl(0 0% 8%) 0%, hsl(0 0% 4%) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pro-max-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: var(--shadow-premium-glow);
+  transform: translateY(-4px);
+}
+
+/* Pro Max Glass Card */
+.pro-max-glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--border-premium);
+  border-radius: 20px;
+}
+
+/* Pro Max Gradient Border */
+.pro-max-gradient-border {
+  position: relative;
+  border-radius: 20px;
+}
+
+.pro-max-gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1px;
+  background: linear-gradient(135deg, hsl(150, 100%, 50%), hsl(190, 100%, 50%), hsl(45, 100%, 60%));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Premium Button Styles */
+.btn-pro-max {
+  background: linear-gradient(135deg, hsl(150, 100%, 50%) 0%, hsl(190, 100%, 50%) 100%);
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 12px 24px;
+  color: hsl(0, 0%, 0%);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-pro-max::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.2) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-pro-max:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-premium-glow);
+}
+
+.btn-pro-max:hover::before {
+  opacity: 1;
+}
+
+/* Premium Text Gradient */
+.text-gradient-pro-max {
+  background: linear-gradient(135deg, hsl(150, 100%, 50%) 0%, hsl(190, 100%, 50%) 50%, hsl(45, 100%, 60%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Premium Badge */
+.badge-pro-max {
+  background: linear-gradient(135deg, hsl(45, 100%, 60%) 0%, hsl(30, 100%, 50%) 100%);
+  color: hsl(0, 0%, 0%);
+  font-weight: 700;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Premium ===== ENHANCEMENTS ===== */
 
 /* Gradient text utility */
 .gradient-text {

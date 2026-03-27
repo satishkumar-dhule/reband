@@ -33,3 +33,9 @@ export {
   type Recommendation,
   type UserEngagementData,
 } from './recommendation.service';
+
+// Browser DB (IndexedDB)
+export { browserDB } from './browser-db';
+
+// Database Storage Sync (Database as source of truth)
+export { dbStorageSync } from './db-storage-sync';

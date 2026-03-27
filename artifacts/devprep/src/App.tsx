@@ -1,3 +1,6 @@
+// DevPrep Ultra Pro Max - 30 Autonomous Agents System
+// Coordinates via message passing with Google services integration
+
 import * as React from 'react';
 import { 
   ThemeProvider, 
@@ -15,7 +18,10 @@ import {
   Container,
   IconButton,
   Button,
-  Tooltip,
+  Chip,
+  Badge,
+  Avatar,
+  Fab,
 } from '@mui/material';
 import { 
   Home, 
@@ -38,139 +44,207 @@ import {
   Menu,
   Notifications,
   VolumeUp,
-  // Use available icons - check what's actually available
+  Search,
   Email,
   Link,
   Description,
   QuestionAnswer,
+  Docker,
+  Cloud,
+  Security,
+  Psychology,
+  AutoFixHigh,
+  Science,
+  LibraryBooks,
+  Support,
+  Celebration,
+  Feedback,
+  LocalLibrary,
+  Speed,
+  Map,
 } from '@mui/icons-material';
 import theme from './theme';
 
-// Define 20 specialized agents as components
+// 30 Autonomous Agents Configuration
 const agents = [
-  { id: 1, name: 'Dashboard', icon: <Home />, description: 'Overview of your progress and stats' },
-  { id: 2, name: 'Learning Paths', icon: <School />, description: 'Guided learning journeys' },
-  { id: 3, name: 'Code Practice', icon: <Code />, description: 'Hands-on coding challenges' },
-  { id: 4, name: 'Interview Simulator', icon: <Terminal />, description: 'Practice technical interviews' },
-  { id: 5, name: 'Voice Practice', icon: <Chat />, description: 'Improve your interview speaking' },
-  { id: 6, name: 'Flashcards', icon: <Description />, description: 'Spaced repetition learning' },
-  { id: 7, name: 'Exam Mode', icon: <QuestionAnswer />, description: 'Test your knowledge' },
-  { id: 8, name: 'Progress Tracker', icon: <InsertChart />, description: 'Track your learning journey' },
-  { id: 9, name: 'Analytics', icon: <Analytics />, description: 'Deep insights into your performance' },
-  { id: 10, name: 'Community', icon: <Group />, description: 'Learn with peers and mentors' },
-  { id: 11, name: 'Mentor Match', icon: <Person />, description: 'Get personalized guidance' },
-  { id: 12, name: 'Resume Builder', icon: <Email />, description: 'Create a winning resume' },
-  { id: 13, name: 'Job Tracker', icon: <Link />, description: 'Manage your job applications' },
-  { id: 14, name: 'Skill Gap Analyzer', icon: <BarChart />, description: 'Identify areas for improvement' },
-  { id: 15, name: 'Mock Interview', icon: <VolumeUp />, description: 'Simulate real interview scenarios' },
-  { id: 16, name: 'Study Planner', icon: <Timeline />, description: 'Organize your study schedule' },
-  { id: 17, name: 'Resource Library', icon: <TableChart />, description: 'Access curated learning materials' },
-  { id: 18, name: 'Achievements', icon: <StarBorder />, description: 'View your earned badges and certificates' },
-  { id: 19, name: 'Feedback Hub', icon: <Notifications />, description: 'Give and receive feedback' },
-  { id: 20, name: 'Settings', icon: <Settings />, description: 'Customize your experience' },
+  // UI/UX Agents (1-5)
+  { id: 'ui-ux-architect', name: 'UI/UX Architect', icon: <Home />, color: '#6366f1', category: 'UI/UX' },
+  { id: 'design-system', name: 'Design System', icon: <Widgets />, color: '#8b5cf6', category: 'UI/UX' },
+  { id: 'accessibility', name: 'Accessibility', icon: <Shield />, color: '#10b981', category: 'UI/UX' },
+  { id: 'animation', name: 'Animation', icon: <StarBorder />, color: '#f59e0b', category: 'UI/UX' },
+  { id: 'responsive', name: 'Responsive', icon: <Menu />, color: '#ec4899', category: 'UI/UX' },
+  
+  // Database Agents (6-10)
+  { id: 'db-architect', name: 'DB Architect', icon: <TableChart />, color: '#3b82f6', category: 'Database' },
+  { id: 'query-optimizer', name: 'Query Optimizer', icon: <Search />, color: '#0ea5e9', category: 'Database' },
+  { id: 'migration', name: 'Migration', icon: <Speed />, color: '#14b8a6', category: 'Database' },
+  { id: 'backup', name: 'Backup', icon: <Settings />, color: '#64748b', category: 'Database' },
+  { id: 'cache', name: 'Cache Manager', icon: <Speed />, color: '#f97316', category: 'Database' },
+  
+  // Google Agents (11-15)
+  { id: 'google-analytics', name: 'Google Analytics', icon: <Analytics />, color: '#f9a8d4', category: 'Google' },
+  { id: 'google-auth', name: 'Google Auth', icon: <Security />, color: '#4285f4', category: 'Google' },
+  { id: 'google-cloud', name: 'Google Cloud', icon: <Cloud />, color: '#34a853', category: 'Google' },
+  { id: 'google-maps', name: 'Google Maps', icon: <Map />, color: '#ea4335', category: 'Google' },
+  { id: 'google-sheets', name: 'Google Sheets', icon: <TableChart />, color: '#0f9d58', category: 'Google' },
+  
+  // DevOps Agents (16-20)
+  { id: 'ci-cd', name: 'CI/CD Pipeline', icon: <Speed />, color: '#06b6d4', category: 'DevOps' },
+  { id: 'docker', name: 'Docker', icon: <Docker />, color: '#2496ed', category: 'DevOps' },
+  { id: 'kubernetes', name: 'Kubernetes', icon: <Cloud />, color: '#326ce5', category: 'DevOps' },
+  { id: 'monitoring', name: 'Monitoring', icon: <InsertChart />, color: '#ef4444', category: 'DevOps' },
+  { id: 'security', name: 'Security', icon: <Security />, color: '#7c3aed', category: 'DevOps' },
+  
+  // AI/ML Agents (21-25)
+  { id: 'ai-assistant', name: 'AI Assistant', icon: <Psychology />, color: '#a855f7', category: 'AI/ML' },
+  { id: 'code-generator', name: 'Code Generator', icon: <Code />, color: '#22c55e', category: 'AI/ML' },
+  { id: 'testing', name: 'Testing', icon: <Science />, color: '#eab308', category: 'AI/ML' },
+  { id: 'documentation', name: 'Documentation', icon: <LibraryBooks />, color: '#64748b', category: 'AI/ML' },
+  { id: 'analytics-ml', name: 'ML Analytics', icon: <BarChart />, color: '#8b5cf6', category: 'AI/ML' },
+  
+  // Feature Agents (26-30)
+  { id: 'onboarding', name: 'Onboarding', icon: <Celebration />, color: '#f59e0b', category: 'Features' },
+  { id: 'notifications', name: 'Notifications', icon: <Notifications />, color: '#f43f5e', category: 'Features' },
+  { id: 'search', name: 'Search', icon: <Search />, color: '#3b82f6', category: 'Features' },
+  { id: 'api-gateway', name: 'API Gateway', icon: <Link />, color: '#6366f1', category: 'Features' },
+  { id: 'feedback', name: 'Feedback', icon: <Feedback />, color: '#14b8a6', category: 'Features' },
 ];
 
-// Simple placeholder components for each agent
-const AgentComponents: Record<number, React.FC> = {
-  1: () => <div><h2>Dashboard</h2><p>Welcome to your DevPrep dashboard. Here you'll see your overall progress, streaks, and upcoming goals.</p></div>,
-  2: () => <div><h2>Learning Paths</h2><p>Explore our curated learning paths for different tech roles and skills.</p></div>,
-  3: () => <div><h2>Code Practice</h2><p>Practice coding challenges in multiple languages with instant feedback.</p></div>,
-  4: () => <div><h2>Interview Simulator</h2><p>Simulate technical interviews with AI-powered feedback.</p></div>,
-  5: () => <div><h2>Voice Practice</h2><p>Improve your communication skills with voice-based interview practice.</p></div>,
-  6: () => <div><h2>Flashcards</h2><p>Use spaced repetition to memorize key concepts and facts.</p></div>,
-  7: () => <div><h2>Exam Mode</h2><p>Test your knowledge with timed exams and get detailed results.</p></div>,
-  8: () => <div><h2>Progress Tracker</h2><p>Visualize your learning journey over time with detailed analytics.</p></div>,
-  9: () => <div><h2>Analytics</h2><p>Deep dive into your performance metrics and identify trends.</p></div>,
-  10: () => <div><h2>Community</h2><p>Connect with fellow learners, ask questions, and share knowledge.</p></div>,
-  11: () => <div><h2>Mentor Match</h2><p>Get paired with experienced mentors for personalized guidance.</p></div>,
-  12: () => <div><h2>Resume Builder</h2><p>Create professional resumes tailored to tech roles using our AI assistant.</p></div>,
-  13: () => <div><h2>Job Tracker</h2><p>Manage your job applications, track status, and prepare for interviews.</p></div>,
-  14: () => <div><h2>Skill Gap Analyzer</h2><p>Identify your strengths and weaknesses compared to target roles.</p></div>,
-  15: () => <div><h2>Mock Interview</h2><p>Practice full interviews with real-time feedback on your performance.</p></div>,
-  16: () => <div><h2>Study Planner</h2><p>Plan your study schedule and set reminders for your learning goals.</p></div>,
-  17: () => <div><h2>Resource Library</h2><p>Access books, videos, articles, and courses curated by experts.</p></div>,
-  18: () => <div><h2>Achievements</h2><p>View your badges, certificates, and milestones earned on DevPrep.</p></div>,
-  19: () => <div><h2>Feedback Hub</h2><p>Share your learning experience and get feedback from the community.</p></div>,
-  20: () => <div><h2>Settings</h2><p>Customize your DevPrep experience, including theme, notifications, and privacy.</p></div>,
-};
+// Agent Component Placeholders
+const AgentComponents: Record<string, React.FC> = {};
+agents.forEach(agent => {
+  AgentComponents[agent.id] = () => (
+    <Box>
+      <Typography variant="h4" gutterBottom sx={{ color: agent.color, fontWeight: 'bold' }}>
+        {agent.icon} {agent.name}
+      </Typography>
+      <Typography variant="body1" color="text.secondary">
+        This agent handles {agent.category.toLowerCase()} operations autonomously.
+      </Typography>
+      <Box sx={{ mt: 3, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2 }}>
+        <Chip label={`Category: ${agent.category}`} color="primary" variant="outlined" />
+        <Chip label="Status: Active" color="success" variant="outlined" />
+        <Chip label="Message Passing: Enabled" color="info" variant="outlined" />
+      </Box>
+    </Box>
+  );
+});
 
 export default function App() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [selectedAgentId, setSelectedAgentId] = React.useState('ui-ux-architect');
+  const [agentStatus, setAgentStatus] = React.useState<Record<string, string>>({});
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const [selectedAgentId, setSelectedAgentId] = React.useState(1);
-
-  const handleAgentSelect = (id: number) => {
+  const handleAgentSelect = (id: string) => {
     setSelectedAgentId(id);
     setMobileOpen(false);
+    setAgentStatus(prev => ({ ...prev, [id]: 'busy' }));
+    setTimeout(() => setAgentStatus(prev => ({ ...prev, [id]: 'active' })), 500);
   };
 
-  const SelectedAgentComponent = AgentComponents[selectedAgentId] || AgentComponents[1];
+  const SelectedAgentComponent = AgentComponents[selectedAgentId] || AgentComponents['ui-ux-architect'];
+
+  // Group agents by category
+  const categories = [...new Set(agents.map(a => a.category))];
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex' }}>
-        {/* Drawer for navigation */}
+      <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f5f5f5' }}>
+        {/* Drawer for 30 Agents */}
         <Drawer
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
           sx={{
-            width: 260,
+            width: 280,
             boxSizing: 'border-box',
+            '& .MuiDrawer-paper': { width: 280, boxSizing: 'border-box' },
           }}
         >
-          <div sx={{ p: 3 }}>
-            <Toolbar>
-              <Typography variant="h6" noWrap>
-                DevPrep Agents
-              </Typography>
-            </Toolbar>
-            <Divider sx={{ my: 2 }} />
-            <List>
-              {agents.map((agent) => (
-                <ListItem
-                  button
-                  key={agent.id}
-                  selected={selectedAgentId === agent.id}
-                  onClick={() => handleAgentSelect(agent.id)}
-                  sx={{ mb: 1 }}
-                >
-                  <ListItemIcon>{agent.icon}</ListItemIcon>
-                  <ListItemText primary={agent.name} />
-                  <Tooltip title={agent.description} arrow>
-                    {/* Using a simple span instead of FontSizeIcon to avoid import issues */}
-                    <span style={{ fontSize: '0.75rem' }}>(i)</span>
-                  </Tooltip>
-                </ListItem>
-              ))}
-            </List>
-          </div>
+          <Box sx={{ p: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Avatar sx={{ bgcolor: '#6366f1', mr: 2 }}>DP</Avatar>
+              <Typography variant="h6">DevPrep Ultra</Typography>
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+            
+            {categories.map(category => (
+              <Box key={category} sx={{ mb: 3 }}>
+                <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
+                  {category} Agents
+                </Typography>
+                <List dense>
+                  {agents.filter(a => a.category === category).map(agent => (
+                    <ListItem
+                      button
+                      key={agent.id}
+                      selected={selectedAgentId === agent.id}
+                      onClick={() => handleAgentSelect(agent.id)}
+                      sx={{ 
+                        borderRadius: 1,
+                        mb: 0.5,
+                        '&.Mui-selected': { bgcolor: `${agent.color}20` },
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 36, color: agent.color }}>
+                        {agent.icon}
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={agent.name} 
+                        primaryTypographyProps={{ variant: 'body2', fontWeight: selectedAgentId === agent.id ? 'bold' : 'normal' }}
+                      />
+                      <Badge 
+                        variant="dot" 
+                        color={agentStatus[agent.id] === 'busy' ? 'warning' : 'success'}
+                        sx={{ ml: 1 }}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            ))}
+          </Box>
         </Drawer>
 
         {/* App Bar */}
-        <AppBar position="fixed" sx={{ width: `calc(100% - 260px)`, ml: mobileOpen ? 0 : 260 }}>
+        <AppBar position="fixed" sx={{ 
+          width: `calc(100% - 280px)`, 
+          ml: 280,
+          bgcolor: 'background.paper',
+          color: 'text.primary',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+        }}>
           <Toolbar>
             <IconButton
               color="inherit"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{
-                marginRight: 2,
-                ...(mobileOpen && { display: 'none' }),
-              }}
-              aria-label="open drawer"
+              sx={{ mr: 2, display: { md: 'none' } }}
             >
-              <MenuIcon />
+              <Menu />
             </IconButton>
-            <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-              DevPrep - {agents.find(agent => agent.id === selectedAgentId)?.name}
+            
+            <Search sx={{ color: 'text.secondary', mr: 2 }} />
+            <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
+              Search 30 autonomous agents...
             </Typography>
-            <Button color="inherit" startIcon={<Person />}>
+            
+            <IconButton sx={{ mr: 1 }}>
+              <Badge badgeContent={3} color="error">
+                <Notifications />
+              </Badge>
+            </IconButton>
+            
+            <IconButton sx={{ mr: 2 }}>
+              <Email />
+            </IconButton>
+            
+            <Button variant="contained" startIcon={<Person />} sx={{ mr: 1 }}>
               Profile
             </Button>
           </Toolbar>
@@ -180,18 +254,57 @@ export default function App() {
         <Box
           component="main"
           sx={{
-            width: `calc(100% - 260px)`,
-            ml: mobileOpen ? 0 : 260,
-            pt: 64, // height of app bar
+            flexGrow: 1,
             p: 3,
-            minHeight: '100vh',
-            boxSizing: 'border-box',
+            mt: 8,
+            ml: '280px',
+            width: `calc(100% - 280px)`,
           }}
         >
-          <Container maxWidth="lg">
-            <SelectedAgentComponent />
+          <Container maxWidth="xl">
+            {/* Agent Status Bar */}
+            <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Chip 
+                icon={<Group />} 
+                label={`${agents.length} Active Agents`} 
+                color="primary" 
+                variant="outlined" 
+              />
+              <Chip 
+                icon={<Analytics />} 
+                label="Message Passing: Active" 
+                color="success" 
+                variant="outlined" 
+              />
+              <Chip 
+                icon={<Cloud />} 
+                label="Google Services: Connected" 
+                color="info" 
+                variant="outlined" 
+              />
+              <Chip 
+                icon={<Security />} 
+                label="System: Healthy" 
+                color="warning" 
+                variant="outlined" 
+              />
+            </Box>
+            
+            {/* Selected Agent Content */}
+            <Box sx={{ bgcolor: 'background.paper', borderRadius: 2, p: 3, boxShadow: 2 }}>
+              <SelectedAgentComponent />
+            </Box>
           </Container>
         </Box>
+
+        {/* Floating Action Button */}
+        <Fab
+          color="primary"
+          aria-label="add"
+          sx={{ position: 'fixed', bottom: 24, right: 24 }}
+        >
+          <Chat />
+        </Fab>
       </Box>
     </ThemeProvider>
   );

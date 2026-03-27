@@ -9,9 +9,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { allChannelsConfig } from '../lib/channels-config';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import {
   Code, Server, Rocket, Target, Sparkles, Brain,
-  Plus, ChevronRight, Star, Clock, Trophy, Zap, Check, X, Award, Search
+  Plus, ChevronRight, Star, Clock, Trophy, Zap, Check, X, Award, Search, Home
 } from 'lucide-react';
 
 // Certification type
@@ -253,6 +254,21 @@ export default function LearningPathsGenZ() {
       />
 
       <AppLayout>
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">
+                <Home className="w-4 h-4" />
+                <span className="ml-1">Home</span>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Learning Paths</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         {/* Custom Path Builder Modal */}
         <AnimatePresence>
           {showCustom && (

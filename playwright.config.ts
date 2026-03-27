@@ -78,6 +78,7 @@ export default defineConfig({
         '**/reduced-motion.spec.ts',
         '**/custom-checks.spec.ts',
         '**/iphone13-ui-audit.spec.ts', // Run separately
+        '**/mobile/comprehensive-mobile.spec.ts', // Run on mobile projects only
       ],
     },
     
@@ -92,6 +93,90 @@ export default defineConfig({
         hasTouch: true,
       },
       testMatch: '**/iphone13-ui-audit.spec.ts',
+    },
+
+    // Mobile Device Emulation - iPhone SE (using Chromium)
+    {
+      name: 'mobile-iphone-se',
+      use: {
+        ...devices['iPhone SE'],
+        viewport: { width: 375, height: 667 },
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        browserName: 'chromium',
+      },
+      testMatch: '**/mobile/comprehensive-mobile.spec.ts',
+    },
+
+    // Mobile Device Emulation - iPhone 13 (using Chromium)
+    {
+      name: 'mobile-iphone-13',
+      use: {
+        ...devices['iPhone 13'],
+        viewport: { width: 390, height: 844 },
+        deviceScaleFactor: 3,
+        isMobile: true,
+        hasTouch: true,
+        browserName: 'chromium',
+      },
+      testMatch: '**/mobile/comprehensive-mobile.spec.ts',
+    },
+
+    // Mobile Device Emulation - iPhone 14 Pro (using Chromium)
+    {
+      name: 'mobile-iphone-14-pro',
+      use: {
+        ...devices['iPhone 14 Pro'],
+        viewport: { width: 393, height: 852 },
+        deviceScaleFactor: 3,
+        isMobile: true,
+        hasTouch: true,
+        browserName: 'chromium',
+      },
+      testMatch: '**/mobile/comprehensive-mobile.spec.ts',
+    },
+
+    // Mobile Device Emulation - iPad Pro 11 (using Chromium)
+    {
+      name: 'mobile-ipad-pro',
+      use: {
+        ...devices['iPad Pro 11'],
+        viewport: { width: 834, height: 1194 },
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        browserName: 'chromium',
+      },
+      testMatch: '**/mobile/comprehensive-mobile.spec.ts',
+    },
+
+    // Mobile Device Emulation - Samsung Galaxy S24 (using Chromium)
+    {
+      name: 'mobile-samsung-galaxy',
+      use: {
+        ...devices['Samsung Galaxy S24'],
+        viewport: { width: 360, height: 780 },
+        deviceScaleFactor: 3,
+        isMobile: true,
+        hasTouch: true,
+        browserName: 'chromium',
+      },
+      testMatch: '**/mobile/comprehensive-mobile.spec.ts',
+    },
+
+    // Mobile Device Emulation - Pixel 7 (using Chromium)
+    {
+      name: 'mobile-pixel-7',
+      use: {
+        ...devices['Pixel 7'],
+        viewport: { width: 412, height: 915 },
+        deviceScaleFactor: 2.625,
+        isMobile: true,
+        hasTouch: true,
+        browserName: 'chromium',
+      },
+      testMatch: '**/mobile/comprehensive-mobile.spec.ts',
     },
   ],
   

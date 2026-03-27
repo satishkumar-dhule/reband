@@ -1,15 +1,25 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-// Gen Z themes - Dark and Light modes
+// Pro Max themes - Ultra Premium UI/UX
 export const themes = [
+  // Gen Z themes
   { id: "genz-dark", name: "Gen Z Dark", category: "genz", description: "Pure black with neon accents" },
   { id: "genz-light", name: "Gen Z Light", category: "genz", description: "Pure white with vibrant accents" },
+  // UI/UX Pro Max themes
+  { id: "pro-midnight", name: "Pro Midnight", category: "pro-max", description: "Deep midnight blue with gold accents" },
+  { id: "pro-aurora", name: "Pro Aurora", category: "pro-max", description: "Aurora borealis inspired gradients" },
+  { id: "pro-obsidian", name: "Pro Obsidian", category: "pro-max", description: "Sleek obsidian black with diamond accents" },
+  { id: "pro-sapphire", name: "Pro Sapphire", category: "pro-max", description: "Royal sapphire with silver highlights" },
+  { id: "pro-emerald", name: "Pro Emerald", category: "pro-max", description: "Rich emerald with platinum accents" },
+  { id: "pro-ruby", name: "Pro Ruby", category: "pro-max", description: "Luxurious ruby with rose gold" },
+  { id: "pro-amethyst", name: "Pro Amethyst", category: "pro-max", description: "Royal amethyst with pearl accents" },
 ] as const;
 
 export type Theme = typeof themes[number]["id"];
 
 export const themeCategories = [
   { id: "genz", name: "Gen Z" },
+  { id: "pro-max", name: "UI/UX Pro Max" },
 ];
 
 interface ThemeContextType {
@@ -26,20 +36,21 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Load theme from localStorage or default to dark
   const [theme, setThemeState] = useState<Theme>(() => {
     const saved = localStorage.getItem('theme');
-    return (saved === 'genz-dark' || saved === 'genz-light') ? saved : 'genz-dark';
+    if (saved && themes.some(t => t.id === saved)) {
+      return saved as Theme;
+    }
+    return 'pro-midnight';
   });
 
   const [autoRotate, setAutoRotate] = useState(false);
   
-  // Listen to storage events for theme changes (for testing and cross-tab sync)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'theme' && e.newValue) {
         const newTheme = e.newValue as Theme;
-        if (newTheme === 'genz-dark' || newTheme === 'genz-light') {
+        if (themes.some(t => t.id === newTheme)) {
           setThemeState(newTheme);
         }
       }
@@ -49,25 +60,23 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Apply theme to DOM and save to localStorage
   useEffect(() => {
     const root = window.document.documentElement;
     
-    // Remove old theme classes
-    root.classList.remove('genz-dark', 'genz-light', 'dark', 'light');
+    // Remove all theme classes
+    root.classList.remove('genz-dark', 'genz-light', 'pro-midnight', 'pro-aurora', 'pro-obsidian', 'pro-sapphire', 'pro-emerald', 'pro-ruby', 'pro-amethyst', 'dark', 'light');
     
     // Add new theme class
     root.classList.add(theme);
     root.setAttribute("data-theme", theme);
     
-    // Also set dark/light for compatibility
-    if (theme === 'genz-dark') {
+    // Set dark/light for compatibility
+    if (theme.includes('dark') || theme.includes('midnight') || theme.includes('obsidian') || theme.includes('sapphire')) {
       root.classList.add('dark');
     } else {
       root.classList.add('light');
     }
     
-    // Save to localStorage
     localStorage.setItem('theme', theme);
   }, [theme]);
 
@@ -76,7 +85,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleTheme = () => {
-    setThemeState(current => current === 'genz-dark' ? 'genz-light' : 'genz-dark');
+    setThemeState(current => current.includes('dark') || current.includes('midnight') || current.includes('obsidian') ? 'pro-aurora' : 'pro-midnight');
   };
 
   const cycleTheme = () => {
