@@ -3,7 +3,9 @@ import { useLocation } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { useAchievements } from '../hooks/use-achievements';
-import { Trophy, Lock, ChevronRight, Award } from 'lucide-react';
+import { Trophy, Lock, Award, Home } from 'lucide-react';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { Button } from "../components/ui/button";
 
 const tierColors: Record<string, string> = {
   bronze: 'text-orange-600',
@@ -23,7 +25,7 @@ const tierBg: Record<string, string> = {
 
 export default function BadgesGenZ() {
   const [, setLocation] = useLocation();
-  const { progress: allBadges, unlocked: unlockedBadges, locked: lockedBadges, nextUp, stats, isLoading } = useAchievements();
+  const { progress: allBadges, stats, isLoading } = useAchievements();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const categories = Array.from(new Set(allBadges.map(b => b.achievement.category)));
@@ -34,32 +36,11 @@ export default function BadgesGenZ() {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="max-w-5xl mx-auto px-4 py-6 lg:px-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-40 rounded-md border border-border bg-card animate-pulse" />
+        <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="h-48 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] animate-pulse" />
             ))}
-          </div>
-        </div>
-      </AppLayout>
-    );
-  }
-
-  if (!allBadges || allBadges.length === 0) {
-    return (
-      <AppLayout>
-        <div className="max-w-5xl mx-auto px-4 py-6 lg:px-8">
-          <div className="rounded-md border border-border bg-card p-12 text-center">
-            <Trophy className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <h2 className="text-base font-semibold text-foreground mb-1">No badges yet</h2>
-            <p className="text-sm text-muted-foreground mb-4">Complete challenges to earn your first badge</p>
-            <button
-              onClick={() => setLocation('/channels')}
-              className="px-4 py-1.5 text-sm rounded-md font-medium text-white"
-              style={{ backgroundColor: 'var(--gh-green)' }}
-            >
-              Start learning
-            </button>
           </div>
         </div>
       </AppLayout>
@@ -75,171 +56,157 @@ export default function BadgesGenZ() {
       />
 
       <AppLayout>
-        <div className="max-w-5xl mx-auto px-4 py-6 lg:px-8">
-          {/* Page header */}
-          <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <h1 className="text-xl font-semibold text-foreground flex items-center gap-2">
-                <Award className="w-5 h-5 text-muted-foreground" />
+        <div className="bg-[var(--gh-canvas-subtle)] min-h-screen">
+          <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8">
+            <Breadcrumb className="mb-4">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">
+                    <Home className="w-3.5 h-3.5 mr-1" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Achievements</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+
+            <div className="mb-8">
+              <h1 className="text-2xl font-semibold text-[var(--gh-fg)] flex items-center gap-2">
+                <Award className="w-6 h-6 text-[var(--gh-fg-muted)]" />
                 Achievements
               </h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {stats.unlocked} of {stats.total} badges unlocked
+              <p className="text-[var(--gh-fg-muted)]">
+                You've earned {stats.unlocked} of {stats.total} total badges. Keep it up!
               </p>
             </div>
-          </div>
 
-          {/* Progress bar */}
-          <div className="rounded-md border border-border bg-card p-4 mb-6">
-            <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-              <span>Overall progress</span>
-              <span className="font-medium text-foreground">{stats.percentage}%</span>
+            {/* Summary Card */}
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-6 mb-8">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-[var(--gh-fg)]">Overall Progress</span>
+                <span className="text-sm font-bold text-[var(--gh-fg)]">{stats.percentage}%</span>
+              </div>
+              <div className="gh-progress mb-4">
+                <div 
+                  className="gh-progress-bar" 
+                  style={{ width: `${stats.percentage}%` }}
+                />
+              </div>
+              <div className="flex gap-4 text-sm">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-[var(--gh-success-emphasis)]" />
+                  <span className="text-[var(--gh-fg-muted)]">{stats.unlocked} Earned</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-[var(--gh-border)]" />
+                  <span className="text-[var(--gh-fg-muted)]">{stats.locked} Locked</span>
+                </div>
+              </div>
             </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${stats.percentage}%`, backgroundColor: 'var(--gh-green)' }}
-              />
-            </div>
-            <div className="flex items-center gap-6 mt-3 text-sm">
-              <span className="text-foreground font-medium">{stats.unlocked} unlocked</span>
-              <span className="text-muted-foreground">{stats.locked} locked</span>
-            </div>
-          </div>
 
-          {/* Category filters */}
-          {categories.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
+            {/* Filter Tabs */}
+            <div className="flex border-b border-[var(--gh-border)] mb-6 overflow-x-auto gap-2">
               <button
                 onClick={() => setSelectedCategory(null)}
-                className={`px-3 py-1 text-xs rounded-md border font-medium transition-colors ${
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   !selectedCategory
-                    ? 'border-[var(--gh-blue)] text-[var(--gh-blue)] bg-[var(--gh-blue)]/10'
-                    : 'border-border text-muted-foreground hover:border-foreground/30'
+                    ? 'border-[#fd8c73] text-[var(--gh-fg)]'
+                    : 'border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]'
                 }`}
-                data-testid="filter-all"
               >
-                All
+                All Badges
               </button>
               {categories.map(cat => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1 text-xs rounded-md border font-medium capitalize transition-colors ${
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap capitalize ${
                     selectedCategory === cat
-                      ? 'border-[var(--gh-blue)] text-[var(--gh-blue)] bg-[var(--gh-blue)]/10'
-                      : 'border-border text-muted-foreground hover:border-foreground/30'
+                      ? 'border-[#fd8c73] text-[var(--gh-fg)]'
+                      : 'border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]'
                   }`}
-                  data-testid={`filter-${cat}`}
                 >
                   {cat}
                 </button>
               ))}
             </div>
-          )}
 
-          {/* Badges grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {filteredBadges.map((badgeProgress) => {
-              const badge = badgeProgress.achievement;
-              const isUnlocked = badgeProgress.isUnlocked;
-              const currentProgress = badgeProgress.progress;
-              const target = badgeProgress.target;
-              const tier = badge.tier as keyof typeof tierColors;
+            {/* Badges Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {filteredBadges.map((badgeProgress) => {
+                const badge = badgeProgress.achievement;
+                const isUnlocked = badgeProgress.isUnlocked;
+                const tier = badge.tier as keyof typeof tierColors;
 
-              return (
-                <div
-                  key={badge.id}
-                  className={`rounded-md border p-4 transition-colors ${
-                    isUnlocked
-                      ? 'border-border bg-card hover:border-foreground/30'
-                      : 'border-border bg-card opacity-60'
-                  }`}
-                  data-testid={`badge-${badge.id}`}
-                >
-                  {/* Icon */}
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
-                    isUnlocked ? (tierBg[tier] || 'bg-muted') : 'bg-muted'
-                  }`}>
-                    {isUnlocked ? (
-                      <Trophy className={`w-6 h-6 ${tierColors[tier] || 'text-muted-foreground'}`} />
-                    ) : (
-                      <Lock className="w-6 h-6 text-muted-foreground" />
-                    )}
+                return (
+                  <div
+                    key={badge.id}
+                    className={`bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 flex flex-col items-center text-center transition-all ${
+                      isUnlocked ? 'hover:shadow-md hover:border-[var(--gh-border-strong)]' : 'opacity-60 grayscale-[0.5]'
+                    }`}
+                  >
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 ${
+                      isUnlocked ? (tierBg[tier] || 'bg-[var(--gh-canvas-subtle)]') : 'bg-[var(--gh-canvas-subtle)]'
+                    }`}>
+                      {isUnlocked ? (
+                        <Trophy className={`w-8 h-8 ${tierColors[tier] || 'text-[var(--gh-fg-muted)]'}`} />
+                      ) : (
+                        <Lock className="w-8 h-8 text-[var(--gh-fg-subtle)]" />
+                      )}
+                    </div>
+
+                    <h3 className="text-sm font-semibold text-[var(--gh-fg)] leading-snug mb-1 line-clamp-1">{badge.name}</h3>
+                    <p className="text-[10px] text-[var(--gh-fg-muted)] line-clamp-2 mb-3 h-6">{badge.description}</p>
+
+                    <div className="mt-auto pt-2 border-t border-[var(--gh-border-muted)] w-full flex flex-col gap-2">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                        isUnlocked ? (tierColors[tier] || 'text-[var(--gh-fg-muted)]') : 'text-[var(--gh-fg-subtle)]'
+                      }`}>
+                        {badge.tier}
+                      </span>
+                      
+                      {isUnlocked && badgeProgress.unlockedAt && (
+                        <span className="text-[9px] text-[var(--gh-success-fg)] font-medium">
+                          Unlocked {new Date(badgeProgress.unlockedAt).toLocaleDateString()}
+                        </span>
+                      )}
+                      
+                      {!isUnlocked && badgeProgress.progress !== undefined && badgeProgress.target !== undefined && (
+                        <div className="w-full">
+                          <div className="flex justify-between text-[9px] text-[var(--gh-fg-subtle)] mb-1">
+                            <span>{Math.round((badgeProgress.progress / badgeProgress.target) * 100)}%</span>
+                          </div>
+                          <div className="gh-progress h-1">
+                            <div 
+                              className="gh-progress-bar bg-[var(--gh-accent-emphasis)]" 
+                              style={{ width: `${(badgeProgress.progress / badgeProgress.target) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-
-                  {/* Info */}
-                  <h3 className="text-sm font-semibold text-foreground leading-tight mb-1">{badge.name}</h3>
-                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{badge.description}</p>
-
-                  {isUnlocked && badgeProgress.unlockedAt ? (
-                    <p className="text-[10px] text-[var(--gh-green)]">
-                      {new Date(badgeProgress.unlockedAt).toLocaleDateString()}
-                    </p>
-                  ) : !isUnlocked && currentProgress !== undefined && target !== undefined ? (
-                    <div>
-                      <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
-                        <span>{currentProgress}/{target}</span>
-                        <span>{Math.round((currentProgress / target) * 100)}%</span>
-                      </div>
-                      <div className="h-1 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${Math.min((currentProgress / target) * 100, 100)}%`,
-                            backgroundColor: 'var(--gh-blue)',
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {/* Tier label */}
-                  <span className={`mt-2 inline-block text-[10px] font-medium uppercase tracking-wide ${
-                    isUnlocked ? (tierColors[tier] || 'text-muted-foreground') : 'text-muted-foreground'
-                  }`}>
-                    {badge.tier}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Next up section */}
-          {nextUp.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-sm font-semibold text-foreground mb-3">Almost there</h2>
-              <div className="rounded-md border border-border bg-card divide-y divide-border">
-                {nextUp.slice(0, 4).map((badgeProgress) => {
-                  const badge = badgeProgress.achievement;
-                  const current = badgeProgress.current;
-                  const target = badgeProgress.target;
-                  const pct = target > 0 ? Math.round((current / target) * 100) : 0;
-
-                  return (
-                    <div key={badge.id} className="flex items-center gap-4 px-4 py-3">
-                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                        <Trophy className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium text-foreground">{badge.name}</span>
-                          <span className="text-xs text-muted-foreground">{current}/{target}</span>
-                        </div>
-                        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: `${pct}%`, backgroundColor: 'var(--gh-blue)' }}
-                          />
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                    </div>
-                  );
-                })}
-              </div>
+                );
+              })}
             </div>
-          )}
+
+            {allBadges.length === 0 && (
+              <div className="text-center py-12 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md">
+                <Trophy className="w-12 h-12 text-[var(--gh-fg-subtle)] mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-[var(--gh-fg)] mb-2">No badges found</h3>
+                <p className="text-[var(--gh-fg-muted)] mb-6">Start learning to unlock your first achievement!</p>
+                <Button 
+                  onClick={() => setLocation('/channels')}
+                  className="bg-[var(--gh-success-emphasis)] text-white hover:bg-green-700"
+                >
+                  Browse Channels
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </AppLayout>
     </>

@@ -4,7 +4,7 @@ import {
   Mic, Code, RotateCcw, BookOpen, ChevronRight,
   Flame, CheckCircle2, Layers, TrendingUp,
   Clock, BookMarked, Activity, Brain, Award,
-  Lock, Star, GitFork, Circle
+  Circle, Star, GitFork
 } from "lucide-react";
 import { AppLayout } from "../components/layout/AppLayout";
 import { allChannelsConfig } from "../lib/channels-config";
@@ -33,32 +33,19 @@ function getProgress(channelId: string, total: number) {
   }
 }
 
-const categoryColors: Record<string, string> = {
-  fundamentals: "bg-blue-500",
-  engineering: "bg-purple-500",
-  cloud: "bg-orange-500",
-  security: "bg-red-500",
-  data: "bg-yellow-500",
-  management: "bg-pink-500",
-  mobile: "bg-cyan-500",
-  ai: "bg-violet-500",
-  testing: "bg-green-500",
-  certification: "bg-amber-500",
-};
-
 const quickActions = [
-  { label: "Voice Practice", icon: Mic, path: "/voice-interview", desc: "AI speech analysis", color: "text-rose-500" },
-  { label: "Coding Challenges", icon: Code, path: "/coding", desc: "Solve problems", color: "text-violet-500" },
-  { label: "SRS Review", icon: RotateCcw, path: "/review", desc: "Spaced repetition", color: "text-blue-500" },
-  { label: "Learning Paths", icon: BookOpen, path: "/learning-paths", desc: "Curated journeys", color: "text-green-500" },
+  { label: "Voice Practice", icon: Mic, path: "/voice-interview", desc: "AI speech analysis" },
+  { label: "Coding Challenges", icon: Code, path: "/coding", desc: "Solve problems" },
+  { label: "SRS Review", icon: RotateCcw, path: "/review", desc: "Spaced repetition" },
+  { label: "Learning Paths", icon: BookOpen, path: "/learning-paths", desc: "Curated journeys" },
 ];
 
 const recentActivity = [
-  { icon: CheckCircle2, text: "Completed React Hooks quiz", time: "2h ago", color: "text-green-500" },
-  { icon: BookMarked, text: "Reviewed 8 JavaScript flashcards", time: "4h ago", color: "text-blue-500" },
-  { icon: Mic, text: "Finished voice interview session", time: "Yesterday", color: "text-rose-500" },
-  { icon: Award, text: "Earned 'First Steps' badge", time: "2 days ago", color: "text-amber-500" },
-  { icon: Code, text: "Solved Binary Search challenge", time: "3 days ago", color: "text-violet-500" },
+  { icon: CheckCircle2, text: "Completed React Hooks quiz", time: "2h ago", color: "text-[var(--gh-success-fg)]" },
+  { icon: BookMarked, text: "Reviewed 8 JavaScript flashcards", time: "4h ago", color: "text-[var(--gh-accent-fg)]" },
+  { icon: Mic, text: "Finished voice interview session", time: "Yesterday", color: "text-[var(--gh-danger-fg)]" },
+  { icon: Award, text: "Earned 'First Steps' badge", time: "2 days ago", color: "text-[var(--gh-attention-fg)]" },
+  { icon: Code, text: "Solved Binary Search challenge", time: "3 days ago", color: "text-[var(--gh-done-fg)]" },
 ];
 
 function ContributionGrid() {
@@ -77,11 +64,11 @@ function ContributionGrid() {
   );
 
   const colorMap = [
-    "dark:bg-[hsl(215_22%_13%)] bg-[hsl(213_20%_93%)]",
-    "bg-[hsl(136_70%_20%)] dark:bg-[hsl(136_70%_18%)]",
-    "bg-[hsl(136_70%_30%)] dark:bg-[hsl(136_70%_28%)]",
-    "bg-[hsl(136_70%_42%)] dark:bg-[hsl(136_70%_40%)]",
-    "bg-[hsl(136_79%_54%)] dark:bg-[hsl(136_79%_52%)]",
+    "bg-[var(--gh-canvas-inset)]",
+    "bg-[hsl(136_70%_20%)]",
+    "bg-[hsl(136_70%_30%)]",
+    "bg-[hsl(136_70%_42%)]",
+    "bg-[var(--gh-success-emphasis)]",
   ];
 
   return (
@@ -100,11 +87,11 @@ function ContributionGrid() {
         ))}
       </div>
       <div className="flex items-center justify-end gap-1.5 mt-2">
-        <span className="text-[10px] text-muted-foreground">Less</span>
+        <span className="text-[10px] text-[var(--gh-fg-muted)]">Less</span>
         {levels.map((l) => (
           <div key={l} className={cn("w-3 h-3 rounded-sm", colorMap[l])} />
         ))}
-        <span className="text-[10px] text-muted-foreground">More</span>
+        <span className="text-[10px] text-[var(--gh-fg-muted)]">More</span>
       </div>
     </div>
   );
@@ -115,42 +102,40 @@ function ChannelCard({ channelId, questionCount }: { channelId: string; question
   const config = allChannelsConfig.find((c) => c.id === channelId);
   if (!config) return null;
   const { completed, pct } = getProgress(channelId, questionCount);
-  const dotColor = categoryColors[config.category] ?? "bg-gray-500";
 
   return (
     <div
       onClick={() => setLocation(`/channel/${channelId}`)}
-      className="flex flex-col gap-3 p-4 rounded-md border border-border hover-elevate cursor-pointer bg-card transition-colors"
+      className="flex flex-col gap-3 p-4 rounded-md border border-[var(--gh-border)] hover:border-[var(--gh-accent-fg)] cursor-pointer bg-[var(--gh-canvas)] transition-colors group"
       data-testid={`card-channel-${channelId}`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <BookOpen className="w-4 h-4 text-primary shrink-0" />
-          <span className="font-semibold text-sm text-primary truncate">{config.name}</span>
+          <BookOpen className="w-4 h-4 text-[var(--gh-accent-fg)] shrink-0" />
+          <span className="font-semibold text-sm text-[var(--gh-accent-fg)] truncate group-hover:underline">{config.name}</span>
         </div>
-        <Lock className="w-3.5 h-3.5 text-muted-foreground shrink-0 opacity-0" />
       </div>
 
-      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+      <p className="text-xs text-[var(--gh-fg-muted)] line-clamp-2 leading-relaxed">
         {config.description}
       </p>
 
       <div className="mt-auto space-y-1.5">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center justify-between text-xs text-[var(--gh-fg-muted)]">
           <span>{completed}/{questionCount} done</span>
           <span>{pct}%</span>
         </div>
-        <div className="h-1 rounded-full bg-muted overflow-hidden">
+        <div className="gh-progress">
           <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${pct}%`, backgroundColor: "var(--gh-green)" }}
+            className="gh-progress-bar"
+            style={{ width: `${pct}%` }}
           />
         </div>
       </div>
 
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <span className={cn("w-2.5 h-2.5 rounded-full", dotColor)} />
+      <div className="flex items-center gap-3 text-xs text-[var(--gh-fg-muted)]">
+        <span className="flex items-center gap-1 capitalize">
+          <Circle className="w-2.5 h-2.5 fill-current" />
           {config.category}
         </span>
         <span className="flex items-center gap-1">
@@ -172,8 +157,8 @@ function StatBadge({ icon: Icon, label, value, color }: {
   return (
     <div className="flex items-center gap-2 py-2">
       <Icon className={cn("w-4 h-4 shrink-0", color)} />
-      <span className="text-sm text-foreground font-medium">{value}</span>
-      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="text-sm text-[var(--gh-fg)] font-medium">{value}</span>
+      <span className="text-sm text-[var(--gh-fg-muted)]">{label}</span>
     </div>
   );
 }
@@ -223,217 +208,217 @@ export default function Home() {
 
   return (
     <AppLayout>
-      <div className="max-w-5xl mx-auto px-4 py-6 lg:px-8">
-        {/* Greeting */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-foreground">
-            Welcome back!
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{today}</p>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* ── Main column ── */}
-          <div className="flex-1 min-w-0 space-y-6">
-
-            {/* Quick actions */}
-            <section>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-foreground">Quick Actions</h2>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {quickActions.map((action) => {
-                  const Icon = action.icon;
-                  return (
-                    <button
-                      key={action.path}
-                      onClick={() => setLocation(action.path)}
-                      className="flex flex-col items-start gap-2 p-3 rounded-md border border-border bg-card hover-elevate text-left transition-colors"
-                      data-testid={`action-${action.path.replace("/", "")}`}
-                    >
-                      <Icon className={cn("w-5 h-5", action.color)} strokeWidth={2} />
-                      <div>
-                        <div className="text-xs font-semibold text-foreground">{action.label}</div>
-                        <div className="text-[11px] text-muted-foreground">{action.desc}</div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            {/* Pinned channels */}
-            <section>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-foreground">
-                  Pinned Channels
-                </h2>
-                <Link
-                  href="/channels"
-                  className="text-xs text-primary hover:underline flex items-center gap-0.5"
-                  data-testid="link-all-channels"
-                >
-                  View all <ChevronRight className="w-3 h-3" />
-                </Link>
-              </div>
-
-              {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-32 rounded-md border border-border bg-card animate-pulse" />
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {pinnedChannels.map((channel) => (
-                    <ChannelCard
-                      key={channel.id}
-                      channelId={channel.id}
-                      questionCount={channel.questionCount}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* Recent Activity */}
-            <section>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-foreground">Recent Activity</h2>
-              </div>
-              <div className="rounded-md border border-border bg-card divide-y divide-border">
-                {recentActivity.map((item, i) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={i} className="flex items-center gap-3 px-4 py-3">
-                      <Icon className={cn("w-4 h-4 shrink-0", item.color)} />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm text-foreground">{item.text}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-                        <Clock className="w-3 h-3" />
-                        {item.time}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
+      <div className="min-h-screen bg-[var(--gh-canvas-subtle)]">
+        <div className="max-w-6xl mx-auto px-4 py-8 lg:px-8">
+          {/* Dashboard Header */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">Dashboard</h1>
+            <p className="text-[var(--gh-fg-muted)] mt-1">{today}</p>
           </div>
 
-          {/* ── Right sidebar ── */}
-          <div className="lg:w-72 shrink-0 space-y-5">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* ── Main column ── */}
+            <div className="flex-1 min-w-0 space-y-8">
 
-            {/* Stats card */}
-            <section className="rounded-md border border-border bg-card p-4">
-              <h2 className="text-sm font-semibold text-foreground mb-3">Your Progress</h2>
-              <div className="divide-y divide-border">
-                <StatBadge
-                  icon={CheckCircle2}
-                  label="questions completed"
-                  value={totalCompleted}
-                  color="text-green-500"
-                />
-                <StatBadge
-                  icon={Layers}
-                  label="topics unlocked"
-                  value={apiChannels.length}
-                  color="text-blue-500"
-                />
-                <StatBadge
-                  icon={TrendingUp}
-                  label="overall progress"
-                  value={`${overallProgress}%`}
-                  color="text-violet-500"
-                />
-                <StatBadge
-                  icon={Flame}
-                  label="day streak"
-                  value={streak || "—"}
-                  color="text-orange-500"
-                />
-              </div>
-
-              {/* Progress bar */}
-              <div className="mt-3 pt-3 border-t border-border">
-                <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
-                  <span>Total completion</span>
-                  <span className="font-medium text-foreground">{overallProgress}%</span>
+              {/* Quick actions */}
+              <section>
+                <h2 className="text-sm font-semibold text-[var(--gh-fg)] mb-4">Quick Actions</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {quickActions.map((action) => {
+                    const Icon = action.icon;
+                    return (
+                      <button
+                        key={action.path}
+                        onClick={() => setLocation(action.path)}
+                        className="flex flex-col items-start gap-2 p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] hover:bg-[var(--gh-canvas-inset)] text-left transition-colors"
+                        data-testid={`action-${action.path.replace("/", "")}`}
+                      >
+                        <Icon className="w-5 h-5 text-[var(--gh-accent-fg)]" strokeWidth={2} />
+                        <div>
+                          <div className="text-sm font-semibold text-[var(--gh-fg)]">{action.label}</div>
+                          <div className="text-xs text-[var(--gh-fg-muted)] mt-0.5">{action.desc}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
-                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${overallProgress}%`, backgroundColor: "var(--gh-green)" }}
+              </section>
+
+              {/* Topics section header */}
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-semibold text-[var(--gh-fg)]">
+                      Your Topics
+                    </h2>
+                    <span className="gh-label gh-label-gray">{apiChannels.length}</span>
+                  </div>
+                  <Link
+                    href="/channels"
+                    className="text-xs text-[var(--gh-accent-fg)] hover:underline flex items-center gap-0.5"
+                    data-testid="link-all-channels"
+                  >
+                    View all <ChevronRight className="w-3 h-3" />
+                  </Link>
+                </div>
+
+                {isLoading ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="h-32 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] animate-pulse" />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {pinnedChannels.map((channel) => (
+                      <ChannelCard
+                        key={channel.id}
+                        channelId={channel.id}
+                        questionCount={channel.questionCount}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
+
+            {/* ── Right sidebar ── */}
+            <div className="hidden lg:block w-72 shrink-0 space-y-6">
+
+              {/* Stats card */}
+              <section className="gh-card p-4">
+                <h2 className="text-sm font-semibold text-[var(--gh-fg)] mb-4">Your Progress</h2>
+                <div className="divide-y divide-[var(--gh-border-muted)]">
+                  <StatBadge
+                    icon={CheckCircle2}
+                    label="questions completed"
+                    value={totalCompleted}
+                    color="text-[var(--gh-success-fg)]"
+                  />
+                  <StatBadge
+                    icon={Layers}
+                    label="topics unlocked"
+                    value={apiChannels.length}
+                    color="text-[var(--gh-accent-fg)]"
+                  />
+                  <StatBadge
+                    icon={TrendingUp}
+                    label="overall progress"
+                    value={`${overallProgress}%`}
+                    color="text-[var(--gh-done-fg)]"
+                  />
+                  <StatBadge
+                    icon={Flame}
+                    label="day streak"
+                    value={streak || "—"}
+                    color="text-[var(--gh-attention-fg)]"
                   />
                 </div>
-              </div>
-            </section>
 
-            {/* Contribution graph */}
-            <section className="rounded-md border border-border bg-card p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-foreground">Study Activity</h2>
-                <Activity className="w-4 h-4 text-muted-foreground" />
-              </div>
-              <p className="text-xs text-muted-foreground mb-3">
-                {streak > 0 ? `${streak} day streak — keep going!` : "Start a streak today!"}
-              </p>
-              <ContributionGrid />
-            </section>
-
-            {/* Start learning CTA */}
-            <section className="rounded-md border border-border bg-card p-4">
-              <h2 className="text-sm font-semibold text-foreground mb-2">
-                Ready to practice?
-              </h2>
-              <p className="text-xs text-muted-foreground mb-3">
-                Jump into a topic channel and start answering questions.
-              </p>
-              <button
-                onClick={() => setLocation("/channels")}
-                className="w-full py-1.5 px-3 rounded-md text-sm font-medium text-white transition-colors"
-                style={{ backgroundColor: "var(--accent)" }}
-                data-testid="button-explore-channels"
-              >
-                Explore all channels
-              </button>
-              <button
-                onClick={() => setLocation("/learning-paths")}
-                className="w-full mt-2 py-1.5 px-3 rounded-md text-sm font-medium border border-border text-foreground hover-elevate transition-colors"
-                data-testid="button-view-paths"
-              >
-                View learning paths
-              </button>
-            </section>
-
-            {/* Badges teaser */}
-            <section className="rounded-md border border-border bg-card p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-foreground">Achievements</h2>
-                <Link href="/badges" className="text-xs text-primary hover:underline">
-                  View all
-                </Link>
-              </div>
-              <div className="flex gap-2">
-                {[Brain, Star, Award, Flame].map((Icon, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      "w-9 h-9 rounded-full flex items-center justify-center",
-                      i === 0 ? "bg-[var(--accent)] text-white" : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    <Icon className="w-4 h-4" />
+                {/* Progress bar */}
+                <div className="mt-4 pt-4 border-t border-[var(--gh-border-muted)]">
+                  <div className="flex items-center justify-between text-xs text-[var(--gh-fg-muted)] mb-2">
+                    <span>Total completion</span>
+                    <span className="font-medium text-[var(--gh-fg)]">{overallProgress}%</span>
                   </div>
-                ))}
-                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
-                  <Circle className="w-4 h-4 text-muted-foreground/40" />
+                  <div className="gh-progress">
+                    <div
+                      className="gh-progress-bar"
+                      style={{ width: `${overallProgress}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                1 badge earned — keep going to unlock more!
-              </p>
-            </section>
+              </section>
+
+              {/* Recent Activity */}
+              <section className="gh-card overflow-hidden">
+                <h2 className="text-sm font-semibold text-[var(--gh-fg)] p-4 border-b border-[var(--gh-border-muted)]">Recent Activity</h2>
+                <div className="divide-y divide-[var(--gh-border-muted)]">
+                  {recentActivity.map((item, i) => {
+                    const Icon = item.icon;
+                    return (
+                      <div key={i} className="flex items-start gap-3 p-4">
+                        <Icon className={cn("w-4 h-4 mt-0.5 shrink-0", item.color)} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-[var(--gh-fg)] leading-snug">{item.text}</p>
+                          <div className="flex items-center gap-1 text-[10px] text-[var(--gh-fg-subtle)] mt-1">
+                            <Clock className="w-3 h-3" />
+                            {item.time}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {/* Contribution graph */}
+              <section className="gh-card p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-sm font-semibold text-[var(--gh-fg)]">Study Activity</h2>
+                  <Activity className="w-4 h-4 text-[var(--gh-fg-muted)]" />
+                </div>
+                <p className="text-xs text-[var(--gh-fg-muted)] mb-4">
+                  {streak > 0 ? `${streak} day streak — keep going!` : "Start a streak today!"}
+                </p>
+                <ContributionGrid />
+              </section>
+
+              {/* Start learning CTA */}
+              <section className="gh-card p-4">
+                <h2 className="text-sm font-semibold text-[var(--gh-fg)] mb-2">
+                  Ready to practice?
+                </h2>
+                <p className="text-xs text-[var(--gh-fg-muted)] mb-4">
+                  Jump into a topic channel and start answering questions.
+                </p>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setLocation("/channels")}
+                    className="gh-btn gh-btn-primary w-full justify-center"
+                    data-testid="button-explore-channels"
+                  >
+                    Explore all channels
+                  </button>
+                  <button
+                    onClick={() => setLocation("/learning-paths")}
+                    className="gh-btn gh-btn-secondary w-full justify-center"
+                    data-testid="button-view-paths"
+                  >
+                    View learning paths
+                  </button>
+                </div>
+              </section>
+
+              {/* Achievements teaser */}
+              <section className="gh-card p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-sm font-semibold text-[var(--gh-fg)]">Achievements</h2>
+                  <Link href="/badges" className="text-xs text-[var(--gh-accent-fg)] hover:underline">
+                    View all
+                  </Link>
+                </div>
+                <div className="flex gap-2">
+                  {[Brain, Star, Award, Flame].map((Icon, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "w-9 h-9 rounded-full flex items-center justify-center border border-[var(--gh-border-muted)]",
+                        i === 0 ? "bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)]" : "bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-subtle)]"
+                      )}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </div>
+                  ))}
+                  <div className="w-9 h-9 rounded-full bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border-muted)] border-dashed flex items-center justify-center">
+                    <Circle className="w-4 h-4 text-[var(--gh-fg-subtle)] opacity-40" />
+                  </div>
+                </div>
+                <p className="text-xs text-[var(--gh-fg-muted)] mt-3">
+                  1 badge earned — keep going to unlock more!
+                </p>
+              </section>
+            </div>
           </div>
         </div>
       </div>

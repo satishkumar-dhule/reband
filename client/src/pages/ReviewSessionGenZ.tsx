@@ -1,11 +1,5 @@
-/**
- * Gen Z SRS Review - Spaced Repetition Made Addictive
- * Swipe cards, earn XP, level up your memory
- */
-
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { useCredits } from '../context/CreditsContext';
@@ -16,7 +10,7 @@ import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import {
-  Brain, ChevronLeft, Eye, Flame, Sparkles, Zap, Check
+  Brain, ChevronLeft, Eye, Flame, Sparkles, Zap, Check, RotateCcw
 } from 'lucide-react';
 
 // Mock SRS data - replace with actual implementation
@@ -201,27 +195,25 @@ In practice, partition tolerance is mandatory for distributed systems, so you ch
 ];
 
 const confidenceLevels = [
-  { id: 'again', label: 'Again', color: 'from-red-500 to-orange-500', emoji: '😰', interval: 1 },
-  { id: 'hard', label: 'Hard', color: 'from-orange-500 to-yellow-500', emoji: '😅', interval: 2 },
-  { id: 'good', label: 'Good', color: 'from-green-500 to-emerald-500', emoji: '😊', interval: 4 },
-  { id: 'easy', label: 'Easy', color: 'from-blue-500 to-cyan-500', emoji: '🚀', interval: 7 }
+  { id: 'again', label: 'Again', color: 'gh-label-red', interval: 1 },
+  { id: 'hard', label: 'Hard', color: 'gh-label-yellow', interval: 2 },
+  { id: 'good', label: 'Good', color: 'gh-label-blue', interval: 4 },
+  { id: 'easy', label: 'Easy', color: 'gh-label-green', interval: 7 }
 ];
 
-// Diagram section with error handling - uses design system glass-card
+// Diagram section
 function DiagramSection({ diagram }: { diagram: string }) {
   const [renderSuccess, setRenderSuccess] = useState<boolean | null>(null);
   
   if (renderSuccess === false) return null;
   
   return (
-    <div className="p-6 glass-card rounded-[24px]">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="p-2 rounded-lg" style={{ background: 'hsla(270, 100%, 65%, 0.2)' }}>
-          <Eye className="w-5 h-5" style={{ color: 'var(--color-accent-purple-light)' }} />
-        </div>
-        <span className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--color-accent-purple-light)' }}>Diagram</span>
+    <div className="mt-4 p-4 gh-card bg-[var(--gh-canvas-inset)]">
+      <div className="flex items-center gap-2 mb-3">
+        <Eye className="w-4 h-4 text-[var(--gh-fg-muted)]" />
+        <span className="text-xs font-semibold uppercase tracking-wider text-[var(--gh-fg-muted)]">Diagram</span>
       </div>
-      <div className="rounded-xl p-4 overflow-x-auto" style={{ background: 'rgba(0, 0, 0, 0.3)' }}>
+      <div className="overflow-x-auto">
         <EnhancedMermaid 
           chart={diagram} 
           onRenderResult={(success) => setRenderSuccess(success)}
@@ -254,10 +246,9 @@ export default function ReviewSessionGenZ() {
   const [streak, setStreak] = useState(0);
 
   const currentCard = cards[currentIndex];
-  const progress = ((reviewedCount / cards.length) * 100).toFixed(0);
+  const progress = (reviewedCount / cards.length) * 100;
 
   const handleConfidence = (level: string) => {
-    // Award credits based on confidence using the unified system
     const rating = level as 'again' | 'hard' | 'good' | 'easy';
     onSRSReview(rating);
 
@@ -265,11 +256,9 @@ export default function ReviewSessionGenZ() {
     setStreak(prev => level === 'easy' || level === 'good' ? prev + 1 : 0);
     setShowAnswer(false);
 
-    // Move to next card
     if (currentIndex < cards.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else {
-      // Session complete
       setLocation('/stats');
     }
   };
@@ -278,28 +267,23 @@ export default function ReviewSessionGenZ() {
     setShowAnswer(true);
   };
 
-  const handleSkip = () => {
-    if (currentIndex < cards.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-      setShowAnswer(false);
-    }
-  };
-
   if (!currentCard) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-3xl font-black mb-2">Review Complete!</h2>
-            <p className="text-muted-foreground mb-6">You've reviewed all cards for today</p>
-            <button
-              onClick={() => setLocation('/')}
-              className="btn-primary"
-            >
-              Back to Home
-            </button>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] p-8">
+          <div className="w-16 h-16 bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] rounded-full flex items-center justify-center mb-4">
+            <Check className="w-8 h-8" />
           </div>
+          <h2 className="text-2xl font-semibold text-[var(--gh-fg)] mb-2">Review Complete!</h2>
+          <p className="text-[var(--gh-fg-muted)] mb-6 text-center">
+            You've reviewed all cards for today. Your memory is leveling up!
+          </p>
+          <button
+            onClick={() => setLocation('/')}
+            className="gh-btn gh-btn-primary"
+          >
+            Back to Dashboard
+          </button>
         </div>
       </AppLayout>
     );
@@ -314,370 +298,209 @@ export default function ReviewSessionGenZ() {
       />
 
       <AppLayout>
-        {/* iPhone 13 FIX: Ensure content fits within viewport with safe areas */}
-        <div className="min-h-screen bg-background text-foreground overflow-x-hidden w-full">
-          <div className="max-w-4xl mx-auto px-6 py-8 w-full" style={{ maxWidth: '100vw' }}>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+        <div className="max-w-3xl mx-auto px-4 py-8">
+          {/* Header */}
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex items-center justify-between">
               <button
                 onClick={() => setLocation('/')}
-                aria-label="Go back"
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1 text-sm text-[var(--gh-accent-fg)] hover:underline"
               >
-                <ChevronLeft className="w-5 h-5" />
-                <span>Back</span>
+                <ChevronLeft className="w-4 h-4" />
+                Back to Dashboard
               </button>
 
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <Flame className="w-5 h-5 text-orange-500" aria-hidden="true" />
-                  <span className="font-bold">{streak}</span>
+              <div className="flex items-center gap-4 text-sm font-medium">
+                <div className="flex items-center gap-1.5 text-[var(--gh-attention-fg)]">
+                  <Flame className="w-4 h-4" />
+                  <span>Streak: {streak}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-primary" />
-                  <span className="font-bold">{reviewedCount}/{cards.length}</span>
+                <div className="flex items-center gap-1.5 text-[var(--gh-fg-muted)]">
+                  <Brain className="w-4 h-4" />
+                  <span>{reviewedCount} / {cards.length}</span>
                 </div>
               </div>
             </div>
 
             {/* Progress Bar */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Progress</span>
-                <span className="font-bold">{progress}%</span>
-              </div>
-              <div className="h-3 rounded-full overflow-hidden reduced-motion-safe" style={{ background: 'var(--color-base-elevated)' }}>
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                  className="h-full"
-                  style={{ background: 'var(--gradient-primary)' }}
-                />
-              </div>
+            <div className="gh-progress">
+              <div 
+                className="gh-progress-bar" 
+                style={{ width: `${progress}%` }}
+              />
             </div>
+          </div>
 
-            {/* Card */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentCard.id}
-                initial={{ opacity: 0, scale: 0.9, rotateY: -10 }}
-                animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                exit={{ opacity: 0, scale: 0.9, rotateY: 10 }}
-                transition={{ duration: 0.3 }}
-                className="relative w-full overflow-hidden"
-                style={{ maxWidth: '100%' }}
-              >
-                {/* Question Card - uses design system glass-card */}
-                <div className="p-8 glass-card rounded-[32px] min-h-[400px] flex flex-col w-full overflow-hidden"
-                     style={{ maxWidth: '100%' }}>
-                  {/* Tags */}
-                  <div className="flex items-center gap-2 mb-6">
-                    <span className="badge badge-primary">
-                      {currentCard.channel}
-                    </span>
-                    <span className={`badge ${
-                      currentCard.difficulty === 'beginner' ? 'badge-success' :
-                      currentCard.difficulty === 'intermediate' ? 'badge-warning' :
-                      'badge-error'
-                    }`}>
-                      {currentCard.difficulty}
-                    </span>
-                  </div>
+          {/* Card Container */}
+          <div className="gh-card shadow-sm overflow-hidden">
+            {/* Card Content */}
+            <div className="p-6 md:p-8">
+              {/* Metadata */}
+              <div className="flex items-center gap-2 mb-6">
+                <span className="gh-label gh-label-gray uppercase text-[10px]">
+                  {currentCard.channel}
+                </span>
+                <span className={`gh-label text-[10px] uppercase ${
+                  currentCard.difficulty === 'beginner' ? 'gh-label-green' :
+                  currentCard.difficulty === 'intermediate' ? 'gh-label-yellow' :
+                  'gh-label-red'
+                }`}>
+                  {currentCard.difficulty}
+                </span>
+              </div>
 
-                  {/* Question */}
-                  <div className="flex-1 flex items-center justify-center">
-                    <h2 className="text-3xl font-bold text-center leading-relaxed">
-                      {currentCard.question}
-                    </h2>
-                  </div>
+              {/* Question */}
+              <div className="min-h-[120px] flex items-center justify-center mb-8">
+                <h2 className="text-2xl md:text-3xl font-semibold text-center text-[var(--gh-fg)] leading-snug">
+                  {currentCard.question}
+                </h2>
+              </div>
 
-                  {/* Answer (Hidden/Shown) */}
-                  <AnimatePresence>
-                    {showAnswer && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="mt-6 space-y-4"
-                      >
-                        {/* TLDR */}
-                        {currentCard.tldr && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="p-4 rounded-[20px] glass-card"
-                            style={{ border: '1px solid hsla(190, 100%, 50%, 0.3)' }}
-                          >
-                            <div className="flex items-center gap-2 mb-2">
-                              <Zap className="w-4 h-4" style={{ color: 'var(--color-accent-cyan-light)' }} />
-                              <span className="text-xs font-bold uppercase" style={{ color: 'var(--color-accent-cyan-light)' }}>TL;DR</span>
-                            </div>
-                            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{currentCard.tldr}</p>
-                          </motion.div>
-                        )}
-
-                        {/* Answer */}
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.15 }}
-                          className="p-6 glass-card rounded-[24px]"
-                        >
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <Sparkles className="w-5 h-5" style={{ color: 'var(--color-accent-cyan)' }} />
-                              <span className="font-bold" style={{ color: 'var(--color-accent-cyan)' }}>Answer</span>
-                            </div>
-                            <ListenButton 
-                              text={`${currentCard.answer}${currentCard.explanation ? '. ' + currentCard.explanation : ''}`}
-                              label="Listen"
-                              size="sm"
-                            />
-                          </div>
-                          <p className="text-lg leading-relaxed" style={{ color: 'var(--color-text-primary)' }}>
-                            {currentCard.answer}
-                          </p>
-                        </motion.div>
-
-                        {/* Code Interpretation */}
-                        {currentCard.codeInterpretation && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.18 }}
-                            className="p-6 rounded-[24px] glass-card"
-                            style={{ border: '1px solid hsla(330, 100%, 65%, 0.3)' }}
-                          >
-                            <div className="flex items-center gap-2 mb-4">
-                              <Check className="w-5 h-5" style={{ color: 'var(--color-accent-pink-light)' }} />
-                              <span className="font-bold uppercase text-sm" style={{ color: 'var(--color-accent-pink-light)' }}>Code Interpretation</span>
-                            </div>
-                            <div className="prose prose-invert max-w-none">
-                              <ReactMarkdown
-                                remarkPlugins={[remarkGfm]}
-                                components={{
-                                  code({ className, children }) {
-                                    const match = /language-(\w+)/.exec(className || '');
-                                    const isInline = !match && !String(children).includes('\n');
-                                    
-                                    if (isInline) {
-                                      return (
-                                        <code className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'hsla(190, 100%, 50%, 0.2)', color: 'var(--color-accent-cyan-light)' }}>
-                                          {children}
-                                        </code>
-                                      );
-                                    }
-                                    
-                                    return (
-                                      <div className="my-4 rounded-xl overflow-hidden">
-                                        <SyntaxHighlighter
-                                          language={match ? match[1] : 'text'}
-                                          style={vscDarkPlus}
-                                          customStyle={{ 
-                                            margin: 0, 
-                                            padding: '1.5rem',
-                                            background: 'var(--color-base-dark)',
-                                            fontSize: '0.9rem',
-                                          }}
-                                        >
-                                          {String(children).replace(/\n$/, '')}
-                                        </SyntaxHighlighter>
-                                      </div>
-                                    );
-                                  },
-                                  p({ children }) {
-                                    return <p className="mb-3 leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{children}</p>;
-                                  },
-                                  h1({ children }) {
-                                    return <h1 className="text-xl font-bold mb-3 mt-4" style={{ color: 'var(--color-text-primary)' }}>{children}</h1>;
-                                  },
-                                  h2({ children }) {
-                                    return <h2 className="text-lg font-bold mb-2 mt-4" style={{ color: 'var(--color-text-primary)' }}>{children}</h2>;
-                                  },
-                                  strong({ children }) {
-                                    return <strong className="font-bold" style={{ color: 'var(--color-text-primary)' }}>{children}</strong>;
-                                  },
-                                  ul({ children }) {
-                                    return <ul className="space-y-2 mb-3">{children}</ul>;
-                                  },
-                                  ol({ children }) {
-                                    return <ol className="space-y-2 mb-3 list-decimal list-inside">{children}</ol>;
-                                  },
-                                  li({ children }) {
-                                    return (
-                                      <li className="flex gap-2" style={{ color: 'var(--color-text-secondary)' }}>
-                                        <span className="mt-1" style={{ color: 'var(--color-accent-pink-light)' }}>•</span>
-                                        <span className="flex-1">{children}</span>
-                                      </li>
-                                    );
-                                  },
-                                }}
-                              >
-                                {preprocessMarkdown(currentCard.codeInterpretation)}
-                              </ReactMarkdown>
-                            </div>
-                          </motion.div>
-                        )}
-
-                        {/* Diagram */}
-                        {currentCard.diagram && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                          >
-                            <DiagramSection diagram={currentCard.diagram} />
-                          </motion.div>
-                        )}
-
-                        {/* Explanation */}
-                        {currentCard.explanation && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.25 }}
-                            className="p-6 glass-card rounded-[24px]"
-                          >
-                            <div className="flex items-center gap-2 mb-4">
-                              <Brain className="w-5 h-5" style={{ color: 'var(--color-warning-light)' }} />
-                              <span className="font-bold uppercase text-sm" style={{ color: 'var(--color-warning-light)' }}>Explanation</span>
-                            </div>
-                            <div className="prose prose-invert max-w-none">
-                              <ReactMarkdown
-                                remarkPlugins={[remarkGfm]}
-                                components={{
-                                  code({ className, children }) {
-                                    const match = /language-(\w+)/.exec(className || '');
-                                    const isInline = !match && !String(children).includes('\n');
-                                    
-                                    if (isInline) {
-                                      return (
-                                        <code className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'hsla(190, 100%, 50%, 0.2)', color: 'var(--color-accent-cyan-light)' }}>
-                                          {children}
-                                        </code>
-                                      );
-                                    }
-                                    
-                                    return (
-                                      <div className="my-4 rounded-xl overflow-hidden">
-                                        <SyntaxHighlighter
-                                          language={match ? match[1] : 'text'}
-                                          style={vscDarkPlus}
-                                          customStyle={{ 
-                                            margin: 0, 
-                                            padding: '1.5rem',
-                                            background: 'var(--color-base-dark)',
-                                            fontSize: '0.9rem',
-                                          }}
-                                        >
-                                          {String(children).replace(/\n$/, '')}
-                                        </SyntaxHighlighter>
-                                      </div>
-                                    );
-                                  },
-                                  p({ children }) {
-                                    return <p className="mb-3 leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>{children}</p>;
-                                  },
-                                  h1({ children }) {
-                                    return <h1 className="text-xl font-bold mb-3 mt-4" style={{ color: 'var(--color-text-primary)' }}>{children}</h1>;
-                                  },
-                                  h2({ children }) {
-                                    return <h2 className="text-lg font-bold mb-2 mt-4" style={{ color: 'var(--color-text-primary)' }}>{children}</h2>;
-                                  },
-                                  strong({ children }) {
-                                    return <strong className="font-bold" style={{ color: 'var(--color-text-primary)' }}>{children}</strong>;
-                                  },
-                                  ul({ children }) {
-                                    return <ul className="space-y-2 mb-3">{children}</ul>;
-                                  },
-                                  li({ children }) {
-                                    return (
-                                      <li className="flex gap-2" style={{ color: 'var(--color-text-secondary)' }}>
-                                        <span className="mt-1" style={{ color: 'var(--color-accent-cyan)' }}>•</span>
-                                        <span className="flex-1">{children}</span>
-                                      </li>
-                                    );
-                                  },
-                                }}
-                              >
-                                {preprocessMarkdown(currentCard.explanation)}
-                              </ReactMarkdown>
-                            </div>
-                          </motion.div>
-                        )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+              {/* Action Area */}
+              {!showAnswer ? (
+                <div className="flex justify-center">
+                  <button
+                    onClick={handleRevealAnswer}
+                    className="gh-btn gh-btn-primary px-8 py-2.5 text-base"
+                  >
+                    Reveal Answer
+                  </button>
                 </div>
-
-                {/* Actions */}
-                <div className="mt-6">
-                  {!showAnswer ? (
-                    // Reveal Answer Button - uses design system btn-primary with glow
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleRevealAnswer}
-                      className="btn-primary w-full py-6 rounded-[20px] text-xl flex items-center justify-center gap-3 glow-hover-cyan"
-                    >
-                      <Eye className="w-6 h-6" />
-                      Tap to reveal answer
-                    </motion.button>
-                  ) : (
-                    // Confidence Buttons
-                    <div className="space-y-3">
-                      <div className="text-center text-sm text-muted-foreground mb-4">
-                        How well did you know this?
+              ) : (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  {/* TLDR */}
+                  {currentCard.tldr && (
+                    <div className="p-4 rounded-md border-l-4 border-[var(--gh-accent-fg)] bg-[var(--gh-canvas-subtle)]">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Zap className="w-4 h-4 text-[var(--gh-accent-fg)]" />
+                        <span className="text-xs font-bold uppercase text-[var(--gh-accent-fg)]">TL;DR</span>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {confidenceLevels.map((level) => (
-                          <motion.button
-                            key={level.id}
-                            whileHover={{ scale: 1.05, y: -4 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => handleConfidence(level.id)}
-                            className="p-4 rounded-[16px] font-bold"
-                            style={{ background: `linear-gradient(135deg, var(--color-${level.id === 'again' ? 'error' : level.id === 'hard' ? 'warning' : level.id === 'good' ? 'success' : 'info'}) 0%, var(--color-${level.id === 'again' ? 'error-light' : level.id === 'hard' ? 'warning-light' : level.id === 'good' ? 'success-light' : 'info-light'}) 100%)` }}
-                          >
-                            <div className="text-2xl mb-1">{level.emoji}</div>
-                            <div className="text-sm">{level.label}</div>
-                            <div className="text-xs opacity-70 mt-1">+{level.interval}d</div>
-                          </motion.button>
-                        ))}
+                      <p className="text-sm text-[var(--gh-fg)]">{currentCard.tldr}</p>
+                    </div>
+                  )}
+
+                  {/* Main Answer */}
+                  <div className="p-6 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-[var(--gh-accent-fg)]" />
+                        <span className="font-semibold text-[var(--gh-fg)]">Full Answer</span>
+                      </div>
+                      <ListenButton 
+                        text={`${currentCard.answer}${currentCard.explanation ? '. ' + currentCard.explanation : ''}`}
+                        label="Listen"
+                        size="sm"
+                      />
+                    </div>
+                    <p className="text-lg text-[var(--gh-fg)] leading-relaxed">
+                      {currentCard.answer}
+                    </p>
+                  </div>
+
+                  {/* Code Interpretation */}
+                  {currentCard.codeInterpretation && (
+                    <div className="p-6 bg-[var(--gh-canvas-inset)] border border-[var(--gh-border)] rounded-md">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Check className="w-4 h-4 text-[var(--gh-fg-muted)]" />
+                        <span className="font-bold uppercase text-xs text-[var(--gh-fg-muted)] tracking-wider">Analysis</span>
+                      </div>
+                      <div className="prose prose-sm max-w-none prose-slate">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            code({ className, children }) {
+                              const match = /language-(\w+)/.exec(className || '');
+                              const isInline = !match && !String(children).includes('\n');
+                              
+                              if (isInline) {
+                                return (
+                                  <code className="px-1.5 py-0.5 rounded bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] text-xs font-mono text-[var(--gh-fg)]">
+                                    {children}
+                                  </code>
+                                );
+                              }
+                              
+                              return (
+                                <div className="my-4 rounded-md overflow-hidden border border-[var(--gh-border)]">
+                                  <SyntaxHighlighter
+                                    language={match ? match[1] : 'text'}
+                                    style={vscDarkPlus}
+                                    customStyle={{ 
+                                      margin: 0, 
+                                      padding: '1rem',
+                                      fontSize: '0.85rem',
+                                    }}
+                                  >
+                                    {String(children).replace(/\n$/, '')}
+                                  </SyntaxHighlighter>
+                                </div>
+                              );
+                            },
+                            p: ({children}) => <p className="mb-3 text-[var(--gh-fg-muted)]">{children}</p>,
+                            strong: ({children}) => <strong className="font-semibold text-[var(--gh-fg)]">{children}</strong>,
+                            ul: ({children}) => <ul className="list-disc pl-4 mb-3 space-y-1">{children}</ul>,
+                            li: ({children}) => <li className="text-[var(--gh-fg-muted)]">{children}</li>
+                          }}
+                        >
+                          {preprocessMarkdown(currentCard.codeInterpretation)}
+                        </ReactMarkdown>
                       </div>
                     </div>
                   )}
-                </div>
 
-                {/* Skip Button */}
-                <div className="mt-4 text-center">
-                  <button
-                    onClick={handleSkip}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Skip this card
-                  </button>
-                </div>
-              </motion.div>
-            </AnimatePresence>
+                  {/* Diagram */}
+                  {currentCard.diagram && <DiagramSection diagram={currentCard.diagram} />}
 
-            {/* Stats Footer - uses design system glass-card */}
-            <div className="mt-8 grid grid-cols-3 gap-4 w-full" style={{ maxWidth: '100%' }}>
-              <div className="p-4 glass-card rounded-[16px] text-center">
-                <div className="text-2xl font-black">{cards.length}</div>
-                <div className="text-xs text-muted-foreground">Total Cards</div>
-              </div>
-              <div className="p-4 glass-card rounded-[16px] text-center">
-                <div className="text-2xl font-black">{reviewedCount}</div>
-                <div className="text-xs text-muted-foreground">Reviewed</div>
-              </div>
-              <div className="p-4 glass-card rounded-[16px] text-center">
-                <div className="text-2xl font-black">{cards.length - reviewedCount}</div>
-                <div className="text-xs text-muted-foreground">Remaining</div>
+                  {/* Rating Section */}
+                  <div className="pt-6 border-t border-[var(--gh-border)]">
+                    <p className="text-center text-sm font-medium text-[var(--gh-fg-muted)] mb-4">
+                      How well did you know this?
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                      {confidenceLevels.map((level) => (
+                        <button
+                          key={level.id}
+                          onClick={() => handleConfidence(level.id)}
+                          className="gh-btn gh-btn-outline group relative"
+                        >
+                          <span className={`w-2 h-2 rounded-full mr-2 ${
+                            level.id === 'again' ? 'bg-[var(--gh-danger-emphasis)]' :
+                            level.id === 'hard' ? 'bg-[var(--gh-attention-emphasis)]' :
+                            level.id === 'good' ? 'bg-[var(--gh-accent-emphasis)]' :
+                            'bg-[var(--gh-success-emphasis)]'
+                          }`} />
+                          {level.label}
+                          <span className="ml-2 text-[10px] text-[var(--gh-fg-subtle)] opacity-0 group-hover:opacity-100 transition-opacity">
+                            {level.interval}d
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Footer */}
+            <div className="px-6 py-4 bg-[var(--gh-canvas-subtle)] border-t border-[var(--gh-border)] flex items-center justify-between text-[10px] uppercase font-bold tracking-widest text-[var(--gh-fg-subtle)]">
+              <span>Spaced Repetition System</span>
+              <div className="flex items-center gap-1">
+                <RotateCcw className="w-3 h-3" />
+                <span>Active Session</span>
               </div>
             </div>
           </div>
+
+          {/* Hint */}
+          {!showAnswer && (
+            <div className="mt-8 p-4 gh-card bg-blue-50 border-blue-100 flex gap-3 items-start">
+              <Zap className="w-4 h-4 text-blue-600 mt-0.5" />
+              <div className="text-sm text-blue-800">
+                <p className="font-semibold mb-1">Pro Tip</p>
+                <p>Try to recall the answer out loud or write it down before revealing. This strengthens memory recall neural pathways!</p>
+              </div>
+            </div>
+          )}
         </div>
       </AppLayout>
     </>

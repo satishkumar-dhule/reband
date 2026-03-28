@@ -120,42 +120,122 @@ export const DashboardPage: React.FC<PageProps> = () => {
   );
 };
 
-// Learning Paths Page - Agent 2
+// Learning Paths Page - Agent 2 (GitHub Theme)
 export const LearningPathsPage: React.FC<PageProps> = () => {
   const paths = [
-    { id: 1, title: 'DevOps Mastery', steps: 12, completed: 5, difficulty: 'Advanced', duration: '20 hours', icon: '🚀', color: '#6366f1' },
-    { id: 2, title: 'Kubernetes Fundamentals', steps: 8, completed: 2, difficulty: 'Intermediate', duration: '15 hours', icon: '☸️', color: '#326ce5' },
-    { id: 3, title: 'AWS Solutions Architect', steps: 15, completed: 0, difficulty: 'Advanced', duration: '30 hours', icon: '☁️', color: '#ff9900' },
-    { id: 4, title: 'Docker & Containers', steps: 10, completed: 7, difficulty: 'Beginner', duration: '12 hours', icon: '🐳', color: '#2496ed' },
-    { id: 5, title: 'CI/CD Pipelines', steps: 6, completed: 3, difficulty: 'Intermediate', duration: '8 hours', icon: '🔄', color: '#06b6d4' },
+    { id: 1, title: 'DevOps Mastery', steps: 12, completed: 5, difficulty: 'Advanced', duration: '20 hours', icon: '🚀', color: '#8250df' },
+    { id: 2, title: 'Kubernetes Fundamentals', steps: 8, completed: 2, difficulty: 'Intermediate', duration: '15 hours', icon: '☸️', color: '#0969da' },
+    { id: 3, title: 'AWS Solutions Architect', steps: 15, completed: 0, difficulty: 'Advanced', duration: '30 hours', icon: '☁️', color: '#bf8700' },
+    { id: 4, title: 'Docker & Containers', steps: 10, completed: 7, difficulty: 'Beginner', duration: '12 hours', icon: '🐳', color: '#1a7f37' },
+    { id: 5, title: 'CI/CD Pipelines', steps: 6, completed: 3, difficulty: 'Intermediate', duration: '8 hours', icon: '🔄', color: '#0969da' },
   ];
-  
+
+  const getDifficultyColor = (difficulty: string): 'green' | 'orange' | 'red' => {
+    switch (difficulty) {
+      case 'Beginner': return 'green';
+      case 'Intermediate': return 'orange';
+      case 'Advanced': return 'red';
+      default: return 'gray';
+    }
+  };
+
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>Learning Paths</Typography>
-      <Grid container spacing={3}>
+    <Box sx={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif' }}>
+      <Box sx={{ mb: 3, borderBottom: '1px solid #d0d7de', pb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <BookOpen size={28} style={{ color: '#24292f' }} />
+          <Typography variant="h4" sx={{ fontWeight: 600, color: '#24292f', fontSize: '1.75rem' }}>
+            Learning Paths
+          </Typography>
+        </Box>
+        <Typography variant="body2" sx={{ color: '#656d76', mt: 0.5 }}>
+          Structured learning journeys to master new skills
+        </Typography>
+      </Box>
+
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
+        gap: '16px' 
+      }}>
         {paths.map(path => (
-          <Grid item xs={12} md={4} key={path.id}>
-            <Card sx={{ '&:hover': { boxShadow: 6 } }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="h4" sx={{ mr: 2 }}>{path.icon}</Typography>
-                  <Box>
-                    <Typography variant="h6">{path.title}</Typography>
-                    <Chip label={path.difficulty} size="small" color={path.difficulty === 'Beginner' ? 'success' : path.difficulty === 'Intermediate' ? 'warning' : 'error'} />
-                  </Box>
-                </Box>
-                <Typography variant="body2" color="text.secondary" gutterBottom>{path.duration}</Typography>
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="caption">Progress: {path.completed}/{path.steps} steps</Typography>
-                  <LinearProgress variant="determinate" value={(path.completed / path.steps) * 100} sx={{ height: 6, borderRadius: 3 }} />
-                </Box>
-                <Button variant="contained" fullWidth>Continue Learning</Button>
-              </CardContent>
-            </Card>
-          </Grid>
+          <GitHubCard
+            key={path.id}
+            variant="bordered"
+            padding="md"
+            className="gh-path-card"
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '12px' }}>
+              <span style={{ fontSize: '28px' }}>{path.icon}</span>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ 
+                  margin: '0 0 4px 0', 
+                  fontSize: '16px', 
+                  fontWeight: 600, 
+                  color: '#24292f' 
+                }}>
+                  {path.title}
+                </h3>
+                <GitHubBadge
+                  color={getDifficultyColor(path.difficulty)}
+                  size="sm"
+                >
+                  {path.difficulty}
+                </GitHubBadge>
+              </div>
+            </div>
+
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              fontSize: '13px', 
+              color: '#656d76',
+              marginBottom: '12px'
+            }}>
+              <Clock size={14} />
+              <span>{path.duration}</span>
+              <span style={{ margin: '0 4px' }}>•</span>
+              <span>{path.steps} steps</span>
+            </div>
+
+            <div style={{ marginBottom: '12px' }}>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                fontSize: '12px', 
+                color: '#57606a',
+                marginBottom: '4px'
+              }}>
+                <span>Progress</span>
+                <span>{path.completed}/{path.steps} steps</span>
+              </div>
+              <GitHubProgress 
+                value={(path.completed / path.steps) * 100} 
+                size="sm"
+                color={path.color}
+              />
+            </div>
+
+            <GitHubButton 
+              variant={path.completed > 0 ? 'primary' : 'outline'} 
+              size="sm"
+              fullWidth
+            >
+              {path.completed > 0 ? 'Continue Learning' : 'Start Learning'}
+            </GitHubButton>
+          </GitHubCard>
         ))}
-      </Grid>
+      </div>
+
+      <style>{`
+        .gh-path-card {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .gh-path-card:hover {
+          transform: translateY(-2px);
+        }
+      `}</style>
     </Box>
   );
 };

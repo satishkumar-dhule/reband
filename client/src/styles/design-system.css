@@ -570,3 +570,260 @@ input + input {
     margin-left: 0.75rem; /* 12px spacing on mobile */
   }
 }
+
+/* ===== GITHUB DESIGN SYSTEM TOKENS ===== */
+/* Light mode (default) */
+:root,
+:root.light,
+.light {
+  /* Canvas backgrounds */
+  --gh-canvas: #ffffff;
+  --gh-canvas-subtle: #f6f8fa;
+  --gh-canvas-inset: #f0f6fc;
+  --gh-canvas-overlay: #ffffff;
+
+  /* Foreground / text */
+  --gh-fg: #1f2328;
+  --gh-fg-muted: #636c76;
+  --gh-fg-subtle: #6e7781;
+  --gh-fg-on-emphasis: #ffffff;
+
+  /* Borders */
+  --gh-border: #d0d7de;
+  --gh-border-muted: #d8dee4;
+
+  /* Accent (blue) */
+  --gh-accent-fg: #0969da;
+  --gh-accent-emphasis: #0969da;
+  --gh-accent-subtle: #ddf4ff;
+
+  /* Success (green) */
+  --gh-success-fg: #1a7f37;
+  --gh-success-emphasis: #1f883d;
+  --gh-success-subtle: #dafbe1;
+
+  /* Attention (yellow) */
+  --gh-attention-fg: #9a6700;
+  --gh-attention-emphasis: #bf8700;
+  --gh-attention-subtle: #fff8c5;
+
+  /* Danger (red) */
+  --gh-danger-fg: #d1242f;
+  --gh-danger-emphasis: #cf222e;
+  --gh-danger-subtle: #ffebe9;
+
+  /* Done (purple) */
+  --gh-done-fg: #8250df;
+  --gh-done-emphasis: #8250df;
+  --gh-done-subtle: #fbefff;
+
+  /* Neutral */
+  --gh-neutral-emphasis: #6e7781;
+  --gh-neutral-subtle: #eaeef2;
+
+  /* Difficulty */
+  --gh-diff-beginner: #1f883d;
+  --gh-diff-beginner-bg: #dafbe1;
+  --gh-diff-intermediate: #9a6700;
+  --gh-diff-intermediate-bg: #fff8c5;
+  --gh-diff-advanced: #cf222e;
+  --gh-diff-advanced-bg: #ffebe9;
+}
+
+/* Dark mode */
+:root.dark,
+.dark {
+  --gh-canvas: #0d1117;
+  --gh-canvas-subtle: #161b22;
+  --gh-canvas-inset: #010409;
+  --gh-canvas-overlay: #161b22;
+
+  --gh-fg: #e6edf3;
+  --gh-fg-muted: #8d96a0;
+  --gh-fg-subtle: #6e7681;
+  --gh-fg-on-emphasis: #ffffff;
+
+  --gh-border: #30363d;
+  --gh-border-muted: #21262d;
+
+  --gh-accent-fg: #58a6ff;
+  --gh-accent-emphasis: #1f6feb;
+  --gh-accent-subtle: #031d30;
+
+  --gh-success-fg: #3fb950;
+  --gh-success-emphasis: #238636;
+  --gh-success-subtle: #0d1f12;
+
+  --gh-attention-fg: #d29922;
+  --gh-attention-emphasis: #9e6a03;
+  --gh-attention-subtle: #1c1502;
+
+  --gh-danger-fg: #f85149;
+  --gh-danger-emphasis: #da3633;
+  --gh-danger-subtle: #160b10;
+
+  --gh-done-fg: #bc8cff;
+  --gh-done-emphasis: #6e40c9;
+  --gh-done-subtle: #21003d;
+
+  --gh-neutral-emphasis: #6e7681;
+  --gh-neutral-subtle: #21262d;
+
+  --gh-diff-beginner: #3fb950;
+  --gh-diff-beginner-bg: #0d1f12;
+  --gh-diff-intermediate: #d29922;
+  --gh-diff-intermediate-bg: #1c1502;
+  --gh-diff-advanced: #f85149;
+  --gh-diff-advanced-bg: #160b10;
+}
+
+/* ===== GITHUB UTILITY CLASSES ===== */
+
+/* Buttons */
+.gh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3125rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  border-radius: 6px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: background-color 80ms ease, border-color 80ms ease, box-shadow 80ms ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.gh-btn:focus-visible {
+  outline: 2px solid var(--gh-accent-emphasis);
+  outline-offset: 2px;
+}
+.gh-btn-primary {
+  background-color: var(--gh-success-emphasis);
+  border-color: rgba(31,35,40,0.15);
+  color: #ffffff;
+}
+.gh-btn-primary:hover {
+  background-color: #1a7f37;
+}
+.gh-btn-secondary {
+  background-color: var(--gh-canvas-subtle);
+  border-color: var(--gh-border);
+  color: var(--gh-fg);
+}
+.gh-btn-secondary:hover {
+  background-color: var(--gh-neutral-subtle);
+}
+.gh-btn-danger {
+  background-color: var(--gh-danger-emphasis);
+  border-color: rgba(31,35,40,0.15);
+  color: #ffffff;
+}
+.gh-btn-danger:hover {
+  background-color: #b91c1c;
+}
+.gh-btn-outline {
+  background-color: transparent;
+  border-color: var(--gh-border);
+  color: var(--gh-fg);
+}
+.gh-btn-outline:hover {
+  background-color: var(--gh-canvas-subtle);
+}
+
+/* Cards */
+.gh-card {
+  background-color: var(--gh-canvas);
+  border: 1px solid var(--gh-border);
+  border-radius: 6px;
+}
+
+/* Labels / Badges */
+.gh-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  border-radius: 2em;
+  border: 1px solid transparent;
+}
+.gh-label-blue {
+  background-color: #ddf4ff;
+  color: #0550ae;
+  border-color: #80ccff;
+}
+.gh-label-green {
+  background-color: var(--gh-success-subtle);
+  color: var(--gh-success-fg);
+  border-color: #82cfaf;
+}
+.gh-label-yellow {
+  background-color: var(--gh-attention-subtle);
+  color: var(--gh-attention-fg);
+  border-color: #eac54f;
+}
+.gh-label-red {
+  background-color: var(--gh-danger-subtle);
+  color: var(--gh-danger-fg);
+  border-color: #ffa198;
+}
+.gh-label-purple {
+  background-color: var(--gh-done-subtle);
+  color: var(--gh-done-fg);
+  border-color: #d2b2ff;
+}
+.gh-label-gray {
+  background-color: var(--gh-neutral-subtle);
+  color: var(--gh-neutral-emphasis);
+  border-color: var(--gh-border);
+}
+
+/* Tabs (horizontal underline style) */
+.gh-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--gh-border);
+  gap: 0;
+  overflow-x: auto;
+}
+.gh-tab {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gh-fg-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 80ms, border-color 80ms;
+}
+.gh-tab:hover {
+  color: var(--gh-fg);
+}
+.gh-tab.active {
+  color: var(--gh-fg);
+  border-bottom-color: #fd8c73;
+}
+
+/* Page header */
+.gh-page-header {
+  padding: 1.5rem 1rem 1rem;
+  border-bottom: 1px solid var(--gh-border);
+  background-color: var(--gh-canvas);
+}
+
+/* Progress bar */
+.gh-progress {
+  width: 100%;
+  height: 8px;
+  background-color: var(--gh-neutral-subtle);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.gh-progress-bar {
+  height: 100%;
+  background-color: var(--gh-success-emphasis);
+  border-radius: 9999px;
+  transition: width 300ms ease;
+}

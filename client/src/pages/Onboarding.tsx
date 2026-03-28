@@ -5,16 +5,15 @@
 
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { useUserPreferences } from '../context/UserPreferencesContext';
-import { allChannelsConfig, getRecommendedChannels } from '../lib/channels-config';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { getRecommendedChannels } from '../lib/channels-config';
 import {
-  Sparkles, ArrowRight, ArrowLeft, Check, Code, Server, Layout, Database,
-  Cloud, Brain, Target, Rocket, BookOpen, Zap, ChevronRight, Star, Trophy
+  ArrowRight, ArrowLeft, Check, Code, Server, Layout, Database,
+  Cloud, Brain, Target, Rocket, BookOpen, Zap, ChevronRight, Trophy, Sparkles, Star
 } from 'lucide-react';
+import { Button } from "../components/ui/button";
 
 interface Role {
   id: string;
@@ -76,18 +75,6 @@ const steps = [
   { id: 4, title: 'Ready to Go', description: 'Start your journey' }
 ];
 
-const getRoleGradient = (roleId: string): string => {
-  const gradients: Record<string, string> = {
-    frontend: 'linear-gradient(135deg, hsl(210 100% 50%) 0%, hsl(190 100% 50%) 100%)',
-    backend: 'linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(160 76% 46%) 100%)',
-    fullstack: 'linear-gradient(135deg, hsl(270 100% 65%) 0%, hsl(330 100% 65%) 100%)',
-    devops: 'linear-gradient(135deg, hsl(25 92% 50%) 0%, hsl(0 84% 60%) 100%)',
-    data: 'linear-gradient(135deg, hsl(240 100% 65%) 0%, hsl(270 100% 65%) 100%)',
-    ml: 'linear-gradient(135deg, hsl(350 85% 65%) 0%, hsl(330 100% 65%) 100%)'
-  };
-  return gradients[roleId] || 'var(--gradient-primary)';
-};
-
 export default function OnboardingPage() {
   const [, setLocation] = useLocation();
   const { setRole, skipOnboarding } = useUserPreferences();
@@ -115,13 +102,6 @@ export default function OnboardingPage() {
     setLocation('/');
   };
 
-  const canProceed = () => {
-    if (currentStep === 1) return true;
-    if (currentStep === 2) return selectedRole !== null;
-    if (currentStep === 3) return selectedChannels.length > 0;
-    return true;
-  };
-
   return (
     <>
       <SEOHead
@@ -130,331 +110,219 @@ export default function OnboardingPage() {
         canonical="https://open-interview.github.io/onboarding"
       />
 
-      <AppLayout>
-        <div className="min-h-screen" style={{ background: 'var(--color-base-dark)', color: 'var(--color-text-primary)' }}>
-          <div className="max-w-4xl mx-auto px-6 py-12">
-            {/* Progress Steps */}
-            <div className="mb-12">
-              <div className="flex items-center justify-between mb-4">
-                {steps.map((step, index) => (
-                  <div key={step.id} className="flex items-center">
-                    <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold transition-all ${
-                      currentStep > step.id
-                        ? 'gradient-text'
-                        : currentStep === step.id
-                          ? 'border-2'
-                          : ''
+      <AppLayout hideNav={true}>
+        <div className="min-h-screen bg-[var(--gh-canvas-subtle)] flex flex-col items-center py-12 px-6">
+          <div className="max-w-3xl w-full">
+            {/* Header / Progress Indicator */}
+            <div className="flex items-center justify-center gap-2 mb-12">
+              {steps.map((step, index) => (
+                <div key={step.id} className="flex items-center">
+                  <div 
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold border-2 transition-colors ${
+                      currentStep >= step.id 
+                        ? 'bg-[var(--gh-accent-emphasis)] border-[var(--gh-accent-emphasis)] text-white' 
+                        : 'bg-[var(--gh-canvas)] border-[var(--gh-border)] text-[var(--gh-fg-muted)]'
                     }`}
-                    style={{
-                      background: currentStep > step.id 
-                        ? 'var(--gradient-primary)' 
-                        : currentStep === step.id 
-                          ? 'rgba(0,0,0,0.2)' 
-                          : 'var(--color-base-elevated)',
-                      color: currentStep > step.id || currentStep === step.id
-                        ? 'white' 
-                        : 'var(--color-text-tertiary)',
-                      borderColor: currentStep === step.id 
-                        ? 'var(--color-accent-cyan)' 
-                        : 'transparent'
-                    }}>
-                      {currentStep > step.id ? <Check className="w-5 h-5" /> : step.id}
-                    </div>
-                    {index < steps.length - 1 && (
-                      <div className={`w-12 md:w-24 h-0.5 mx-2 transition-all`}
-                        style={{
-                          background: currentStep > step.id 
-                            ? 'var(--gradient-primary)' 
-                            : 'var(--color-border-subtle)'
-                        }}
-                      />
-                    )}
+                  >
+                    {currentStep > step.id ? <Check className="w-4 h-4" /> : step.id}
                   </div>
-                ))}
+                  {index < steps.length - 1 && (
+                    <div 
+                      className={`w-12 h-0.5 mx-2 ${
+                        currentStep > step.id ? 'bg-[var(--gh-accent-emphasis)]' : 'bg-[var(--gh-border)]'
+                      }`}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-sm overflow-hidden min-h-[500px] flex flex-col">
+              {/* Step Content */}
+              <div className="flex-1 p-8">
+                {currentStep === 1 && (
+                  <div className="flex flex-col items-center text-center py-8">
+                    <div className="w-20 h-20 rounded-xl bg-[var(--gh-canvas-inset)] border border-[var(--gh-border)] flex items-center justify-center mb-6 text-[var(--gh-accent-fg)]">
+                      <Rocket className="w-10 h-10" />
+                    </div>
+                    <h1 className="text-3xl font-bold text-[var(--gh-fg)] mb-4">Welcome to DevPrep</h1>
+                    <p className="text-[var(--gh-fg-muted)] text-lg mb-10 max-w-lg">
+                      Your personal AI-powered interview preparation assistant. Let's set up your learning journey in just a few steps.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-2xl">
+                      <div className="flex flex-col items-center p-4">
+                        <div className="w-10 h-10 rounded-md bg-[var(--gh-success-subtle)] flex items-center justify-center mb-3 text-[var(--gh-success-fg)]">
+                          <BookOpen className="w-5 h-5" />
+                        </div>
+                        <h3 className="font-semibold text-sm mb-1">Learn</h3>
+                        <p className="text-xs text-[var(--gh-fg-muted)]">Thousands of interview questions</p>
+                      </div>
+                      <div className="flex flex-col items-center p-4">
+                        <div className="w-10 h-10 rounded-md bg-[var(--gh-attention-subtle)] flex items-center justify-center mb-3 text-[var(--gh-attention-fg)]">
+                          <Target className="w-5 h-5" />
+                        </div>
+                        <h3 className="font-semibold text-sm mb-1">Practice</h3>
+                        <p className="text-xs text-[var(--gh-fg-muted)]">Voice & coding sessions</p>
+                      </div>
+                      <div className="flex flex-col items-center p-4">
+                        <div className="w-10 h-10 rounded-md bg-[var(--gh-done-subtle)] flex items-center justify-center mb-3 text-[var(--gh-done-fg)]">
+                          <Trophy className="w-5 h-5" />
+                        </div>
+                        <h3 className="font-semibold text-sm mb-1">Achieve</h3>
+                        <p className="text-xs text-[var(--gh-fg-muted)]">Track progress & earn badges</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 2 && (
+                  <div>
+                    <div className="mb-8">
+                      <h2 className="text-2xl font-bold text-[var(--gh-fg)] mb-2">Choose Your Career Path</h2>
+                      <p className="text-[var(--gh-fg-muted)]">Select the role you're currently focusing on.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {roles.map((role) => {
+                        const Icon = role.icon;
+                        const isSelected = selectedRole === role.id;
+                        return (
+                          <button
+                            key={role.id}
+                            onClick={() => setSelectedRole(role.id)}
+                            className={`flex flex-col items-start p-6 rounded-md border text-left transition-all ${
+                              isSelected 
+                                ? 'bg-[var(--gh-canvas-subtle)] border-[var(--gh-accent-fg)] ring-1 ring-[var(--gh-accent-fg)]' 
+                                : 'bg-[var(--gh-canvas)] border-[var(--gh-border)] hover:border-[var(--gh-border-strong)]'
+                            }`}
+                          >
+                            <div className={`p-2 rounded-md mb-4 ${isSelected ? 'bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)]' : 'bg-[var(--gh-canvas-inset)] text-[var(--gh-fg-muted)]'}`}>
+                              <Icon className="w-5 h-5" />
+                            </div>
+                            <h3 className="font-semibold mb-1">{role.name}</h3>
+                            <p className="text-sm text-[var(--gh-fg-muted)]">{role.description}</p>
+                            {isSelected && (
+                              <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-[var(--gh-accent-fg)]">
+                                <Check className="w-3.5 h-3.5" />
+                                SELECTED
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 3 && (
+                  <div>
+                    <div className="mb-8">
+                      <h2 className="text-2xl font-bold text-[var(--gh-fg)] mb-2">Select Focus Areas</h2>
+                      <p className="text-[var(--gh-fg-muted)]">Pick the topics you want to prioritize in your prep.</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 mb-6 p-3 bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-md text-sm text-[var(--gh-fg-muted)]">
+                      <Zap className="w-4 h-4 text-[var(--gh-attention-fg)]" />
+                      Recommended based on your <strong>{roles.find(r => r.id === selectedRole)?.name}</strong> choice
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {recommendedChannels.slice(0, 12).map((channel) => {
+                        const isSelected = selectedChannels.includes(channel.id);
+                        return (
+                          <button
+                            key={channel.id}
+                            onClick={() => toggleChannel(channel.id)}
+                            className={`flex items-center justify-between px-4 py-3 rounded-md border text-sm transition-all ${
+                              isSelected 
+                                ? 'bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-fg)] text-[var(--gh-accent-fg)] font-semibold' 
+                                : 'bg-[var(--gh-canvas)] border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:border-[var(--gh-border-strong)]'
+                            }`}
+                          >
+                            <span className="truncate mr-2">{channel.name}</span>
+                            {isSelected && <Check className="w-4 h-4 shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 4 && (
+                  <div className="flex flex-col items-center text-center py-12">
+                    <div className="w-24 h-24 rounded-full bg-[var(--gh-success-subtle)] flex items-center justify-center mb-8 text-[var(--gh-success-fg)]">
+                      <Sparkles className="w-12 h-12" />
+                    </div>
+                    <h2 className="text-3xl font-bold text-[var(--gh-fg)] mb-4">You're all set!</h2>
+                    <p className="text-[var(--gh-fg-muted)] text-lg mb-10 max-w-md">
+                      Your personalized roadmap is ready. Let's start building the career you deserve.
+                    </p>
+
+                    <div className="flex gap-12 mb-12">
+                      <div>
+                        <div className="text-3xl font-bold text-[var(--gh-fg)]">{selectedChannels.length}</div>
+                        <div className="text-sm text-[var(--gh-fg-muted)]">Topics</div>
+                      </div>
+                      <div>
+                        <div className="text-3xl font-bold text-[var(--gh-fg)]">20+</div>
+                        <div className="text-sm text-[var(--gh-fg-muted)]">Channels</div>
+                      </div>
+                      <div>
+                        <div className="text-3xl font-bold text-[var(--gh-accent-fg)]">
+                          <Star className="w-8 h-8 inline-block fill-current" />
+                        </div>
+                        <div className="text-sm text-[var(--gh-fg-muted)]">Ready</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="text-center">
-                <h2 className="font-bold" style={{ fontSize: 'var(--text-xl)' }}>{steps[currentStep - 1].title}</h2>
-                <p style={{ color: 'var(--color-text-tertiary)' }}>{steps[currentStep - 1].description}</p>
+
+              {/* Action Buttons */}
+              <div className="p-6 bg-[var(--gh-canvas-subtle)] border-t border-[var(--gh-border)] flex items-center justify-between">
+                <div className="flex gap-3">
+                  {currentStep === 1 ? (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setLocation('/')}
+                      className="text-[var(--gh-fg-muted)]"
+                    >
+                      Skip for now
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setCurrentStep(prev => prev - 1)}
+                      className="text-[var(--gh-fg)]"
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                    </Button>
+                  )}
+                </div>
+
+                {currentStep < 4 ? (
+                  <Button 
+                    onClick={() => setCurrentStep(prev => prev + 1)}
+                    disabled={currentStep === 2 && !selectedRole || currentStep === 3 && selectedChannels.length === 0}
+                    className="bg-[var(--gh-accent-emphasis)] text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    Continue <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={handleComplete}
+                    className="bg-[var(--gh-success-emphasis)] text-white hover:bg-green-700"
+                  >
+                    Start Your Journey <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                )}
               </div>
             </div>
 
-            {/* Step Content */}
-            <AnimatePresence mode="wait">
-              {currentStep === 1 && (
-                <motion.div
-                  key="step1"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-8"
-                >
-                  <div className="text-center space-y-4">
-                    <div className="w-24 h-24 mx-auto rounded-full flex items-center justify-center animate-pulse-glow" style={{ background: 'var(--gradient-primary)' }}>
-                      <Rocket className="w-12 h-12" style={{ color: 'white' }} aria-hidden="true" />
-                    </div>
-                    <h1 className="font-black" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.75rem)' }}>
-                      Welcome to <span className="gradient-text">DevPrep</span>
-                    </h1>
-                    <p className="max-w-2xl mx-auto" style={{ fontSize: 'var(--text-xl)', color: 'var(--color-text-tertiary)' }}>
-                      Your personal AI-powered interview preparation assistant. Let's set up your learning journey in just a few steps.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-                    <div className="glass-card" style={{ borderRadius: 'var(--radius-xl)', padding: 'var(--space-xl)' }}>
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: 'hsla(190, 100%, 50%, 0.15)' }}>
-                        <BookOpen className="w-6 h-6" style={{ color: 'var(--color-accent-cyan)' }} />
-                      </div>
-                      <h3 className="font-bold mb-2" style={{ fontSize: 'var(--text-lg)' }}>Learn</h3>
-                      <p style={{ color: 'var(--color-text-tertiary)' }}>Access thousands of questions across multiple topics</p>
-                    </div>
-                    <div className="glass-card" style={{ borderRadius: 'var(--radius-xl)', padding: 'var(--space-xl)' }}>
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: 'hsla(190, 100%, 50%, 0.15)' }}>
-                        <Target className="w-6 h-6" style={{ color: 'var(--color-accent-cyan)' }} />
-                      </div>
-                      <h3 className="font-bold mb-2" style={{ fontSize: 'var(--text-lg)' }}>Practice</h3>
-                      <p style={{ color: 'var(--color-text-tertiary)' }}>Voice interviews, coding challenges, and more</p>
-                    </div>
-                    <div className="glass-card" style={{ borderRadius: 'var(--radius-xl)', padding: 'var(--space-xl)' }}>
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: 'hsla(142, 76%, 46%, 0.15)' }}>
-                        <Trophy className="w-6 h-6" style={{ color: 'var(--color-success-light)' }} />
-                      </div>
-                      <h3 className="font-bold mb-2" style={{ fontSize: 'var(--text-lg)' }}>Achieve</h3>
-                      <p style={{ color: 'var(--color-text-tertiary)' }}>Track progress and earn badges</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-4 pt-8">
-                    <button
-                      onClick={() => setLocation('/')}
-                      className="transition-fast focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-cyan)]"
-                      style={{ 
-                        padding: '0.75rem 1.5rem', 
-                        color: 'var(--color-text-tertiary)',
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Skip for now
-                    </button>
-                    <button
-                      onClick={() => setCurrentStep(2)}
-                      className="btn-primary glow-hover-cyan flex items-center gap-2"
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                    >
-                      Get Started <ArrowRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-
-              {currentStep === 2 && (
-                <motion.div
-                  key="step2"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-6"
-                >
-                  <div className="text-center mb-8">
-                    <h2 className="font-black mb-2" style={{ fontSize: 'var(--text-3xl)' }}>Choose Your Career Path</h2>
-                    <p style={{ color: 'var(--color-text-tertiary)' }}>Select the role you're preparing for</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {roles.map((role) => {
-                      const Icon = role.icon;
-                      const isSelected = selectedRole === role.id;
-                      
-                      return (
-                        <button
-                          key={role.id}
-                          onClick={() => setSelectedRole(role.id)}
-                          className={`p-6 text-left transition-all card-premium ${isSelected ? 'glow-cyan' : ''}`}
-                          style={{
-                            borderRadius: 'var(--radius-xl)',
-                            border: `2px solid ${isSelected ? 'var(--color-accent-cyan)' : 'var(--color-border-subtle)'}`,
-                            background: isSelected ? 'hsla(190, 100%, 50%, 0.08)' : 'var(--color-base-card)'
-                          }}
-                        >
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4`} style={{ background: getRoleGradient(role.id) }}>
-                            <Icon className="w-6 h-6 text-white" />
-                          </div>
-                          <h3 className="font-bold mb-1" style={{ fontSize: 'var(--text-lg)' }}>{role.name}</h3>
-                          <p className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>{role.description}</p>
-                          {isSelected && (
-                            <div className="mt-4 flex items-center gap-2" style={{ color: 'var(--color-accent-cyan)' }}>
-                              <Check className="w-5 h-5" />
-                              <span className="font-semibold">Selected</span>
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex items-center justify-between pt-8">
-                    <button
-                      onClick={() => setCurrentStep(1)}
-                      className="flex items-center gap-2 transition-fast"
-                      style={{ 
-                        padding: '0.75rem 1.5rem', 
-                        color: 'var(--color-text-tertiary)',
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <ArrowLeft className="w-5 h-5" /> Back
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (selectedRole) {
-                          const role = roles.find(r => r.id === selectedRole);
-                          if (role) {
-                            setSelectedChannels(role.channels);
-                          }
-                          setCurrentStep(3);
-                        }
-                      }}
-                      disabled={!selectedRole}
-                      className="btn-primary glow-hover-cyan flex items-center gap-2"
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '0.5rem',
-                        opacity: selectedRole ? 1 : 0.5,
-                        cursor: selectedRole ? 'pointer' : 'not-allowed'
-                      }}
-                    >
-                      Continue <ArrowRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-
-              {currentStep === 3 && (
-                <motion.div
-                  key="step3"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-6"
-                >
-                  <div className="text-center mb-8">
-                    <h2 className="font-black mb-2" style={{ fontSize: 'var(--text-3xl)' }}>Select Topics to Focus On</h2>
-                    <p style={{ color: 'var(--color-text-tertiary)' }}>Choose the areas you want to practice</p>
-                  </div>
-
-                  <div className="p-4 rounded-xl mb-6 glass-card" style={{ border: '1px solid hsla(190, 100%, 50%, 0.3)' }}>
-                    <div className="flex items-center gap-2" style={{ color: 'var(--color-accent-cyan)' }}>
-                      <Zap className="w-5 h-5" />
-                      <span className="font-semibold">Recommended for {roles.find(r => r.id === selectedRole)?.name}</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {recommendedChannels.slice(0, 9).map((channel) => {
-                      const isSelected = selectedChannels.includes(channel.id);
-                      
-                      return (
-                        <button
-                          key={channel.id}
-                          onClick={() => toggleChannel(channel.id)}
-                          className="p-4 rounded-xl text-left transition-all"
-                          style={{
-                            border: `1px solid ${isSelected ? 'var(--color-accent-cyan)' : 'var(--color-border-subtle)'}`,
-                            background: isSelected ? 'hsla(190, 100%, 50%, 0.08)' : 'var(--color-base-card)'
-                          }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-semibold">{channel.name}</span>
-                            {isSelected && <Check className="w-5 h-5" style={{ color: 'var(--color-accent-cyan)' }} />}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex items-center justify-between pt-8">
-                    <button
-                      onClick={() => setCurrentStep(2)}
-                      className="flex items-center gap-2 transition-fast"
-                      style={{ 
-                        padding: '0.75rem 1.5rem', 
-                        color: 'var(--color-text-tertiary)',
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <ArrowLeft className="w-5 h-5" /> Back
-                    </button>
-                    <button
-                      onClick={handleComplete}
-                      disabled={selectedChannels.length === 0}
-                      className="btn-primary glow-hover-cyan flex items-center gap-2"
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '0.5rem',
-                        opacity: selectedChannels.length > 0 ? 1 : 0.5,
-                        cursor: selectedChannels.length > 0 ? 'pointer' : 'not-allowed'
-                      }}
-                    >
-                      Complete Setup <Sparkles className="w-5 h-5" />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-
-              {currentStep === 4 && (
-                <motion.div
-                  key="step4"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-8 text-center"
-                >
-                  <div className="w-32 h-32 mx-auto rounded-full flex items-center justify-center animate-pulse-glow" style={{ background: 'var(--gradient-primary)' }}>
-                    <Trophy className="w-16 h-16" style={{ color: 'white' }} />
-                  </div>
-
-                  <div>
-                    <h2 className="font-black mb-4" style={{ fontSize: 'var(--text-4xl)' }}>You're All Set!</h2>
-                    <p className="max-w-2xl mx-auto" style={{ fontSize: 'var(--text-xl)', color: 'var(--color-text-tertiary)' }}>
-                      Your personalized learning path is ready. Start practicing and land your dream job!
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mt-8">
-                    <div className="text-center">
-                      <div className="font-black gradient-text" style={{ fontSize: 'var(--text-3xl)' }}>{selectedChannels.length}</div>
-                      <div className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>Topics</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-black" style={{ fontSize: 'var(--text-3xl)', color: 'var(--color-accent-cyan)' }}>{roles.find(r => r.id === selectedRole)?.name.split(' ')[0]}</div>
-                      <div className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>Focus</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-black" style={{ fontSize: 'var(--text-3xl)', color: 'var(--color-success-light)' }}>20+</div>
-                      <div className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>Channels</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-4 pt-8">
-                    <button
-                      onClick={() => setLocation('/')}
-                      className="btn-primary glow-hover-cyan flex items-center gap-2"
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                    >
-                      Start Learning <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <p className="text-center mt-8 text-sm text-[var(--gh-fg-subtle)]">
+              Welcome to the community of world-class developers.
+            </p>
           </div>
         </div>
       </AppLayout>

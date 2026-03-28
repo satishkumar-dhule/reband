@@ -121,11 +121,17 @@ def list_models():
             "object": "list",
             "data": [
                 {
-                    "id": "qwen2.5-3b",
+                    "id": "claude-sonnet-4-6",
                     "object": "model",
                     "created": 1234567890,
-                    "owned_by": "local",
-                }
+                    "owned_by": "anthropic",
+                },
+                {
+                    "id": "claude-opus-4-6",
+                    "object": "model",
+                    "created": 1234567890,
+                    "owned_by": "anthropic",
+                },
             ],
         }
     )

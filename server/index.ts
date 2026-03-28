@@ -7,7 +7,7 @@ const app = express();
 const httpServer = createServer(app);
 
 function startKeepAlive() {
-  const port = parseInt(process.env.PORT || "5000", 10);
+  const port = parseInt(process.env.PORT || "5173", 10);
   const host = process.env.REPLIT?.includes("1") ? "localhost" : "0.0.0.0";
   const pingInterval = 4 * 60 * 1000; // 4 minutes (Replit sleeps after ~5 min)
   const keepAliveUrl = `http://${host}:${port}/api/keep-alive`;
@@ -105,10 +105,9 @@ app.use((req, res, next) => {
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
+  // Default to 5173 which is mapped to external port 80 in Replit.
   // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || "5000", 10);
+  const port = parseInt(process.env.PORT || "5173", 10);
   httpServer.listen(
     {
       port,
