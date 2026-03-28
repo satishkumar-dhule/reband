@@ -808,19 +808,19 @@ function CompletedScreen({
             className="grid grid-cols-4 gap-1.5 sm:gap-2 mb-4 sm:mb-6 p-3 sm:p-4 bg-muted/30 rounded-xl"
           >
             <div className="text-center">
-              <div className="text-base sm:text-lg font-bold text-red-500">{stats.again}</div>
+              <div className="text-base sm:text-lg font-bold text-[var(--gh-danger-fg)]">{stats.again}</div>
               <div className="text-[10px] sm:text-xs text-muted-foreground">Again</div>
             </div>
             <div className="text-center">
-              <div className="text-base sm:text-lg font-bold text-orange-500">{stats.hard}</div>
+              <div className="text-base sm:text-lg font-bold text-[var(--gh-attention-fg)]">{stats.hard}</div>
               <div className="text-[10px] sm:text-xs text-muted-foreground">Hard</div>
             </div>
             <div className="text-center">
-              <div className="text-base sm:text-lg font-bold text-green-500">{stats.good}</div>
+              <div className="text-base sm:text-lg font-bold text-[var(--gh-success-fg)]">{stats.good}</div>
               <div className="text-[10px] sm:text-xs text-muted-foreground">Good</div>
             </div>
             <div className="text-center">
-              <div className="text-base sm:text-lg font-bold text-blue-500">{stats.easy}</div>
+              <div className="text-base sm:text-lg font-bold text-[var(--gh-accent-fg)]">{stats.easy}</div>
               <div className="text-[10px] sm:text-xs text-muted-foreground">Easy</div>
             </div>
           </motion.div>
@@ -838,9 +838,9 @@ function CompletedScreen({
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
             >
-              <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
+              <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--gh-attention-fg)]" />
             </motion.div>
-            <span className="text-sm sm:text-base font-bold text-orange-500">{srsStats.reviewStreak} day streak! 🔥</span>
+            <span className="text-sm sm:text-base font-bold text-[var(--gh-attention-fg)]">{srsStats.reviewStreak} day streak! 🔥</span>
           </motion.div>
         )}
 
@@ -853,7 +853,7 @@ function CompletedScreen({
           {hasMoreDue && (
             <button
               onClick={onContinue}
-              className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity text-sm sm:text-base"
+              className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[var(--gh-done-emphasis)] to-[var(--gh-accent-emphasis)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-medium hover:opacity-90 transition-opacity text-sm sm:text-base"
             >
               Continue Reviewing ({srsStats.dueToday} more)
             </button>
@@ -863,7 +863,7 @@ function CompletedScreen({
             className={`w-full py-2.5 sm:py-3 rounded-xl font-medium transition-colors text-sm sm:text-base ${
               hasMoreDue 
                 ? 'bg-muted text-foreground hover:bg-muted/80' 
-                : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:opacity-90'
+                : 'bg-gradient-to-r from-[var(--gh-success-emphasis)] to-[var(--gh-success-fg)] text-[var(--gh-fg-on-emphasis)] hover:opacity-90'
             }`}
           >
             Back to Home

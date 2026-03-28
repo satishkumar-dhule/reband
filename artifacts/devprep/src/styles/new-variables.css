@@ -1,4 +1,37 @@
 :root {
+  /* Base color tokens - mapped from HSL variables for Tailwind theme */
+  /* These map to the Apple Vision Pro inspired theme */
+  --color-bg-base: #ffffff;
+  --color-fg-base: #24292f;
+  --color-fg-inverted: #ffffff;
+  --color-border-base: #d0d7de;
+  --color-ring-base: #0969da;
+
+  /* Surface colors */
+  --color-surface-base: #ffffff;
+  --color-surface-overlay: rgba(255, 255, 255, 0.8);
+  --color-surface-elevated: #ffffff;
+
+  /* Background variants */
+  --color-bg-primary: #f6f8fa;
+  --color-bg-secondary: #f6f8fa;
+  --color-bg-muted: #f6f8fa;
+  --color-bg-accent: #f6f8fa;
+  --color-bg-destructive: #ffebe9;
+
+  /* Foreground variants */
+  --color-fg-primary: #24292f;
+  --color-fg-secondary: #57606a;
+  --color-fg-muted: #6e7781;
+  --color-fg-accent: #0969da;
+
+  /* Border variants */
+  --color-border-primary: #d0d7de;
+  --color-border-secondary: #d8dee4;
+  --color-border-muted: #eaeef2;
+  --color-border-accent: #0969da;
+  --color-border-destructive: #cf222e;
+
   /* Color Palette */
   --color-primary: #2563eb;
   --color-primary-dark: #1d4ed8;
@@ -185,4 +218,44 @@
   --z-index-modal: 1000;
   --z-index-popover: 1100;
   --z-index-tooltip: 1200;
+}
+
+/* Dark mode overrides for design tokens */
+[data-theme="dark"] {
+  --color-bg-base: #0d1117;
+  --color-fg-base: #e6edf3;
+  --color-fg-inverted: #0d1117;
+  --color-border-base: #30363d;
+  --color-ring-base: #58a6ff;
+
+  /* Surface colors */
+  --color-surface-base: #161b22;
+  --color-surface-overlay: rgba(22, 27, 34, 0.8);
+  --color-surface-elevated: #21262d;
+
+  /* Background variants */
+  --color-bg-primary: #0d1117;
+  --color-bg-secondary: #161b22;
+  --color-bg-muted: #21262d;
+  --color-bg-accent: #388bfd26;
+  --color-bg-destructive: #f8514926;
+
+  /* Foreground variants */
+  --color-fg-primary: #e6edf3;
+  --color-fg-secondary: #8b949e;
+  --color-fg-muted: #6e7681;
+  --color-fg-accent: #58a6ff;
+
+  /* Border variants */
+  --color-border-primary: #30363d;
+  --color-border-secondary: #21262d;
+  --color-border-muted: #21262d;
+  --color-border-accent: #58a6ff;
+  --color-border-destructive: #f85149;
+
+  /* Primary color */
+  --color-primary: #58a6ff;
+  --color-primary-dark: #388bfd;
+  --color-primary-light: #79b8ff;
+  --color-primary-very-light: #1f6feb26;
 }

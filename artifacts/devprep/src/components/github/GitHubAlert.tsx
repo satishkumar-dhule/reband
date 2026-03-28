@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 type AlertType = 'info' | 'success' | 'warning' | 'error';
 
@@ -13,30 +13,78 @@ interface GitHubAlertProps {
   style?: React.CSSProperties;
 }
 
-const alertStyles: Record<AlertType, { bg: string; border: string; icon: string; title: string }> = {
+const alertStyles: Record<AlertType, { 
+  bg: string; 
+  border: string; 
+  icon: string; 
+  title: string;
+  content: string;
+}> = {
   info: {
     bg: '#ddf4ff',
     border: '#54aeff',
     icon: 'ℹ️',
     title: '#0969da',
+    content: '#24292f',
   },
   success: {
     bg: '#dafbe1',
     border: '#54c754',
     icon: '✓',
     title: '#1a7f37',
+    content: '#24292f',
   },
   warning: {
     bg: '#fff8c5',
     border: '#d4a72c',
     icon: '⚠',
     title: '#9a6700',
+    content: '#24292f',
   },
   error: {
     bg: '#ffebe9',
     border: '#ff818266',
     icon: '✕',
     title: '#cf222e',
+    content: '#24292f',
+  },
+};
+
+// Dark mode alert styles
+const darkAlertStyles: Record<AlertType, { 
+  bg: string; 
+  border: string; 
+  icon: string; 
+  title: string;
+  content: string;
+}> = {
+  info: {
+    bg: '#388bfd26',
+    border: '#58a6ff',
+    icon: 'ℹ️',
+    title: '#58a6ff',
+    content: '#e6edf3',
+  },
+  success: {
+    bg: '#23863626',
+    border: '#3fb950',
+    icon: '✓',
+    title: '#3fb950',
+    content: '#e6edf3',
+  },
+  warning: {
+    bg: '#d2992226',
+    border: '#d29922',
+    icon: '⚠',
+    title: '#d29922',
+    content: '#e6edf3',
+  },
+  error: {
+    bg: '#f8514926',
+    border: '#f85149',
+    icon: '✕',
+    title: '#f85149',
+    content: '#e6edf3',
   },
 };
 
@@ -72,7 +120,36 @@ export const GitHubAlert: React.FC<GitHubAlertProps> = ({
   style,
 }) => {
   const [isDismissed, setIsDismissed] = useState(false);
-  const styles = alertStyles[type];
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Detect dark mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const isDark = document.documentElement.classList.contains('dark') || 
+                     document.documentElement.getAttribute('data-theme') === 'dark' ||
+                     window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setIsDarkMode(isDark);
+    };
+    
+    checkDarkMode();
+    
+    // Listen for theme changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class', 'data-theme'] 
+    });
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', checkDarkMode);
+    
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', checkDarkMode);
+    };
+  }, []);
+
+  const styles = isDarkMode ? darkAlertStyles[type] : alertStyles[type];
 
   if (isDismissed) return null;
 
@@ -111,7 +188,7 @@ export const GitHubAlert: React.FC<GitHubAlertProps> = ({
         )}
         <div style={{
           fontSize: '14px',
-          color: '#24292f',
+          color: styles.content,
           lineHeight: '1.5',
         }}>
           {children}

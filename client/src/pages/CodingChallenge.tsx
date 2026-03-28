@@ -967,9 +967,9 @@ export default function CodingChallenge() {
                 <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/10 flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                      <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                      <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                      <div className="w-3 h-3 rounded-full bg-[var(--gh-danger-fg)]/80" />
+                      <div className="w-3 h-3 rounded-full bg-[var(--gh-attention-fg)]/80" />
+                      <div className="w-3 h-3 rounded-full bg-[var(--gh-success-fg)]/80" />
                     </div>
                     <span className="text-xs text-muted-foreground font-mono ml-2">
                       {language === 'javascript' ? 'solution.js' : 'solution.py'}
@@ -1195,9 +1195,9 @@ export default function CodingChallenge() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                      className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4"
+                      className="w-20 h-20 rounded-full bg-[var(--gh-success-subtle)] flex items-center justify-center mx-auto mb-4"
                     >
-                      <Trophy className="w-10 h-10 text-green-500" />
+                      <Trophy className="w-10 h-10 text-[var(--gh-success-fg)]" />
                     </motion.div>
                     <h2 className="text-2xl font-bold mb-2">🎉 Challenge Complete!</h2>
                     <p className="text-muted-foreground mb-4">

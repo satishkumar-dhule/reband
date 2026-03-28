@@ -186,7 +186,7 @@ export default function ReviewSessionOptimized() {
         description="Spaced repetition review with checkpoint tests"
       />
 
-      <div className="min-h-screen min-h-dvh bg-gradient-to-br from-background via-background to-green-500/5 flex flex-col">
+      <div className="min-h-screen min-h-dvh bg-[var(--gh-canvas)] flex flex-col">
         {/* Minimal Header - NO REDUNDANCY */}
         <motion.header 
           className="h-12 bg-card/90 backdrop-blur-xl border-b border-border/50 flex items-center px-3 gap-3 shrink-0"
@@ -201,7 +201,7 @@ export default function ReviewSessionOptimized() {
             <ChevronLeft className="w-5 h-5" />
           </motion.button>
           
-          <Brain className="w-4 h-4 text-green-500" />
+          <Brain className="w-4 h-4 text-[var(--gh-success-fg)]" />
           <h1 className="font-bold text-sm">SRS Review</h1>
           
           <div className="flex-1" />
@@ -210,9 +210,9 @@ export default function ReviewSessionOptimized() {
           {dueCards.length > 0 && sessionState !== 'completed' && (
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium">{reviewedCount}/{dueCards.length}</span>
-              <div className="w-16 h-1.5 bg-secondary rounded-full overflow-hidden">
+              <div className="w-16 h-1.5 bg-[var(--gh-neutral-subtle)] rounded-full overflow-hidden">
                 <motion.div 
-                  className="h-full bg-gradient-to-r from-green-500 to-emerald-500" 
+                  className="h-full bg-gradient-to-r from-[var(--gh-success-emphasis)] to-[var(--gh-success-fg)]" 
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
                 />
@@ -224,10 +224,10 @@ export default function ReviewSessionOptimized() {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="flex items-center gap-1 px-2 py-0.5 bg-purple-500/20 rounded-lg"
+              className="flex items-center gap-1 px-2 py-0.5 bg-[var(--gh-done-subtle)] rounded-lg"
             >
-              <Zap className="w-3 h-3 text-purple-400" />
-              <span className="text-xs font-bold text-purple-400">{sessionXP}</span>
+              <Zap className="w-3 h-3 text-[var(--gh-done-fg)]" />
+              <span className="text-xs font-bold text-[var(--gh-done-fg)]">{sessionXP}</span>
             </motion.div>
           )}
         </motion.header>
@@ -244,7 +244,7 @@ export default function ReviewSessionOptimized() {
             >
               <div className="text-center">
                 <motion.div 
-                  className="w-10 h-10 border-2 border-green-500 border-t-transparent rounded-full mx-auto mb-3"
+                  className="w-10 h-10 border-2 border-[var(--gh-success-emphasis)] border-t-transparent rounded-full mx-auto mb-3"
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                 />
@@ -269,7 +269,7 @@ export default function ReviewSessionOptimized() {
                     <motion.button
                       onClick={() => handleTagClick(currentCard.channel)}
                       whileTap={{ scale: 0.95 }}
-                      className="px-2 py-0.5 bg-cyan-500/20 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/30 hover:bg-cyan-500/30 transition-colors cursor-pointer"
+                      className="px-2 py-0.5 bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)] text-xs font-semibold rounded-full border border-[var(--gh-accent-fg)]/30 hover:opacity-80 transition-colors cursor-pointer"
                     >
                       {currentCard.channel}
                     </motion.button>
@@ -278,9 +278,9 @@ export default function ReviewSessionOptimized() {
                       whileTap={{ scale: 0.95 }}
                       className={cn(
                         "px-2 py-0.5 text-xs font-semibold rounded-full border hover:opacity-80 transition-opacity cursor-pointer",
-                        currentCard.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                        currentCard.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                        'bg-red-500/20 text-red-400 border-red-500/30'
+                        currentCard.difficulty === 'beginner' ? 'bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] border-[var(--gh-success-fg)]/30' :
+                        currentCard.difficulty === 'intermediate' ? 'bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)] border-[var(--gh-attention-fg)]/30' :
+                        'bg-[var(--gh-danger-subtle)] text-[var(--gh-danger-fg)] border-[var(--gh-danger-fg)]/30'
                       )}
                     >
                       {currentCard.difficulty}
@@ -290,7 +290,7 @@ export default function ReviewSessionOptimized() {
                         key={idx}
                         onClick={() => handleTagClick(tag)}
                         whileTap={{ scale: 0.95 }}
-                        className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-xs font-semibold rounded-full border border-purple-500/30 hover:bg-purple-500/30 transition-colors cursor-pointer"
+                        className="px-2 py-0.5 bg-[var(--gh-done-subtle)] text-[var(--gh-done-fg)] text-xs font-semibold rounded-full border border-[var(--gh-done-fg)]/30 hover:opacity-80 transition-colors cursor-pointer"
                       >
                         {tag}
                       </motion.button>
@@ -311,20 +311,20 @@ export default function ReviewSessionOptimized() {
                     >
                       {/* TLDR - COMPACT */}
                       {currentQuestion.tldr && (
-                        <div className="p-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                        <div className="p-2 bg-[var(--gh-accent-subtle)] border border-[var(--gh-accent-fg)]/30 rounded-lg">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <Zap className="w-3 h-3 text-cyan-400" />
-                            <span className="text-xs font-bold text-cyan-400">TL;DR</span>
+                            <Zap className="w-3 h-3 text-[var(--gh-accent-fg)]" />
+                            <span className="text-xs font-bold text-[var(--gh-accent-fg)]">TL;DR</span>
                           </div>
                           <p className="text-sm text-foreground/90">{currentQuestion.tldr}</p>
                         </div>
                       )}
 
                       {/* Answer - COMPACT with Markdown */}
-                      <div className="p-2 bg-green-500/10 border border-green-500/30 rounded-lg">
+                      <div className="p-2 bg-[var(--gh-success-subtle)] border border-[var(--gh-success-fg)]/30 rounded-lg">
                         <div className="flex items-center gap-1.5 mb-1">
-                          <Check className="w-3 h-3 text-green-400" />
-                          <span className="text-xs font-bold text-green-400">ANSWER</span>
+                          <Check className="w-3 h-3 text-[var(--gh-success-fg)]" />
+                          <span className="text-xs font-bold text-[var(--gh-success-fg)]">ANSWER</span>
                         </div>
                         <div className="prose prose-invert prose-sm max-w-none text-sm">
                           <ReactMarkdown
@@ -344,7 +344,7 @@ export default function ReviewSessionOptimized() {
                                         className="absolute top-1 right-1 p-1.5 rounded-lg bg-secondary/80 hover:bg-secondary transition-all opacity-0 group-hover:opacity-100 z-10"
                                       >
                                         {copiedCode === codeId ? (
-                                          <Check className="w-3 h-3 text-green-400" />
+                                          <Check className="w-3 h-3 text-[var(--gh-success-fg)]" />
                                         ) : (
                                           <Copy className="w-3 h-3" />
                                         )}
@@ -381,10 +381,10 @@ export default function ReviewSessionOptimized() {
 
                       {/* Explanation - COMPACT with Markdown */}
                       {currentQuestion.explanation && (
-                        <div className="p-2 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                        <div className="p-2 bg-[var(--gh-attention-subtle)] border border-[var(--gh-attention-fg)]/30 rounded-lg">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <Brain className="w-3 h-3 text-orange-400" />
-                            <span className="text-xs font-bold text-orange-400">EXPLANATION</span>
+                            <Brain className="w-3 h-3 text-[var(--gh-attention-fg)]" />
+                            <span className="text-xs font-bold text-[var(--gh-attention-fg)]">EXPLANATION</span>
                           </div>
                           <div className="prose prose-invert prose-sm max-w-none text-xs">
                             <ReactMarkdown
@@ -456,7 +456,7 @@ export default function ReviewSessionOptimized() {
                     whileTap={{ scale: 0.98 }}
                     className="w-full p-4 text-center"
                   >
-                    <div className="flex items-center justify-center gap-2 text-green-400">
+                    <div className="flex items-center justify-center gap-2 text-[var(--gh-success-fg)]">
                       <Eye className="w-5 h-5" />
                       <span className="font-semibold">Tap to reveal answer</span>
                     </div>
@@ -469,10 +469,10 @@ export default function ReviewSessionOptimized() {
                     </p>
                     <div className="grid grid-cols-4 gap-2">
                       {[
-                        { rating: 'again' as ConfidenceRating, label: 'Again', color: 'from-red-500 to-red-600', icon: X },
-                        { rating: 'hard' as ConfidenceRating, label: 'Hard', color: 'from-orange-500 to-orange-600', icon: Brain },
-                        { rating: 'good' as ConfidenceRating, label: 'Good', color: 'from-green-500 to-green-600', icon: Check },
-                        { rating: 'easy' as ConfidenceRating, label: 'Easy', color: 'from-blue-500 to-blue-600', icon: Zap },
+                        { rating: 'again' as ConfidenceRating, label: 'Again', color: 'from-[var(--gh-danger-emphasis)] to-[var(--gh-danger-fg)]', icon: X },
+                        { rating: 'hard' as ConfidenceRating, label: 'Hard', color: 'from-[var(--gh-attention-emphasis)] to-[var(--gh-attention-fg)]', icon: Brain },
+                        { rating: 'good' as ConfidenceRating, label: 'Good', color: 'from-[var(--gh-success-emphasis)] to-[var(--gh-success-fg)]', icon: Check },
+                        { rating: 'easy' as ConfidenceRating, label: 'Easy', color: 'from-[var(--gh-accent-emphasis)] to-[var(--gh-accent-fg)]', icon: Zap },
                       ].map((btn) => {
                         const Icon = btn.icon;
                         return (
@@ -586,11 +586,11 @@ function CheckpointTest({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col bg-gradient-to-br from-background via-background to-amber-500/5"
+      className="flex-1 flex flex-col bg-[var(--gh-canvas)]"
     >
       {/* Header */}
-      <div className="h-12 bg-card/90 backdrop-blur-xl border-b border-border/50 flex items-center px-3 gap-3">
-        <Target className="w-4 h-4 text-amber-500" />
+      <div className="h-12 bg-[var(--gh-canvas-overlay)]/90 backdrop-blur-xl border-b border-[var(--gh-border)]/50 flex items-center px-3 gap-3">
+        <Target className="w-4 h-4 text-[var(--gh-attention-fg)]" />
         <h1 className="font-bold text-sm">Checkpoint Test</h1>
         <div className="flex-1" />
         <span className="text-xs font-medium">{answeredCount}/{totalQuestions}</span>
@@ -603,11 +603,11 @@ function CheckpointTest({
             <div className="mb-3">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs text-muted-foreground">Q{currentQuestionIndex + 1}/{totalQuestions}</span>
-                <span className="text-xs font-bold text-amber-500">Score: {score}/{answeredCount}</span>
+                <span className="text-xs font-bold text-[var(--gh-attention-fg)]">Score: {score}/{answeredCount}</span>
               </div>
-              <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+              <div className="h-1.5 bg-[var(--gh-neutral-subtle)] rounded-full overflow-hidden">
                 <motion.div 
-                  className="h-full bg-gradient-to-r from-amber-500 to-orange-500" 
+                  className="h-full bg-gradient-to-r from-[var(--gh-attention-emphasis)] to-[var(--gh-attention-fg)]" 
                   animate={{ width: `${(answeredCount / totalQuestions) * 100}%` }}
                 />
               </div>
@@ -618,10 +618,10 @@ function CheckpointTest({
               key={currentQuestionIndex}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-card/90 border border-border/50 rounded-xl p-3 mb-3"
+              className="bg-[var(--gh-canvas-overlay)]/90 border border-[var(--gh-border)]/50 rounded-xl p-3 mb-3"
             >
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-0.5 bg-cyan-500/20 text-cyan-400 text-xs font-semibold rounded-full">
+                <span className="px-2 py-0.5 bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)] text-xs font-semibold rounded-full">
                   {currentCard.channel}
                 </span>
               </div>
@@ -634,11 +634,11 @@ function CheckpointTest({
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="p-2 bg-green-500/10 border border-green-500/30 rounded-lg"
+                  className="p-2 bg-[var(--gh-success-subtle)] border border-[var(--gh-success-fg)]/30 rounded-lg"
                 >
                   <div className="flex items-center gap-1.5 mb-1">
-                    <Check className="w-3 h-3 text-green-400" />
-                    <span className="text-xs font-bold text-green-400">ANSWER</span>
+                    <Check className="w-3 h-3 text-[var(--gh-success-fg)]" />
+                    <span className="text-xs font-bold text-[var(--gh-success-fg)]">ANSWER</span>
                   </div>
                   <div className="prose prose-invert prose-sm max-w-none text-sm">
                     <ReactMarkdown
@@ -701,7 +701,7 @@ function CheckpointTest({
                 <motion.button
                   onClick={() => handleAnswer(false)}
                   whileTap={{ scale: 0.95 }}
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg min-h-[56px]"
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-gradient-to-br from-[var(--gh-danger-emphasis)] to-[var(--gh-danger-fg)] text-[var(--gh-fg-on-emphasis)] shadow-lg min-h-[56px]"
                 >
                   <X className="w-5 h-5" />
                   <span className="text-sm font-semibold">Don't Remember</span>
@@ -710,7 +710,7 @@ function CheckpointTest({
                 <motion.button
                   onClick={() => handleAnswer(true)}
                   whileTap={{ scale: 0.95 }}
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg min-h-[56px]"
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-gradient-to-br from-[var(--gh-success-emphasis)] to-[var(--gh-success-fg)] text-[var(--gh-fg-on-emphasis)] shadow-lg min-h-[56px]"
                 >
                   <Check className="w-5 h-5" />
                   <span className="text-sm font-semibold">Remember</span>
@@ -726,15 +726,15 @@ function CheckpointTest({
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', duration: 0.8 }}
-              className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-4"
+              className="w-16 h-16 rounded-full bg-[var(--gh-attention-subtle)] flex items-center justify-center mx-auto mb-4"
             >
-              <Trophy className="w-8 h-8 text-amber-500" />
+              <Trophy className="w-8 h-8 text-[var(--gh-attention-fg)]" />
             </motion.div>
 
             <h2 className="text-xl font-bold mb-2">Checkpoint Complete!</h2>
             
-            <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-xl mb-4">
-              <div className="text-3xl font-bold text-green-400 mb-1">
+            <div className="p-4 bg-[var(--gh-success-subtle)] border border-[var(--gh-success-fg)]/30 rounded-xl mb-4">
+              <div className="text-3xl font-bold text-[var(--gh-success-fg)] mb-1">
                 {score}/{totalQuestions}
               </div>
               <p className="text-sm text-muted-foreground">
@@ -748,7 +748,7 @@ function CheckpointTest({
             <motion.button
               onClick={() => onComplete(score)}
               whileTap={{ scale: 0.95 }}
-              className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-bold shadow-lg"
+              className="w-full py-3 bg-gradient-to-r from-[var(--gh-attention-emphasis)] to-[var(--gh-attention-fg)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-bold shadow-lg"
             >
               Continue Reviewing
             </motion.button>
@@ -785,16 +785,16 @@ function CompletedScreen({
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', duration: 0.8 }}
-          className="w-20 h-20 rounded-full bg-yellow-400/20 flex items-center justify-center mx-auto mb-4 relative"
+          className="w-20 h-20 rounded-full bg-[var(--gh-attention-subtle)] flex items-center justify-center mx-auto mb-4 relative"
         >
-          <Trophy className="w-10 h-10 text-yellow-500" />
+          <Trophy className="w-10 h-10 text-[var(--gh-attention-fg)]" />
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: [0, 1.2, 1] }}
             transition={{ delay: 0.5 }}
             className="absolute -top-1 -right-1"
           >
-            <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+            <Star className="w-5 h-5 text-[var(--gh-attention-fg)] fill-[var(--gh-attention-fg)]" />
           </motion.div>
         </motion.div>
 
@@ -807,19 +807,19 @@ function CompletedScreen({
         </p>
 
         {sessionXP > 0 && (
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 rounded-full mb-4">
-            <Zap className="w-5 h-5 text-purple-400" />
-            <span className="text-lg font-bold text-purple-400">+{sessionXP} XP</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--gh-done-subtle)] rounded-full mb-4">
+            <Zap className="w-5 h-5 text-[var(--gh-done-fg)]" />
+            <span className="text-lg font-bold text-[var(--gh-done-fg)]">+{sessionXP} XP</span>
           </div>
         )}
 
         {totalReviewed > 0 && (
-          <div className="grid grid-cols-4 gap-2 mb-4 p-3 bg-secondary/30 rounded-xl">
+          <div className="grid grid-cols-4 gap-2 mb-4 p-3 bg-[var(--gh-neutral-subtle)]/30 rounded-xl">
             {[
-              { label: 'Again', value: stats.again, color: 'text-red-500' },
-              { label: 'Hard', value: stats.hard, color: 'text-orange-500' },
-              { label: 'Good', value: stats.good, color: 'text-green-500' },
-              { label: 'Easy', value: stats.easy, color: 'text-blue-500' },
+              { label: 'Again', value: stats.again, color: 'text-[var(--gh-danger-fg)]' },
+              { label: 'Hard', value: stats.hard, color: 'text-[var(--gh-attention-fg)]' },
+              { label: 'Good', value: stats.good, color: 'text-[var(--gh-success-fg)]' },
+              { label: 'Easy', value: stats.easy, color: 'text-[var(--gh-accent-fg)]' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className={cn('text-lg font-bold', stat.color)}>{stat.value}</div>
@@ -831,8 +831,8 @@ function CompletedScreen({
 
         {srsStats.reviewStreak > 0 && (
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Flame className="w-5 h-5 text-orange-500" />
-            <span className="text-sm font-bold text-orange-500">
+            <Flame className="w-5 h-5 text-[var(--gh-attention-fg)]" />
+            <span className="text-sm font-bold text-[var(--gh-attention-fg)]">
               {srsStats.reviewStreak} day streak!
             </span>
           </div>
@@ -841,7 +841,7 @@ function CompletedScreen({
         <motion.button
           onClick={onGoHome}
           whileTap={{ scale: 0.95 }}
-          className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold shadow-lg"
+          className="w-full py-3 bg-gradient-to-r from-[var(--gh-success-emphasis)] to-[var(--gh-success-fg)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-bold shadow-lg"
         >
           Back to Home
         </motion.button>

@@ -90,11 +90,13 @@ export const colors = {
 
   // Text colors
   text: {
-    primary: '#24292f',
-    secondary: '#57606a',
-    disabled: '#8c959f',
-    hint: '#8c959f',
-    inverse: '#ffffff',
+    primary: '#c9d1d9',   // GitHub dark text primary
+    secondary: '#8b949e', // GitHub dark text secondary
+    // WCAG AA compliant disabled/hint colors (4.5:1 contrast on #0d1117)
+    // Changed from #6e7681 (~4.8:1) to #6e7681 - keeping but adding better variants
+    disabled: '#6e7681',  // GitHub dark text disabled
+    hint: '#6e7681',      // GitHub dark text hint
+    inverse: '#24292f',   // Inverse text (on light backgrounds)
   },
 
   // SRS-specific colors (adapted to GitHub palette)

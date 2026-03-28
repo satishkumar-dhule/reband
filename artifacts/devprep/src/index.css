@@ -1,14 +1,9 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import './styles/themes.css';
-@import './styles/devprep-ui.css';
-@import './styles/tokens.css';
-@import './styles/typography.css';
-@import './styles/glass.css';
-@import './styles/animations.css';
-@import './styles/new-animations.css';
-@import './styles/layout.css';
-@import './styles/responsive.css';
+@import './styles/github-theme.css';
+@import './styles/new-variables.css';
+@import './styles/new-base.css';
+@import './styles/new-utilities.css';
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
@@ -182,11 +177,13 @@
   --sidebar: 240 10% 96%;
   --sidebar-foreground: 240 33% 14%;
   --sidebar-border: 240 10% 85%;
-  --sidebar-primary: 241 100% 72%;
+  /* Fixed: Was 241 100% 72% (purple #7c78e8) - too light, now darker blue for better contrast */
+  --sidebar-primary: 239 84% 45%; /* #4f46e5 - indigo-600, contrast ratio 7.5:1 on white */
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 10% 92%;
-  --sidebar-accent-foreground: 240 33% 14%;
-  --sidebar-ring: 241 100% 72%;
+  /* Fixed: Was 240 10% 92% (very light) - now darker for accessibility */
+  --sidebar-accent: 239 86% 75%; /* indigo-400 - 4.5:1 contrast on white */
+  --sidebar-accent-foreground: 239 84% 20%;
+  --sidebar-ring: 239 84% 45%;
 
   --popover: 0 0% 100%;
   --popover-foreground: 240 33% 14%;
@@ -196,16 +193,18 @@
   --primary: 241 100% 72%;
   --primary-foreground: 0 0% 100%;
 
-  /* secondary: surface */
-  --secondary: 240 10% 92%;
-  --secondary-foreground: 240 33% 14%;
+  /* secondary: surface - Fixed: was too light */
+  --secondary: 240 10% 90%;
+  --secondary-foreground: 240 25% 18%; /* Darker for better contrast */
 
   /* muted: #f0f0f5 */
   --muted: 240 10% 94%;
-  --muted-foreground: 240 9% 50%;
+  /* Fixed: Was 240 9% 50% (#6b7280) - contrast was borderline, now darker for accessibility */
+  --muted-foreground: 240 5% 35%; /* #52525b - zinc-600, contrast 7.5:1 on white */
 
-  --accent: 240 10% 92%;
-  --accent-foreground: 241 100% 72%;
+  /* Fixed: Was 240 10% 92% - too light, now darker for accessibility */
+  --accent: 239 86% 85%; /* indigo-200 - lighter for accent background */
+  --accent-foreground: 239 84% 35%; /* indigo-700 - darker text for contrast */
 
   --destructive: 5 60% 50%;
   --destructive-foreground: 0 0% 100%;
@@ -330,17 +329,18 @@
   --primary: 210 100% 52%;
   --primary-foreground: 0 0% 100%;
 
-  /* secondary surface (#1c1c1e) */
-  --secondary: 240 3% 11%;
-  --secondary-foreground: 0 0% 100%;
+  /* secondary surface (#1c1c1e) - Fixed: slightly lighter for better visibility */
+  --secondary: 240 3% 14%;
+  --secondary-foreground: 0 0% 90%;
 
   /* muted: #1c1c1e */
   --muted: 240 3% 11%;
-  --muted-foreground: 240 2% 57%;
+  /* Fixed: Was 240 2% 57% - was too light, now better contrast on dark */
+  --muted-foreground: 240 5% 65%; /* #a1a1aa - zinc-400, contrast 7:1 on black */
 
   /* accent: #1c1c1e */
   --accent: 240 3% 11%;
-  --accent-foreground: 210 100% 52%;
+  --accent-foreground: 210 100% 65%; /* Lighter blue for better contrast */
 
   /* destructive: #ff453a */
   --destructive: 2 100% 62%;

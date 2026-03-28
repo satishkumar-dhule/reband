@@ -267,7 +267,7 @@ export default function CodingChallengeGenZ() {
               <Button
                 variant="default"
                 size="sm"
-                className="bg-[var(--gh-success-emphasis)] hover:bg-green-700 text-white gap-2 h-8"
+                className="bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-emphasis)]/80 text-white gap-2 h-8"
                 onClick={runCode}
                 disabled={isRunning}
               >
@@ -362,7 +362,7 @@ export default function CodingChallengeGenZ() {
                   <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={copyCode}>
                     {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   </Button>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50" onClick={resetCode}>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[var(--gh-danger-fg)] hover:bg-[var(--gh-danger-subtle)]" onClick={resetCode}>
                     <RotateCcw className="w-3.5 h-3.5" />
                   </Button>
                 </div>
@@ -389,7 +389,7 @@ export default function CodingChallengeGenZ() {
                     <span className="text-xs font-medium text-[var(--gh-fg-muted)] uppercase tracking-wider">Test Results</span>
                     {testResults.length > 0 && (
                       <Badge variant="outline" className={`ml-2 h-5 px-1.5 text-[10px] ${
-                        testResults.every(r => r.passed) ? "bg-green-100 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-200"
+                        testResults.every(r => r.passed) ? "bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] border-[var(--gh-success-fg)]/30" : "bg-[var(--gh-danger-subtle)] text-[var(--gh-danger-fg)] border-[var(--gh-danger-fg)]/30"
                       }`}>
                         {testResults.filter(r => r.passed).length}/{testResults.length} Passed
                       </Badge>
@@ -432,13 +432,13 @@ export default function CodingChallengeGenZ() {
                                   <p className="text-[var(--gh-fg-muted)] mb-1 uppercase text-[9px] font-bold">Expected</p>
                                   <p className="text-[var(--gh-fg)]">{testCase?.expectedOutput || 'N/A'}</p>
                                 </div>
-                                <div className={`col-span-full p-2 rounded border ${result.passed ? 'bg-green-100/20' : 'bg-red-100/20 border-red-200/40'}`}>
+                                <div className={`col-span-full p-2 rounded border ${result.passed ? 'bg-[var(--gh-success-subtle)]/30' : 'bg-[var(--gh-danger-subtle)]/30 border-[var(--gh-danger-fg)]/30'}`}>
                                   <p className="text-[var(--gh-fg-muted)] mb-1 uppercase text-[9px] font-bold">Actual Output</p>
                                   <p className={result.passed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}>{result.actualOutput}</p>
                                 </div>
                               </div>
                               {!result.passed && result.error && (
-                                <div className="mt-3 p-2 bg-red-100/30 border border-red-200/40 rounded text-[11px] font-mono text-red-600">
+                                <div className="mt-3 p-2 bg-[var(--gh-danger-subtle)]/30 border border-[var(--gh-danger-fg)]/30 rounded text-[11px] font-mono text-[var(--gh-danger-fg)]">
                                   <p className="font-bold mb-1 uppercase text-[9px]">Error Message</p>
                                   {result.error}
                                 </div>
@@ -448,19 +448,19 @@ export default function CodingChallengeGenZ() {
                         })}
 
                         {testResults.every(r => r.passed) && currentChallenge.complexity && (
-                          <div className="mt-6 p-4 bg-blue-50/30 border border-blue-200/50 rounded-md">
-                            <h4 className="text-sm font-bold text-blue-700 mb-2 flex items-center gap-2">
+                          <div className="mt-6 p-4 bg-[var(--gh-accent-subtle)]/30 border border-[var(--gh-accent-fg)]/30 rounded-md">
+                            <h4 className="text-sm font-bold text-[var(--gh-accent-fg)] mb-2 flex items-center gap-2">
                               <Sparkles className="w-4 h-4" />
                               Complexity Analysis
                             </h4>
                             <div className="grid grid-cols-2 gap-4">
                               <div className="space-y-1">
-                                <p className="text-[10px] text-blue-600 uppercase font-bold">Time Complexity</p>
-                                <p className="text-sm font-mono text-blue-800">{currentChallenge.complexity.time}</p>
+                                <p className="text-[10px] text-[var(--gh-accent-fg)] uppercase font-bold">Time Complexity</p>
+                                <p className="text-sm font-mono text-[var(--gh-fg)]">{currentChallenge.complexity.time}</p>
                               </div>
                               <div className="space-y-1">
-                                <p className="text-[10px] text-blue-600 uppercase font-bold">Space Complexity</p>
-                                <p className="text-sm font-mono text-blue-800">{currentChallenge.complexity.space}</p>
+                                <p className="text-[10px] text-[var(--gh-accent-fg)] uppercase font-bold">Space Complexity</p>
+                                <p className="text-sm font-mono text-[var(--gh-fg)]">{currentChallenge.complexity.space}</p>
                               </div>
                             </div>
                           </div>
@@ -504,7 +504,7 @@ export default function CodingChallengeGenZ() {
                 </Button>
                 <Button
                   onClick={() => startRandom('easy')}
-                  className="bg-[var(--gh-success-emphasis)] hover:bg-green-700 text-white"
+                  className="bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-emphasis)]/80 text-white"
                 >
                   <Play className="w-4 h-4 mr-2" />
                   Quick Start
@@ -522,7 +522,7 @@ export default function CodingChallengeGenZ() {
               ].map((stat, i) => (
                 <Card key={i} className="bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)]/50">
                   <CardContent className="p-4 flex items-center gap-4">
-                    <div className={`p-2 rounded-md bg-white border ${stat.color}`}>
+                    <div className={`p-2 rounded-md bg-[var(--gh-canvas)] border ${stat.color}`}>
                       <stat.icon className="w-5 h-5" />
                     </div>
                     <div>

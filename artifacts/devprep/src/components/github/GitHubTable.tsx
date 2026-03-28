@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 export interface Column<T> {
   key: keyof T | string;
@@ -26,22 +26,70 @@ export interface GitHubTableProps<T extends Record<string, unknown>> {
   style?: React.CSSProperties;
 }
 
-const cellStyles: React.CSSProperties = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-  fontSize: '14px',
-  color: '#24292f',
-  padding: '12px 16px',
-  borderBottom: '1px solid #d0d7de',
-};
-
-const headerStyles: React.CSSProperties = {
-  ...cellStyles,
-  fontWeight: 600,
-  backgroundColor: '#f6f8fa',
-  fontSize: '12px',
-  color: '#57606a',
-  textTransform: 'uppercase',
-  letterSpacing: '0.5px',
+// Theme-aware colors
+const tableColors = {
+  light: {
+    cell: {
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+      fontSize: '14px',
+      color: '#24292f',
+      padding: '12px 16px',
+      borderBottom: '1px solid #d0d7de',
+    },
+    header: {
+      fontWeight: 600,
+      backgroundColor: '#f6f8fa',
+      fontSize: '12px',
+      color: '#57606a',
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.5px',
+    },
+    pagination: {
+      borderTop: '1px solid #d0d7de',
+      backgroundColor: '#f6f8fa',
+      textColor: '#57606a',
+      buttonBorder: '#d0d7de',
+      buttonBg: '#fff',
+      buttonText: '#24292f',
+      buttonDisabled: '#8c959f',
+      activeButtonBg: '#0969da',
+      activeButtonText: '#fff',
+    },
+    empty: '#57606a',
+    striped: '#f6f8fa',
+    hover: '#eaeef2',
+  },
+  dark: {
+    cell: {
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+      fontSize: '14px',
+      color: '#e6edf3',
+      padding: '12px 16px',
+      borderBottom: '1px solid #30363d',
+    },
+    header: {
+      fontWeight: 600,
+      backgroundColor: '#161b22',
+      fontSize: '12px',
+      color: '#8b949e',
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.5px',
+    },
+    pagination: {
+      borderTop: '1px solid #30363d',
+      backgroundColor: '#161b22',
+      textColor: '#8b949e',
+      buttonBorder: '#30363d',
+      buttonBg: '#21262d',
+      buttonText: '#c9d1d9',
+      buttonDisabled: '#484f58',
+      activeButtonBg: '#238636',
+      activeButtonText: '#ffffff',
+    },
+    empty: '#8b949e',
+    striped: '#161b22',
+    hover: '#21262d',
+  },
 };
 
 export function GitHubTable<T extends Record<string, unknown>>({
@@ -54,8 +102,39 @@ export function GitHubTable<T extends Record<string, unknown>>({
   emptyMessage = 'No data available',
   style,
 }: GitHubTableProps<T>) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const rowPadding = size === 'sm' ? '8px 16px' : '12px 16px';
   const totalPages = pagination ? Math.ceil(pagination.total / pagination.pageSize) : 1;
+
+  // Detect dark mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const isDark = document.documentElement.classList.contains('dark') || 
+                     document.documentElement.getAttribute('data-theme') === 'dark' ||
+                     window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setIsDarkMode(isDark);
+    };
+    
+    checkDarkMode();
+    
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class', 'data-theme'] 
+    });
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', checkDarkMode);
+    
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', checkDarkMode);
+    };
+  }, []);
+
+  const colors = isDarkMode ? tableColors.dark : tableColors.light;
+  const cellStyles = { ...colors.cell };
+  const headerStyles = { ...colors.header };
 
   const renderPagination = () => {
     if (!pagination) return null;
@@ -63,6 +142,7 @@ export function GitHubTable<T extends Record<string, unknown>>({
     const { page, pageSize, total, onPageChange } = pagination;
     const startItem = (page - 1) * pageSize + 1;
     const endItem = Math.min(page * pageSize, total);
+    const p = colors.pagination;
 
     return (
       <div style={{
@@ -70,12 +150,12 @@ export function GitHubTable<T extends Record<string, unknown>>({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '16px',
-        borderTop: '1px solid #d0d7de',
-        backgroundColor: '#f6f8fa',
+        borderTop: p.borderTop,
+        backgroundColor: p.backgroundColor,
       }}>
         <span style={{
           fontSize: '14px',
-          color: '#57606a',
+          color: p.textColor,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
         }}>
           {startItem}–{endItem} of {total} results
@@ -86,10 +166,10 @@ export function GitHubTable<T extends Record<string, unknown>>({
             disabled={page === 1}
             style={{
               padding: '6px 12px',
-              border: '1px solid #d0d7de',
+              border: `1px solid ${p.buttonBorder}`,
               borderRadius: '6px',
-              backgroundColor: '#fff',
-              color: page === 1 ? '#8c959f' : '#24292f',
+              backgroundColor: p.buttonBg,
+              color: page === 1 ? p.buttonDisabled : p.buttonText,
               cursor: page === 1 ? 'not-allowed' : 'pointer',
               fontSize: '14px',
               fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
@@ -109,16 +189,17 @@ export function GitHubTable<T extends Record<string, unknown>>({
               }
             }
             if (pageNum > totalPages) return null;
+            const isActive = page === pageNum;
             return (
               <button
                 key={pageNum}
                 onClick={() => onPageChange(pageNum)}
                 style={{
                   padding: '6px 12px',
-                  border: '1px solid #d0d7de',
+                  border: `1px solid ${p.buttonBorder}`,
                   borderRadius: '6px',
-                  backgroundColor: page === pageNum ? '#0969da' : '#fff',
-                  color: page === pageNum ? '#fff' : '#24292f',
+                  backgroundColor: isActive ? p.activeButtonBg : p.buttonBg,
+                  color: isActive ? p.activeButtonText : p.buttonText,
                   cursor: 'pointer',
                   fontSize: '14px',
                   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
@@ -133,10 +214,10 @@ export function GitHubTable<T extends Record<string, unknown>>({
             disabled={page === totalPages}
             style={{
               padding: '6px 12px',
-              border: '1px solid #d0d7de',
+              border: `1px solid ${p.buttonBorder}`,
               borderRadius: '6px',
-              backgroundColor: '#fff',
-              color: page === totalPages ? '#8c959f' : '#24292f',
+              backgroundColor: p.buttonBg,
+              color: page === totalPages ? p.buttonDisabled : p.buttonText,
               cursor: page === totalPages ? 'not-allowed' : 'pointer',
               fontSize: '14px',
               fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
@@ -151,7 +232,7 @@ export function GitHubTable<T extends Record<string, unknown>>({
   };
 
   return (
-    <div style={{ border: '1px solid #d0d7de', borderRadius: '6px', overflow: 'hidden', ...style }}>
+    <div style={{ border: `1px solid ${isDarkMode ? '#30363d' : '#d0d7de'}`, borderRadius: '6px', overflow: 'hidden', ...style }}>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
@@ -178,7 +259,7 @@ export function GitHubTable<T extends Record<string, unknown>>({
                   style={{
                     ...cellStyles,
                     textAlign: 'center',
-                    color: '#57606a',
+                    color: colors.empty,
                     padding: '32px 16px',
                   }}
                 >
@@ -190,17 +271,17 @@ export function GitHubTable<T extends Record<string, unknown>>({
                 <tr
                   key={rowIndex}
                   style={{
-                    backgroundColor: striped && rowIndex % 2 === 1 ? '#f6f8fa' : 'transparent',
+                    backgroundColor: striped && rowIndex % 2 === 1 ? colors.striped : 'transparent',
                     transition: 'background-color 0.15s ease',
                   }}
                   onMouseEnter={(e) => {
                     if (hoverable) {
-                      e.currentTarget.style.backgroundColor = striped && rowIndex % 2 === 1 ? '#eaeef2' : '#f6f8fa';
+                      e.currentTarget.style.backgroundColor = colors.hover;
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (hoverable) {
-                      e.currentTarget.style.backgroundColor = striped && rowIndex % 2 === 1 ? '#f6f8fa' : 'transparent';
+                      e.currentTarget.style.backgroundColor = striped && rowIndex % 2 === 1 ? colors.striped : 'transparent';
                     }
                   }}
                 >

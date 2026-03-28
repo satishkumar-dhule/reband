@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 type InputSize = 'sm' | 'md';
 
@@ -10,6 +10,30 @@ interface GitHubInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
 }
+
+// Theme-aware colors
+const inputColors = {
+  light: {
+    border: '#d0d7de',
+    bg: '#ffffff',
+    text: '#24292f',
+    icon: '#57606a',
+    placeholder: '#8c959f',
+    focus: 'rgba(9, 105, 218, 0.3)',
+    errorBorder: '#cf222e',
+    errorFocus: 'rgba(207, 34, 46, 0.15)',
+  },
+  dark: {
+    border: '#30363d',
+    bg: '#0d1117',
+    text: '#e6edf3',
+    icon: '#8b949e',
+    placeholder: '#6e7681',
+    focus: 'rgba(88, 166, 255, 0.3)',
+    errorBorder: '#f85149',
+    errorFocus: 'rgba(248, 81, 73, 0.15)',
+  },
+};
 
 const sizeStyles: Record<InputSize, React.CSSProperties> = {
   sm: {
@@ -24,22 +48,6 @@ const sizeStyles: Record<InputSize, React.CSSProperties> = {
   },
 };
 
-const baseStyles: React.CSSProperties = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-  border: '1px solid #d0d7de',
-  borderRadius: '6px',
-  outline: 'none',
-  backgroundColor: '#fff',
-  color: '#24292f',
-  width: '100%',
-  boxSizing: 'border-box',
-  transition: 'box-shadow 0.2s ease',
-};
-
-const focusStyles: React.CSSProperties = {
-  boxShadow: '0 0 0 3px rgba(9, 105, 218, 0.3)',
-};
-
 export const GitHubInput = React.forwardRef<HTMLInputElement, GitHubInputProps>(
   ({ 
     inputSize = 'md', 
@@ -49,10 +57,55 @@ export const GitHubInput = React.forwardRef<HTMLInputElement, GitHubInputProps>(
     style,
     ...props 
   }, ref) => {
-    const [isFocused, setIsFocused] = React.useState(false);
+    const [isFocused, setIsFocused] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+    // Detect dark mode
+    useEffect(() => {
+      const checkDarkMode = () => {
+        const isDark = document.documentElement.classList.contains('dark') || 
+                       document.documentElement.getAttribute('data-theme') === 'dark' ||
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setIsDarkMode(isDark);
+      };
+      
+      checkDarkMode();
+      
+      const observer = new MutationObserver(checkDarkMode);
+      observer.observe(document.documentElement, { 
+        attributes: true, 
+        attributeFilter: ['class', 'data-theme'] 
+      });
+      
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      mediaQuery.addEventListener('change', checkDarkMode);
+      
+      return () => {
+        observer.disconnect();
+        mediaQuery.removeEventListener('change', checkDarkMode);
+      };
+    }, []);
+
+    const colors = isDarkMode ? inputColors.dark : inputColors.light;
+    
+    const baseStyles: React.CSSProperties = {
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+      border: `1px solid ${colors.border}`,
+      borderRadius: '6px',
+      outline: 'none',
+      backgroundColor: colors.bg,
+      color: colors.text,
+      width: '100%',
+      boxSizing: 'border-box',
+      transition: 'box-shadow 0.2s ease',
+    };
+
+    const focusStyles: React.CSSProperties = {
+      boxShadow: `0 0 0 3px ${colors.focus}`,
+    };
 
     const validationStyles = validation === 'error' 
-      ? { borderColor: '#cf222e', boxShadow: '0 0 0 3px rgba(207, 34, 46, 0.15)' }
+      ? { borderColor: colors.errorBorder, boxShadow: `0 0 0 3px ${colors.errorFocus}` }
       : {};
 
     const containerStyle: React.CSSProperties = {
@@ -78,7 +131,7 @@ export const GitHubInput = React.forwardRef<HTMLInputElement, GitHubInputProps>(
           <span style={{
             position: 'absolute',
             left: '12px',
-            color: '#57606a',
+            color: colors.icon,
             display: 'flex',
             alignItems: 'center',
             pointerEvents: 'none',
@@ -103,7 +156,7 @@ export const GitHubInput = React.forwardRef<HTMLInputElement, GitHubInputProps>(
           <span style={{
             position: 'absolute',
             right: '12px',
-            color: '#57606a',
+            color: colors.icon,
             display: 'flex',
             alignItems: 'center',
           }}>

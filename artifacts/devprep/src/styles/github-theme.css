@@ -26,9 +26,10 @@
   /* Text Colors */
   --gh-text-primary: #1f2328;
   --gh-text-secondary: #656d76;
-  --gh-text-muted: #8b949e;
-  --gh-text-placeholder: #8b949e;
-  --gh-text-disabled: #8b949e;
+  /* WCAG AA compliant muted text - Changed from #8b949e (~2.85:1) to #586069 (~6.5:1) */
+  --gh-text-muted: #586069;
+  --gh-text-placeholder: #586069;
+  --gh-text-disabled: #586069;
   
   /* Semantic Colors */
   --gh-success: #1a7f37;

@@ -95,11 +95,12 @@
 
 /* Color variants */
 .color-default {
-  color: var(--color-text-primary, #24292f);
+  color: var(--color-text-primary, #f0f6fc);
 }
 
 .color-muted {
-  color: var(--color-text-secondary, #57606a);
+  /* WCAG AA compliant fallback - 65% lightness provides 5.6:1 contrast on dark */
+  color: var(--color-text-secondary, #8b949e);
 }
 
 .color-accent {

@@ -68,7 +68,7 @@ export function AppLayout({
           {/* Mobile menu trigger */}
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-md text-[hsl(0_0%_85%)] hover:text-white transition-colors"
+            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-md text-[var(--sidebar-foreground)] hover:text-[var(--primary)] transition-colors"
             aria-label="Open menu"
             data-testid="button-mobile-menu"
           >
@@ -83,22 +83,22 @@ export function AppLayout({
             >
               <Brain className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
             </div>
-            <span className="font-semibold text-sm text-[hsl(0_0%_90%)]">DevPrep</span>
+            <span className="font-semibold text-sm text-[var(--sidebar-foreground)]">DevPrep</span>
           </div>
 
           {/* Search */}
           <button
             onClick={() => setSearchOpen(true)}
-            className="hidden sm:flex flex-1 max-w-xs items-center gap-2 h-7 px-3 rounded-md border text-sm text-[hsl(0_0%_60%)] hover:text-[hsl(0_0%_80%)] hover:border-[hsl(215_14%_35%)] transition-colors"
+            className="hidden sm:flex flex-1 max-w-xs items-center gap-2 h-7 px-3 rounded-md border text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--primary)] transition-colors"
             style={{
-              backgroundColor: "hsl(215 22% 12%)",
-              borderColor: "hsl(215 14% 28%)",
+              backgroundColor: "var(--popover)",
+              borderColor: "var(--border)",
             }}
             data-testid="button-search"
           >
             <Search className="w-3.5 h-3.5 shrink-0" />
             <span className="flex-1 text-left">Search...</span>
-            <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono border border-[hsl(215_14%_32%)] text-[hsl(0_0%_50%)]">
+            <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono border border-[var(--border)] text-[var(--muted-foreground)]">
               /
             </kbd>
           </button>

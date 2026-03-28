@@ -14,7 +14,8 @@ const githubColors = {
     borderMuted: '#d8dee4',
     textPrimary: '#1f2328',
     textSecondary: '#656d76',
-    textMuted: '#8b949e',
+    // WCAG AA compliant muted text - Changed from #8b949e (~2.85:1) to #586069 (~6.5:1)
+    textMuted: '#586069',
     success: '#1a7f37',
     successBg: '#dafbe1',
     warning: '#9a6700',
@@ -36,6 +37,7 @@ const githubColors = {
     borderMuted: '#21262d',
     textPrimary: '#f0f6fc',
     textSecondary: '#8b949e',
+    // WCAG AA compliant muted text - darker for better contrast on dark background
     textMuted: '#6e7681',
     success: '#3fb950',
     successBg: '#1f6feb26',

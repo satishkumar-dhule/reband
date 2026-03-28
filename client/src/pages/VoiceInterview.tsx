@@ -358,18 +358,18 @@ export default function VoiceInterview() {
   // Unsupported browser
   if (!isSpeechSupported) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center p-4">
         <div className="max-w-md text-center">
-          <div className="w-20 h-20 rounded-2xl bg-[#d29922]/20 flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-10 h-10 text-[#d29922]" />
+          <div className="w-20 h-20 rounded-2xl bg-[var(--gh-attention-fg)]/20 flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-10 h-10 text-[var(--gh-attention-fg)]" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-3">Browser Not Supported</h1>
-          <p className="text-[#8b949e] mb-6">
+          <h1 className="text-2xl font-bold text-[var(--gh-fg)] mb-3">Browser Not Supported</h1>
+          <p className="text-[var(--gh-fg-muted)] mb-6">
             Voice interview requires the Web Speech API. Please use Chrome, Edge, or Safari.
           </p>
           <button
             onClick={() => setLocation('/')}
-            className="px-6 py-3 bg-[#238636] text-white font-medium rounded-xl hover:bg-[#2ea043] transition-colors"
+            className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-medium rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors"
           >
             Go Home
           </button>
@@ -381,12 +381,12 @@ export default function VoiceInterview() {
   // Loading
   if (state === 'loading' || questions.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#58a6ff]/20 flex items-center justify-center mx-auto mb-4">
-            <Loader2 className="w-8 h-8 animate-spin text-[#58a6ff]" />
+          <div className="w-16 h-16 rounded-2xl bg-[var(--gh-accent-fg)]/20 flex items-center justify-center mx-auto mb-4">
+            <Loader2 className="w-8 h-8 animate-spin text-[var(--gh-accent-fg)]" />
           </div>
-          <p className="text-[#8b949e]">Loading interview questions...</p>
+          <p className="text-[var(--gh-fg-muted)]">Loading interview questions...</p>
         </div>
       </div>
     );
@@ -395,16 +395,16 @@ export default function VoiceInterview() {
   // Error state
   if (error && !currentQuestion) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center p-4">
         <div className="max-w-md text-center">
-          <div className="w-20 h-20 rounded-2xl bg-[#f85149]/20 flex items-center justify-center mx-auto mb-6">
-            <XCircle className="w-10 h-10 text-[#f85149]" />
+          <div className="w-20 h-20 rounded-2xl bg-[var(--gh-danger-fg)]/20 flex items-center justify-center mx-auto mb-6">
+            <XCircle className="w-10 h-10 text-[var(--gh-danger-fg)]" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-3">Error</h1>
-          <p className="text-[#8b949e] mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-[var(--gh-fg)] mb-3">Error</h1>
+          <p className="text-[var(--gh-fg-muted)] mb-6">{error}</p>
           <button
             onClick={() => setLocation('/')}
-            className="px-6 py-3 bg-[#238636] text-white font-medium rounded-xl hover:bg-[#2ea043] transition-colors"
+            className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-medium rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors"
           >
             Go Home
           </button>
@@ -425,25 +425,25 @@ export default function VoiceInterview() {
 
       <DesktopSidebarWrapper>
       {/* iPhone 13 FIX: Ensure content fits within viewport with safe areas */}
-      <div className="min-h-screen bg-[#0d1117] text-[#e6edf3] overflow-x-hidden w-full">
+      <div className="min-h-screen bg-[var(--gh-canvas)] text-[var(--gh-fg)] overflow-x-hidden w-full">
         {/* Header - COMPACT */}
-        <header className="sticky top-0 z-50 border-b border-[#30363d] bg-[#0d1117]/95 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]/95 backdrop-blur-md">
           <div className="max-w-4xl mx-auto px-3 h-14 flex items-center justify-between w-full" style={{ maxWidth: '100vw' }}>
             <div className="flex items-center gap-3">
               <button
                 onClick={exitInterview}
-                className="p-1.5 hover:bg-[#21262d] rounded-lg transition-colors"
+                className="p-1.5 hover:bg-[var(--gh-canvas-subtle)] rounded-lg transition-colors"
                 title="Exit and save progress"
               >
-                <Home className="w-4 h-4 text-[#8b949e]" />
+                <Home className="w-4 h-4 text-[var(--gh-fg-muted)]" />
               </button>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#f85149] to-[#ff7b72] flex items-center justify-center">
-                  <Mic className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--gh-danger-emphasis)] to-[var(--gh-danger-fg)] flex items-center justify-center">
+                  <Mic className="w-4 h-4 text-[var(--gh-fg-on-emphasis)]" />
                 </div>
                 <div>
-                  <h1 className="font-semibold text-white text-sm">Voice Interview</h1>
-                  <p className="text-[10px] text-[#8b949e]">
+                  <h1 className="font-semibold text-[var(--gh-fg)] text-sm">Voice Interview</h1>
+                  <p className="text-[10px] text-[var(--gh-fg-muted)]">
                     Q{currentIndex + 1}/{questions.length}
                   </p>
                 </div>
@@ -453,16 +453,16 @@ export default function VoiceInterview() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setLocation('/voice-session')}
-                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[#21262d] text-[#8b949e] hover:text-white rounded-lg border border-[#30363d] hover:border-[#58a6ff]/50 transition-all"
+                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] rounded-lg border border-[var(--gh-border)] hover:border-[var(--gh-accent-fg)]/50 transition-all"
               >
                 <Target className="w-3.5 h-3.5" />
                 Sessions
               </button>
               <CreditsDisplay compact onClick={() => setLocation('/profile')} />
               <span className={`px-2 py-0.5 text-[10px] font-medium rounded-lg ${
-                currentQuestion?.difficulty === 'beginner' ? 'bg-[#238636]/20 text-[#3fb950]' :
-                currentQuestion?.difficulty === 'intermediate' ? 'bg-[#d29922]/20 text-[#d29922]' :
-                'bg-[#f85149]/20 text-[#f85149]'
+                currentQuestion?.difficulty === 'beginner' ? 'bg-[var(--gh-success-fg)]/20 text-[var(--gh-success-fg)]' :
+                currentQuestion?.difficulty === 'intermediate' ? 'bg-[var(--gh-attention-fg)]/20 text-[var(--gh-attention-fg)]' :
+                'bg-[var(--gh-danger-fg)]/20 text-[var(--gh-danger-fg)]'
               }`}>
                 {currentQuestion?.difficulty}
               </span>
@@ -478,11 +478,11 @@ export default function VoiceInterview() {
           
           {/* Progress Bar */}
           <div className="max-w-4xl mx-auto px-3 pb-2 w-full" style={{ maxWidth: '100vw' }}>
-            <div className="h-1 bg-[#21262d] rounded-full overflow-hidden">
+            <div className="h-1 bg-[var(--gh-canvas-inset)] rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
-                className="h-full bg-gradient-to-r from-[#58a6ff] to-[#a371f7] rounded-full"
+                className="h-full bg-gradient-to-r from-[var(--gh-accent-fg)] to-[var(--gh-done-fg)] rounded-full"
               />
             </div>
           </div>
@@ -495,20 +495,20 @@ export default function VoiceInterview() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl border border-[#30363d] bg-[#161b22] overflow-hidden mb-6 w-full"
+            className="rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden mb-6 w-full"
             style={{ maxWidth: '100%' }}
           >
             <div className="p-6">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex items-start gap-4 flex-1">
-                  <div className="p-2.5 rounded-xl bg-[#58a6ff]/10 flex-shrink-0">
-                    <MessageSquare className="w-5 h-5 text-[#58a6ff]" />
+                  <div className="p-2.5 rounded-xl bg-[var(--primary)]/10 flex-shrink-0">
+                    <MessageSquare className="w-5 h-5 text-[var(--primary)]" />
                   </div>
-                  <h2 className="text-lg font-medium text-white leading-relaxed">{currentQuestion?.question}</h2>
+                  <h2 className="text-lg font-medium text-[var(--foreground)] leading-relaxed">{currentQuestion?.question}</h2>
                 </div>
                 <button
                   onClick={goToOriginalQuestion}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#8b949e] hover:text-[#58a6ff] hover:bg-[#21262d] rounded-lg transition-colors flex-shrink-0"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[var(--muted-foreground)] hover:text-[var(--primary)] hover:bg-[var(--muted)] rounded-lg transition-colors flex-shrink-0"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">View Details</span>
@@ -516,15 +516,15 @@ export default function VoiceInterview() {
               </div>
               
               {/* Question Controls */}
-              <div className="flex items-center justify-between pt-4 border-t border-[#30363d]/50">
+              <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]/50">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-[#6e7681] font-mono">Q{currentIndex + 1}/{questions.length}</span>
+                  <span className="text-xs text-[var(--muted-foreground)] font-mono">Q{currentIndex + 1}/{questions.length}</span>
                   
                   {/* Actions Dropdown */}
                   <div className="relative">
                     <button
                       onClick={() => setShowActions(!showActions)}
-                      className="p-1.5 text-[#6e7681] hover:text-white hover:bg-[#21262d] rounded-lg transition-colors"
+                      className="p-1.5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] rounded-lg transition-colors"
                     >
                       <MoreHorizontal className="w-4 h-4" />
                     </button>
@@ -535,12 +535,12 @@ export default function VoiceInterview() {
                           initial={{ opacity: 0, y: -5 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -5 }}
-                          className="absolute left-0 top-full mt-1 bg-[#161b22] border border-[#30363d] rounded-xl shadow-xl py-1 z-10 min-w-[160px]"
+                          className="absolute left-0 top-full mt-1 bg-[var(--popover)] border border-[var(--border)] rounded-xl shadow-xl py-1 z-10 min-w-[160px]"
                         >
                           <button
                             onClick={previousQuestion}
                             disabled={currentIndex === 0}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors disabled:opacity-30"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors disabled:opacity-30"
                           >
                             <ChevronLeft className="w-4 h-4" />
                             Previous
