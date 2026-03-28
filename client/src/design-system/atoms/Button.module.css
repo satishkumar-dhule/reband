@@ -32,7 +32,7 @@
 
 /* Focus styles for accessibility */
 .button:focus-visible {
-  outline: 2px solid var(--color-primary-500, #2196F3);
+  outline: 2px solid var(--color-primary-500, #0969da);
   outline-offset: 2px;
 }
 
@@ -43,38 +43,38 @@
 
 /* Variant styles */
 .variant-primary {
-  background-color: var(--color-primary-500, #2196F3);
+  background-color: var(--color-primary-500, #0969da);
   color: var(--color-primary-contrastText, #FFFFFF);
-  border-color: var(--color-primary-500, #2196F3);
+  border-color: var(--color-primary-500, #0969da);
 }
 
 .variant-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-600, #1E88E5);
-  border-color: var(--color-primary-600, #1E88E5);
+  background-color: var(--color-primary-600, #0550ae);
+  border-color: var(--color-primary-600, #0550ae);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+  box-shadow: 0 4px 8px rgba(9, 105, 218, 0.2);
 }
 
 .variant-primary:active:not(:disabled) {
-  background-color: var(--color-primary-700, #1976D2);
-  border-color: var(--color-primary-700, #1976D2);
+  background-color: var(--color-primary-700, #033d8b);
+  border-color: var(--color-primary-700, #033d8b);
   transform: translateY(0);
   box-shadow: none;
 }
 
 .variant-secondary {
   background-color: transparent;
-  color: var(--color-primary-500, #2196F3);
-  border-color: var(--color-primary-500, #2196F3);
+  color: var(--color-primary-500, #0969da);
+  border-color: var(--color-primary-500, #0969da);
 }
 
 .variant-secondary:hover:not(:disabled) {
-  background-color: var(--color-primary-50, #E3F2FD);
-  border-color: var(--color-primary-600, #1E88E5);
+  background-color: var(--color-primary-50, #ddf4ff);
+  border-color: var(--color-primary-600, #0550ae);
 }
 
 .variant-secondary:active:not(:disabled) {
-  background-color: var(--color-primary-100, #BBDEFB);
+  background-color: var(--color-primary-100, #b6e3ff);
 }
 
 .variant-ghost {
@@ -113,19 +113,19 @@
 
 /* Rating type specific styles */
 .rating-again {
-  --rating-color: var(--color-srs-again, #F44336);
+  --rating-color: var(--color-srs-again, #cf222e);
 }
 
 .rating-hard {
-  --rating-color: var(--color-srs-hard, #FF9800);
+  --rating-color: var(--color-srs-hard, #d29922);
 }
 
 .rating-good {
-  --rating-color: var(--color-srs-good, #4CAF50);
+  --rating-color: var(--color-srs-good, #2da44e);
 }
 
 .rating-easy {
-  --rating-color: var(--color-srs-easy, #2196F3);
+  --rating-color: var(--color-srs-easy, #0969da);
 }
 
 /* Size variants */
@@ -216,35 +216,35 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .button {
-    background-color: var(--color-neutral-800, #424242);
+    background-color: var(--color-neutral-800, #32383f);
     color: var(--color-text-inverse, #FFFFFF);
   }
 
   .variant-primary {
-    background-color: var(--color-primary-500, #2196F3);
+    background-color: var(--color-primary-500, #0969da);
     color: var(--color-primary-contrastText, #FFFFFF);
   }
 
   .variant-primary:hover:not(:disabled) {
-    background-color: var(--color-primary-400, #42A5F5);
+    background-color: var(--color-primary-400, #218bff);
   }
 
   .variant-secondary {
     background-color: transparent;
-    color: var(--color-primary-300, #64B5F6);
-    border-color: var(--color-primary-300, #64B5F6);
+    color: var(--color-primary-300, #54aeff);
+    border-color: var(--color-primary-300, #54aeff);
   }
 
   .variant-secondary:hover:not(:disabled) {
-    background-color: var(--color-primary-900, rgba(33, 150, 243, 0.1));
+    background-color: var(--color-primary-900, rgba(9, 105, 218, 0.1));
   }
 
   .variant-ghost:hover:not(:disabled) {
-    background-color: var(--color-neutral-700, #616161);
+    background-color: var(--color-neutral-700, #424a53);
   }
 
   .variant-ghost:active:not(:disabled) {
-    background-color: var(--color-neutral-600, #757575);
+    background-color: var(--color-neutral-600, #57606a);
   }
 }
 

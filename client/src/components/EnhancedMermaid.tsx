@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, lazy, Suspense } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ZoomIn, ZoomOut, Maximize2, Move, Palette } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
@@ -25,13 +25,15 @@ async function loadMermaid() {
 
 let currentMermaidTheme: MermaidTheme | null = null;
 
-function initMermaid(mermaidTheme: MermaidTheme, force = false) {
+async function initMermaid(mermaidTheme: MermaidTheme, force = false) {
   if (currentMermaidTheme === mermaidTheme && !force) return;
+  
+  const mermaidModule = await loadMermaid();
   const isMobile = window.innerWidth < 640;
   const config = mermaidThemeConfigs[mermaidTheme];
 
   try {
-    mermaid.initialize({
+    mermaidModule.initialize({
       startOnLoad: false,
       ...config,
       securityLevel: 'loose',
@@ -255,7 +257,8 @@ export function EnhancedMermaid({ chart, compact = false, onRenderResult }: Enha
       try {
         await new Promise(resolve => setTimeout(resolve, 50));
         if (cancelled) return;
-        const { svg } = await mermaid.render(id, cleanChart);
+        const mermaidModule = await loadMermaid();
+        const { svg } = await mermaidModule.render(id, cleanChart);
         if (!cancelled && currentRenderId === renderIdRef.current) {
           setSvgContent(svg);
           setError(null);

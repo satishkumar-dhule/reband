@@ -44,8 +44,8 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
   const debouncedQuery = useDebounce(query, 150);
   
   // Apply focus trapping to both mobile and desktop modals
-  useFocusTrap(mobileContainerRef as RefObject<HTMLElement>, { enabled: isOpen, initialFocus: mobileInputRef, returnFocus: true });
-  useFocusTrap(desktopContainerRef, { enabled: isOpen, initialFocus: inputRef, returnFocus: true });
+  useFocusTrap(mobileContainerRef as RefObject<HTMLElement>, { enabled: isOpen, initialFocus: mobileInputRef as RefObject<HTMLElement>, returnFocus: true });
+  useFocusTrap(desktopContainerRef as RefObject<HTMLElement>, { enabled: isOpen, initialFocus: inputRef as RefObject<HTMLElement>, returnFocus: true });
 
   // Set initial query when modal opens
   useEffect(() => {

@@ -31,41 +31,79 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node-pnpm
 
-      - name: Fetch questions data
-        run: node script/fetch-questions-for-build.js
+      - name: Fetch and generate data (parallel)
+        run: |
+          echo "Starting parallel data fetching..."
+          
+          # Create log directory
+          mkdir -p logs
+          
+          # Start all data fetching/generation scripts in parallel with logging
+          node script/fetch-questions-for-build.js > logs/fetch-questions.log 2>&1 &
+          PID1=$!
+          echo "PID1: fetch-questions-for-build.js"
+          
+          node script/fetch-question-history.js > logs/fetch-history.log 2>&1 &
+          PID2=$!
+          echo "PID2: fetch-question-history.js"
+          
+          node script/generate-curated-paths.js > logs/generate-paths.log 2>&1 &
+          PID3=$!
+          echo "PID3: generate-curated-paths.js"
+          
+          node script/generate-rss.js > logs/generate-rss.log 2>&1 &
+          PID4=$!
+          echo "PID4: generate-rss.js"
+          
+          node script/generate-sitemap.js > logs/generate-sitemap.log 2>&1 &
+          PID5=$!
+          echo "PID5: generate-sitemap.js"
+          
+          node script/fetch-bot-monitor-data.js > logs/fetch-bot-monitor.log 2>&1 &
+          PID6=$!
+          echo "PID6: fetch-bot-monitor-data.js"
+          
+          # Wait for all background jobs and capture exit codes
+          FAILED_PIDS=""
+          for pid in $PID1 $PID2 $PID3 $PID4 $PID5 $PID6; do
+            if ! wait $pid; then
+              FAILED_PIDS="$FAILED_PIDS $pid"
+            fi
+          done
+          
+          if [ -n "$FAILED_PIDS" ]; then
+            echo "❌ The following data fetching scripts failed:$FAILED_PIDS"
+            echo ""
+            echo "Failure details:"
+            for pid in $FAILED_PIDS; do
+              case $pid in
+                $PID1) echo "- fetch-questions-for-build.js"; cat logs/fetch-questions.log ;;
+                $PID2) echo "- fetch-question-history.js"; cat logs/fetch-history.log ;;
+                $PID3) echo "- generate-curated-paths.js"; cat logs/generate-paths.log ;;
+                $PID4) echo "- generate-rss.js"; cat logs/generate-rss.log ;;
+                $PID5) echo "- generate-sitemap.js"; cat logs/generate-sitemap.log ;;
+                $PID6) echo "- fetch-bot-monitor-data.js"; cat logs/fetch-bot-monitor.log ;;
+              esac
+            done
+            exit 1
+          fi
+          
+          echo "✅ All data fetching scripts completed successfully"
+          echo "Logs available in logs/"
         env:
           TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
           TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
-      
-      - name: Fetch question history
-        run: node script/fetch-question-history.js
-        env:
-          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
-          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
-      
-      - name: Generate curated paths
-        run: node script/generate-curated-paths.js
-        env:
-          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
-          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
-      
-      - name: Generate RSS feed
-        run: node script/generate-rss.js
-        env:
-          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
-          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
-      
-      - name: Generate sitemap
-        run: node script/generate-sitemap.js
-        env:
-          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
-          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
-      
-      - name: Fetch bot monitor data
-        run: node script/fetch-bot-monitor-data.js
-        env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+
+      - name: Cache build output
+        uses: actions/cache@v4
+        with:
+          path: dist
+          key: ${{ runner.os }}-dist-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.{ts,tsx,js,jsx,json,css,html}') }}
+          restore-keys: |
+            ${{ runner.os }}-dist-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-dist-
 
       - name: Install Playwright (if not cached)
         run: |
@@ -192,3 +230,108 @@ jobs:
           echo "| Production | https://open-interview.github.io |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+
+  verify-deployment:
+    name: 🔍 Verify Production Deployment
+    needs: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for deployment to propagate
+        run: sleep 30
+      
+      - name: Verify site accessibility
+        run: |
+          echo "Checking if production site is accessible..."
+          
+          # Check main site
+          if ! curl -s --max-time 30 --retry 3 --retry-delay 5 "https://open-interview.github.io" > /dev/null; then
+            echo "❌ Production site is not accessible"
+            exit 1
+          fi
+          
+          # Check staging site
+          if ! curl -s --max-time 30 --retry 3 --retry-delay 5 "https://stage-open-interview.github.io" > /dev/null; then
+            echo "❌ Staging site is not accessible"
+            exit 1
+          fi
+          
+          echo "✅ Both sites are accessible"
+      
+      - name: Verify content integrity
+        run: |
+          echo "Checking for expected content..."
+          
+          # Check for expected elements in production
+          content=$(curl -s --max-time 30 "https://open-interview.github.io")
+          
+          # Check for common issues
+          if echo "$content" | grep -q "Error"; then
+            echo "❌ Site contains error messages"
+            exit 1
+          fi
+          
+          if echo "$content" | grep -q "404"; then
+            echo "❌ Site contains 404 references"
+            exit 1
+          fi
+          
+          echo "✅ Content integrity verified"
+      
+      - name: Verify critical pages
+        run: |
+          echo "Checking critical pages..."
+          
+          critical_pages=(
+            "https://open-interview.github.io"
+            "https://open-interview.github.io/practice"
+            "https://open-interview.github.io/learn"
+          )
+          
+          for page in "${critical_pages[@]}"; do
+            echo "Checking: $page"
+            if ! curl -s --max-time 30 --retry 2 --retry-delay 3 "$page" > /dev/null; then
+              echo "❌ Failed to access: $page"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All critical pages accessible"
+
+  rollback-preparation:
+    name: 🛡️ Prepare Rollback Plan
+    needs: production
+    runs-on: ubuntu-latest
+    if: always() && needs.production.result != 'skipped'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Generate rollback instructions
+        run: |
+          echo "## 🛡️ Rollback Plan" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**If deployment issues are detected:**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. **Manual Rollback:**" >> $GITHUB_STEP_SUMMARY
+          echo "   - Go to GitHub Actions" >> $GITHUB_STEP_SUMMARY
+          echo "   - Find the last successful deployment" >> $GITHUB_STEP_SUMMARY
+          echo "   - Re-run that workflow" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "2. **Git Rollback:**" >> $GITHUB_STEP_SUMMARY
+          echo "   \`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "   git revert ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "   git push" >> $GITHUB_STEP_SUMMARY
+          echo "   \`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Current Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment Time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Upload deployment metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-metadata-${{ github.sha }}
+          path: |
+            dist/**
+            !dist/node_modules
+          retention-days: 7

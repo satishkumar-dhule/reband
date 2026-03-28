@@ -3,6 +3,11 @@
  * 
  * Basic building blocks of the DevPrep design system.
  * Each atom is a primitive UI component with specific responsibilities.
+ * 
+ * @example
+ * ```tsx
+ * import { Button, Text, Icon, Badge } from '@/design-system/atoms';
+ * ```
  */
 
 // Button component
@@ -40,12 +45,12 @@ export type {
   MasteryLevel 
 } from './Badge';
 
-// Re-export all atoms as a collection
+// Re-export all atoms as a collection for convenience
 export const atoms = {
   Button: () => import('./Button'),
   Text: () => import('./Text'),
   Icon: () => import('./Icon'),
   Badge: () => import('./Badge'),
-};
+} as const;
 
 export default atoms;

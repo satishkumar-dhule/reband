@@ -178,15 +178,15 @@ function AnimatedGradientHeader() {
       {/* Dark base with gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-base-dark)] via-[var(--color-base-card)] to-[var(--color-base-darker)]" />
       
-      {/* Animated gradient orbs using design system colors */}
-      <div className="absolute inset-0 opacity-30">
+      {/* Animated gradient orbs using design system colors - responsive sizes */}
+      <div className="absolute inset-0 opacity-30 overflow-hidden">
         <motion.div 
           animate={{ 
             x: [0, 30, 0],
             y: [0, -20, 0],
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-0 -left-20 w-96 h-96 rounded-full blur-3xl" 
+          className="absolute top-0 -left-10 md:-left-15 lg:-left-20 w-48 h-48 md:w-64 md:h-64 lg:w-96 lg:h-96 rounded-full blur-2xl md:blur-3xl" 
           style={{ background: 'rgba(6, 182, 212, 0.3)' }}
         />
         <motion.div 
@@ -195,7 +195,7 @@ function AnimatedGradientHeader() {
             y: [0, 30, 0],
           }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-0 right-0 w-[30rem] h-[30rem] rounded-full blur-3xl" 
+          className="absolute bottom-0 right-0 w-64 h-64 md:w-80 md:h-80 lg:w-[30rem] lg:h-[30rem] rounded-full blur-2xl md:blur-3xl" 
           style={{ background: 'rgba(139, 92, 246, 0.2)' }}
         />
         <motion.div 
@@ -204,7 +204,7 @@ function AnimatedGradientHeader() {
             opacity: [0.3, 0.5, 0.3],
           }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-3xl" 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full blur-2xl md:blur-3xl" 
           style={{ background: 'rgba(236, 72, 153, 0.2)' }}
         />
       </div>
@@ -433,47 +433,49 @@ function CategoryTabs({
   ];
 
   return (
-    <div className="flex gap-3 mb-10 overflow-x-auto pb-3 scrollbar-hide">
-      {tabItems.map((tab) => {
-        const isSelected = selected === tab.id;
-        const count = tab.id ? counts[tab.id] : Object.values(counts).reduce((a, b) => a + b, 0);
-        const colors = tab.id ? categoryColors[tab.id] : null;
-        
-        return (
-          <motion.button
-            key={tab.id || 'all'}
-            whileHover={{ scale: 1.03, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => onChange(tab.id)}
-            className="relative px-6 py-3 rounded-2xl font-bold text-sm whitespace-nowrap transition-all"
-            style={{ 
-              background: isSelected 
-                ? 'linear-gradient(135deg, hsl(190, 100%, 50%) 0%, hsl(270, 100%, 65%) 100%)'
-                : 'hsl(0, 0%, 8%)',
-              border: `1px solid ${isSelected ? 'hsl(190, 100%, 50%, 0.5)' : 'hsl(0, 0%, 18%)'}`,
-              color: isSelected ? 'var(--foreground)' : 'hsl(0, 0%, 75%)',
-              boxShadow: isSelected ? '0 0 20px hsl(190, 100%, 50%, 0.3)' : '0 4px 12px rgba(0,0,0,0.2)'
-            }}
-          >
-            <span className="flex items-center gap-2.5">
-              <tab.icon 
-                className="w-4 h-4" 
-                style={{ color: isSelected ? 'var(--foreground)' : (colors?.text || 'hsl(0, 0%, 53%)') }} 
-              />
-              {tab.name}
-              <span 
-                className="px-2.5 py-0.5 rounded-full text-xs font-bold"
-                style={{ 
-                  background: isSelected ? 'rgba(255,255,255,0.2)' : 'hsl(0, 0%, 12%)',
-                  color: isSelected ? 'var(--foreground)' : 'hsl(0, 0%, 53%)'
-                }}
-              >
-                {count}
+    <div className="w-full max-w-full mb-10 overflow-x-auto pb-3 scrollbar-hide">
+      <div className="flex gap-3 min-w-max">
+        {tabItems.map((tab) => {
+          const isSelected = selected === tab.id;
+          const count = tab.id ? counts[tab.id] : Object.values(counts).reduce((a, b) => a + b, 0);
+          const colors = tab.id ? categoryColors[tab.id] : null;
+          
+          return (
+            <motion.button
+              key={tab.id || 'all'}
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => onChange(tab.id)}
+              className="relative px-4 md:px-6 py-3 rounded-2xl font-bold text-sm whitespace-nowrap transition-all"
+              style={{ 
+                background: isSelected 
+                  ? 'linear-gradient(135deg, hsl(190, 100%, 50%) 0%, hsl(270, 100%, 65%) 100%)'
+                  : 'hsl(0, 0%, 8%)',
+                border: `1px solid ${isSelected ? 'hsl(190, 100%, 50%, 0.5)' : 'hsl(0, 0%, 18%)'}`,
+                color: isSelected ? 'var(--foreground)' : 'hsl(0, 0%, 75%)',
+                boxShadow: isSelected ? '0 0 20px hsl(190, 100%, 50%, 0.3)' : '0 4px 12px rgba(0,0,0,0.2)'
+              }}
+            >
+              <span className="flex items-center gap-2.5">
+                <tab.icon 
+                  className="w-4 h-4" 
+                  style={{ color: isSelected ? 'var(--foreground)' : (colors?.text || 'hsl(0, 0%, 53%)') }} 
+                />
+                {tab.name}
+                <span 
+                  className="px-2.5 py-0.5 rounded-full text-xs font-bold"
+                  style={{ 
+                    background: isSelected ? 'rgba(255,255,255,0.2)' : 'hsl(0, 0%, 12%)',
+                    color: isSelected ? 'var(--foreground)' : 'hsl(0, 0%, 53%)'
+                  }}
+                >
+                  {count}
+                </span>
               </span>
-            </span>
-          </motion.button>
-        );
-      })}
+            </motion.button>
+          );
+        })}
+      </div>
     </div>
   );
 }

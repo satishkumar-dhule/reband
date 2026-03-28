@@ -95,23 +95,23 @@
 
 /* Color variants */
 .color-default {
-  color: var(--color-text-primary, rgba(0, 0, 0, 0.87));
+  color: var(--color-text-primary, #24292f);
 }
 
 .color-muted {
-  color: var(--color-text-secondary, rgba(0, 0, 0, 0.6));
+  color: var(--color-text-secondary, #57606a);
 }
 
 .color-accent {
-  color: var(--color-primary-500, #2196F3);
+  color: var(--color-primary-500, #0969da);
 }
 
 .color-error {
-  color: var(--color-semantic-error-main, #F44336);
+  color: var(--color-semantic-error-main, #cf222e);
 }
 
 .color-success {
-  color: var(--color-semantic-success-main, #4CAF50);
+  color: var(--color-semantic-success-main, #2da44e);
 }
 
 /* Truncate */
@@ -165,16 +165,16 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .color-default {
-    color: var(--color-text-primary, #FFFFFF);
+    color: var(--color-text-primary, #e6edf3);
   }
 
   .color-muted {
-    color: var(--color-text-secondary, rgba(255, 255, 255, 0.7));
+    color: var(--color-text-secondary, #8b949e);
   }
 
   .variant-code {
-    background-color: var(--color-neutral-800, #424242);
-    border-color: var(--color-neutral-700, #616161);
+    background-color: var(--color-neutral-800, #32383f);
+    border-color: var(--color-neutral-700, #424a53);
   }
 }
 
@@ -192,7 +192,7 @@
   }
 
   .color-muted {
-    color: var(--color-text-primary, rgba(0, 0, 0, 0.87));
+    color: var(--color-text-primary, #24292f);
   }
 }
 

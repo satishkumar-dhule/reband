@@ -4,11 +4,11 @@
  */
 
 export const typography = {
-  // Font families
+  // Font families (GitHub system fonts)
   fontFamily: {
-    primary: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    mono: '"JetBrains Mono", "Fira Code", "Consolas", "Monaco", monospace',
-    display: '"Inter", sans-serif',
+    primary: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+    mono: 'ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace',
+    display: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
   },
 
   // Font weights
@@ -63,42 +63,42 @@ export const typography = {
       fontWeight: 700,
       lineHeight: 1.25,
       letterSpacing: '-0.025em',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
     h2: {
       fontSize: '2.25rem',
       fontWeight: 600,
       lineHeight: 1.25,
       letterSpacing: '-0.025em',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
     h3: {
       fontSize: '1.875rem',
       fontWeight: 600,
       lineHeight: 1.375,
       letterSpacing: '-0.025em',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
     h4: {
       fontSize: '1.5rem',
       fontWeight: 600,
       lineHeight: 1.375,
       letterSpacing: '-0.025em',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
     h5: {
       fontSize: '1.25rem',
       fontWeight: 600,
       lineHeight: 1.5,
       letterSpacing: '0',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
     h6: {
       fontSize: '1.125rem',
       fontWeight: 600,
       lineHeight: 1.5,
       letterSpacing: '0',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
 
     // Body text
@@ -107,14 +107,14 @@ export const typography = {
       fontWeight: 400,
       lineHeight: 1.5,
       letterSpacing: '0',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
     body2: {
       fontSize: '0.875rem',
       fontWeight: 400,
       lineHeight: 1.5,
       letterSpacing: '0',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
 
     // Caption and small text
@@ -123,7 +123,7 @@ export const typography = {
       fontWeight: 400,
       lineHeight: 1.5,
       letterSpacing: '0',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
     overline: {
       fontSize: '0.75rem',
@@ -131,7 +131,7 @@ export const typography = {
       lineHeight: 1.5,
       letterSpacing: '0.05em',
       textTransform: 'uppercase',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
 
     // Code
@@ -140,14 +140,14 @@ export const typography = {
       fontWeight: 400,
       lineHeight: 1.5,
       letterSpacing: '0',
-      fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+      fontFamily: 'ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace',
     },
     pre: {
       fontSize: '0.875rem',
       fontWeight: 400,
       lineHeight: 1.5,
       letterSpacing: '0',
-      fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+      fontFamily: 'ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace',
     },
 
     // Buttons
@@ -157,7 +157,7 @@ export const typography = {
       lineHeight: 1.5,
       letterSpacing: '0.025em',
       textTransform: 'uppercase',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
 
     // Labels
@@ -166,7 +166,7 @@ export const typography = {
       fontWeight: 500,
       lineHeight: 1.5,
       letterSpacing: '0',
-      fontFamily: '"Inter", sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     },
   },
 

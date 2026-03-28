@@ -49,13 +49,13 @@
 
 /* Badge types */
 .type-xp {
-  background: linear-gradient(135deg, var(--color-primary-500, #2196F3) 0%, var(--color-primary-600, #1E88E5) 100%);
-  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+  background: linear-gradient(135deg, var(--color-primary-500, #0969da) 0%, var(--color-primary-600, #0550ae) 100%);
+  box-shadow: 0 2px 4px rgba(9, 105, 218, 0.3);
 }
 
 .type-level {
-  background: linear-gradient(135deg, var(--color-secondary-500, #E91E63) 0%, var(--color-secondary-600, #D81B60) 100%);
-  box-shadow: 0 2px 4px rgba(233, 30, 99, 0.3);
+  background: linear-gradient(135deg, var(--color-secondary-500, #8250df) 0%, var(--color-secondary-600, #6639ba) 100%);
+  box-shadow: 0 2px 4px rgba(130, 80, 223, 0.3);
 }
 
 .type-mastery {
@@ -63,13 +63,13 @@
 }
 
 .type-streak {
-  background: linear-gradient(135deg, var(--color-semantic-warning-main, #FF9800) 0%, var(--color-semantic-warning-dark, #F57C00) 100%);
-  box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
+  background: linear-gradient(135deg, var(--color-semantic-warning-main, #d29922) 0%, var(--color-semantic-warning-dark, #9a6700) 100%);
+  box-shadow: 0 2px 4px rgba(210, 153, 34, 0.3);
 }
 
 .type-notification {
-  background: linear-gradient(135deg, var(--color-semantic-error-main, #F44336) 0%, var(--color-semantic-error-dark, #D32F2F) 100%);
-  box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+  background: linear-gradient(135deg, var(--color-semantic-error-main, #cf222e) 0%, var(--color-semantic-error-dark, #a40e26) 100%);
+  box-shadow: 0 2px 4px rgba(207, 34, 46, 0.3);
 }
 
 /* Icon styles */
@@ -140,7 +140,7 @@
 
 /* Focus styles for accessibility */
 .badge:focus-visible {
-  outline: 2px solid var(--color-primary-500, #2196F3);
+  outline: 2px solid var(--color-primary-500, #0969da);
   outline-offset: 2px;
 }
 
@@ -151,19 +151,19 @@
   }
 
   .type-xp {
-    background: linear-gradient(135deg, var(--color-primary-400, #42A5F5) 0%, var(--color-primary-500, #2196F3) 100%);
+    background: linear-gradient(135deg, var(--color-primary-400, #218bff) 0%, var(--color-primary-500, #0969da) 100%);
   }
 
   .type-level {
-    background: linear-gradient(135deg, var(--color-secondary-400, #EC407A) 0%, var(--color-secondary-500, #E91E63) 100%);
+    background: linear-gradient(135deg, var(--color-secondary-400, #bc8cff) 0%, var(--color-secondary-500, #8250df) 100%);
   }
 
   .type-streak {
-    background: linear-gradient(135deg, var(--color-semantic-warning-light, #FFB74D) 0%, var(--color-semantic-warning-main, #FF9800) 100%);
+    background: linear-gradient(135deg, var(--color-semantic-warning-light, #fff8c5) 0%, var(--color-semantic-warning-main, #d29922) 100%);
   }
 
   .type-notification {
-    background: linear-gradient(135deg, var(--color-semantic-error-light, #E57373) 0%, var(--color-semantic-error-main, #F44336) 100%);
+    background: linear-gradient(135deg, var(--color-semantic-error-light, #ffebe9) 0%, var(--color-semantic-error-main, #cf222e) 100%);
   }
 }
 
@@ -188,6 +188,7 @@
 
   .badge:focus-visible {
     outline-width: 3px;
+    outline-color: var(--color-primary-500, #0969da);
   }
 }
 
