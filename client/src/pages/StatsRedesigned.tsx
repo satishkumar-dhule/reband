@@ -129,7 +129,11 @@ export default function StatsRedesigned() {
     };
   }, [stats, days]);
 
-  const diffColors = { beginner: '#22c55e', intermediate: '#eab308', advanced: '#ef4444' };
+  const diffColors = { 
+    beginner: 'var(--gh-diff-beginner)', 
+    intermediate: 'var(--gh-diff-intermediate)', 
+    advanced: 'var(--gh-diff-advanced)' 
+  };
 
   return (
     <>
@@ -161,32 +165,32 @@ export default function StatsRedesigned() {
               label="Progress"
               value={`${overallPct}%`}
               subtext={`${totalCompleted}/${totalQuestions}`}
-              color="text-primary"
-              bgColor="bg-primary/10"
+              color="text-[var(--gh-accent-fg)]"
+              bgColor="bg-[var(--gh-accent-subtle)]"
             />
             <StatCard
               icon={<Flame className="w-5 h-5" />}
               label="Streak"
               value={`${streak}`}
               subtext="days"
-              color="text-orange-500"
-              bgColor="bg-orange-500/10"
+              color="text-[var(--gh-attention-fg)]"
+              bgColor="bg-[var(--gh-attention-subtle)]"
             />
             <StatCard
               icon={<Zap className="w-5 h-5" />}
               label="Sessions"
               value={totalSessions.toString()}
               subtext="total"
-              color="text-blue-500"
-              bgColor="bg-blue-500/10"
+              color="text-[var(--gh-accent-fg)]"
+              bgColor="bg-[var(--gh-accent-subtle)]"
             />
             <StatCard
               icon={<Activity className="w-5 h-5" />}
               label={`${timeRange}d Activity`}
               value={activityData.reduce((a, d) => a + d.count, 0).toString()}
               subtext="questions"
-              color="text-purple-500"
-              bgColor="bg-purple-500/10"
+              color="text-[var(--gh-done-fg)]"
+              bgColor="bg-[var(--gh-done-subtle)]"
             />
           </div>
 
@@ -194,16 +198,16 @@ export default function StatsRedesigned() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-card border border-border rounded-xl p-6"
+            className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-xl p-6"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-primary" />
+              <h3 className="font-semibold flex items-center gap-2 text-[var(--gh-fg)]">
+                <Trophy className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                 Your Achievements
               </h3>
               <button
                 onClick={() => setLocation('/badges')}
-                className="text-sm text-primary hover:underline flex items-center gap-1"
+                className="text-sm text-[var(--gh-accent-fg)] hover:underline flex items-center gap-1"
               >
                 View All
                 <ChevronRight className="w-4 h-4" />
@@ -219,15 +223,15 @@ export default function StatsRedesigned() {
             
             {/* Next achievements */}
             {nextUp.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-border">
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              <div className="mt-6 pt-6 border-t border-[var(--gh-border)]">
+                <div className="text-xs font-semibold text-[var(--gh-fg-muted)] uppercase tracking-wider mb-3">
                   Next Up
                 </div>
                 <div className="grid grid-cols-4 gap-3">
                   {nextUp.slice(0, 4).map((ap) => (
                     <div key={ap.achievement.id} className="text-center">
-                      <div className="text-xs font-medium mb-1">{ap.achievement.name}</div>
-                      <div className="text-[10px] text-muted-foreground">
+                      <div className="text-xs font-medium mb-1 text-[var(--gh-fg)]">{ap.achievement.name}</div>
+                      <div className="text-[10px] text-[var(--gh-fg-muted)]">
                         {Math.round(ap.progress)}%
                       </div>
                     </div>
@@ -241,10 +245,10 @@ export default function StatsRedesigned() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-card border border-border rounded-xl p-6"
+            className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-xl p-6"
           >
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <BarChart2 className="w-5 h-5 text-primary" />
+            <h3 className="font-semibold mb-4 flex items-center gap-2 text-[var(--gh-fg)]">
+              <BarChart2 className="w-5 h-5 text-[var(--gh-accent-fg)]" />
               By Difficulty
             </h3>
             <div className="grid grid-cols-3 gap-6">
@@ -257,7 +261,7 @@ export default function StatsRedesigned() {
                     <div className="text-3xl font-bold mb-2" style={{ color: diffColors[d] }}>
                       {pct}%
                     </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden mb-2">
+                    <div className="h-2 bg-[var(--gh-canvas-inset)] rounded-full overflow-hidden mb-2">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${pct}%` }}
@@ -266,8 +270,8 @@ export default function StatsRedesigned() {
                         style={{ backgroundColor: diffColors[d] }}
                       />
                     </div>
-                    <div className="text-sm text-muted-foreground capitalize">{d}</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-sm text-[var(--gh-fg-muted)] capitalize">{d}</div>
+                    <div className="text-xs text-[var(--gh-fg-muted)]">
                       {globalDifficulty[d].done}/{globalDifficulty[d].total}
                     </div>
                   </div>
@@ -283,22 +287,22 @@ export default function StatsRedesigned() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-card border border-border rounded-xl p-6"
+            className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-xl p-6"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-primary" />
+              <h3 className="font-semibold flex items-center gap-2 text-[var(--gh-fg)]">
+                <Calendar className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                 Activity
               </h3>
-              <div className="flex gap-1 bg-muted/50 p-1 rounded-lg">
+              <div className="flex gap-1 bg-[var(--gh-canvas-inset)] p-1 rounded-lg">
                 {(['30', '90', '365'] as const).map((r) => (
                   <button
                     key={r}
                     onClick={() => setTimeRange(r)}
                     className={`px-3 py-1 text-xs rounded-md transition-colors ${
                       timeRange === r 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? 'bg-[var(--gh-accent-emphasis)] text-[var(--gh-fg-on-emphasis)]' 
+                        : 'text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]'
                     }`}
                   >
                     {r === '365' ? '1Y' : r + 'D'}
@@ -313,10 +317,10 @@ export default function StatsRedesigned() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-card border border-border rounded-xl p-6"
+            className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-xl p-6"
           >
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-primary" />
+            <h3 className="font-semibold mb-4 flex items-center gap-2 text-[var(--gh-fg)]">
+              <Trophy className="w-5 h-5 text-[var(--gh-accent-fg)]" />
               Channel Progress
             </h3>
             <div className="space-y-3">
@@ -327,28 +331,28 @@ export default function StatsRedesigned() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.03 }}
                   onClick={() => setLocation(`/channel/${m.id}`)}
-                  className="p-4 bg-muted/30 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors group"
+                  className="p-4 bg-[var(--gh-canvas-subtle)] rounded-lg hover:bg-[var(--gh-canvas-inset)] cursor-pointer transition-colors group"
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">{m.name}</span>
+                    <span className="font-medium text-[var(--gh-fg)]">{m.name}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm text-[var(--gh-fg-muted)]">
                         {m.completed}/{m.total}
                       </span>
-                      <span className="text-primary font-bold">{m.pct}%</span>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      <span className="text-[var(--gh-accent-fg)] font-bold">{m.pct}%</span>
+                      <ChevronRight className="w-4 h-4 text-[var(--gh-fg-muted)] group-hover:text-[var(--gh-accent-fg)] transition-colors" />
                     </div>
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-2 bg-[var(--gh-canvas-inset)] rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${m.pct}%` }}
                       transition={{ duration: 0.4, delay: i * 0.03 }}
-                      className="h-full bg-primary rounded-full"
+                      className="h-full bg-[var(--gh-accent-emphasis)] rounded-full"
                     />
                   </div>
                   {/* Difficulty breakdown */}
-                  <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+                  <div className="flex gap-4 mt-2 text-xs text-[var(--gh-fg-muted)]">
                     {(['beginner', 'intermediate', 'advanced'] as const).map((d) => (
                       <div key={d} className="flex items-center gap-1">
                         <div 
@@ -381,17 +385,17 @@ function StatCard({ icon, label, value, subtext, color, bgColor }: {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card border border-border rounded-xl p-5"
+      className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-xl p-5"
     >
       <div className="flex items-center gap-3 mb-3">
         <div className={`p-2 rounded-lg ${bgColor}`}>
           <div className={color}>{icon}</div>
         </div>
-        <span className="text-sm text-muted-foreground">{label}</span>
+        <span className="text-sm text-[var(--gh-fg-muted)]">{label}</span>
       </div>
       <div className="flex items-baseline gap-2">
         <span className={`text-3xl font-bold ${color}`}>{value}</span>
-        <span className="text-sm text-muted-foreground">{subtext}</span>
+        <span className="text-sm text-[var(--gh-fg-muted)]">{subtext}</span>
       </div>
     </motion.div>
   );
@@ -402,11 +406,11 @@ function ActivityHeatmap({ data, days }: { data: any[]; days: number }) {
   const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   const getActivityClass = (count: number) => {
-    if (count === 0) return 'bg-muted/30';
-    if (count === 1) return 'bg-primary/30';
-    if (count <= 3) return 'bg-primary/50';
-    if (count <= 5) return 'bg-primary/75';
-    return 'bg-primary';
+    if (count === 0) return 'bg-[var(--gh-canvas-inset)]';
+    if (count === 1) return 'bg-[var(--gh-accent-subtle)]';
+    if (count <= 3) return 'bg-[var(--gh-accent-fg)]/50';
+    if (count <= 5) return 'bg-[var(--gh-accent-fg)]/75';
+    return 'bg-[var(--gh-accent-emphasis)]';
   };
 
   return (
@@ -414,7 +418,7 @@ function ActivityHeatmap({ data, days }: { data: any[]; days: number }) {
       <div className="flex gap-[3px] min-w-fit">
         <div className="flex flex-col gap-[3px] mr-1">
           {dayLabels.map((d, i) => (
-            <div key={i} className="w-3 h-3 text-[9px] text-muted-foreground flex items-center">
+            <div key={i} className="w-3 h-3 text-[9px] text-[var(--gh-fg-muted)] flex items-center">
               {i % 2 === 1 ? d : ''}
             </div>
           ))}
@@ -429,17 +433,17 @@ function ActivityHeatmap({ data, days }: { data: any[]; days: number }) {
                 <div
                   key={d}
                   title={`${day.date}: ${day.count} questions`}
-                  className={`w-3 h-3 rounded-sm ${getActivityClass(day.count)} hover:ring-1 hover:ring-primary transition-all`}
+                  className={`w-3 h-3 rounded-sm ${getActivityClass(day.count)} hover:ring-1 hover:ring-[var(--gh-accent-fg)] transition-all`}
                 />
               );
             })}
           </div>
         ))}
       </div>
-      <div className="flex items-center justify-end gap-2 mt-3 text-xs text-muted-foreground">
+      <div className="flex items-center justify-end gap-2 mt-3 text-xs text-[var(--gh-fg-muted)]">
         <span>Less</span>
         <div className="flex gap-[3px]">
-          {['bg-muted/30', 'bg-primary/30', 'bg-primary/50', 'bg-primary/75', 'bg-primary'].map((c, i) => (
+          {['bg-[var(--gh-canvas-inset)]', 'bg-[var(--gh-accent-subtle)]', 'bg-[var(--gh-accent-fg)]/50', 'bg-[var(--gh-accent-fg)]/75', 'bg-[var(--gh-accent-emphasis)]'].map((c, i) => (
             <div key={i} className={`w-3 h-3 rounded-sm ${c}`} />
           ))}
         </div>

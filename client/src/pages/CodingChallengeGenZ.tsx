@@ -410,7 +410,7 @@ export default function CodingChallengeGenZ() {
                         {testResults.map((result, idx) => {
                           const testCase = currentChallenge.testCases.find(tc => tc.id === result.testCaseId);
                           return (
-                            <div key={result.testCaseId} className={`rounded-md border p-3 ${result.passed ? 'bg-green-50/30 border-green-200/50' : 'bg-red-50/30 border-red-200/50'}`}>
+                            <div key={result.testCaseId} className={`rounded-md border p-3 ${result.passed ? 'bg-[var(--gh-success-subtle)] border-[var(--gh-success-fg)]/30' : 'bg-[var(--gh-danger-subtle)] border-[var(--gh-danger-fg)]/30'}`}>
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex items-center gap-2">
                                   {result.passed ? (
@@ -517,7 +517,7 @@ export default function CodingChallengeGenZ() {
               {[
                 { label: 'Challenges Attempted', value: stats.totalAttempts, icon: Target, color: 'text-[var(--gh-accent-fg)]' },
                 { label: 'Challenges Passed', value: stats.passedChallenges, icon: CheckCircle, color: 'text-[var(--gh-success-fg)]' },
-                { label: 'Average Time', value: `${Math.floor(stats.averageTime / 60)}m`, icon: Clock, color: 'text-orange-500' },
+                { label: 'Average Time', value: `${Math.floor(stats.averageTime / 60)}m`, icon: Clock, color: 'text-[var(--gh-attention-fg)]' },
                 { label: 'Total Solved', value: solvedIds.size, icon: Trophy, color: 'text-[var(--gh-attention-fg)]' },
               ].map((stat, i) => (
                 <Card key={i} className="bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)]/50">

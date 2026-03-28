@@ -493,9 +493,9 @@ export default function ReviewSessionGenZ() {
 
           {/* Hint */}
           {!showAnswer && (
-            <div className="mt-8 p-4 gh-card bg-blue-50 border-blue-100 flex gap-3 items-start">
-              <Zap className="w-4 h-4 text-blue-600 mt-0.5" />
-              <div className="text-sm text-blue-800">
+            <div className="mt-8 p-4 gh-card bg-[var(--gh-accent-subtle)] border-[var(--gh-border)] flex gap-3 items-start">
+              <Zap className="w-4 h-4 text-[var(--gh-accent-fg)] mt-0.5" />
+              <div className="text-sm text-[var(--gh-fg)]">
                 <p className="font-semibold mb-1">Pro Tip</p>
                 <p>Try to recall the answer out loud or write it down before revealing. This strengthens memory recall neural pathways!</p>
               </div>

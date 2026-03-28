@@ -1168,12 +1168,12 @@ export default function TestSession() {
                     <motion.circle
                       cx="64" cy="64" r="56"
                       fill="none"
-                      stroke={result.passed ? '#22c55e' : '#f97316'}
                       strokeWidth="8"
                       strokeLinecap="round"
                       initial={{ strokeDasharray: '0 352' }}
                       animate={{ strokeDasharray: `${(result.score / 100) * 352} 352` }}
                       transition={{ duration: 1, delay: 0.3 }}
+                      className={result.passed ? 'text-green-500' : 'text-orange-500'}
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">

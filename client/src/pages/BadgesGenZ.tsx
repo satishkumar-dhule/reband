@@ -113,7 +113,7 @@ export default function BadgesGenZ() {
                 onClick={() => setSelectedCategory(null)}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   !selectedCategory
-                    ? 'border-[#fd8c73] text-[var(--gh-fg)]'
+                    ? 'border-[var(--gh-accent-fg)] text-[var(--gh-fg)]'
                     : 'border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]'
                 }`}
               >
@@ -125,7 +125,7 @@ export default function BadgesGenZ() {
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap capitalize ${
                     selectedCategory === cat
-                      ? 'border-[#fd8c73] text-[var(--gh-fg)]'
+                      ? 'border-[var(--gh-accent-fg)] text-[var(--gh-fg)]'
                       : 'border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]'
                   }`}
                 >

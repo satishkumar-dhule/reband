@@ -131,8 +131,8 @@ export function UnifiedAnswerPanel({
                 className="w-full flex items-center justify-between p-4 hover:bg-secondary/30 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-green-400" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-primary" />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground">Answer</h3>
                 </div>
@@ -203,8 +203,8 @@ export function UnifiedAnswerPanel({
                   className="w-full flex items-center justify-between p-4 hover:bg-secondary/30 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
-                      <Lightbulb className="w-5 h-5 text-blue-400" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
+                      <Lightbulb className="w-5 h-5 text-primary" />
                     </div>
                     <h3 className="text-lg font-semibold text-foreground">Explanation</h3>
                   </div>

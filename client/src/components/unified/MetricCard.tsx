@@ -36,14 +36,14 @@ const variantClasses: Record<MetricCardVariant, { bg: string; text: string; icon
     iconBg: 'bg-primary/10'
   },
   success: {
-    bg: 'bg-green-500/5 border-green-500/20',
-    text: 'text-green-500',
-    iconBg: 'bg-green-500/10'
+    bg: 'bg-emerald-500/5 border-emerald-500/20',
+    text: 'text-emerald-500',
+    iconBg: 'bg-emerald-500/10'
   },
   warning: {
-    bg: 'bg-yellow-500/5 border-yellow-500/20',
-    text: 'text-yellow-500',
-    iconBg: 'bg-yellow-500/10'
+    bg: 'bg-amber-500/5 border-amber-500/20',
+    text: 'text-amber-500',
+    iconBg: 'bg-amber-500/10'
   },
   danger: {
     bg: 'bg-red-500/5 border-red-500/20',
@@ -98,14 +98,14 @@ export function MetricCard({
     <div 
       className={`
         ${variantConfig.bg} rounded-xl border ${sizeConfig.padding}
-        ${onClick ? 'cursor-pointer hover:border-primary/30 hover:shadow-lg transition-all' : ''}
+        ${onClick ? 'cursor-pointer hover:border-primary/40 hover:shadow-md transition-all duration-200' : ''}
         ${className}
       `}
       onClick={onClick}
     >
       {/* Icon */}
       {icon && (
-        <div className={`${sizeConfig.icon} rounded-xl ${variantConfig.iconBg} flex items-center justify-center mb-3`}>
+        <div className={`${sizeConfig.icon} rounded-lg ${variantConfig.iconBg} flex items-center justify-center mb-3`}>
           <span className={variantConfig.text}>{icon}</span>
         </div>
       )}
@@ -130,7 +130,7 @@ export function MetricCard({
       {/* Trend */}
       {trend !== undefined && (
         <div className={`flex items-center gap-1 mt-2 text-xs ${
-          trend >= 0 ? 'text-green-500' : 'text-red-500'
+          trend >= 0 ? 'text-emerald-500' : 'text-red-500'
         }`}>
           {trend >= 0 ? (
             <TrendingUp className="w-3 h-3" />
@@ -190,13 +190,13 @@ export function CompactMetricCard({
       className={`
         ${variantConfig.bg} rounded-lg border p-3
         flex items-center gap-3
-        ${onClick ? 'cursor-pointer hover:border-primary/30 transition-all' : ''}
+        ${onClick ? 'cursor-pointer hover:border-primary/40 transition-all duration-200' : ''}
         ${className}
       `}
       onClick={onClick}
     >
       {icon && (
-        <div className={`w-8 h-8 rounded-lg ${variantConfig.iconBg} flex items-center justify-center flex-shrink-0`}>
+        <div className={`w-8 h-8 rounded-md ${variantConfig.iconBg} flex items-center justify-center flex-shrink-0`}>
           <span className={variantConfig.text}>{icon}</span>
         </div>
       )}

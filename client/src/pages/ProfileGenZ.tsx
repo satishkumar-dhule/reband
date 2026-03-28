@@ -125,7 +125,7 @@ export default function ProfileGenZ() {
               {/* Main Content */}
               <div className="flex-1 min-w-0">
                 <nav className="flex gap-4 border-b border-[var(--gh-border)] mb-6 overflow-x-auto">
-                  <button className="px-4 py-2 text-sm font-semibold border-b-2 border-[#fd8c73] text-[var(--gh-fg)] whitespace-nowrap">
+                  <button className="px-4 py-2 text-sm font-semibold border-b-2 border-[var(--gh-accent-fg)] text-[var(--gh-fg)] whitespace-nowrap">
                     Overview
                   </button>
                   <button className="px-4 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] whitespace-nowrap">

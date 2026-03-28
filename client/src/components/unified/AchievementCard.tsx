@@ -88,7 +88,7 @@ export function AchievementCard({
             fill="none"
             stroke="currentColor"
             strokeWidth={s.stroke}
-            className="text-muted/30"
+            className="text-muted-foreground/30"
           />
           {/* Progress ring */}
           <motion.circle
@@ -113,7 +113,7 @@ export function AchievementCard({
             absolute rounded-full flex items-center justify-center
             ${isUnlocked 
               ? `bg-gradient-to-br ${achievement.gradient} shadow-md` 
-              : 'bg-muted/40'
+              : 'bg-muted/50'
             }
           `}
           style={{ 
@@ -140,7 +140,7 @@ export function AchievementCard({
         {/* Unlocked checkmark */}
         {isUnlocked && size !== 'sm' && (
           <div 
-            className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center shadow-md"
+            className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shadow-md"
           >
             <Check className="w-3 h-3 text-white" />
           </div>

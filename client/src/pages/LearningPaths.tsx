@@ -37,11 +37,11 @@ interface LearningPath {
 const getDifficultyConfig = (difficulty: string) => {
   switch (difficulty) {
     case 'beginner':
-      return { icon: <Zap className="w-4 h-4" />, color: 'text-green-500', bg: 'bg-green-500/10', label: 'Beginner' };
+      return { icon: <Zap className="w-4 h-4" />, color: 'text-[var(--gh-diff-beginner)]', bg: 'bg-[var(--gh-diff-beginner-bg)]', label: 'Beginner' };
     case 'intermediate':
-      return { icon: <Target className="w-4 h-4" />, color: 'text-yellow-500', bg: 'bg-yellow-500/10', label: 'Intermediate' };
+      return { icon: <Target className="w-4 h-4" />, color: 'text-[var(--gh-diff-intermediate)]', bg: 'bg-[var(--gh-diff-intermediate-bg)]', label: 'Intermediate' };
     case 'advanced':
-      return { icon: <Flame className="w-4 h-4" />, color: 'text-red-500', bg: 'bg-red-500/10', label: 'Advanced' };
+      return { icon: <Flame className="w-4 h-4" />, color: 'text-[var(--gh-diff-advanced)]', bg: 'bg-[var(--gh-diff-advanced-bg)]', label: 'Advanced' };
     default:
       return { icon: <Target className="w-4 h-4" />, color: 'text-muted-foreground', bg: 'bg-muted', label: 'Unknown' };
   }
@@ -65,13 +65,13 @@ const getPathTypeIcon = (pathType: string) => {
 const getPathTypeColor = (pathType: string) => {
   switch (pathType) {
     case 'company':
-      return 'from-blue-500 to-cyan-500';
+      return 'from-[var(--gh-accent-fg)] to-cyan-500';
     case 'job-title':
-      return 'from-purple-500 to-pink-500';
+      return 'from-[var(--gh-done-fg)] to-pink-500';
     case 'skill':
-      return 'from-green-500 to-emerald-500';
+      return 'from-[var(--gh-success-fg)] to-emerald-500';
     case 'certification':
-      return 'from-orange-500 to-red-500';
+      return 'from-[var(--gh-attention-fg)] to-red-500';
     default:
       return 'from-gray-500 to-gray-600';
   }
@@ -364,7 +364,7 @@ export default function LearningPaths() {
                         {/* Company or Job Title Badge */}
                         {path.targetCompany && (
                           <div className="mb-4">
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/10 text-blue-500 text-xs rounded-full">
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)] text-xs rounded-full">
                               <Building2 className="w-3 h-3" />
                               {path.targetCompany}
                             </span>
@@ -372,7 +372,7 @@ export default function LearningPaths() {
                         )}
                         {path.targetJobTitle && (
                           <div className="mb-4">
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-500/10 text-purple-500 text-xs rounded-full">
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--gh-done-subtle)] text-[var(--gh-done-fg)] text-xs rounded-full">
                               <Briefcase className="w-3 h-3" />
                               {path.targetJobTitle.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                             </span>

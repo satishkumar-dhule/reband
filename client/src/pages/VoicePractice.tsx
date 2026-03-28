@@ -523,12 +523,12 @@ export default function VoicePractice() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#58a6ff]/20 flex items-center justify-center mx-auto mb-4">
-            <div className="w-8 h-8 border-3 border-[#58a6ff] border-t-transparent rounded-full animate-spin" />
+          <div className="w-16 h-16 rounded-2xl bg-[var(--gh-accent-fg)]/20 flex items-center justify-center mx-auto mb-4">
+            <div className="w-8 h-8 border-3 border-[var(--gh-accent-fg)] border-t-transparent rounded-full animate-spin" />
           </div>
-          <p className="text-[#8b949e]">Loading questions...</p>
+          <p className="text-[var(--gh-fg-muted)]">Loading questions...</p>
         </div>
       </div>
     );
@@ -537,16 +537,16 @@ export default function VoicePractice() {
   // No questions state
   if (questions.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <div className="w-20 h-20 rounded-2xl bg-[#21262d] flex items-center justify-center mx-auto mb-6">
-            <BookOpen className="w-10 h-10 text-[#6e7681]" />
+          <div className="w-20 h-20 rounded-2xl bg-[var(--gh-canvas-inset)] flex items-center justify-center mx-auto mb-6">
+            <BookOpen className="w-10 h-10 text-[var(--gh-fg-subtle)]" />
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">No Questions Available</h2>
-          <p className="text-[#8b949e] mb-6">Subscribe to channels to access practice questions</p>
+          <h2 className="text-xl font-bold text-[var(--gh-fg)] mb-2">No Questions Available</h2>
+          <p className="text-[var(--gh-fg-muted)] mb-6">Subscribe to channels to access practice questions</p>
           <button
             onClick={() => setLocation('/channels')}
-            className="px-6 py-3 bg-[#238636] text-white rounded-xl font-semibold hover:bg-[#2ea043] transition-colors"
+            className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-semibold hover:bg-[var(--gh-success-fg)] transition-colors"
           >
             Browse Channels
           </button>
@@ -558,15 +558,15 @@ export default function VoicePractice() {
   // Browser not supported
   if (!isSpeechSupported) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center p-4">
         <div className="max-w-md text-center">
-          <h1 className="text-2xl font-bold text-white mb-3">Browser Not Supported</h1>
-          <p className="text-[#8b949e] mb-6">
+          <h1 className="text-2xl font-bold text-[var(--gh-fg)] mb-3">Browser Not Supported</h1>
+          <p className="text-[var(--gh-fg-muted)] mb-6">
             Voice practice requires the Web Speech API. Please use Chrome, Edge, or Safari.
           </p>
           <button
             onClick={() => setLocation('/')}
-            className="px-6 py-3 bg-[#238636] text-white font-medium rounded-xl hover:bg-[#2ea043] transition-colors"
+            className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-medium rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors"
           >
             Go Home
           </button>
@@ -586,24 +586,24 @@ export default function VoicePractice() {
       />
 
       <DesktopSidebarWrapper>
-        <div className="min-h-screen bg-[#0d1117] text-[#e6edf3]">
+        <div className="min-h-screen bg-[var(--gh-canvas)] text-[var(--gh-fg)]">
           {/* Header */}
-          <header className="sticky top-0 z-50 border-b border-[#30363d] bg-[#0d1117]/95 backdrop-blur-md">
+          <header className="sticky top-0 z-50 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]/95 backdrop-blur-md">
             <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setLocation('/')}
-                  className="p-1.5 hover:bg-[#21262d] rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-[var(--gh-canvas-subtle)] rounded-lg transition-colors"
                 >
-                  <ArrowLeft className="w-4 h-4 text-[#8b949e]" />
+                  <ArrowLeft className="w-4 h-4 text-[var(--gh-fg-muted)]" />
                 </button>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#f85149] to-[#ff7b72] flex items-center justify-center">
-                    <Mic className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--gh-danger-emphasis)] to-[var(--gh-danger-fg)] flex items-center justify-center">
+                    <Mic className="w-4 h-4 text-[var(--gh-fg-on-emphasis)]" />
                   </div>
                   <div>
-                    <h1 className="font-semibold text-white text-sm">Voice Practice</h1>
-                    <p className="text-[10px] text-[#8b949e]">
+                    <h1 className="font-semibold text-[var(--gh-fg)] text-sm">Voice Practice</h1>
+                    <p className="text-[10px] text-[var(--gh-fg-muted)]">
                       Q{currentIndex + 1}/{questions.length}
                     </p>
                   </div>
@@ -615,8 +615,8 @@ export default function VoicePractice() {
                 onClick={toggleMode}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   mode === 'interview'
-                    ? 'bg-[#f85149]/20 text-[#f85149] border border-[#f85149]/30'
-                    : 'bg-[#238636]/20 text-[#3fb950] border border-[#238636]/30'
+                    ? 'bg-[var(--gh-danger-fg)]/20 text-[var(--gh-danger-fg)] border border-[var(--gh-danger-fg)]/30'
+                    : 'bg-[var(--gh-success-fg)]/20 text-[var(--gh-success-fg)] border border-[var(--gh-success-fg)]/30'
                 }`}
               >
                 {mode === 'interview' ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -626,11 +626,11 @@ export default function VoicePractice() {
             
             {/* Progress Bar */}
             <div className="max-w-4xl mx-auto px-4 pb-2">
-              <div className="h-1 bg-[#21262d] rounded-full overflow-hidden">
+              <div className="h-1 bg-[var(--gh-canvas-inset)] rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
-                  className="h-full bg-gradient-to-r from-[#58a6ff] to-[#a371f7] rounded-full"
+                  className="h-full bg-gradient-to-r from-[var(--gh-accent-fg)] to-[var(--gh-done-fg)] rounded-full"
                 />
               </div>
             </div>
@@ -639,53 +639,53 @@ export default function VoicePractice() {
           {/* Main Content */}
           <main className="max-w-4xl mx-auto px-4 py-6">
             {/* Debug Info Panel */}
-            <div className="mb-4 p-4 bg-[#161b22] border border-[#30363d] rounded-xl">
+            <div className="mb-4 p-4 bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-xl">
               <div className="flex items-start gap-3 mb-3">
                 <div className="text-2xl">🔍</div>
                 <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-white mb-2">System Status</h3>
-                  <div className="grid grid-cols-2 gap-2 text-xs font-mono text-[#8b949e]">
-                    <div>Speech API: <span className={isSpeechSupported ? 'text-[#3fb950]' : 'text-[#f85149]'}>{isSpeechSupported ? '✓ Available' : '✗ Not Available'}</span></div>
-                    <div>Recognition: <span className={recognitionReady ? 'text-[#3fb950]' : 'text-[#d29922]'}>{recognitionReady ? '✓ Ready' : '⏳ Initializing...'}</span></div>
-                    <div>Protocol: <span className="text-white">{typeof window !== 'undefined' ? window.location.protocol : 'unknown'}</span></div>
-                    <div>Recording: <span className="text-white">{recordingState}</span></div>
+                  <h3 className="text-sm font-semibold text-[var(--gh-fg)] mb-2">System Status</h3>
+                  <div className="grid grid-cols-2 gap-2 text-xs font-mono text-[var(--gh-fg-muted)]">
+                    <div>Speech API: <span className={isSpeechSupported ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}>{isSpeechSupported ? '✓ Available' : '✗ Not Available'}</span></div>
+                    <div>Recognition: <span className={recognitionReady ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-attention-fg)]'}>{recognitionReady ? '✓ Ready' : '⏳ Initializing...'}</span></div>
+                    <div>Protocol: <span className="text-[var(--gh-fg)]">{typeof window !== 'undefined' ? window.location.protocol : 'unknown'}</span></div>
+                    <div>Recording: <span className="text-[var(--gh-fg)]">{recordingState}</span></div>
                   </div>
                 </div>
               </div>
               
               {!isSpeechSupported && (
-                <div className="p-3 bg-[#f85149]/10 border border-[#f85149]/30 rounded-lg text-sm">
-                  <div className="font-semibold text-[#f85149] mb-1">⚠️ Browser Not Supported</div>
-                  <div className="text-[#8b949e]">
+                <div className="p-3 bg-[var(--gh-danger-fg)]/10 border border-[var(--gh-danger-fg)]/30 rounded-lg text-sm">
+                  <div className="font-semibold text-[var(--gh-danger-fg)] mb-1">⚠️ Browser Not Supported</div>
+                  <div className="text-[var(--gh-fg-muted)]">
                     Please use Chrome, Edge, or Safari. Firefox is not supported.
                   </div>
                 </div>
               )}
               
               {isSpeechSupported && !recognitionReady && (
-                <div className="p-3 bg-[#d29922]/10 border border-[#d29922]/30 rounded-lg text-sm">
-                  <div className="font-semibold text-[#d29922] mb-1">⏳ Initializing...</div>
-                  <div className="text-[#8b949e]">
+                <div className="p-3 bg-[var(--gh-attention-fg)]/10 border border-[var(--gh-attention-fg)]/30 rounded-lg text-sm">
+                  <div className="font-semibold text-[var(--gh-attention-fg)] mb-1">⏳ Initializing...</div>
+                  <div className="text-[var(--gh-fg-muted)]">
                     Setting up speech recognition. If this takes too long, check console (F12).
                   </div>
                 </div>
               )}
               
               {isSpeechSupported && recognitionReady && (
-                <div className="p-3 bg-[#238636]/10 border border-[#238636]/30 rounded-lg text-sm">
-                  <div className="font-semibold text-[#3fb950] mb-1">✓ Ready to Record</div>
-                  <div className="text-[#8b949e]">
+                <div className="p-3 bg-[var(--gh-success-fg)]/10 border border-[var(--gh-success-fg)]/30 rounded-lg text-sm">
+                  <div className="font-semibold text-[var(--gh-success-fg)] mb-1">✓ Ready to Record</div>
+                  <div className="text-[var(--gh-fg-muted)]">
                     Click "Start Recording" and allow microphone access when prompted.
                   </div>
                 </div>
               )}
               
-              <div className="mt-3 pt-3 border-t border-[#30363d] text-xs text-[#6e7681]">
+              <div className="mt-3 pt-3 border-t border-[var(--gh-border)] text-xs text-[var(--gh-fg-subtle)]">
                 💡 <strong>Troubleshooting:</strong> Open browser console (F12) to see detailed logs. 
                 <a 
                   href="/test-speech-recognition.html" 
                   target="_blank"
-                  className="ml-2 text-[#58a6ff] hover:underline"
+                  className="ml-2 text-[var(--gh-accent-fg)] hover:underline"
                 >
                   Run diagnostic test →
                 </a>
@@ -701,56 +701,56 @@ export default function VoicePractice() {
                 className="space-y-6"
               >
                 {/* Question Card */}
-                <div className="rounded-2xl border border-[#30363d] bg-[#161b22] p-6">
+                <div className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] p-6">
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="p-2.5 rounded-xl bg-[#58a6ff]/10 flex-shrink-0">
-                      <Sparkles className="w-5 h-5 text-[#58a6ff]" />
+                    <div className="p-2.5 rounded-xl bg-[var(--gh-accent-fg)]/10 flex-shrink-0">
+                      <Sparkles className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                     </div>
                     <div className="flex-1">
-                      <h2 className="text-lg font-semibold text-white mb-2">{currentQuestion.question}</h2>
+                      <h2 className="text-lg font-semibold text-[var(--gh-fg)] mb-2">{currentQuestion.question}</h2>
                       <div className="flex items-center gap-2 text-sm">
                         <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${
-                          currentQuestion.difficulty === 'beginner' ? 'bg-[#238636]/20 text-[#3fb950]' :
-                          currentQuestion.difficulty === 'intermediate' ? 'bg-[#d29922]/20 text-[#d29922]' :
-                          'bg-[#f85149]/20 text-[#f85149]'
+                          currentQuestion.difficulty === 'beginner' ? 'bg-[var(--gh-success-fg)]/20 text-[var(--gh-success-fg)]' :
+                          currentQuestion.difficulty === 'intermediate' ? 'bg-[var(--gh-attention-fg)]/20 text-[var(--gh-attention-fg)]' :
+                          'bg-[var(--gh-danger-fg)]/20 text-[var(--gh-danger-fg)]'
                         }`}>
                           {currentQuestion.difficulty}
                         </span>
-                        <span className="text-[#6e7681]">•</span>
-                        <span className="text-[#8b949e]">{currentQuestion.channel}</span>
+                        <span className="text-[var(--gh-fg-subtle)]">•</span>
+                        <span className="text-[var(--gh-fg-muted)]">{currentQuestion.channel}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Answer Display */}
                   {showAnswer ? (
-                    <div className="bg-[#0d1117] rounded-xl p-5 border border-[#30363d]">
+                    <div className="bg-[var(--gh-canvas)] rounded-xl p-5 border border-[var(--gh-border)]">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                          <Eye className="w-4 h-4 text-[#3fb950]" />
-                          <span className="text-sm font-semibold text-white">
+                          <Eye className="w-4 h-4 text-[var(--gh-success-fg)]" />
+                          <span className="text-sm font-semibold text-[var(--gh-fg)]">
                             {mode === 'training' ? 'Answer to Read' : 'Ideal Answer'}
                           </span>
                         </div>
-                        <span className="text-xs text-[#6e7681] px-2 py-1 bg-[#21262d] rounded-lg">
+                        <span className="text-xs text-[var(--gh-fg-subtle)] px-2 py-1 bg-[var(--gh-canvas-inset)] rounded-lg">
                           {targetWords} words
                         </span>
                       </div>
                       <div className="max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
-                        <p className="text-[#e6edf3] text-[15px] leading-[1.7] whitespace-pre-wrap">
+                        <p className="text-[var(--gh-fg)] text-[15px] leading-[1.7] whitespace-pre-wrap">
                           {currentQuestion.answer}
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-[#0d1117] rounded-xl p-5 border border-[#30363d]">
+                    <div className="bg-[var(--gh-canvas)] rounded-xl p-5 border border-[var(--gh-border)]">
                       <div className="flex items-center justify-center py-8">
                         <div className="text-center">
-                          <div className="w-16 h-16 rounded-2xl bg-[#f85149]/10 flex items-center justify-center mx-auto mb-4">
-                            <EyeOff className="w-8 h-8 text-[#f85149]" />
+                          <div className="w-16 h-16 rounded-2xl bg-[var(--gh-danger-fg)]/10 flex items-center justify-center mx-auto mb-4">
+                            <EyeOff className="w-8 h-8 text-[var(--gh-danger-fg)]" />
                           </div>
-                          <h3 className="text-lg font-semibold text-white mb-2">Answer Hidden</h3>
-                          <p className="text-sm text-[#8b949e] max-w-md">
+                          <h3 className="text-lg font-semibold text-[var(--gh-fg)] mb-2">Answer Hidden</h3>
+                          <p className="text-sm text-[var(--gh-fg-muted)] max-w-md">
                             Record your answer first. The ideal answer will be revealed after you finish.
                           </p>
                         </div>
@@ -760,16 +760,16 @@ export default function VoicePractice() {
                 </div>
 
                 {/* Recording Panel */}
-                <div className="rounded-2xl border border-[#30363d] bg-[#161b22] p-6">
+                <div className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] p-6">
                   {/* Recording Status */}
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold flex items-center gap-2">
-                      <Mic className="w-5 h-5 text-primary" />
+                      <Mic className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                       Record Your Answer
                     </h3>
                     {recordingState === 'recording' && (
-                      <div className="flex items-center gap-2 text-sm text-[#f85149]">
-                        <span className="w-2 h-2 bg-[#f85149] rounded-full animate-pulse" />
+                      <div className="flex items-center gap-2 text-sm text-[var(--gh-danger-fg)]">
+                        <span className="w-2 h-2 bg-[var(--gh-danger-fg)] rounded-full animate-pulse" />
                         {Math.floor(duration / 60)}:{(duration % 60).toString().padStart(2, '0')}
                       </div>
                     )}
@@ -779,11 +779,11 @@ export default function VoicePractice() {
                   {(recordingState !== 'idle' || transcript) && (
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-[#8b949e]">Your Response</span>
+                        <span className="text-xs font-medium text-[var(--gh-fg-muted)]">Your Response</span>
                         {audioBlob && recordingState === 'recorded' && (
                           <button
                             onClick={isPlayingAudio ? stopAudioPlayback : playRecording}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-[#238636] hover:bg-[#2ea043] text-white rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-fg)] text-[var(--gh-fg-on-emphasis)] rounded-lg transition-colors"
                           >
                             {isPlayingAudio ? (
                               <>
@@ -799,15 +799,15 @@ export default function VoicePractice() {
                           </button>
                         )}
                       </div>
-                      <div className="p-4 bg-[#0d1117] rounded-xl max-h-[300px] overflow-y-auto custom-scrollbar border border-[#30363d]">
+                      <div className="p-4 bg-[var(--gh-canvas)] rounded-xl max-h-[300px] overflow-y-auto custom-scrollbar border border-[var(--gh-border)]">
                         {transcript || interimTranscript ? (
-                          <p className="text-sm text-[#e6edf3] leading-relaxed whitespace-pre-wrap break-words">
+                          <p className="text-sm text-[var(--gh-fg)] leading-relaxed whitespace-pre-wrap break-words">
                             {transcript}
-                            <span className="text-[#6e7681]">{interimTranscript}</span>
-                            {recordingState === 'recording' && <span className="animate-pulse text-[#58a6ff]">|</span>}
+                            <span className="text-[var(--gh-fg-subtle)]">{interimTranscript}</span>
+                            {recordingState === 'recording' && <span className="animate-pulse text-[var(--gh-accent-fg)]">|</span>}
                           </p>
                         ) : (
-                          <p className="text-sm text-[#6e7681] italic">
+                          <p className="text-sm text-[var(--gh-fg-subtle)] italic">
                             Start speaking... Your words will appear here.
                           </p>
                         )}
@@ -818,8 +818,8 @@ export default function VoicePractice() {
                   {/* Word Count */}
                   {transcript && (
                     <div className="mb-4 flex items-center justify-between text-sm">
-                      <span className="text-[#8b949e]">Words spoken:</span>
-                      <span className="font-semibold text-white">
+                      <span className="text-[var(--gh-fg-muted)]">Words spoken:</span>
+                      <span className="font-semibold text-[var(--gh-fg)]">
                         {countWords(transcript)} / {targetWords}
                       </span>
                     </div>
@@ -832,13 +832,13 @@ export default function VoicePractice() {
                         <button
                           onClick={startRecording}
                           disabled={!recognitionReady}
-                          className="flex items-center gap-2 px-6 py-3 bg-[#f85149] text-white font-semibold rounded-xl hover:bg-[#da3633] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                          className="flex items-center gap-2 px-6 py-3 bg-[var(--gh-danger-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-danger-fg)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
                           <Mic className="w-5 h-5" />
                           Start Recording
                         </button>
                         {!recognitionReady && (
-                          <span className="text-xs text-[#6e7681]">Initializing microphone...</span>
+                          <span className="text-xs text-[var(--gh-fg-subtle)]">Initializing microphone...</span>
                         )}
                       </>
                     )}
@@ -846,7 +846,7 @@ export default function VoicePractice() {
                     {recordingState === 'recording' && (
                       <button
                         onClick={stopRecording}
-                        className="flex items-center gap-2 px-6 py-3 bg-[#f85149] text-white font-semibold rounded-xl hover:bg-[#da3633] transition-all"
+                        className="flex items-center gap-2 px-6 py-3 bg-[var(--gh-danger-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-danger-fg)] transition-all"
                       >
                         <Square className="w-5 h-5" />
                         Stop Recording
@@ -856,7 +856,7 @@ export default function VoicePractice() {
                     {recordingState === 'recorded' && (
                       <button
                         onClick={tryAgain}
-                        className="flex items-center gap-2 px-5 py-3 border border-[#30363d] text-[#8b949e] hover:text-white hover:border-[#8b949e] rounded-xl transition-colors"
+                        className="flex items-center gap-2 px-5 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors"
                       >
                         <RotateCcw className="w-4 h-4" />
                         Try Again
@@ -870,35 +870,35 @@ export default function VoicePractice() {
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="rounded-2xl border border-[#30363d] bg-[#161b22] p-6"
+                    className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] p-6"
                   >
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-[#238636]/20 flex items-center justify-center">
-                        <Trophy className="w-6 h-6 text-[#3fb950]" />
+                      <div className="w-12 h-12 rounded-xl bg-[var(--gh-success-fg)]/20 flex items-center justify-center">
+                        <Trophy className="w-6 h-6 text-[var(--gh-success-fg)]" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-white">{feedback.message}</h3>
-                        <p className="text-sm text-[#8b949e]">Recording completed</p>
+                        <h3 className="font-semibold text-[var(--gh-fg)]">{feedback.message}</h3>
+                        <p className="text-sm text-[var(--gh-fg-muted)]">Recording completed</p>
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-3 gap-4">
-                      <div className="text-center p-3 bg-[#0d1117] rounded-xl">
-                        <div className="text-xs text-[#8b949e] mb-1">Words</div>
-                        <div className="text-lg font-bold text-white">
+                      <div className="text-center p-3 bg-[var(--gh-canvas)] rounded-xl">
+                        <div className="text-xs text-[var(--gh-fg-muted)] mb-1">Words</div>
+                        <div className="text-lg font-bold text-[var(--gh-fg)]">
                           {feedback.wordsSpoken}
-                          <span className="text-sm text-[#6e7681]">/{feedback.targetWords}</span>
+                          <span className="text-sm text-[var(--gh-fg-subtle)]">/{feedback.targetWords}</span>
                         </div>
                       </div>
-                      <div className="text-center p-3 bg-[#0d1117] rounded-xl">
-                        <div className="text-xs text-[#8b949e] mb-1">Duration</div>
-                        <div className="text-lg font-bold text-white">
+                      <div className="text-center p-3 bg-[var(--gh-canvas)] rounded-xl">
+                        <div className="text-xs text-[var(--gh-fg-muted)] mb-1">Duration</div>
+                        <div className="text-lg font-bold text-[var(--gh-fg)]">
                           {Math.floor(feedback.duration / 60)}:{(feedback.duration % 60).toString().padStart(2, '0')}
                         </div>
                       </div>
-                      <div className="text-center p-3 bg-[#0d1117] rounded-xl">
-                        <div className="text-xs text-[#8b949e] mb-1">Coverage</div>
-                        <div className="text-lg font-bold text-white">
+                      <div className="text-center p-3 bg-[var(--gh-canvas)] rounded-xl">
+                        <div className="text-xs text-[var(--gh-fg-muted)] mb-1">Coverage</div>
+                        <div className="text-lg font-bold text-[var(--gh-fg)]">
                           {Math.round((feedback.wordsSpoken / feedback.targetWords) * 100)}%
                         </div>
                       </div>
@@ -911,13 +911,13 @@ export default function VoicePractice() {
                   <button
                     onClick={goToPrevious}
                     disabled={currentIndex === 0}
-                    className="px-6 py-3 bg-[#21262d] hover:bg-[#30363d] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-semibold transition-colors text-[#8b949e] hover:text-white border border-[#30363d]"
+                    className="px-6 py-3 bg-[var(--gh-canvas-subtle)] hover:bg-[var(--gh-border)] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-semibold transition-colors text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] border border-[var(--gh-border)]"
                   >
                     Previous
                   </button>
                   <button
                     onClick={goToNext}
-                    className="flex-1 px-6 py-3 bg-[#238636] hover:bg-[#2ea043] text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+                    className="flex-1 px-6 py-3 bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-fg)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
                   >
                     {currentIndex === questions.length - 1 ? 'Finish' : 'Next Question'}
                     <ChevronRight className="w-5 h-5" />

@@ -44,9 +44,9 @@ function renderWithInlineCode(text: string): React.ReactNode {
     // Odd indices are code (content between backticks)
     if (index % 2 === 1) {
       return (
-        <code 
+          <code 
           key={index}
-          className="px-1.5 py-0.5 mx-0.5 bg-cyan-500/20 text-cyan-300 rounded text-[0.9em] font-mono"
+          className="px-1.5 py-0.5 mx-0.5 bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)] rounded text-[0.9em] font-mono"
         >
           {part}
         </code>
@@ -135,12 +135,12 @@ function DiagramSection({ diagram }: { diagram: string }) {
   }
   
   return (
-    <div className="p-4 bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-fuchsia-500/10 border border-purple-500/30 rounded-2xl backdrop-blur-sm">
+    <div className="p-4 bg-[var(--gh-done-subtle)] border border-[var(--gh-done-fg)]/30 rounded-2xl backdrop-blur-sm">
       <div className="flex items-center gap-2 mb-3">
-        <div className="p-1.5 bg-purple-500/20 rounded-lg">
-          <Eye className="w-4 h-4 text-purple-400" />
+        <div className="p-1.5 bg-[var(--gh-done-subtle)] rounded-lg">
+          <Eye className="w-4 h-4 text-[var(--gh-done-fg)]" />
         </div>
-        <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Diagram</span>
+        <span className="text-xs font-bold text-[var(--gh-done-fg)] uppercase tracking-wider">Diagram</span>
       </div>
       <div className="bg-black/30 rounded-xl p-4 overflow-x-auto border border-white/5">
         <EnhancedMermaid 
@@ -299,7 +299,7 @@ export default function ReviewSession() {
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-purple-500 text-white rounded-full font-bold shadow-lg"
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-[var(--gh-done-emphasis)] text-[var(--gh-fg-on-emphasis)] rounded-full font-bold shadow-lg"
           >
             +{xpPopup.amount} XP ⚡
           </motion.div>
@@ -315,8 +315,8 @@ export default function ReviewSession() {
             exit={{ opacity: 0, x: 20 }}
             className={`fixed bottom-24 right-4 z-50 px-4 py-2 rounded-xl font-bold shadow-lg ${
               creditPopup.amount > 0 
-                ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-white' 
-                : 'bg-gradient-to-r from-red-500 to-rose-500 text-white'
+                ? 'bg-[var(--gh-attention-emphasis)] text-[var(--gh-fg-on-emphasis)]' 
+                : 'bg-[var(--gh-danger-emphasis)] text-[var(--gh-fg-on-emphasis)]'
             }`}
           >
             {creditPopup.amount > 0 ? '+' : ''}{creditPopup.amount} 💰
@@ -336,7 +336,7 @@ export default function ReviewSession() {
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <Brain className="w-4 h-4 text-purple-500" />
+              <Brain className="w-4 h-4 text-[var(--gh-done-fg)]" />
               <h1 className="font-semibold">Review Session</h1>
             </div>
             {dueCards.length > 0 && sessionState !== 'completed' && (
@@ -344,7 +344,7 @@ export default function ReviewSession() {
                 <span>{reviewedCount + 1} of {dueCards.length}</span>
                 <div className="flex-1 max-w-[100px] h-1 bg-muted rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-purple-500 rounded-full transition-all" 
+                    className="h-full bg-[var(--gh-done-emphasis)] rounded-full transition-all" 
                     style={{ width: `${progress}%` }} 
                   />
                 </div>
@@ -375,7 +375,7 @@ export default function ReviewSession() {
                 className="flex-1 flex items-center justify-center"
               >
                 <div className="text-center">
-                  <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                  <div className="w-8 h-8 border-2 border-[var(--gh-done-emphasis)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                   <p className="text-muted-foreground">Loading review cards...</p>
                 </div>
               </motion.div>
@@ -394,19 +394,19 @@ export default function ReviewSession() {
                   <div className="max-w-3xl mx-auto space-y-4">
                     {/* Card header badges */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="px-3 py-1.5 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 text-xs font-semibold rounded-full border border-cyan-500/30">
+                      <span className="px-3 py-1.5 bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)] text-xs font-semibold rounded-full border border-[var(--gh-accent-fg)]/30">
                         {currentCard.channel}
                       </span>
                       <span className={`px-3 py-1.5 text-xs font-semibold rounded-full border ${
                         currentCard.difficulty === 'beginner' 
-                          ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 border-green-500/30' 
+                          ? 'bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] border-[var(--gh-success-fg)]/30' 
                           : currentCard.difficulty === 'intermediate' 
-                          ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-400 border-yellow-500/30' 
-                          : 'bg-gradient-to-r from-red-500/20 to-pink-500/20 text-red-400 border-red-500/30'
+                          ? 'bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)] border-[var(--gh-attention-fg)]/30' 
+                          : 'bg-[var(--gh-danger-subtle)] text-[var(--gh-danger-fg)] border-[var(--gh-danger-fg)]/30'
                       }`}>
                         {currentCard.difficulty}
                       </span>
-                      <span className={`px-3 py-1.5 text-xs font-semibold rounded-full bg-purple-500/10 border border-purple-500/30 flex items-center gap-1.5 ${getMasteryColor(currentCard.masteryLevel)}`}>
+                      <span className={`px-3 py-1.5 text-xs font-semibold rounded-full bg-[var(--gh-done-subtle)] border border-[var(--gh-done-fg)]/30 flex items-center gap-1.5 ${getMasteryColor(currentCard.masteryLevel)}`}>
                         <span>{getMasteryEmoji(currentCard.masteryLevel)}</span>
                         {getMasteryLabel(currentCard.masteryLevel)}
                       </span>
@@ -432,13 +432,13 @@ export default function ReviewSession() {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.1 }}
-                              className="p-4 bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-purple-500/10 border border-cyan-500/30 rounded-2xl backdrop-blur-sm"
+                              className="p-4 bg-[var(--gh-accent-subtle)] border border-[var(--gh-accent-fg)]/30 rounded-2xl backdrop-blur-sm"
                             >
                               <div className="flex items-center gap-2 mb-2">
-                                <div className="p-1.5 bg-cyan-500/20 rounded-lg">
-                                  <Zap className="w-4 h-4 text-cyan-400" />
+                                <div className="p-1.5 bg-[var(--gh-accent-subtle)] rounded-lg">
+                                  <Zap className="w-4 h-4 text-[var(--gh-accent-fg)]" />
                                 </div>
-                                <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">TL;DR</span>
+                                <span className="text-xs font-bold text-[var(--gh-accent-fg)] uppercase tracking-wider">TL;DR</span>
                               </div>
                               <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">{renderWithInlineCode(currentQuestion.tldr)}</p>
                             </motion.div>
@@ -449,14 +449,14 @@ export default function ReviewSession() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.15 }}
-                            className="p-4 bg-gradient-to-br from-green-500/10 via-emerald-500/10 to-teal-500/10 border border-green-500/30 rounded-2xl backdrop-blur-sm"
+                            className="p-4 bg-[var(--gh-success-subtle)] border border-[var(--gh-success-fg)]/30 rounded-2xl backdrop-blur-sm"
                           >
                             <div className="flex items-center justify-between gap-2 mb-2">
                               <div className="flex items-center gap-2">
-                                <div className="p-1.5 bg-green-500/20 rounded-lg">
-                                  <Check className="w-4 h-4 text-green-400" />
+                                <div className="p-1.5 bg-[var(--gh-success-subtle)] rounded-lg">
+                                  <Check className="w-4 h-4 text-[var(--gh-success-fg)]" />
                                 </div>
-                                <span className="text-xs font-bold text-green-400 uppercase tracking-wider">Answer</span>
+                                <span className="text-xs font-bold text-[var(--gh-success-fg)] uppercase tracking-wider">Answer</span>
                               </div>
                               <ListenButton 
                                 text={`${currentQuestion.answer}${currentQuestion.explanation ? '. ' + currentQuestion.explanation : ''}`}
@@ -484,13 +484,13 @@ export default function ReviewSession() {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.25 }}
-                              className="p-4 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-yellow-500/10 border border-orange-500/30 rounded-2xl backdrop-blur-sm"
+                              className="p-4 bg-[var(--gh-attention-subtle)] border border-[var(--gh-attention-fg)]/30 rounded-2xl backdrop-blur-sm"
                             >
                               <div className="flex items-center gap-2 mb-3">
-                                <div className="p-1.5 bg-orange-500/20 rounded-lg">
-                                  <Brain className="w-4 h-4 text-orange-400" />
+                                <div className="p-1.5 bg-[var(--gh-attention-subtle)] rounded-lg">
+                                  <Brain className="w-4 h-4 text-[var(--gh-attention-fg)]" />
                                 </div>
-                                <span className="text-xs font-bold text-orange-400 uppercase tracking-wider">Explanation</span>
+                                <span className="text-xs font-bold text-[var(--gh-attention-fg)] uppercase tracking-wider">Explanation</span>
                               </div>
                               <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
                                 <ReactMarkdown
@@ -592,7 +592,7 @@ export default function ReviewSession() {
                     {sessionState === 'reviewing' ? (
                       <button
                         onClick={handleReveal}
-                        className="w-full py-3 bg-purple-500 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-purple-600 transition-colors"
+                        className="w-full py-3 bg-[var(--gh-done-emphasis)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-colors"
                       >
                         <Eye className="w-5 h-5" />
                         Show Answer
@@ -649,10 +649,10 @@ function RatingButtons({ card, onRate }: { card: ReviewCard; onRate: (rating: Co
   const { config } = useCredits();
 
   const buttons: { rating: ConfidenceRating; label: string; preview: string; icon: React.ReactNode; color: string; key: string; credits: number }[] = [
-    { rating: 'again', label: 'Again', preview: previews.again, icon: <RotateCcw className="w-4 h-4" />, color: 'bg-red-500 hover:bg-red-600', key: '1', credits: config.SRS_AGAIN },
-    { rating: 'hard', label: 'Hard', preview: previews.hard, icon: <Brain className="w-4 h-4" />, color: 'bg-orange-500 hover:bg-orange-600', key: '2', credits: config.SRS_HARD },
-    { rating: 'good', label: 'Good', preview: previews.good, icon: <Check className="w-4 h-4" />, color: 'bg-green-500 hover:bg-green-600', key: '3', credits: config.SRS_GOOD },
-    { rating: 'easy', label: 'Easy', preview: previews.easy, icon: <Zap className="w-4 h-4" />, color: 'bg-blue-500 hover:bg-blue-600', key: '4', credits: config.SRS_EASY },
+    { rating: 'again', label: 'Again', preview: previews.again, icon: <RotateCcw className="w-4 h-4" />, color: 'bg-[var(--gh-danger-emphasis)] hover:opacity-90', key: '1', credits: config.SRS_AGAIN },
+    { rating: 'hard', label: 'Hard', preview: previews.hard, icon: <Brain className="w-4 h-4" />, color: 'bg-[var(--gh-attention-emphasis)] hover:opacity-90', key: '2', credits: config.SRS_HARD },
+    { rating: 'good', label: 'Good', preview: previews.good, icon: <Check className="w-4 h-4" />, color: 'bg-[var(--gh-success-emphasis)] hover:opacity-90', key: '3', credits: config.SRS_GOOD },
+    { rating: 'easy', label: 'Easy', preview: previews.easy, icon: <Zap className="w-4 h-4" />, color: 'bg-[var(--gh-accent-emphasis)] hover:opacity-90', key: '4', credits: config.SRS_EASY },
   ];
 
   return (
@@ -671,7 +671,7 @@ function RatingButtons({ card, onRate }: { card: ReviewCard; onRate: (rating: Co
             <span className="text-xs font-medium">{btn.label}</span>
             <span className="text-[10px] opacity-70">{btn.preview}</span>
             {btn.credits !== 0 && (
-              <span className={`text-[9px] font-bold ${btn.credits > 0 ? 'text-amber-200' : 'text-red-200'}`}>
+              <span className={`text-[9px] font-bold ${btn.credits > 0 ? 'text-[var(--gh-attention-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
                 {btn.credits > 0 ? '+' : ''}{btn.credits} 💰
               </span>
             )}
@@ -716,16 +716,16 @@ function CompletedScreen({
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', delay: 0.2, duration: 0.8 }}
-          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-yellow-400/20 to-orange-500/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 relative"
+          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[var(--gh-attention-subtle)] flex items-center justify-center mx-auto mb-4 sm:mb-6 relative"
         >
-          <Trophy className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-500" />
+          <Trophy className="w-10 h-10 sm:w-12 sm:h-12 text-[var(--gh-attention-fg)]" />
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: [0, 1.2, 1] }}
             transition={{ delay: 0.5, duration: 0.5 }}
             className="absolute -top-1 -right-1"
           >
-            <Star className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 fill-yellow-400" />
+            <Star className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--gh-attention-fg)] fill-[var(--gh-attention-fg)]" />
           </motion.div>
         </motion.div>
 
@@ -759,18 +759,18 @@ function CompletedScreen({
             className="flex items-center justify-center gap-3 mb-4 sm:mb-6"
           >
             {sessionXP > 0 && (
-              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-500/20 rounded-full">
-                <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
-                <span className="text-base sm:text-lg font-bold text-purple-400">+{sessionXP} XP</span>
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[var(--gh-done-subtle)] rounded-full">
+                <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--gh-done-fg)]" />
+                <span className="text-base sm:text-lg font-bold text-[var(--gh-done-fg)]">+{sessionXP} XP</span>
               </div>
             )}
             {sessionCredits !== 0 && (
               <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${
-                sessionCredits > 0 ? 'bg-amber-500/20' : 'bg-red-500/20'
+                sessionCredits > 0 ? 'bg-[var(--gh-attention-subtle)]' : 'bg-[var(--gh-danger-subtle)]'
               }`}>
                 <span className="text-base sm:text-lg">💰</span>
                 <span className={`text-base sm:text-lg font-bold ${
-                  sessionCredits > 0 ? 'text-amber-400' : 'text-red-400'
+                  sessionCredits > 0 ? 'text-[var(--gh-attention-fg)]' : 'text-[var(--gh-danger-fg)]'
                 }`}>
                   {sessionCredits > 0 ? '+' : ''}{sessionCredits}
                 </span>
@@ -795,7 +795,7 @@ function CompletedScreen({
               initial={{ width: 0 }}
               animate={{ width: `${userXP.progress}%` }}
               transition={{ delay: 0.8, duration: 0.5 }}
-              className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"
+              className="h-full bg-gradient-to-r from-[var(--gh-done-emphasis)] to-[var(--gh-accent-emphasis)] rounded-full"
             />
           </div>
         </motion.div>

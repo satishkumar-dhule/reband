@@ -271,8 +271,8 @@ export default function CertificationsGenZ() {
                       <div className="flex items-center gap-2">
                         <Target className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground flex-shrink-0" />
                         <span className={`text-xs font-semibold uppercase ${
-                          cert.difficulty === 'beginner' ? 'text-emerald-500' :
-                          cert.difficulty === 'intermediate' ? 'text-amber-500' :
+                          cert.difficulty === 'beginner' ? 'text-green-500' :
+                          cert.difficulty === 'intermediate' ? 'text-yellow-500' :
                           cert.difficulty === 'advanced' ? 'text-orange-500' :
                           'text-red-500'
                         }`}>

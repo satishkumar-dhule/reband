@@ -81,8 +81,8 @@ export default function Profile() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-card rounded-2xl border border-border overflow-hidden"
           >
-            {/* Top gradient section - Warm premium colors */}
-            <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-5">
+            {/* Top gradient section - Primary design system colors */}
+            <div className="bg-gradient-to-br from-cyan-600 via-purple-600 to-pink-600 p-5">
               {/* XP and Level row */}
               <div className="flex items-start justify-between mb-5">
                 {/* XP Progress */}
@@ -132,7 +132,7 @@ export default function Profile() {
             <div className="px-5 py-4">
               <div className="flex items-center gap-4">
                 {/* Avatar */}
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
                   <Code className="w-7 h-7 text-white" />
                 </div>
                 

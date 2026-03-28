@@ -5,48 +5,49 @@ import { useState } from "react";
 import { messageBus } from "@/agents/core/AgentMessageBus";
 
 // 30 Autonomous Agents Configuration
+// Using consistent design system colors (GitHub-style semantic palette)
 const agents = [
-  // UI/UX Agents (1-5)
-  { id: 'ui-ux-architect', name: 'UI/UX Architect', icon: '🎨', color: '#6366f1', category: 'UI/UX', desc: 'Design & prototyping' },
-  { id: 'design-system', name: 'Design System', icon: '🖌️', color: '#8b5cf6', category: 'UI/UX', desc: 'Component libraries' },
-  { id: 'accessibility', name: 'Accessibility', icon: '♿', color: '#10b981', category: 'UI/UX', desc: 'WCAG compliance' },
-  { id: 'animation', name: 'Animation', icon: '✨', color: '#f59e0b', category: 'UI/UX', desc: 'Motion & transitions' },
-  { id: 'responsive', name: 'Responsive', icon: '📱', color: '#ec4899', category: 'UI/UX', desc: 'Multi-device layouts' },
+  // UI/UX Agents (1-5) - Purple/Pink/Teal accent colors
+  { id: 'ui-ux-architect', name: 'UI/UX Architect', icon: '🎨', color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/30', category: 'UI/UX', desc: 'Design & prototyping' },
+  { id: 'design-system', name: 'Design System', icon: '🖌️', color: 'text-violet-500', bg: 'bg-violet-500/10', border: 'border-violet-500/30', category: 'UI/UX', desc: 'Component libraries' },
+  { id: 'accessibility', name: 'Accessibility', icon: '♿', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', category: 'UI/UX', desc: 'WCAG compliance' },
+  { id: 'animation', name: 'Animation', icon: '✨', color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30', category: 'UI/UX', desc: 'Motion & transitions' },
+  { id: 'responsive', name: 'Responsive', icon: '📱', color: 'text-pink-500', bg: 'bg-pink-500/10', border: 'border-pink-500/30', category: 'UI/UX', desc: 'Multi-device layouts' },
   
-  // Database Agents (6-10)
-  { id: 'db-architect', name: 'DB Architect', icon: '🏗️', color: '#3b82f6', category: 'Database', desc: 'Schema design' },
-  { id: 'query-optimizer', name: 'Query Optimizer', icon: '🔍', color: '#0ea5e9', category: 'Database', desc: 'SQL performance' },
-  { id: 'migration', name: 'Migration', icon: '🔄', color: '#14b8a6', category: 'Database', desc: 'Data migration' },
-  { id: 'backup', name: 'Backup', icon: '💾', color: '#64748b', category: 'Database', desc: 'Disaster recovery' },
-  { id: 'cache', name: 'Cache Manager', icon: '⚡', color: '#f97316', category: 'Database', desc: 'Redis caching' },
+  // Database Agents (6-10) - Blue/Sky/Teal colors
+  { id: 'db-architect', name: 'DB Architect', icon: '🏗️', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Database', desc: 'Schema design' },
+  { id: 'query-optimizer', name: 'Query Optimizer', icon: '🔍', color: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/30', category: 'Database', desc: 'SQL performance' },
+  { id: 'migration', name: 'Migration', icon: '🔄', color: 'text-teal-500', bg: 'bg-teal-500/10', border: 'border-teal-500/30', category: 'Database', desc: 'Data migration' },
+  { id: 'backup', name: 'Backup', icon: '💾', color: 'text-slate-500', bg: 'bg-slate-500/10', border: 'border-slate-500/30', category: 'Database', desc: 'Disaster recovery' },
+  { id: 'cache', name: 'Cache Manager', icon: '⚡', color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/30', category: 'Database', desc: 'Redis caching' },
   
-  // Google Agents (11-15)
-  { id: 'google-analytics', name: 'Google Analytics', icon: '📊', color: '#f9a8d4', category: 'Google', desc: 'User tracking' },
-  { id: 'google-auth', name: 'Google Auth', icon: '🔐', color: '#4285f4', category: 'Google', desc: 'OAuth/SSO' },
-  { id: 'google-cloud', name: 'Google Cloud', icon: '☁️', color: '#34a853', category: 'Google', desc: 'GCP deployment' },
-  { id: 'google-maps', name: 'Google Maps', icon: '🗺️', color: '#ea4335', category: 'Google', desc: 'Location services' },
-  { id: 'google-sheets', name: 'Google Sheets', icon: '📑', color: '#0f9d58', category: 'Google', desc: 'Data export' },
+  // Google Agents (11-15) - Google brand colors
+  { id: 'google-analytics', name: 'Google Analytics', icon: '📊', color: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/30', category: 'Google', desc: 'User tracking' },
+  { id: 'google-auth', name: 'Google Auth', icon: '🔐', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Google', desc: 'OAuth/SSO' },
+  { id: 'google-cloud', name: 'Google Cloud', icon: '☁️', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', category: 'Google', desc: 'GCP deployment' },
+  { id: 'google-maps', name: 'Google Maps', icon: '🗺️', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30', category: 'Google', desc: 'Location services' },
+  { id: 'google-sheets', name: 'Google Sheets', icon: '📑', color: 'text-green-600', bg: 'bg-green-600/10', border: 'border-green-600/30', category: 'Google', desc: 'Data export' },
   
-  // DevOps Agents (16-20)
-  { id: 'ci-cd', name: 'CI/CD Pipeline', icon: '🔄', color: '#06b6d4', category: 'DevOps', desc: 'Automation' },
-  { id: 'docker', name: 'Docker', icon: '🐳', color: '#2496ed', category: 'DevOps', desc: 'Containers' },
-  { id: 'kubernetes', name: 'Kubernetes', icon: '☸️', color: '#326ce5', category: 'DevOps', desc: 'Orchestration' },
-  { id: 'monitoring', name: 'Monitoring', icon: '📈', color: '#ef4444', category: 'DevOps', desc: 'System health' },
-  { id: 'security', name: 'Security', icon: '🛡️', color: '#7c3aed', category: 'DevOps', desc: 'Security scanning' },
+  // DevOps Agents (16-20) - Cyan/Blue colors
+  { id: 'ci-cd', name: 'CI/CD Pipeline', icon: '🔄', color: 'text-cyan-500', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', category: 'DevOps', desc: 'Automation' },
+  { id: 'docker', name: 'Docker', icon: '🐳', color: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/30', category: 'DevOps', desc: 'Containers' },
+  { id: 'kubernetes', name: 'Kubernetes', icon: '☸️', color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', category: 'DevOps', desc: 'Orchestration' },
+  { id: 'monitoring', name: 'Monitoring', icon: '📈', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30', category: 'DevOps', desc: 'System health' },
+  { id: 'security', name: 'Security', icon: '🛡️', color: 'text-violet-600', bg: 'bg-violet-600/10', border: 'border-violet-600/30', category: 'DevOps', desc: 'Security scanning' },
   
-  // AI/ML Agents (21-25)
-  { id: 'ai-assistant', name: 'AI Assistant', icon: '🤖', color: '#a855f7', category: 'AI/ML', desc: 'NLP & generative' },
-  { id: 'code-generator', name: 'Code Generator', icon: '💻', color: '#22c55e', category: 'AI/ML', desc: 'Code generation' },
-  { id: 'testing', name: 'Testing', icon: '🧪', color: '#eab308', category: 'AI/ML', desc: 'QA & coverage' },
-  { id: 'documentation', name: 'Documentation', icon: '📚', color: '#64748b', category: 'AI/ML', desc: 'API docs' },
-  { id: 'analytics-ml', name: 'ML Analytics', icon: '🔬', color: '#8b5cf6', category: 'AI/ML', desc: 'Data insights' },
+  // AI/ML Agents (21-25) - Purple/Lime colors
+  { id: 'ai-assistant', name: 'AI Assistant', icon: '🤖', color: 'text-fuchsia-500', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/30', category: 'AI/ML', desc: 'NLP & generative' },
+  { id: 'code-generator', name: 'Code Generator', icon: '💻', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30', category: 'AI/ML', desc: 'Code generation' },
+  { id: 'testing', name: 'Testing', icon: '🧪', color: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', category: 'AI/ML', desc: 'QA & coverage' },
+  { id: 'documentation', name: 'Documentation', icon: '📚', color: 'text-slate-500', bg: 'bg-slate-500/10', border: 'border-slate-500/30', category: 'AI/ML', desc: 'API docs' },
+  { id: 'analytics-ml', name: 'ML Analytics', icon: '🔬', color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/30', category: 'AI/ML', desc: 'Data insights' },
   
-  // Feature Agents (26-30)
-  { id: 'onboarding', name: 'Onboarding', icon: '🌟', color: '#f59e0b', category: 'Features', desc: 'User guidance' },
-  { id: 'notifications', name: 'Notifications', icon: '🔔', color: '#f43f5e', category: 'Features', desc: 'Push & email' },
-  { id: 'search', name: 'Search', icon: '🔎', color: '#3b82f6', category: 'Features', desc: 'Indexing' },
-  { id: 'api-gateway', name: 'API Gateway', icon: '🚪', color: '#6366f1', category: 'Features', desc: 'Routes & rate limiting' },
-  { id: 'feedback', name: 'Feedback', icon: '💬', color: '#14b8a6', category: 'Features', desc: 'Surveys' },
+  // Feature Agents (26-30) - Orange/Rose/Teal colors
+  { id: 'onboarding', name: 'Onboarding', icon: '🌟', color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30', category: 'Features', desc: 'User guidance' },
+  { id: 'notifications', name: 'Notifications', icon: '🔔', color: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/30', category: 'Features', desc: 'Push & email' },
+  { id: 'search', name: 'Search', icon: '🔎', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Features', desc: 'Indexing' },
+  { id: 'api-gateway', name: 'API Gateway', icon: '🚪', color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', category: 'Features', desc: 'Routes & rate limiting' },
+  { id: 'feedback', name: 'Feedback', icon: '💬', color: 'text-teal-500', bg: 'bg-teal-500/10', border: 'border-teal-500/30', category: 'Features', desc: 'Surveys' },
 ];
 
 // Get agent component based on selection
@@ -56,14 +57,14 @@ function AgentPanel({ agent }: { agent: typeof agents[0] }) {
       <div className="flex items-center gap-4 mb-4">
         <span className="text-4xl">{agent.icon}</span>
         <div>
-          <h2 className="text-2xl font-bold" style={{ color: agent.color }}>{agent.name}</h2>
+          <h2 className={`text-2xl font-bold ${agent.color}`}>{agent.name}</h2>
           <span className="text-sm text-muted-foreground">{agent.category} Agent</span>
         </div>
       </div>
       <p className="text-muted-foreground mb-4">{agent.desc}</p>
       <div className="flex gap-2 flex-wrap">
         <span className="px-3 py-1 rounded-full text-xs bg-primary/10 text-primary">Status: Active</span>
-        <span className="px-3 py-1 rounded-full text-xs bg-green-500/10 text-green-500">Message Passing: Enabled</span>
+        <span className={`px-3 py-1 rounded-full text-xs ${agent.bg} ${agent.color}`}>Message Passing: Enabled</span>
         <span className="px-3 py-1 rounded-full text-xs bg-blue-500/10 text-blue-500">Async: Ready</span>
       </div>
     </div>
@@ -100,7 +101,7 @@ export default function AgentsUltra() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <span className="px-3 py-1 rounded-full text-xs bg-green-500/10 text-green-500">● System Online</span>
+              <span className="px-3 py-1 rounded-full text-xs bg-emerald-500/10 text-emerald-500">● System Online</span>
               <span className="px-3 py-1 rounded-full text-xs bg-blue-500/10 text-blue-500">Message Bus: Active</span>
             </div>
           </div>
@@ -156,8 +157,8 @@ export default function AgentsUltra() {
                         </div>
                         <span className={`w-2 h-2 rounded-full ${
                           agentStatus[agent.id] === 'processing' 
-                            ? 'bg-yellow-500 animate-pulse' 
-                            : 'bg-green-500'
+                            ? 'bg-amber-500 animate-pulse' 
+                            : 'bg-emerald-500'
                         }`} />
                       </button>
                     ))}
@@ -176,22 +177,22 @@ export default function AgentsUltra() {
               <h3 className="text-lg font-semibold mb-4">🔄 Message Passing Demo</h3>
               <div className="space-y-2 font-mono text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-400">→</span>
+                  <span className="text-blue-500">→</span>
                   <span className="text-muted-foreground">User:</span>
                   <span>Requesting data from {selectedAgent.name}...</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-yellow-400">↔</span>
+                  <span className="text-amber-500">↔</span>
                   <span className="text-muted-foreground">Message Bus:</span>
                   <span>Routing message to {selectedAgent.id} via async queue</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
+                  <span className="text-emerald-500">✓</span>
                   <span className="text-muted-foreground">{selectedAgent.name}:</span>
                   <span>Processing request and coordinating with other agents...</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-purple-400">←</span>
+                  <span className="text-purple-500">←</span>
                   <span className="text-muted-foreground">Response:</span>
                   <span>Data returned to UI successfully</span>
                 </div>
@@ -205,11 +206,10 @@ export default function AgentsUltra() {
                 {agents.slice(0, 5).map(agent => (
                   <div 
                     key={agent.id}
-                    className="p-3 rounded-lg bg-muted text-center"
-                    style={{ borderColor: agent.color, borderWidth: 1 }}
+                    className={`p-3 rounded-lg bg-muted text-center border ${agent.border}`}
                   >
                     <span className="text-2xl block mb-1">{agent.icon}</span>
-                    <span className="text-xs font-medium">{agent.name.split(' ')[0]}</span>
+                    <span className={`text-xs font-medium ${agent.color}`}>{agent.name.split(' ')[0]}</span>
                   </div>
                 ))}
               </div>

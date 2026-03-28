@@ -248,7 +248,7 @@ export default function LearningPathsGenZ() {
               </div>
               <Button 
                 onClick={() => setShowCustom(true)}
-                className="bg-[var(--gh-success-emphasis)] text-white hover:bg-green-700"
+                className="bg-[var(--gh-accent-emphasis)] text-white hover:opacity-90"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Custom Path
@@ -262,7 +262,7 @@ export default function LearningPathsGenZ() {
                   onClick={() => setActiveTab(tab as any)}
                   className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                     activeTab === tab
-                      ? 'border-[#fd8c73] text-[var(--gh-fg)]'
+                      ? 'border-[var(--gh-accent-fg)] text-[var(--gh-fg)]'
                       : 'border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]'
                   }`}
                 >
@@ -275,9 +275,9 @@ export default function LearningPathsGenZ() {
               {filteredPaths.map((path) => {
                 const Icon = path.icon;
                 const difficultyColor = 
-                  path.difficulty === 'Beginner' ? 'bg-green-100 text-green-700 border-green-200' :
-                  path.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' :
-                  'bg-red-100 text-red-700 border-red-200';
+                  path.difficulty === 'Beginner' ? 'bg-[var(--gh-diff-beginner-bg)] text-[var(--gh-diff-beginner)] border-[var(--gh-diff-beginner)]' :
+                  path.difficulty === 'Intermediate' ? 'bg-[var(--gh-diff-intermediate-bg)] text-[var(--gh-diff-intermediate)] border-[var(--gh-diff-intermediate)]' :
+                  'bg-[var(--gh-diff-advanced-bg)] text-[var(--gh-diff-advanced)] border-[var(--gh-diff-advanced)]';
 
                 return (
                   <div 
@@ -401,7 +401,7 @@ export default function LearningPathsGenZ() {
                   <div className="p-4 border-t border-[var(--gh-border)] flex justify-end gap-3">
                     <Button variant="outline" onClick={() => setShowCustom(false)}>Cancel</Button>
                     <Button 
-                      className="bg-[var(--gh-success-emphasis)] text-white hover:bg-green-700"
+                      className="bg-[var(--gh-accent-emphasis)] text-white hover:opacity-90"
                       disabled={!customPath.name || customPath.channels.length === 0}
                       onClick={handleCreateCustomPath}
                     >

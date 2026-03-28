@@ -68,19 +68,19 @@ type ViewState = 'list' | 'challenge';
 const CODING_LANGUAGE_KEY = 'coding-preferred-language';
 const CODING_PROGRESS_PREFIX = 'coding-progress-';
 
-// Category configuration with icons and colors
+// Category configuration with icons and colors - using GitHub design system
 const CATEGORY_CONFIG: Record<string, { icon: React.ElementType; color: string; bgColor: string; label: string }> = {
-  arrays: { icon: Layers, color: 'text-blue-500', bgColor: 'bg-blue-500/10 border-blue-500/30', label: 'Arrays' },
-  strings: { icon: Hash, color: 'text-purple-500', bgColor: 'bg-purple-500/10 border-purple-500/30', label: 'Strings' },
-  stacks: { icon: Database, color: 'text-orange-500', bgColor: 'bg-orange-500/10 border-orange-500/30', label: 'Stacks & Queues' },
-  searching: { icon: Search, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10 border-cyan-500/30', label: 'Searching' },
-  'dynamic-programming': { icon: GitBranch, color: 'text-pink-500', bgColor: 'bg-pink-500/10 border-pink-500/30', label: 'Dynamic Programming' },
-  basics: { icon: Binary, color: 'text-green-500', bgColor: 'bg-green-500/10 border-green-500/30', label: 'Basics' },
-  'linked-lists': { icon: GitBranch, color: 'text-teal-500', bgColor: 'bg-teal-500/10 border-teal-500/30', label: 'Linked Lists' },
-  math: { icon: Binary, color: 'text-amber-500', bgColor: 'bg-amber-500/10 border-amber-500/30', label: 'Math' },
-  sorting: { icon: Layers, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10 border-indigo-500/30', label: 'Sorting' },
-  'two-pointers': { icon: ChevronRight, color: 'text-rose-500', bgColor: 'bg-rose-500/10 border-rose-500/30', label: 'Two Pointers' },
-  default: { icon: Braces, color: 'text-gray-500', bgColor: 'bg-gray-500/10 border-gray-500/30', label: 'Other' },
+  arrays: { icon: Layers, color: 'text-[var(--gh-accent-fg)]', bgColor: 'bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-fg)]/20', label: 'Arrays' },
+  strings: { icon: Hash, color: 'text-[var(--gh-done-fg)]', bgColor: 'bg-[var(--gh-done-subtle)] border-[var(--gh-done-fg)]/20', label: 'Strings' },
+  stacks: { icon: Database, color: 'text-[var(--gh-attention-fg)]', bgColor: 'bg-[var(--gh-attention-subtle)] border-[var(--gh-attention-fg)]/20', label: 'Stacks & Queues' },
+  searching: { icon: Search, color: 'text-[var(--gh-accent-fg)]', bgColor: 'bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-fg)]/20', label: 'Searching' },
+  'dynamic-programming': { icon: GitBranch, color: 'text-[var(--gh-danger-fg)]', bgColor: 'bg-[var(--gh-danger-subtle)] border-[var(--gh-danger-fg)]/20', label: 'Dynamic Programming' },
+  basics: { icon: Binary, color: 'text-[var(--gh-success-fg)]', bgColor: 'bg-[var(--gh-success-subtle)] border-[var(--gh-success-fg)]/20', label: 'Basics' },
+  'linked-lists': { icon: GitBranch, color: 'text-[var(--gh-success-fg)]', bgColor: 'bg-[var(--gh-success-subtle)] border-[var(--gh-success-fg)]/20', label: 'Linked Lists' },
+  math: { icon: Binary, color: 'text-[var(--gh-attention-fg)]', bgColor: 'bg-[var(--gh-attention-subtle)] border-[var(--gh-attention-fg)]/20', label: 'Math' },
+  sorting: { icon: Layers, color: 'text-[var(--gh-accent-fg)]', bgColor: 'bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-fg)]/20', label: 'Sorting' },
+  'two-pointers': { icon: ChevronRight, color: 'text-[var(--gh-danger-fg)]', bgColor: 'bg-[var(--gh-danger-subtle)] border-[var(--gh-danger-fg)]/20', label: 'Two Pointers' },
+  default: { icon: Braces, color: 'text-[var(--gh-fg-muted)]', bgColor: 'bg-[var(--gh-neutral-subtle)] border-[var(--gh-border)]/20', label: 'Other' },
 };
 
 function getStoredLanguage(): Language {
@@ -493,14 +493,14 @@ export default function CodingChallenge() {
                   <div className="text-[9px] text-muted-foreground uppercase">Solved</div>
                 </div>
                 <div className="border border-border p-3 bg-card rounded-lg text-center">
-                  <Code className="w-5 h-5 mx-auto mb-1 text-blue-500" />
+                  <Code className="w-5 h-5 mx-auto mb-1 text-[var(--gh-accent-fg)]" />
                   <div className="text-lg font-bold" data-testid="stat-attempts">
                     {stats.totalAttempts}
                   </div>
                   <div className="text-[9px] text-muted-foreground uppercase">Attempts</div>
                 </div>
                 <div className="border border-border p-3 bg-card rounded-lg text-center">
-                  <Clock className="w-5 h-5 mx-auto mb-1 text-green-500" />
+                  <Clock className="w-5 h-5 mx-auto mb-1 text-[var(--gh-success-fg)]" />
                   <div className="text-lg font-bold" data-testid="stat-time">
                     {formatTime(stats.averageTime)}
                   </div>
@@ -508,10 +508,10 @@ export default function CodingChallenge() {
                 </div>
                 <button 
                   onClick={() => setLocation('/profile')}
-                  className="border border-amber-500/30 p-3 bg-amber-500/10 rounded-lg text-center hover:bg-amber-500/20 transition-colors"
+                  className="border border-[var(--gh-attention-fg)]/30 p-3 bg-[var(--gh-attention-subtle)] rounded-lg text-center hover:bg-[var(--gh-attention-subtle)]/50 transition-colors"
                 >
-                  <Coins className="w-5 h-5 mx-auto mb-1 text-amber-500" />
-                  <div className="text-lg font-bold text-amber-500">{formatCredits(balance)}</div>
+                  <Coins className="w-5 h-5 mx-auto mb-1 text-[var(--gh-attention-fg)]" />
+                  <div className="text-lg font-bold text-[var(--gh-attention-fg)]">{formatCredits(balance)}</div>
                   <div className="text-[9px] text-muted-foreground uppercase">Credits</div>
                 </button>
               </motion.div>
@@ -531,7 +531,7 @@ export default function CodingChallenge() {
                   <h3 className="font-bold text-sm">Try Voice Interview</h3>
                   <p className="text-[10px] text-muted-foreground">Practice system design & behavioral questions</p>
                 </div>
-                <span className="text-xs font-bold text-green-400 flex items-center gap-1">
+                <span className="text-xs font-bold text-[var(--gh-success-fg)] flex items-center gap-1">
                   <Coins className="w-3 h-3" />+{config.VOICE_ATTEMPT}
                 </span>
               </motion.button>
@@ -570,14 +570,14 @@ export default function CodingChallenge() {
                 </button>
                 <button
                   onClick={() => startRandom('easy')}
-                  className="px-4 py-3 border border-green-500/50 text-green-500 font-bold rounded-lg hover:bg-green-500/10 transition-colors"
+                  className="px-4 py-3 border border-[var(--gh-success-fg)]/50 text-[var(--gh-success-fg)] font-bold rounded-lg hover:bg-[var(--gh-success-subtle)] transition-colors"
                   data-testid="easy-btn"
                 >
                   Easy
                 </button>
                 <button
                   onClick={() => startRandom('medium')}
-                  className="px-4 py-3 border border-yellow-500/50 text-yellow-500 font-bold rounded-lg hover:bg-yellow-500/10 transition-colors"
+                  className="px-4 py-3 border border-[var(--gh-attention-fg)]/50 text-[var(--gh-attention-fg)] font-bold rounded-lg hover:bg-[var(--gh-attention-subtle)] transition-colors"
                   data-testid="medium-btn"
                 >
                   Medium
@@ -643,7 +643,7 @@ export default function CodingChallenge() {
                                         {solvedInTopic}/{topicChallenges.length}
                                       </span>
                                       {solvedInTopic === topicChallenges.length && (
-                                        <CheckCircle className="w-2.5 h-2.5 text-green-500" />
+                                        <CheckCircle className="w-2.5 h-2.5 text-[var(--gh-success-fg)]" />
                                       )}
                                     </button>
 
@@ -661,16 +661,16 @@ export default function CodingChallenge() {
                                             >
                                               <span className="text-border/50 select-none text-[10px]">{isLast ? '└' : '├'}</span>
                                               {isSolved ? (
-                                                <CheckCircle className="w-2.5 h-2.5 text-green-500 flex-shrink-0" />
+                                                <CheckCircle className="w-2.5 h-2.5 text-[var(--gh-success-fg)] flex-shrink-0" />
                                               ) : (
                                                 <Code className="w-2.5 h-2.5 text-muted-foreground/60 flex-shrink-0" />
                                               )}
-                                              <span className={`flex-1 truncate text-[11px] ${isSolved ? 'text-green-600 dark:text-green-400' : 'text-foreground/80'}`}>
+                                              <span className={`flex-1 truncate text-[11px] ${isSolved ? 'text-[var(--gh-success-fg)]' : 'text-foreground/80'}`}>
                                                 {challenge.title}
                                               </span>
                                               <span
                                                 className={`text-[8px] w-3 text-center ${
-                                                  challenge.difficulty === 'easy' ? 'text-green-500' : 'text-yellow-500'
+                                                  challenge.difficulty === 'easy' ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-attention-fg)]'
                                                 }`}
                                               >
                                                 {challenge.difficulty === 'easy' ? '●' : '◆'}
@@ -712,8 +712,8 @@ export default function CodingChallenge() {
                 <span
                   className={`px-2 py-0.5 text-[10px] uppercase rounded font-bold ${
                     currentChallenge.difficulty === 'easy'
-                      ? 'bg-green-500/20 text-green-500'
-                      : 'bg-yellow-500/20 text-yellow-500'
+                      ? 'bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)]'
+                      : 'bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)]'
                   }`}
                   data-testid="challenge-difficulty"
                 >
@@ -800,12 +800,12 @@ export default function CodingChallenge() {
                           className="bg-muted/30 rounded-lg p-3 text-xs font-mono border border-border/50"
                         >
                           <div className="text-muted-foreground mb-1">
-                            <span className="text-blue-400">Input:</span>{' '}
+                            <span className="text-[var(--gh-accent-fg)]">Input:</span>{' '}
                             <span className="text-foreground">{tc.input}</span>
                           </div>
                           <div className="text-muted-foreground">
-                            <span className="text-green-400">Output:</span>{' '}
-                            <span className="text-green-500 font-semibold">{tc.expectedOutput}</span>
+                            <span className="text-[var(--gh-success-fg)]">Output:</span>{' '}
+                            <span className="text-[var(--gh-success-fg)] font-semibold">{tc.expectedOutput}</span>
                           </div>
                           {tc.description && (
                             <div className="text-muted-foreground/60 mt-1 text-[10px]">
@@ -821,7 +821,7 @@ export default function CodingChallenge() {
                   <div className="mb-4">
                     <button
                       onClick={() => setShowHints(!showHints)}
-                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-yellow-500 transition-colors"
+                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-[var(--gh-attention-fg)] transition-colors"
                       data-testid="hints-toggle"
                     >
                       <Lightbulb className="w-4 h-4" />
@@ -839,16 +839,16 @@ export default function CodingChallenge() {
                           {currentChallenge.hints.slice(0, hintIndex + 1).map((hint, i) => (
                             <div
                               key={i}
-                              className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 text-xs"
+                              className="bg-[var(--gh-attention-subtle)] border border-[var(--gh-attention-fg)]/30 rounded-lg p-3 text-xs"
                             >
-                              <span className="text-yellow-500 font-bold">💡 Hint {i + 1}:</span>{' '}
+                              <span className="text-[var(--gh-attention-fg)] font-bold">💡 Hint {i + 1}:</span>{' '}
                               {hint}
                             </div>
                           ))}
                           {hintIndex < currentChallenge.hints.length - 1 && (
                             <button
                               onClick={() => setHintIndex(hintIndex + 1)}
-                              className="text-xs text-yellow-500 hover:underline"
+                              className="text-xs text-[var(--gh-attention-fg)] hover:underline"
                               data-testid="next-hint-btn"
                             >
                               Show next hint →
@@ -871,16 +871,16 @@ export default function CodingChallenge() {
                         <TrendingUp className="w-3 h-3" />
                         Your Code Analysis (Live)
                       </h3>
-                      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 text-xs space-y-1">
+                      <div className="bg-[var(--gh-accent-subtle)] border border-[var(--gh-accent-fg)]/30 rounded-lg p-3 text-xs space-y-1">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Time Complexity:</span>
-                          <span className="font-mono font-bold text-blue-400">{userComplexity.time}</span>
+                          <span className="font-mono font-bold text-[var(--gh-accent-fg)]">{userComplexity.time}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Space Complexity:</span>
-                          <span className="font-mono font-bold text-blue-400">{userComplexity.space}</span>
+                          <span className="font-mono font-bold text-[var(--gh-accent-fg)]">{userComplexity.space}</span>
                         </div>
-                        <div className="text-muted-foreground/80 mt-2 pt-2 border-t border-blue-500/20">
+                        <div className="text-muted-foreground/80 mt-2 pt-2 border-t border-[var(--gh-accent-fg)]/20">
                           {userComplexity.explanation}
                         </div>
                       </div>
@@ -984,7 +984,7 @@ export default function CodingChallenge() {
                       aria-label="Copy code"
                     >
                       {copied ? (
-                        <Check className="w-4 h-4 text-green-500" />
+                        <Check className="w-4 h-4 text-[var(--gh-success-fg)]" />
                       ) : (
                         <Copy className="w-4 h-4 text-muted-foreground" />
                       )}
@@ -1019,12 +1019,12 @@ export default function CodingChallenge() {
                   >
                     <div className="flex items-center gap-2 mb-2">
                       {allPassed ? (
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <CheckCircle className="w-4 h-4 text-[var(--gh-success-fg)]" />
                       ) : (
-                        <AlertCircle className="w-4 h-4 text-red-500" />
+                        <AlertCircle className="w-4 h-4 text-[var(--gh-danger-fg)]" />
                       )}
                       <span
-                        className={`text-sm font-bold ${allPassed ? 'text-green-500' : 'text-red-500'}`}
+                        className={`text-sm font-bold ${allPassed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}`}
                         data-testid="test-summary"
                       >
                         {allPassed
@@ -1039,15 +1039,15 @@ export default function CodingChallenge() {
                           <div
                             key={result.testCaseId}
                             className={`text-xs p-2 rounded-lg ${
-                              result.passed ? 'bg-green-500/10' : 'bg-red-500/10'
+                              result.passed ? 'bg-[var(--gh-success-subtle)]' : 'bg-[var(--gh-danger-subtle)]'
                             }`}
                             data-testid={`test-result-${i}`}
                           >
                             <div className="flex items-center gap-2">
                               {result.passed ? (
-                                <CheckCircle className="w-3 h-3 text-green-500" />
+                                <CheckCircle className="w-3 h-3 text-[var(--gh-success-fg)]" />
                               ) : (
-                                <XCircle className="w-3 h-3 text-red-500" />
+                                <XCircle className="w-3 h-3 text-[var(--gh-danger-fg)]" />
                               )}
                               <span className="font-mono font-semibold">Test {i + 1}</span>
                               {result.executionTime !== undefined && (
@@ -1059,17 +1059,17 @@ export default function CodingChallenge() {
                             {!result.passed && (
                               <div className="mt-1 pl-5 text-muted-foreground font-mono">
                                 {result.error ? (
-                                  <span className="text-red-400">Error: {result.error}</span>
+                                  <span className="text-[var(--gh-danger-fg)]">Error: {result.error}</span>
                                 ) : (
                                   <div className="space-y-0.5">
                                     <div>
-                                      <span className="text-blue-400">Input:</span> {tc?.input}
+                                      <span className="text-[var(--gh-accent-fg)]">Input:</span> {tc?.input}
                                     </div>
                                     <div>
-                                      <span className="text-green-400">Expected:</span> {tc?.expectedOutput}
+                                      <span className="text-[var(--gh-success-fg)]">Expected:</span> {tc?.expectedOutput}
                                     </div>
                                     <div>
-                                      <span className="text-red-400">Got:</span> {result.actualOutput}
+                                      <span className="text-[var(--gh-danger-fg)]">Got:</span> {result.actualOutput}
                                     </div>
                                   </div>
                                 )}

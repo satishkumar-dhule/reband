@@ -196,10 +196,13 @@ export default function Certifications() {
                   <Target className="w-4 h-4 text-primary" />
                   <span>Exam-Aligned Questions</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-primary" />
-                  <span>Timed Practice Mode</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-amber-500" />
+                <h2 className="text-lg font-semibold">Ready for Exam Practice</h2>
+                <span className="text-xs px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-full font-semibold">
+                  {featuredCerts.length} available
+                </span>
+              </div>
               </div>
             </div>
             
@@ -487,8 +490,8 @@ function CertificationCard({
             {isSubscribed ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
           </button>
           {hasQuestions && (
-            <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-amber-500/10 text-amber-500">
-              EXAM
+            <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-500/10 text-amber-500 uppercase tracking-wide">
+              Exam
             </span>
           )}
           <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${diff.bg} ${diff.color} capitalize`}>

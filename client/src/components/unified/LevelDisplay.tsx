@@ -43,7 +43,7 @@ export function LevelDisplay({
           </div>
           {currentStreak > 0 && (
             <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center">
-              <Flame className="w-3 h-3 text-white" />
+              <Flame className="w-3 h-3 text-white dark:text-white" />
             </div>
           )}
         </div>
@@ -123,13 +123,13 @@ export function LevelDisplay({
         {currentStreak > 0 && (
           <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Flame className="w-4 h-4 text-orange-500" />
+              <Flame className="w-4 h-4 text-orange-500 dark:text-orange-400" />
               <span className="text-sm font-medium">{currentStreak} Day Streak</span>
             </div>
             {streakMultiplier > 1 && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-orange-500/10 rounded-full">
-                <Zap className="w-3 h-3 text-orange-500" />
-                <span className="text-xs font-bold text-orange-500">
+              <div className="flex items-center gap-1 px-2 py-1 bg-orange-500/10 dark:bg-orange-500/15 rounded-full">
+                <Zap className="w-3 h-3 text-orange-500 dark:text-orange-400" />
+                <span className="text-xs font-bold text-orange-500 dark:text-orange-400">
                   {streakMultiplier}x XP
                 </span>
               </div>
@@ -155,7 +155,7 @@ export function LevelDisplay({
             </div>
             {currentStreak > 0 && (
               <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center shadow-md">
-                <Flame className="w-4 h-4 text-white" />
+                <Flame className="w-4 h-4 text-white dark:text-white" />
               </div>
             )}
           </div>
@@ -212,19 +212,19 @@ export function LevelDisplay({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between p-3 bg-orange-500/10 rounded-lg border border-orange-500/20"
+          className="flex items-center justify-between p-3 bg-orange-500/10 dark:bg-orange-500/15 rounded-lg border border-orange-500/20"
         >
           <div className="flex items-center gap-2">
-            <Flame className="w-5 h-5 text-orange-500" />
+            <Flame className="w-5 h-5 text-orange-500 dark:text-orange-400" />
             <div>
               <div className="text-sm font-bold">{currentStreak} Day Streak</div>
               <div className="text-xs text-muted-foreground">Keep it going!</div>
             </div>
           </div>
           {streakMultiplier > 1 && (
-            <div className="flex items-center gap-1 px-3 py-1.5 bg-orange-500/20 rounded-full">
-              <Zap className="w-4 h-4 text-orange-500" />
-              <span className="text-sm font-bold text-orange-500">
+            <div className="flex items-center gap-1 px-3 py-1.5 bg-orange-500/20 dark:bg-orange-500/25 rounded-full">
+              <Zap className="w-4 h-4 text-orange-500 dark:text-orange-400" />
+              <span className="text-sm font-bold text-orange-500 dark:text-orange-400">
                 {streakMultiplier}x XP Bonus
               </span>
             </div>

@@ -100,23 +100,23 @@ export function AllChannelsGenZ() {
         description="Explore all interview topics and learning paths."
       />
       
-      <div className="bg-[var(--gh-canvas)] border-b border-[var(--gh-border-muted)]">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-8 md:px-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">Explore Topics</h1>
-              <p className="text-[var(--gh-fg-muted)] mt-1">
+              <h1 className="text-2xl font-semibold text-foreground">Explore Topics</h1>
+              <p className="text-muted-foreground mt-1">
                 Browse our collection of curated interview topics and certifications.
               </p>
             </div>
             <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--gh-fg-subtle)]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-1.5 bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-fg)] focus:border-transparent transition-all"
+                className="w-full pl-9 pr-4 py-1.5 bg-muted border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
               />
             </div>
           </div>
@@ -126,8 +126,8 @@ export function AllChannelsGenZ() {
               onClick={() => setSelectedCategory(null)}
               className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                 !selectedCategory 
-                  ? 'bg-[var(--gh-accent-emphasis)] text-white border-transparent' 
-                  : 'bg-[var(--gh-canvas)] text-[var(--gh-fg-muted)] border-[var(--gh-border)] hover:bg-[var(--gh-canvas-subtle)]'
+                  ? 'bg-primary text-primary-foreground border-transparent' 
+                  : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground'
               }`}
             >
               All Topics
@@ -138,8 +138,8 @@ export function AllChannelsGenZ() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
                   selectedCategory === cat
-                    ? 'bg-[var(--gh-accent-emphasis)] text-white border-transparent'
-                    : 'bg-[var(--gh-canvas)] text-[var(--gh-fg-muted)] border-[var(--gh-border)] hover:bg-[var(--gh-canvas-subtle)]'
+                    ? 'bg-primary text-primary-foreground border-transparent'
+                    : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground'
                 }`}
               >
                 {categoryLabels[cat] || cat}
@@ -164,39 +164,39 @@ export function AllChannelsGenZ() {
                 <div 
                   key={channel.id}
                   onClick={() => setLocation(`/channel/${channel.id}`)}
-                  className="group bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 hover:border-[var(--gh-accent-fg)] hover:shadow-sm transition-all cursor-pointer flex flex-col h-full"
+                  className="group bg-card border border-border rounded-md p-4 hover:border-primary hover:shadow-sm transition-all cursor-pointer flex flex-col h-full"
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <div className="p-2 bg-[var(--gh-canvas-subtle)] rounded-md border border-[var(--gh-border-muted)] group-hover:border-[var(--gh-accent-fg)] transition-colors">
-                      <Icon className="w-5 h-5 text-[var(--gh-fg-muted)] group-hover:text-[var(--gh-accent-fg)]" />
+                    <div className="p-2 bg-muted rounded-md border border-border-muted group-hover:border-primary transition-colors">
+                      <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
                     </div>
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--gh-canvas-inset)] text-[var(--gh-fg-muted)] border border-[var(--gh-border-muted)]">
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border-muted">
                       {categoryLabels[channel.category] || channel.category}
                     </span>
                   </div>
 
-                  <h3 className="font-semibold text-[var(--gh-fg)] group-hover:text-[var(--gh-accent-fg)] mb-1">
+                  <h3 className="font-semibold text-foreground group-hover:text-primary mb-1">
                     {channel.name}
                   </h3>
-                  <p className="text-sm text-[var(--gh-fg-muted)] line-clamp-2 mb-4 flex-grow">
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-grow">
                     {channel.description}
                   </p>
 
-                  <div className="mt-auto pt-4 border-t border-[var(--gh-border-muted)]">
+                  <div className="mt-auto pt-4 border-t border-border-muted">
                     <div className="flex justify-between items-center text-xs mb-1.5">
-                      <span className="text-[var(--gh-fg-subtle)]">
+                      <span className="text-muted-foreground">
                         {channelStat.total} questions
                       </span>
                       {progress > 0 && (
-                        <span className="font-medium text-[var(--gh-fg-muted)]">
+                        <span className="font-medium text-muted-foreground">
                           {Math.round(progress)}%
                         </span>
                       )}
                     </div>
                     {progress > 0 && (
-                      <div className="gh-progress">
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
                         <div 
-                          className="gh-progress-bar" 
+                          className="h-full bg-primary rounded-full transition-all duration-300"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -207,10 +207,10 @@ export function AllChannelsGenZ() {
             })}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 bg-[var(--gh-canvas)] border border-[var(--gh-border)] border-dashed rounded-md">
-            <Search className="w-12 h-12 text-[var(--gh-border)] mb-4" />
-            <h3 className="text-lg font-medium text-[var(--gh-fg)]">No topics found</h3>
-            <p className="text-[var(--gh-fg-muted)] mt-1">
+          <div className="flex flex-col items-center justify-center py-20 bg-card border border-border border-dashed rounded-md">
+            <Search className="w-12 h-12 text-border mb-4" />
+            <h3 className="text-lg font-medium text-foreground">No topics found</h3>
+            <p className="text-muted-foreground mt-1">
               Try adjusting your search or filters to find what you're looking for.
             </p>
             <button
@@ -218,7 +218,7 @@ export function AllChannelsGenZ() {
                 setSearchQuery('');
                 setSelectedCategory(null);
               }}
-              className="mt-4 gh-btn gh-btn-secondary"
+              className="mt-4 px-4 py-2 text-sm font-medium bg-muted text-foreground border border-border rounded-md hover:bg-muted/80 transition-colors"
             >
               Clear all filters
             </button>

@@ -152,7 +152,7 @@ export function SwipeableCard({
         dragElastic={0.2}
         style={{ x }}
         onDragEnd={handleDragEnd}
-        className={cn("relative bg-white dark:bg-gray-900", className)}
+        className={cn("relative bg-card", className)}
         role="article"
       >
         {children}

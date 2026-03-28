@@ -146,10 +146,10 @@ export default function UnifiedLearningPathsGenZ() {
 
   const getColorForPath = (pathType: string) => {
     const colorMap: Record<string, string> = {
-      'job-title': 'from-blue-500 to-cyan-500',
-      'company': 'from-green-500 to-emerald-500',
-      'skill': 'from-purple-500 to-pink-500',
-      'certification': 'from-orange-500 to-red-500'
+      'job-title': 'from-[var(--gh-accent-fg)] to-cyan-500',
+      'company': 'from-[var(--gh-success-fg)] to-emerald-500',
+      'skill': 'from-[var(--gh-done-fg)] to-pink-500',
+      'certification': 'from-[var(--gh-attention-fg)] to-orange-500'
     };
     return colorMap[pathType] || 'from-indigo-500 to-purple-500';
   };
@@ -494,7 +494,7 @@ export default function UnifiedLearningPathsGenZ() {
             {(view === 'all' || view === 'custom') && customPaths.length > 0 && (
               <div className="mb-8 md:mb-12">
                 <h2 className="text-2xl md:text-3xl font-black mb-4 md:mb-6 flex items-center gap-2 md:gap-3">
-                  <Brain className="w-6 h-6 md:w-8 md:h-8 text-purple-400" />
+                  <Brain className="w-6 h-6 md:w-8 md:h-8 text-[var(--gh-done-fg)]" />
                   My Custom Paths
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -560,7 +560,7 @@ export default function UnifiedLearningPathsGenZ() {
               <div>
                 <div className="flex items-center justify-between mb-4 md:mb-6">
                   <h2 className="text-2xl md:text-3xl font-black flex items-center gap-2 md:gap-3">
-                    <Star className="w-6 h-6 md:w-8 md:h-8 text-amber-400" />
+                    <Star className="w-6 h-6 md:w-8 md:h-8 text-[var(--gh-attention-fg)]" />
                     Curated Career Paths
                     {curatedSearchQuery && (
                       <span className="text-base md:text-lg font-normal text-muted-foreground">

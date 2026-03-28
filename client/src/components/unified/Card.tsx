@@ -64,7 +64,7 @@ export function Card({
   const roundedClass = roundedClasses[rounded];
   
   const hoverClass = hoverable 
-    ? 'hover:border-primary/30 hover:shadow-lg transition-all' 
+    ? 'hover:border-primary/40 hover:shadow-md transition-all duration-200' 
     : '';
   
   const clickableClass = clickable 
@@ -248,13 +248,13 @@ export function StatCard({
           <p className="text-sm text-muted-foreground mb-1">{label}</p>
           <p className="text-2xl font-bold">{value}</p>
           {trend !== undefined && (
-            <p className={`text-xs mt-1 ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            <p className={`text-xs mt-1 ${trend >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
               {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
             </p>
           )}
         </div>
         {icon && (
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+          <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
             {icon}
           </div>
         )}

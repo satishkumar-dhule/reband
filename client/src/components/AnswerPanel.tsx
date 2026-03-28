@@ -175,7 +175,7 @@ function renderWithInlineCode(text: string): React.ReactNode {
       return (
         <code 
           key={index}
-          className="px-1.5 py-0.5 mx-0.5 bg-cyan-500/20 text-cyan-300 rounded text-[0.9em] font-mono"
+          className="px-1.5 py-0.5 mx-0.5 bg-primary/15 text-primary rounded text-[0.9em] font-mono"
         >
           {part}
         </code>
@@ -380,7 +380,7 @@ function TabbedMediaPanel({
   if (availableTabs.length === 0) return null;
 
   const tabConfig = {
-    tldr: { label: 'TL;DR', icon: <Lightbulb className="w-3.5 h-3.5" />, color: 'text-cyan-400' },
+    tldr: { label: 'TL;DR', icon: <Lightbulb className="w-3.5 h-3.5" />, color: 'text-primary' },
     diagram: { label: 'Diagram', icon: <GitBranch className="w-3.5 h-3.5" />, color: 'text-purple-400' },
     eli5: { label: 'ELI5', icon: <Baby className="w-3.5 h-3.5" />, color: 'text-green-400' },
     video: { label: 'Video', icon: <Play className="w-3.5 h-3.5" />, color: 'text-pink-400' },
@@ -408,7 +408,7 @@ function TabbedMediaPanel({
               <motion.div
                 layoutId="activeTabIndicator"
                 className={`absolute bottom-0 left-0 right-0 h-0.5 ${
-                  tab === 'tldr' ? 'bg-cyan-400' :
+                  tab === 'tldr' ? 'bg-primary' :
                   tab === 'diagram' ? 'bg-purple-400' :
                   tab === 'eli5' ? 'bg-green-400' : 'bg-pink-400'
                 }`}
@@ -430,7 +430,7 @@ function TabbedMediaPanel({
               transition={{ duration: 0.2 }}
               className="flex items-start gap-2"
             >
-              <Lightbulb aria-hidden="true" className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+              <Lightbulb aria-hidden="true" className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <p className="text-sm text-foreground/90 leading-relaxed">{renderWithInlineCode(question.answer)}</p>
             </motion.div>
           )}
@@ -668,9 +668,9 @@ export function AnswerPanel({ question }: AnswerPanelProps) {
             )}
             {blogPost && (
               <a href={`https://openstackdaily.github.io${blogPost.url}`} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-md text-[10px]">
-                <FileText className="w-2.5 h-2.5 text-cyan-400" />
-                <span className="text-cyan-400">Blog</span>
+                className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-md text-[10px]">
+                <FileText className="w-2.5 h-2.5 text-primary" />
+                <span className="text-primary">Blog</span>
               </a>
             )}
           </div>

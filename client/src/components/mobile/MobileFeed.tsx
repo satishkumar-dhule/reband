@@ -252,7 +252,7 @@ function StatsCard({
         {/* Stats Grid */}
         <div className="grid grid-cols-4 divide-x divide-border/50">
           <StatItem icon={<Target className="w-4 h-4" />} value={totalQuestions.toLocaleString()} label="Questions" />
-          <StatItem icon={<Flame className="w-4 h-4" />} value={streak.toString()} label="Day Streak" color="text-orange-500" />
+          <StatItem icon={<Flame className="w-4 h-4" />} value={streak.toString()} label="Day Streak" color="text-amber-500" />
           <StatItem icon={<Bookmark className="w-4 h-4" />} value={channelCount.toString()} label="Subscribed" />
           <StatItem icon={<Layers className="w-4 h-4" />} value={topicsCount.toString()} label="Topics" />
         </div>

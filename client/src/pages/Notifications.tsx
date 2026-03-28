@@ -26,17 +26,17 @@ interface Notification {
 const STORAGE_KEY = 'app-notifications';
 
 const typeIcons = {
-  success: <CheckCircle className="w-5 h-5 text-green-500" />,
-  error: <AlertCircle className="w-5 h-5 text-red-500" />,
-  info: <Info className="w-5 h-5 text-blue-500" />,
-  warning: <AlertTriangle className="w-5 h-5 text-yellow-500" />,
+  success: <CheckCircle className="w-5 h-5 text-[var(--gh-success-fg)]" />,
+  error: <AlertCircle className="w-5 h-5 text-[var(--gh-danger-fg)]" />,
+  info: <Info className="w-5 h-5 text-[var(--gh-accent-fg)]" />,
+  warning: <AlertTriangle className="w-5 h-5 text-[var(--gh-attention-fg)]" />,
 };
 
 const typeColors = {
-  success: 'bg-green-500/10 border-green-500/20',
-  error: 'bg-red-500/10 border-red-500/20',
-  info: 'bg-blue-500/10 border-blue-500/20',
-  warning: 'bg-yellow-500/10 border-yellow-500/20',
+  success: 'bg-[var(--gh-success-subtle)] border-[var(--gh-success-emphasis)]/20',
+  error: 'bg-[var(--gh-danger-subtle)] border-[var(--gh-danger-emphasis)]/20',
+  info: 'bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-emphasis)]/20',
+  warning: 'bg-[var(--gh-attention-subtle)] border-[var(--gh-attention-emphasis)]/20',
 };
 
 export default function Notifications() {

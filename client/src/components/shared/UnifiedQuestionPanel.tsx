@@ -188,7 +188,7 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
                 key={idx}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold whitespace-nowrap flex-shrink-0"
+                className="px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary text-xs font-semibold whitespace-nowrap flex-shrink-0"
               >
                 {company}
               </motion.span>

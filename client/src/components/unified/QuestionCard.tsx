@@ -247,16 +247,16 @@ export function QuestionCard({
             {/* Completed indicator */}
             {showCompleted && isCompleted && (
               <div className="flex items-center gap-1 px-2 py-1 bg-green-500/10 border border-green-500/20 rounded-md">
-                <Check className="w-3 h-3 text-green-500" />
-                <span className={`font-medium text-green-500 ${sizeConfig.meta}`}>Done</span>
+                <Check className="w-3 h-3 text-green-500 dark:text-green-400" />
+                <span className={`font-medium text-green-500 dark:text-green-400 ${sizeConfig.meta}`}>Done</span>
               </div>
             )}
 
             {/* NEW badge - show for new questions */}
             {question.isNew && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-md">
-                <Sparkles className="w-3 h-3 text-purple-500" />
-                <span className={`font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent ${sizeConfig.meta}`}>NEW</span>
+              <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-violet-500/10 to-pink-500/10 border border-violet-500/20 rounded-md">
+                <Sparkles className="w-3 h-3 text-violet-500 dark:text-violet-400" />
+                <span className={`font-bold bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent ${sizeConfig.meta}`}>NEW</span>
               </div>
             )}
 
@@ -302,7 +302,7 @@ export function QuestionCard({
           <div className="flex items-center gap-1.5 mb-2 flex-wrap">
             <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
             {question.companies.map((company, idx) => (
-              <span key={idx} className={`px-2 py-0.5 bg-blue-500/10 text-blue-500 font-medium rounded-full ${sizeConfig.meta}`}>
+              <span key={idx} className={`px-2 py-0.5 bg-primary/10 text-primary font-medium rounded-full ${sizeConfig.meta}`}>
                 {company}
               </span>
             ))}
@@ -418,7 +418,7 @@ export function CompactQuestionCard({
               size="xs"
             />
             {isCompleted && (
-              <Check className="w-3.5 h-3.5 text-green-500" />
+              <Check className="w-3.5 h-3.5 text-green-500 dark:text-green-400" />
             )}
           </div>
           <h3 className="font-semibold text-sm line-clamp-2 mb-1">

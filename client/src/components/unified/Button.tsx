@@ -29,12 +29,12 @@ interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'cla
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm',
-  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-  outline: 'border border-border bg-transparent hover:bg-muted/50',
-  ghost: 'bg-transparent hover:bg-muted/50',
-  danger: 'bg-red-500 text-white hover:bg-red-600 shadow-sm',
-  success: 'bg-green-500 text-white hover:bg-green-600 shadow-sm'
+  primary: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm focus-visible:ring-primary/50',
+  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border focus-visible:ring-secondary/50',
+  outline: 'border border-border bg-transparent hover:bg-muted/50 text-foreground focus-visible:ring-ring/50',
+  ghost: 'bg-transparent hover:bg-muted/50 text-foreground focus-visible:ring-ring/50',
+  danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm focus-visible:ring-destructive/50',
+  success: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm focus-visible:ring-emerald-500/50'
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

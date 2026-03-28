@@ -103,8 +103,8 @@ function getBotConfig(botName: string) {
   return BOT_CONFIG[botName] || { 
     name: botName, 
     icon: Bot, 
-    color: 'text-gray-500 bg-gray-500/10 border-gray-500/30',
-    gradient: 'from-gray-500 to-gray-600',
+    color: 'text-slate-500 bg-slate-500/10 border-slate-500/30',
+    gradient: 'from-slate-500 to-slate-600',
     description: 'Unknown bot'
   };
 }
@@ -336,7 +336,7 @@ export default function BotActivity() {
                         <div className="text-[10px] text-muted-foreground uppercase">Runs</div>
                       </div>
                       <div>
-                        <div className="text-lg font-bold text-green-500">
+                        <div className="text-lg font-bold text-emerald-500">
                           {stats?.successfulRuns || 0}
                         </div>
                         <div className="text-[10px] text-muted-foreground uppercase">Success</div>
@@ -455,9 +455,9 @@ export default function BotActivity() {
                                 <span className="font-medium text-sm">{config.name}</span>
                                 <span className={cn(
                                   "text-xs px-2 py-0.5 rounded-full",
-                                  run.status === 'completed' ? "bg-green-500/20 text-green-500" :
-                                  run.status === 'running' ? "bg-blue-500/20 text-blue-500" :
-                                  "bg-red-500/20 text-red-500"
+                                  run.status === 'completed' ? "bg-emerald-500/10 text-emerald-500" :
+                                  run.status === 'running' ? "bg-blue-500/10 text-blue-500" :
+                                  "bg-red-500/10 text-red-500"
                                 )}>
                                   {run.status}
                                 </span>
@@ -510,7 +510,7 @@ export default function BotActivity() {
                 </div>
                 {workQueue.length === 0 ? (
                   <div className="p-8 text-center">
-                    <CheckCircle className="w-8 h-8 mx-auto text-green-500 mb-2" />
+                    <CheckCircle className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
                     <p className="text-sm text-muted-foreground">Queue is empty</p>
                   </div>
                 ) : (
@@ -524,7 +524,7 @@ export default function BotActivity() {
                             <div className={cn(
                               "w-8 h-8 rounded-lg flex items-center justify-center",
                               item.action === 'delete' ? "bg-red-500/10 text-red-500" :
-                              item.action === 'improve' ? "bg-purple-500/10 text-purple-500" :
+                              item.action === 'improve' ? "bg-violet-500/10 text-violet-500" :
                               "bg-amber-500/10 text-amber-500"
                             )}>
                               {item.action === 'delete' ? <Trash2 className="w-4 h-4" /> :
@@ -538,10 +538,10 @@ export default function BotActivity() {
                                 <ItemLink itemType={item.itemType} itemId={item.itemId} />
                                 <span className={cn(
                                   "text-xs px-2 py-0.5 rounded-full",
-                                  item.status === 'pending' ? "bg-amber-500/20 text-amber-500" :
-                                  item.status === 'processing' ? "bg-blue-500/20 text-blue-500" :
-                                  item.status === 'completed' ? "bg-green-500/20 text-green-500" :
-                                  "bg-red-500/20 text-red-500"
+                                  item.status === 'pending' ? "bg-amber-500/10 text-amber-500" :
+                                  item.status === 'processing' ? "bg-blue-500/10 text-blue-500" :
+                                  item.status === 'completed' ? "bg-emerald-500/10 text-emerald-500" :
+                                  "bg-red-500/10 text-red-500"
                                 )}>
                                   {item.status}
                                 </span>
@@ -599,11 +599,11 @@ export default function BotActivity() {
                                 <span className="font-medium text-sm">{config.name}</span>
                                 <span className={cn(
                                   "text-xs px-2 py-0.5 rounded-full",
-                                  entry.action === 'create' ? "bg-cyan-500/20 text-cyan-500" :
-                                  entry.action === 'update' ? "bg-purple-500/20 text-purple-500" :
-                                  entry.action === 'delete' ? "bg-red-500/20 text-red-500" :
-                                  entry.action === 'verify' ? "bg-green-500/20 text-green-500" :
-                                  "bg-amber-500/20 text-amber-500"
+                                  entry.action === 'create' ? "bg-cyan-500/10 text-cyan-500" :
+                                  entry.action === 'update' ? "bg-violet-500/10 text-violet-500" :
+                                  entry.action === 'delete' ? "bg-red-500/10 text-red-500" :
+                                  entry.action === 'verify' ? "bg-emerald-500/10 text-emerald-500" :
+                                  "bg-amber-500/10 text-amber-500"
                                 )}>
                                   {entry.action}
                                 </span>

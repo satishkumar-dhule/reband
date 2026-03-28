@@ -96,7 +96,7 @@ export function RecordingPanel({
 
       {/* Tips */}
       {tip && (
-        <div className="mt-4 p-3 bg-blue-500/10 rounded-lg">
+        <div className="mt-4 p-3 bg-blue-500/10 dark:bg-blue-500/15 rounded-lg">
           <p className="text-xs text-blue-600 dark:text-blue-400">
             💡 {tip}
           </p>

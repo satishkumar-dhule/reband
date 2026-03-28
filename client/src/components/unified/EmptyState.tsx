@@ -32,20 +32,20 @@ const variantClasses: Record<EmptyStateVariant, { iconBg: string; iconText: stri
     iconText: 'text-muted-foreground'
   },
   info: {
-    iconBg: 'bg-blue-500/10',
-    iconText: 'text-blue-500'
+    iconBg: 'bg-blue-500/10 dark:bg-blue-500/15',
+    iconText: 'text-blue-500 dark:text-blue-400'
   },
   warning: {
-    iconBg: 'bg-yellow-500/10',
-    iconText: 'text-yellow-500'
+    iconBg: 'bg-yellow-500/10 dark:bg-yellow-500/15',
+    iconText: 'text-yellow-500 dark:text-yellow-400'
   },
   error: {
-    iconBg: 'bg-red-500/10',
-    iconText: 'text-red-500'
+    iconBg: 'bg-red-500/10 dark:bg-red-500/15',
+    iconText: 'text-red-500 dark:text-red-400'
   },
   success: {
-    iconBg: 'bg-green-500/10',
-    iconText: 'text-green-500'
+    iconBg: 'bg-green-500/10 dark:bg-green-500/15',
+    iconText: 'text-green-500 dark:text-green-400'
   }
 };
 

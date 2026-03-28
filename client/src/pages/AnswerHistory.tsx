@@ -181,7 +181,7 @@ export default function AnswerHistory() {
             className="mb-8"
           >
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center">
                 <History className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -197,29 +197,29 @@ export default function AnswerHistory() {
               icon={<CheckCircle className="w-5 h-5" />}
               label="Total Answered"
               value={stats.totalAnswered}
-              color="text-green-500"
-              bgColor="bg-green-500/10"
+              color="text-[var(--gh-success-fg)]"
+              bgColor="bg-[var(--gh-success-subtle)]"
             />
             <StatCard
               icon={<BarChart3 className="w-5 h-5" />}
               label="Channels Used"
               value={stats.channelsUsed}
-              color="text-blue-500"
-              bgColor="bg-blue-500/10"
+              color="text-[var(--gh-accent-fg)]"
+              bgColor="bg-[var(--gh-accent-subtle)]"
             />
             <StatCard
               icon={<TrendingUp className="w-5 h-5" />}
               label="Per Day (7d avg)"
               value={stats.questionsPerDay}
-              color="text-purple-500"
-              bgColor="bg-purple-500/10"
+              color="text-[var(--gh-done-fg)]"
+              bgColor="bg-[var(--gh-done-subtle)]"
             />
             <StatCard
               icon={<Calendar className="w-5 h-5" />}
               label="Current Streak"
               value={`${stats.currentStreak} days`}
-              color="text-amber-500"
-              bgColor="bg-amber-500/10"
+              color="text-[var(--gh-attention-fg)]"
+              bgColor="bg-[var(--gh-attention-subtle)]"
             />
           </div>
 

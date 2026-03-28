@@ -564,9 +564,9 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
               label={selectedDifficulty === 'all' ? 'Difficulty' : selectedDifficulty}
               options={[
                 { id: 'all', label: 'All Levels', icon: <Target className="w-3 h-3" /> },
-                { id: 'beginner', label: 'Easy', icon: <Zap className="w-3 h-3 text-green-500" /> },
-                { id: 'intermediate', label: 'Medium', icon: <Target className="w-3 h-3 text-yellow-500" /> },
-                { id: 'advanced', label: 'Hard', icon: <Flame className="w-3 h-3 text-red-500" /> },
+                { id: 'beginner', label: 'Easy', icon: <Zap className="w-3 h-3 text-emerald-500" /> },
+                { id: 'intermediate', label: 'Medium', icon: <Target className="w-3 h-3 text-amber-500" /> },
+                { id: 'advanced', label: 'Hard', icon: <Flame className="w-3 h-3 text-rose-500" /> },
               ]}
               selected={selectedDifficulty}
               onSelect={(v) => onFilterChange('diff', v)}
@@ -617,9 +617,9 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
             label={selectedDifficulty === 'all' ? 'Level' : selectedDifficulty.slice(0, 4)}
             options={[
               { id: 'all', label: 'All Levels', icon: <Target className="w-3 h-3" /> },
-              { id: 'beginner', label: 'Easy', icon: <Zap className="w-3 h-3 text-green-500" /> },
-              { id: 'intermediate', label: 'Medium', icon: <Target className="w-3 h-3 text-yellow-500" /> },
-              { id: 'advanced', label: 'Hard', icon: <Flame className="w-3 h-3 text-red-500" /> },
+            { id: 'beginner', label: 'Easy', icon: <Zap className="w-3 h-3 text-emerald-500" /> },
+            { id: 'intermediate', label: 'Medium', icon: <Target className="w-3 h-3 text-amber-500" /> },
+            { id: 'advanced', label: 'Hard', icon: <Flame className="w-3 h-3 text-rose-500" /> },
             ]}
             selected={selectedDifficulty}
             onSelect={(v) => onFilterChange('diff', v)}

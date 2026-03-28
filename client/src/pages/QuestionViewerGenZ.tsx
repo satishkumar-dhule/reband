@@ -360,7 +360,7 @@ export default function QuestionViewerGenZ() {
                     className={cn(
                       "p-1.5 rounded-md border transition-colors",
                       markedQuestions.includes(currentQuestion?.id || '')
-                        ? "bg-yellow-50 border-yellow-400 text-yellow-600"
+                        ? "bg-amber-50 border-amber-400 text-amber-600"
                         : "border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:bg-[var(--gh-canvas-subtle)]"
                     )}
                     aria-label="Bookmark"
@@ -431,7 +431,7 @@ export default function QuestionViewerGenZ() {
                 {/* Feedback & SRS Controls */}
                 <div className="gh-card p-6 bg-[var(--gh-canvas-inset)] border-dashed">
                   <h3 className="text-sm font-semibold text-[var(--gh-fg)] mb-4 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-yellow-500" />
+                    <Zap className="w-4 h-4 text-amber-500" />
                     How well did you know this?
                   </h3>
                   
@@ -439,25 +439,25 @@ export default function QuestionViewerGenZ() {
                     <div className="flex flex-wrap gap-2">
                       <button 
                         onClick={() => handleSRSRating('again')}
-                        className="gh-btn gh-btn-secondary border-red-200 hover:bg-red-50 hover:text-red-700"
+                        className="gh-btn gh-btn-secondary border-red-300 hover:bg-red-50 hover:text-red-700"
                       >
                         Again
                       </button>
                       <button 
                         onClick={() => handleSRSRating('hard')}
-                        className="gh-btn gh-btn-secondary border-orange-200 hover:bg-orange-50 hover:text-orange-700"
+                        className="gh-btn gh-btn-secondary border-orange-300 hover:bg-orange-50 hover:text-orange-700"
                       >
                         Hard
                       </button>
                       <button 
                         onClick={() => handleSRSRating('good')}
-                        className="gh-btn gh-btn-secondary border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                        className="gh-btn gh-btn-secondary border-blue-300 hover:bg-blue-50 hover:text-blue-700"
                       >
                         Good
                       </button>
                       <button 
                         onClick={() => handleSRSRating('easy')}
-                        className="gh-btn gh-btn-secondary border-green-200 hover:bg-green-50 hover:text-green-700"
+                        className="gh-btn gh-btn-secondary border-green-300 hover:bg-green-50 hover:text-green-700"
                       >
                         Easy
                       </button>
@@ -518,7 +518,7 @@ export default function QuestionViewerGenZ() {
               </div>
               <div className="p-4 space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
+                  <div className="w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center text-blue-500 border border-blue-100">
                     <Layers className="w-6 h-6" />
                   </div>
                   <div>

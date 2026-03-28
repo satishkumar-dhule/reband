@@ -206,9 +206,9 @@ export default function PersonalizedPath() {
               className="mb-8"
             >
               <div className="flex items-center gap-2 mb-4">
-                <Zap className="w-5 h-5 text-red-500" />
+                <Zap className="w-5 h-5 text-[var(--gh-danger-fg)]" />
                 <h3 className="text-xl font-bold text-foreground">Must-Know Topics</h3>
-                <span className="px-2 py-1 bg-red-500/10 text-red-500 text-xs font-bold rounded-full">
+                <span className="px-2 py-1 bg-[var(--gh-danger-subtle)] text-[var(--gh-danger-fg)] text-xs font-bold rounded-full">
                   REQUIRED
                 </span>
               </div>
@@ -247,9 +247,9 @@ export default function PersonalizedPath() {
               className="mb-8"
             >
               <div className="flex items-center gap-2 mb-4">
-                <Target className="w-5 h-5 text-blue-500" />
+                <Target className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                 <h3 className="text-xl font-bold text-foreground">Recommended Topics</h3>
-                <span className="px-2 py-1 bg-blue-500/10 text-blue-500 text-xs font-bold rounded-full">
+                <span className="px-2 py-1 bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)] text-xs font-bold rounded-full">
                   NICE TO HAVE
                 </span>
               </div>
@@ -287,7 +287,7 @@ export default function PersonalizedPath() {
               transition={{ delay: 0.3 }}
             >
               <div className="flex items-center gap-2 mb-4">
-                <Award className="w-5 h-5 text-yellow-500" />
+                <Award className="w-5 h-5 text-[var(--gh-attention-fg)]" />
                 <h3 className="text-xl font-bold text-foreground">Recommended Certifications</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -298,13 +298,13 @@ export default function PersonalizedPath() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 + idx * 0.05 }}
                     onClick={() => setLocation(`/certifications/${cert}`)}
-                    className="group bg-card border border-border rounded-lg p-4 hover:border-yellow-500/50 hover:shadow-lg hover:shadow-yellow-500/10 cursor-pointer transition-all"
+                    className="group bg-card border border-border rounded-lg p-4 hover:border-[var(--gh-attention-fg)]/50 hover:shadow-lg hover:shadow-[var(--gh-attention-fg)]/10 cursor-pointer transition-all"
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-bold text-foreground group-hover:text-yellow-500 transition-colors">
+                      <h4 className="font-bold text-foreground group-hover:text-[var(--gh-attention-fg)] transition-colors">
                         {cert.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                       </h4>
-                      <Award className="w-4 h-4 text-yellow-500" />
+                      <Award className="w-4 h-4 text-[var(--gh-attention-fg)]" />
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Clock className="w-3 h-3" />

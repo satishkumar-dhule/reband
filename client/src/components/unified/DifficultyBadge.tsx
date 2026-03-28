@@ -28,31 +28,34 @@ const levelConfig = {
   beginner: {
     label: 'Beginner',
     icon: Zap,
+    // Uses GitHub design system tokens: --gh-diff-beginner / --gh-diff-beginner-bg
     colors: {
-      solid: 'bg-green-500 text-white',
-      soft: 'bg-green-500/10 text-green-600 dark:text-green-400',
-      outline: 'border-green-500/30 text-green-600 dark:text-green-400',
-      minimal: 'text-green-600 dark:text-green-400'
+      solid: 'bg-[var(--gh-diff-beginner)] text-white',
+      soft: 'bg-[var(--gh-diff-beginner-bg)] text-[var(--gh-diff-beginner)]',
+      outline: 'border-[var(--gh-diff-beginner)]/30 text-[var(--gh-diff-beginner)]',
+      minimal: 'text-[var(--gh-diff-beginner)]'
     }
   },
   intermediate: {
     label: 'Intermediate',
     icon: Target,
+    // Uses GitHub design system tokens: --gh-diff-intermediate / --gh-diff-intermediate-bg
     colors: {
-      solid: 'bg-yellow-500 text-white',
-      soft: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400',
-      outline: 'border-yellow-500/30 text-yellow-600 dark:text-yellow-400',
-      minimal: 'text-yellow-600 dark:text-yellow-400'
+      solid: 'bg-[var(--gh-diff-intermediate)] text-white',
+      soft: 'bg-[var(--gh-diff-intermediate-bg)] text-[var(--gh-diff-intermediate)]',
+      outline: 'border-[var(--gh-diff-intermediate)]/30 text-[var(--gh-diff-intermediate)]',
+      minimal: 'text-[var(--gh-diff-intermediate)]'
     }
   },
   advanced: {
     label: 'Advanced',
     icon: Flame,
+    // Uses GitHub design system tokens: --gh-diff-advanced / --gh-diff-advanced-bg
     colors: {
-      solid: 'bg-red-500 text-white',
-      soft: 'bg-red-500/10 text-red-600 dark:text-red-400',
-      outline: 'border-red-500/30 text-red-600 dark:text-red-400',
-      minimal: 'text-red-600 dark:text-red-400'
+      solid: 'bg-[var(--gh-diff-advanced)] text-white',
+      soft: 'bg-[var(--gh-diff-advanced-bg)] text-[var(--gh-diff-advanced)]',
+      outline: 'border-[var(--gh-diff-advanced)]/30 text-[var(--gh-diff-advanced)]',
+      minimal: 'text-[var(--gh-diff-advanced)]'
     }
   }
 };
@@ -132,10 +135,11 @@ export function DifficultyIndicator({
     lg: 'w-2.5 h-2.5'
   };
 
+  // Uses GitHub design system tokens
   const colors = {
-    beginner: 'bg-green-500',
-    intermediate: 'bg-yellow-500',
-    advanced: 'bg-red-500'
+    beginner: 'bg-[var(--gh-diff-beginner)]',
+    intermediate: 'bg-[var(--gh-diff-intermediate)]',
+    advanced: 'bg-[var(--gh-diff-advanced)]'
   };
 
   return (
@@ -186,21 +190,21 @@ export function DifficultyProgress({
       <div className={`flex ${heightClass} rounded-full overflow-hidden bg-muted`}>
         {beginnerPct > 0 && (
           <div
-            className="bg-green-500"
+            className="bg-[var(--gh-diff-beginner)]"
             style={{ width: `${beginnerPct}%` }}
             title={`${stats.beginner} Beginner (${Math.round(beginnerPct)}%)`}
           />
         )}
         {intermediatePct > 0 && (
           <div
-            className="bg-yellow-500"
+            className="bg-[var(--gh-diff-intermediate)]"
             style={{ width: `${intermediatePct}%` }}
             title={`${stats.intermediate} Intermediate (${Math.round(intermediatePct)}%)`}
           />
         )}
         {advancedPct > 0 && (
           <div
-            className="bg-red-500"
+            className="bg-[var(--gh-diff-advanced)]"
             style={{ width: `${advancedPct}%` }}
             title={`${stats.advanced} Advanced (${Math.round(advancedPct)}%)`}
           />

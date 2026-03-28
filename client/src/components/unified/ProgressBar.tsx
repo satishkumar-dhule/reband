@@ -35,8 +35,8 @@ const sizeClasses: Record<ProgressBarSize, string> = {
 
 const variantClasses: Record<ProgressBarVariant, string> = {
   default: 'bg-primary',
-  success: 'bg-green-500',
-  warning: 'bg-yellow-500',
+  success: 'bg-emerald-500',
+  warning: 'bg-amber-500',
   danger: 'bg-red-500',
   info: 'bg-blue-500'
 };

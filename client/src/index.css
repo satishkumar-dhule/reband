@@ -75,9 +75,19 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --radius-sm: var(--radius);
   --radius-md: var(--radius);
   --radius-lg: var(--radius);
+  
+  /* Sidebar theme colors - mapped to CSS variables */
+  --color-sidebar: var(--sidebar-bg);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
   
   /* Premium fonts */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -647,12 +657,19 @@ body {
   --ring: hsl(212 100% 68%);
   --radius: 6px;
   --sidebar-bg: hsl(216 25% 10%);
+  --sidebar-foreground: hsl(213 27% 90%);
   --sidebar-border: hsl(215 14% 22%);
+  --sidebar-accent: hsl(215 14% 18%);
+  --sidebar-accent-foreground: hsl(213 27% 90%);
+  --sidebar-ring: hsl(212 100% 68%);
   --sidebar-active-bg: hsl(215 14% 18%);
   --sidebar-active-border: hsl(212 100% 68%);
   --header-bg: hsl(216 28% 7%);
   --gh-green: hsl(136 79% 57%);
   --gh-blue: hsl(212 100% 68%);
+  --button-outline: hsl(215 14% 22%);
+  --success: hsl(142 76% 36%);
+  --success-foreground: hsl(0 0% 100%);
   color-scheme: dark;
 }
 
@@ -680,12 +697,19 @@ body {
   --ring: hsl(212 92% 44%);
   --radius: 6px;
   --sidebar-bg: hsl(210 17% 98%);
+  --sidebar-foreground: hsl(215 14% 14%);
   --sidebar-border: hsl(213 13% 83%);
+  --sidebar-accent: hsl(213 20% 93%);
+  --sidebar-accent-foreground: hsl(215 14% 14%);
+  --sidebar-ring: hsl(212 92% 44%);
   --sidebar-active-bg: hsl(213 20% 93%);
   --sidebar-active-border: hsl(212 92% 44%);
   --header-bg: hsl(216 28% 13%);
   --gh-green: hsl(136 79% 40%);
   --gh-blue: hsl(212 92% 44%);
+  --button-outline: hsl(213 13% 83%);
+  --success: hsl(142 76% 30%);
+  --success-foreground: hsl(0 0% 100%);
   color-scheme: light;
 }
 
@@ -716,6 +740,14 @@ body {
   --input: hsl(0 0% 12%);
   --ring: hsl(190 100% 50%);
   --radius: 12px;
+  
+  /* Sidebar colors for premium dark theme */
+  --sidebar-bg: hsl(0 0% 6.5%);
+  --sidebar-foreground: hsl(0 0% 98%);
+  --sidebar-border: hsl(0 0% 12%);
+  --sidebar-accent: hsl(0 0% 10%);
+  --sidebar-accent-foreground: hsl(0 0% 98%);
+  --sidebar-ring: hsl(190 100% 50%);
   
   /* Premium custom properties */
   --accent-cyan: hsl(190 100% 50%);
