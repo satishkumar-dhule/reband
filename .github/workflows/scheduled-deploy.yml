@@ -1,0 +1,103 @@
+name: 🔄 Scheduled Deploy
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC (after content generation completes)
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual deploy'
+        required: false
+        default: 'Manual trigger'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy Website
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js with pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '20'
+          pnpm-version: '10'
+      
+      - name: Fetch and generate data (parallel)
+        run: |
+          # Start all data fetching/generation scripts in parallel
+          node script/fetch-questions-for-build.js &
+          PID1=$!
+          node script/fetch-question-history.js &
+          PID2=$!
+          node script/generate-curated-paths.js &
+          PID3=$!
+          node script/generate-rss.js &
+          PID4=$!
+          node script/generate-sitemap.js &
+          PID5=$!
+          node script/fetch-bot-monitor-data.js &
+          PID6=$!
+          
+          # Wait for all background jobs and capture exit codes
+          FAILED=0
+          for pid in $PID1 $PID2 $PID3 $PID4 $PID5 $PID6; do
+            wait $pid || FAILED=1
+          done
+          
+          if [ $FAILED -eq 1 ]; then
+            echo "One or more data fetching scripts failed"
+            exit 1
+          fi
+        env:
+          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
+          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+      
+      - name: Cache build output
+        uses: actions/cache@v4
+        with:
+          path: dist
+          key: ${{ runner.os }}-dist-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.{ts,tsx,js,jsx,json,css,html}') }}
+          restore-keys: |
+            ${{ runner.os }}-dist-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-dist-
+
+      - name: Build website
+        run: |
+          pnpm run build
+          pnpm run build:pagefind
+        env:
+          NODE_ENV: production
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          cname: open-interview.github.io
+          commit_message: 'chore: scheduled deploy [skip ci]'
+      
+      - name: Summary
+        run: |
+          echo "## 🚀 Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "**Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "**Reason:** ${{ github.event.inputs.reason }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** https://open-interview.github.io/" >> $GITHUB_STEP_SUMMARY
