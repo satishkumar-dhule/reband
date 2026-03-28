@@ -6,6 +6,30 @@ import { createServer } from "http";
 const app = express();
 const httpServer = createServer(app);
 
+function startKeepAlive() {
+  const port = parseInt(process.env.PORT || "5000", 10);
+  const host = process.env.REPLIT?.includes("1") ? "localhost" : "0.0.0.0";
+  const pingInterval = 4 * 60 * 1000; // 4 minutes (Replit sleeps after ~5 min)
+  const keepAliveUrl = `http://${host}:${port}/api/keep-alive`;
+
+  log(`Starting keep-alive pings to ${keepAliveUrl} every ${pingInterval / 1000}s`, "keepalive");
+
+  const ping = async () => {
+    try {
+      const response = await fetch(keepAliveUrl, { 
+        method: "GET",
+        signal: AbortSignal.timeout(10000)
+      });
+      log(`Keep-alive ping successful: ${response.status}`, "keepalive");
+    } catch (error) {
+      log(`Keep-alive ping failed: ${error}`, "keepalive");
+    }
+  };
+
+  ping();
+  setInterval(ping, pingInterval);
+}
+
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;
@@ -92,6 +116,14 @@ app.use((req, res, next) => {
     },
     () => {
       log(`serving on port ${port}`);
+      startKeepAlive();
     },
   );
+
+  const shutdown = () => {
+    httpServer.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 3000);
+  };
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
 })();

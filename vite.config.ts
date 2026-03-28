@@ -25,12 +25,47 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-    // Mermaid is now lazy-loaded, no need for manual chunking
-    // This reduces initial bundle size by ~200KB
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react-dom') || id.includes('react/')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@mui/material') || id.includes('@mui/icons')) {
+              return 'vendor-mui';
+            }
+            if (id.includes('framer-motion')) {
+              return 'vendor-motion';
+            }
+            if (id.includes('@tanstack')) {
+              return 'vendor-query';
+            }
+            if (id.includes('recharts')) {
+              return 'vendor-charts';
+            }
+            if (id.includes('mermaid')) {
+              return 'vendor-mermaid';
+            }
+            if (id.includes('@langchain') || id.includes('langgraph')) {
+              return 'vendor-ai';
+            }
+            return 'vendor-other';
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1500,
+    minify: 'esbuild',
+    sourcemap: false,
+    target: 'esnext',
+    cssCodeSplit: true,
   },
   optimizeDeps: {
-    // Include mermaid for proper bundling
-    include: ['mermaid'],
+    include: [],
+    esbuildOptions: {
+      target: 'esnext',
+    },
   },
   server: {
     host: "0.0.0.0",
@@ -50,10 +85,7 @@ export default defineConfig({
     port: 3333,
   },
   appType: 'spa',
-  // @ts-expect-error - vitest config
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: [],
+  esbuild: {
+    target: 'esnext',
   },
 });

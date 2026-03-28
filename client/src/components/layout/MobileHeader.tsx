@@ -5,6 +5,7 @@ interface MobileHeaderProps {
   title?: string;
   showBack?: boolean;
   onSearchClick?: () => void;
+  onMenuClick?: () => void;
   transparent?: boolean;
   showSearch?: boolean;
 }
@@ -12,6 +13,8 @@ interface MobileHeaderProps {
 export function MobileHeader({
   title,
   showBack,
+  onSearchClick,
+  onMenuClick,
 }: MobileHeaderProps) {
   const [location, setLocation] = useLocation();
 
@@ -77,11 +80,19 @@ export function MobileHeader({
         </button>
 
         <div className="flex items-center gap-1">
-          <button aria-label="Search" className="p-2.5 hover:bg-primary/10 rounded-xl transition-all duration-200 group">
+          <button 
+            aria-label="Search" 
+            onClick={onSearchClick}
+            className="p-2.5 hover:bg-primary/10 rounded-xl transition-all duration-200 group"
+          >
             <Search className="w-4.5 h-4.5 text-muted-foreground group-hover:text-primary transition-colors" />
           </button>
           
-          <button aria-label="Menu" className="p-2.5 hover:bg-primary/10 rounded-xl transition-colors">
+          <button 
+            aria-label="Menu" 
+            onClick={onMenuClick}
+            className="p-2.5 hover:bg-primary/10 rounded-xl transition-colors"
+          >
             <Menu className="w-4.5 h-4.5 text-muted-foreground" />
           </button>
         </div>

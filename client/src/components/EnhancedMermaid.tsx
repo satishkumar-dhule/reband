@@ -1,14 +1,27 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ZoomIn, ZoomOut, Maximize2, Move, Palette } from 'lucide-react';
-// @ts-ignore
-import mermaid from 'mermaid/dist/mermaid.esm.mjs';
 import { useTheme } from '../context/ThemeContext';
 import { mermaidThemeConfigs, type MermaidTheme } from './Mermaid';
 
 const appThemeToMermaid: Record<string, MermaidTheme> = {
   'premium-dark': 'dark',
 };
+
+let mermaid: any = null;
+let mermaidLoadPromise: Promise<any> | null = null;
+
+async function loadMermaid() {
+  if (mermaid) return mermaid;
+  if (!mermaidLoadPromise) {
+    // @ts-ignore - mermaid types are incomplete
+    mermaidLoadPromise = import('mermaid/dist/mermaid.esm.mjs').then(m => {
+      mermaid = m.default || m;
+      return mermaid;
+    });
+  }
+  return mermaidLoadPromise;
+}
 
 let currentMermaidTheme: MermaidTheme | null = null;
 

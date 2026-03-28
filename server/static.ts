@@ -10,9 +10,20 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  app.use(express.static(distPath, {
+    maxAge: '1d',
+    etag: true,
+    lastModified: true,
+    immutable: true,
+  }));
 
-  // fall through to index.html if the file doesn't exist
+  app.use((req, res, next) => {
+    if (req.method === 'GET') {
+      res.set('Cache-Control', 'public, max-age=86400, immutable');
+    }
+    next();
+  });
+
   app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });

@@ -25,6 +25,9 @@ on:
         default: '2'
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: 🧪 Run Tests
@@ -33,7 +36,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node-pnpm
-
+      
+      - name: Validate Inputs
+        run: |
+          # Validate pattern (allow any string but sanitize to prevent command injection)
+          # We'll ensure it doesn't contain backticks or $() substitution
+          if [[ "${{ inputs.pattern }}" =~ [\`\$] ]]; then
+            echo "❌ Pattern contains invalid characters"
+            exit 1
+          fi
+          # Validate browser is one of allowed choices
+          if [[ ! "${{ inputs.browser }}" =~ ^(chromium|firefox|webkit|all)$ ]]; then
+            echo "❌ Invalid browser: ${{ inputs.browser }}"
+            exit 1
+          fi
+          # Validate retries is a non-negative integer
+          if [[ ! "${{ inputs.retries }}" =~ ^[0-9]+$ ]]; then
+            echo "❌ Invalid retries: ${{ inputs.retries }}"
+            exit 1
+          fi
+          echo "✅ Inputs validated"
+      
       - name: Fetch test data
         run: node script/fetch-questions-for-build.js
         env:
@@ -42,12 +65,17 @@ jobs:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
 
-      - name: Install Playwright
+      - name: Install Playwright (if not cached)
         run: |
-          if [ "${{ inputs.browser }}" = "all" ]; then
-            pnpm exec playwright install --with-deps
+          if [ ! -d "$HOME/.cache/ms-playwright" ] || [ -z "$(ls -A "$HOME/.cache/ms-playwright")" ]; then
+            echo "Installing Playwright browsers..."
+            if [ "${{ inputs.browser }}" = "all" ]; then
+              pnpm exec playwright install --with-deps
+            else
+              pnpm exec playwright install --with-deps ${{ inputs.browser }}
+            fi
           else
-            pnpm exec playwright install --with-deps ${{ inputs.browser }}
+            echo "Playwright browsers cached, skipping install"
           fi
 
       - name: Build application
@@ -68,14 +96,18 @@ jobs:
         env:
           CI: 'true'
 
+      - name: Compress test results
+        if: always()
+        run: |
+          tar -czf test-results.tar.gz test-results/ playwright-report/ 2>/dev/null || true
+        shell: bash
+
       - name: Upload results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
-          path: |
-            test-results/
-            playwright-report/
+          path: test-results.tar.gz
           retention-days: 7
 
       - name: Summary

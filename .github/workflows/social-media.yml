@@ -57,6 +57,10 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   linkedin-post:
     name: 📢 LinkedIn Post

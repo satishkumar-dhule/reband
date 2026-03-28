@@ -1,0 +1,94 @@
+/**
+ * Icon Component Styles
+ * 
+ * CSS Module for Icon component with design token integration.
+ * Supports dark mode via CSS custom properties.
+ */
+
+/* Base icon styles */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+  user-select: none;
+  transition: color var(--animation-duration-fast, 100ms) var(--animation-easing-ease-out, ease-out);
+}
+
+/* Size variants */
+.size-sm {
+  width: 16px;
+  height: 16px;
+}
+
+.size-md {
+  width: 24px;
+  height: 24px;
+}
+
+.size-lg {
+  width: 32px;
+  height: 32px;
+}
+
+/* Color variants */
+.color-default {
+  color: var(--color-text-primary, rgba(0, 0, 0, 0.87));
+}
+
+.color-muted {
+  color: var(--color-text-secondary, rgba(0, 0, 0, 0.6));
+}
+
+.color-accent {
+  color: var(--color-primary-500, #2196F3);
+}
+
+.color-error {
+  color: var(--color-semantic-error-main, #F44336);
+}
+
+.color-success {
+  color: var(--color-semantic-success-main, #4CAF50);
+}
+
+.color-warning {
+  color: var(--color-semantic-warning-main, #FF9800);
+}
+
+.color-inherit {
+  color: inherit;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .color-default {
+    color: var(--color-text-primary, #FFFFFF);
+  }
+
+  .color-muted {
+    color: var(--color-text-secondary, rgba(255, 255, 255, 0.7));
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .icon {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .color-muted {
+    color: var(--color-text-primary, rgba(0, 0, 0, 0.87));
+  }
+}
+
+/* Focus styles for interactive icons */
+.icon:focus-visible {
+  outline: 2px solid var(--color-primary-500, #2196F3);
+  outline-offset: 2px;
+  border-radius: var(--spacing-1, 0.25rem);
+}

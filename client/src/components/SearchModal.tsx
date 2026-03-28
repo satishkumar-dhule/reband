@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, RefObject } from 'react';
 import { Search, X, ArrowRight, Zap, Target, Flame, Tag, Building2, Video, GitBranch, Filter, Code2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
@@ -44,7 +44,7 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
   const debouncedQuery = useDebounce(query, 150);
   
   // Apply focus trapping to both mobile and desktop modals
-  useFocusTrap(mobileContainerRef, { enabled: isOpen, initialFocus: mobileInputRef, returnFocus: true });
+  useFocusTrap(mobileContainerRef as RefObject<HTMLElement>, { enabled: isOpen, initialFocus: mobileInputRef, returnFocus: true });
   useFocusTrap(desktopContainerRef, { enabled: isOpen, initialFocus: inputRef, returnFocus: true });
 
   // Set initial query when modal opens
@@ -151,9 +151,9 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
   
   const getDifficultyIcon = (difficulty: string) => {
     switch (difficulty) {
-      case 'beginner': return <Zap className="w-3 h-3 text-green-400" />;
-      case 'intermediate': return <Target className="w-3 h-3 text-yellow-400" />;
-      case 'advanced': return <Flame className="w-3 h-3 text-red-400" />;
+      case 'beginner': return <Zap className="w-3 h-3" style={{ color: 'var(--success, #22c55e)' }} />;
+      case 'intermediate': return <Target className="w-3 h-3" style={{ color: 'var(--warning, #eab308)' }} />;
+      case 'advanced': return <Flame className="w-3 h-3" style={{ color: 'var(--destructive, #ef4444)' }} />;
       default: return null;
     }
   };
@@ -180,9 +180,9 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
         >
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              {result.challenge.difficulty === 'easy' ? <Zap className="w-3 h-3 text-green-400" /> : <Target className="w-3 h-3 text-yellow-400" />}
+              {result.challenge.difficulty === 'easy' ? <Zap className="w-3 h-3" style={{ color: 'var(--success, #22c55e)' }} /> : <Target className="w-3 h-3" style={{ color: 'var(--warning, #eab308)' }} />}
               <span className="text-[10px] text-muted-foreground uppercase tracking-wider">coding/{result.challenge.category}</span>
-              <span className="flex items-center gap-0.5 text-[9px] text-purple-600 dark:text-purple-400 bg-purple-400/10 px-1.5 py-0.5 rounded ml-auto">
+              <span className="flex items-center gap-0.5 text-[9px] bg-purple-400/10 px-1.5 py-0.5 rounded ml-auto" style={{ color: 'var(--accent-purple, #a855f7)' }}>
                 <Code2 className="w-2.5 h-2.5" /> Challenge
               </span>
             </div>
@@ -211,9 +211,9 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
             {getDifficultyIcon(result.question.difficulty)}
             <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{result.question.channel}/{result.question.subChannel}</span>
             <div className="flex items-center gap-1 ml-auto">
-              {hasCompanies && <span className="flex items-center gap-0.5 text-[9px] text-blue-600 dark:text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded"><Building2 className="w-2.5 h-2.5" />{result.question.companies!.length}</span>}
-              {hasVideo && <span className="flex items-center text-[9px] text-red-600 dark:text-red-400 bg-red-400/10 px-1.5 py-0.5 rounded"><Video className="w-2.5 h-2.5" /></span>}
-              {hasDiagram && <span className="flex items-center text-[9px] text-green-600 dark:text-green-400 bg-green-400/10 px-1.5 py-0.5 rounded"><GitBranch className="w-2.5 h-2.5" /></span>}
+              {hasCompanies && <span className="flex items-center gap-0.5 text-[9px] bg-blue-400/10 px-1.5 py-0.5 rounded" style={{ color: 'var(--info, #3b82f6)' }}><Building2 className="w-2.5 h-2.5" />{result.question.companies!.length}</span>}
+              {hasVideo && <span className="flex items-center text-[9px] bg-red-400/10 px-1.5 py-0.5 rounded" style={{ color: 'var(--destructive, #ef4444)' }}><Video className="w-2.5 h-2.5" /></span>}
+              {hasDiagram && <span className="flex items-center text-[9px] bg-green-400/10 px-1.5 py-0.5 rounded" style={{ color: 'var(--success, #22c55e)' }}><GitBranch className="w-2.5 h-2.5" /></span>}
             </div>
           </div>
           <p className="text-sm text-foreground line-clamp-2">{result.question.question}</p>

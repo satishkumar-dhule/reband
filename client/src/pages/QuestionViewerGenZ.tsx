@@ -55,6 +55,21 @@ const premiumStyles = `
     --secondary-glow: hsla(270, 100%, 65%, 0.3);
     --tertiary-glow: hsla(330, 100%, 65%, 0.3);
     
+    /* Theme System - CSS Variable Fallbacks */
+    --background: hsl(0, 0%, 4%);
+    --foreground: hsl(0, 0%, 98%);
+    --card: hsl(0, 0%, 8%);
+    --card-foreground: hsl(0, 0%, 98%);
+    --muted: hsl(0, 0%, 15%);
+    --muted-foreground: hsl(0, 0%, 60%);
+    --border: hsl(0, 0%, 12%);
+    --primary-foreground: hsl(0, 0%, 100%);
+    
+    /* Semantic Colors */
+    --success: #10B981;
+    --warning: #F59E0B;
+    --destructive: #EF4444;
+    
     /* Glass - from design system */
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
@@ -69,10 +84,6 @@ const premiumStyles = `
     --clay-shadow-purple: hsla(270, 100%, 65%, 0.25);
     --clay-shadow-pink: hsla(330, 100%, 65%, 0.25);
     
-    /* Semantic */
-    --success: #10B981;
-    --warning: #F59E0B;
-    --danger: #EF4444;
     --surface-elevated: hsl(0, 0%, 8%);
   }
 
@@ -356,7 +367,7 @@ export default function QuestionViewerGenZ() {
   
   // Get current theme from context
   const { theme } = useTheme();
-  const isLightMode = theme === 'genz-light';
+  const isLightMode = theme === 'clean-light';
 
   const { companiesWithCounts } = useCompaniesWithCounts(
     channelId || '',
@@ -652,13 +663,13 @@ export default function QuestionViewerGenZ() {
             }}
             className="w-20 h-20 mx-auto mb-6 rounded-full"
             style={{
-              background: 'linear-gradient(135deg, hsl(190, 100%, 50%), hsl(270, 100%, 65%))',
-              boxShadow: '0 0 40px hsla(190, 100%, 50%, 0.5), inset 0 2px 0 rgba(255,255,255,0.2)'
+              background: 'linear-gradient(135deg, var(--primary), var(--color-accent-purple))',
+              boxShadow: '0 0 40px var(--primary-glow), inset 0 2px 0 var(--glass-highlight)'
             }}
           >
-            <Layers className="w-10 h-10 mx-auto mt-5 text-white" />
+            <Layers className="w-10 h-10 mx-auto mt-5 text-foreground" />
           </motion.div>
-          <p className="text-white/70 font-body text-lg">Loading questions...</p>
+          <p className="text-muted-foreground/70 font-body text-lg">Loading questions...</p>
         </div>
       </div>
     );
@@ -677,13 +688,13 @@ export default function QuestionViewerGenZ() {
             animate={{ scale: 1, opacity: 1 }}
             className="glass-card p-8 max-w-md"
           >
-            <h2 className="text-3xl font-display font-bold text-white mb-3">Channel not found</h2>
-            <p className="text-white/60 font-body mb-6">The channel "{channelId}" doesn't exist.</p>
+            <h2 className="text-3xl font-display font-bold text-foreground mb-3">Channel not found</h2>
+            <p className="text-muted-foreground/60 font-body mb-6">The channel "{channelId}" doesn't exist.</p>
             <motion.button
               onClick={() => setLocation('/channels')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="clay-button-primary px-8 py-4 text-white font-display font-bold"
+              className="clay-button-primary px-8 py-4 text-primary-foreground font-display font-bold"
             >
               Go to Channels
             </motion.button>
@@ -717,8 +728,8 @@ export default function QuestionViewerGenZ() {
               className="glass-card p-8 max-w-md"
             >
               <div className="text-7xl mb-4">📝</div>
-              <h2 className="text-2xl font-display font-bold text-white mb-2">No questions found</h2>
-              <p className="text-white/60 font-body mb-6">
+              <h2 className="text-2xl font-display font-bold text-foreground mb-2">No questions found</h2>
+              <p className="text-muted-foreground/60 font-body mb-6">
                 {hasFilters ? 'Try adjusting your filters.' : 'Check back soon for new content!'}
               </p>
               {hasFilters && (
@@ -730,7 +741,7 @@ export default function QuestionViewerGenZ() {
                   }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="clay-button-primary px-6 py-3 text-white font-display font-bold"
+                  className="clay-button-primary px-6 py-3 text-primary-foreground font-display font-bold"
                 >
                   Reset Filters
                 </motion.button>
@@ -807,7 +818,7 @@ export default function QuestionViewerGenZ() {
           <div className="hidden lg:flex flex-1 overflow-hidden">
             {/* Question Panel */}
             <motion.div 
-              className="w-1/2 border-r border-white/5 overflow-y-auto p-6 md:p-8"
+              className="w-1/2 border-r border-border/20 overflow-y-auto p-6 md:p-8"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4 }}
@@ -841,7 +852,7 @@ export default function QuestionViewerGenZ() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
               style={{
-                backgroundColor: isLightMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.2)',
+                backgroundColor: 'var(--card)',
               }}
             >
               <GenZAnswerPanel 
@@ -854,14 +865,14 @@ export default function QuestionViewerGenZ() {
           {/* Mobile Tab View */}
           <div className="flex-1 flex flex-col lg:hidden overflow-hidden">
             {/* Mobile Tabs - Premium Glass Style */}
-            <div className="flex border-b border-white/5 bg-black/20 backdrop-blur-xl">
+            <div className="flex border-b border-border/20 bg-card/20 backdrop-blur-xl">
               <motion.button
                 onClick={() => setMobileView('question')}
                 whileTap={{ scale: 0.97 }}
                 className={`flex-1 py-4 font-display font-semibold transition-all relative ${
                   mobileView === 'question'
-                    ? 'text-white'
-                    : 'text-white/50'
+                    ? 'text-foreground'
+                    : 'text-muted-foreground/50'
                 }`}
               >
                 <span className="relative z-10">Question</span>
@@ -870,8 +881,8 @@ export default function QuestionViewerGenZ() {
                     layoutId="activeTab"
                     className="absolute bottom-0 left-0 right-0 h-0.5"
                     style={{
-                      background: 'linear-gradient(90deg, hsl(190, 100%, 50%), hsl(270, 100%, 65%))',
-                      boxShadow: '0 0 10px hsla(190, 100%, 50%, 0.5)',
+                      background: 'linear-gradient(90deg, var(--primary), var(--color-accent-purple))',
+                      boxShadow: '0 0 10px var(--primary-glow)',
                     }}
                   />
                 )}
@@ -881,8 +892,8 @@ export default function QuestionViewerGenZ() {
                 whileTap={{ scale: 0.97 }}
                 className={`flex-1 py-4 font-display font-semibold transition-all relative ${
                   mobileView === 'answer'
-                    ? 'text-white'
-                    : 'text-white/50'
+                    ? 'text-foreground'
+                    : 'text-muted-foreground/50'
                 }`}
               >
                 <span className="relative z-10">Answer</span>
@@ -891,8 +902,8 @@ export default function QuestionViewerGenZ() {
                     layoutId="activeTab"
                     className="absolute bottom-0 left-0 right-0 h-0.5"
                     style={{
-                      background: 'linear-gradient(90deg, hsl(190, 100%, 50%), hsl(270, 100%, 65%))',
-                      boxShadow: '0 0 10px hsla(190, 100%, 50%, 0.5)',
+                      background: 'linear-gradient(90deg, var(--primary), var(--color-accent-purple))',
+                      boxShadow: '0 0 10px var(--primary-glow)',
                     }}
                   />
                 )}
@@ -917,7 +928,7 @@ export default function QuestionViewerGenZ() {
                     exit={{ opacity: 0, x: 50, scale: 0.8 }}
                     className="swipe-indicator absolute top-1/2 right-4 -translate-y-1/2 z-10 rounded-full p-4"
                   >
-                    <ChevronRight className="w-8 h-8" style={{ color: 'hsl(190, 100%, 60%)' }} />
+                    <ChevronRight className="w-8 h-8" style={{ color: 'var(--primary-light)' }} />
                   </motion.div>
                 )}
                 {swipeDirection === 'right' && (
@@ -927,7 +938,7 @@ export default function QuestionViewerGenZ() {
                     exit={{ opacity: 0, x: -50, scale: 0.8 }}
                     className="swipe-indicator absolute top-1/2 left-4 -translate-y-1/2 z-10 rounded-full p-4"
                   >
-                    <ChevronLeft className="w-8 h-8" style={{ color: 'hsl(190, 100%, 60%)' }} />
+                    <ChevronLeft className="w-8 h-8" style={{ color: 'var(--primary-light)' }} />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -984,7 +995,7 @@ export default function QuestionViewerGenZ() {
 
         {/* Navigation Footer - Premium Claymorphism */}
         <motion.div 
-          className="border-t border-white/5 bg-black/30 backdrop-blur-2xl p-3 md:p-4 pb-safe"
+          className="border-t border-border/20 bg-card/30 backdrop-blur-2xl p-3 md:p-4 pb-safe"
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -998,21 +1009,21 @@ export default function QuestionViewerGenZ() {
               whileTap={{ scale: 0.95 }}
               className={`p-3 md:p-4 clay-button disabled:opacity-25 disabled:cursor-not-allowed disabled:transform-none flex-shrink-0`}
             >
-              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-white/80" />
+              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-foreground/80" />
             </motion.button>
 
             {/* Progress */}
             <div className="flex-1 max-w-md min-w-0">
               <div className="flex items-center gap-3 md:gap-4 mb-3">
-                <span className="text-sm md:text-base font-display font-bold whitespace-nowrap" style={{ color: 'hsl(190, 100%, 60%)' }}>
+                <span className="text-sm md:text-base font-display font-bold whitespace-nowrap" style={{ color: 'var(--primary-light)' }}>
                   {currentIndex + 1} / {totalQuestions}
                 </span>
-                <div className="flex-1 h-3 bg-white/10 rounded-full overflow-hidden min-w-0 relative">
+                <div className="flex-1 h-3 bg-muted/20 rounded-full overflow-hidden min-w-0 relative">
                   {/* Glow effect behind progress */}
                   <div 
                     className="absolute inset-0 blur-md"
                     style={{
-                      background: 'linear-gradient(90deg, hsl(190, 100%, 50%), hsl(270, 100%, 65%))',
+                      background: 'linear-gradient(90deg, var(--primary), var(--color-accent-purple))',
                       opacity: 0.5,
                     }}
                   />
@@ -1023,7 +1034,7 @@ export default function QuestionViewerGenZ() {
                     transition={{ duration: 0.5, ease: "easeOut" }}
                   />
                 </div>
-                <span className="text-sm md:text-base font-display font-bold text-white/70 whitespace-nowrap">{progress}%</span>
+                <span className="text-sm md:text-base font-display font-bold text-muted-foreground/70 whitespace-nowrap">{progress}%</span>
               </div>
             </div>
 
@@ -1036,7 +1047,7 @@ export default function QuestionViewerGenZ() {
                 className={`p-3 md:p-4 clay-button transition-all ${
                   isMarked
                     ? 'text-yellow-400'
-                    : 'text-white/60 hover:text-yellow-300'
+                    : 'text-muted-foreground/60 hover:text-yellow-300'
                 }`}
               >
                 <Bookmark className="w-5 h-5 md:w-6 md:h-6" fill={isMarked ? 'currentColor' : 'none'} />
@@ -1045,7 +1056,7 @@ export default function QuestionViewerGenZ() {
                 onClick={handleShare}
                 whileHover={{ scale: 1.08, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="hidden sm:block p-3 md:p-4 clay-button text-white/60 hover:text-white"
+                className="hidden sm:block p-3 md:p-4 clay-button text-muted-foreground/60 hover:text-foreground"
               >
                 <Share2 className="w-5 h-5 md:w-6 md:h-6" />
               </motion.button>
@@ -1057,7 +1068,7 @@ export default function QuestionViewerGenZ() {
               disabled={currentIndex === totalQuestions - 1}
               whileHover={{ scale: 1.08, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="p-3 md:p-4 clay-button-primary text-white font-display font-bold flex-shrink-0 disabled:opacity-25 disabled:cursor-not-allowed disabled:transform-none"
+              className="p-3 md:p-4 clay-button-primary text-primary-foreground font-display font-bold flex-shrink-0 disabled:opacity-25 disabled:cursor-not-allowed disabled:transform-none"
             >
               <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
             </motion.button>
@@ -1143,7 +1154,7 @@ export default function QuestionViewerGenZ() {
 function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progress, onToggleFilters, hasFilters }: any) {
   return (
     <motion.header 
-      className="border-b border-white/5 bg-black/20 backdrop-blur-xl"
+      className="border-b border-border/20 bg-card/20 backdrop-blur-xl"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -1158,14 +1169,14 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
               whileTap={{ scale: 0.95 }}
               className="p-2.5 md:p-3 clay-button flex-shrink-0"
             >
-              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-white/80" />
+              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-foreground/80" />
             </motion.button>
             <div className="min-w-0 flex-1">
-              <h1 className="font-display font-bold text-lg md:text-xl text-white truncate">
+              <h1 className="font-display font-bold text-lg md:text-xl text-foreground truncate">
                 {channel.name}
               </h1>
               {totalQuestions > 0 && (
-                <p className="text-xs md:text-sm text-white/50 font-body truncate">
+                <p className="text-xs md:text-sm text-muted-foreground/50 font-body truncate">
                   Question {currentIndex + 1} of {totalQuestions}
                 </p>
               )}
@@ -1182,7 +1193,7 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
                     cx="20"
                     cy="20"
                     r="16"
-                    stroke="rgba(255,255,255,0.1)"
+                    stroke="var(--muted)"
                     strokeWidth="3"
                     fill="none"
                   />
@@ -1200,12 +1211,12 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
                   />
                   <defs>
                     <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="hsl(190, 100%, 50%)" />
-                      <stop offset="100%" stopColor="hsl(270, 100%, 65%)" />
+                      <stop offset="0%" stopColor="var(--primary)" />
+                      <stop offset="100%" stopColor="var(--color-accent-purple)" />
                     </linearGradient>
                   </defs>
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-xs font-display font-bold text-white">
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-display font-bold text-foreground">
                   {progress}%
                 </span>
               </div>
@@ -1219,7 +1230,7 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
                 className={`p-2.5 md:p-3 transition-all ${
                   hasFilters
                     ? 'clay-button-primary'
-                    : 'clay-button text-white/70 hover:text-white'
+                    : 'clay-button text-muted-foreground/70 hover:text-foreground'
                 }`}
               >
                 <Filter className="w-5 h-5 md:w-6 md:h-6" />
@@ -1229,7 +1240,7 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
               onClick={onSearch}
               whileHover={{ scale: 1.08, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2.5 md:p-3 clay-button text-white/70 hover:text-white"
+              className="p-2.5 md:p-3 clay-button text-muted-foreground/70 hover:text-foreground"
             >
               <Search className="w-5 h-5 md:w-6 md:h-6" />
             </motion.button>
@@ -1248,7 +1259,7 @@ function FiltersPanel({ channel, selectedSubChannel, selectedDifficulty, selecte
       animate={{ height: 'auto', opacity: 1 }}
       exit={{ height: 0, opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="border-b border-white/5 bg-black/30 backdrop-blur-2xl overflow-hidden"
+      className="border-b border-border/20 bg-card/30 backdrop-blur-2xl overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-3 md:px-6 py-5 md:py-7">
         <motion.div 
@@ -1256,15 +1267,15 @@ function FiltersPanel({ channel, selectedSubChannel, selectedDifficulty, selecte
           animate={{ y: 0, opacity: 1 }}
           className="flex items-center justify-between mb-4 md:mb-6"
         >
-          <h3 className="font-display font-bold text-lg text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5" style={{ color: 'hsl(190, 100%, 60%)' }} />
+          <h3 className="font-display font-bold text-lg text-foreground flex items-center gap-2">
+            <Sparkles className="w-5 h-5" style={{ color: 'var(--primary-light)' }} />
             Filters
           </h3>
           <motion.button 
             onClick={onClose} 
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="p-2 clay-button text-white/60 hover:text-white"
+            className="p-2 clay-button text-muted-foreground/60 hover:text-foreground"
           >
             <X className="w-5 h-5" />
           </motion.button>
@@ -1278,35 +1289,34 @@ function FiltersPanel({ channel, selectedSubChannel, selectedDifficulty, selecte
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <label className="text-xs md:text-sm font-display font-semibold text-white/60 mb-3 block">Topic</label>
+              <label className="text-xs md:text-sm font-display font-semibold text-muted-foreground/60 mb-3 block">Topic</label>
               <select
                 value={selectedSubChannel}
                 onChange={(e) => onSubChannelChange(e.target.value)}
-                className="w-full px-4 py-3 premium-input text-white font-body text-sm md:text-base focus:outline-none"
+                className="w-full px-4 py-3 premium-input text-foreground font-body text-sm md:text-base focus:outline-none"
               >
                 {channel.subChannels.map((sc: any) => (
-                  <option key={sc.id} value={sc.id} className="bg-gray-900">{sc.name}</option>
+                  <option key={sc.id} value={sc.id} className="bg-card text-foreground">{sc.name}</option>
                 ))}
               </select>
             </motion.div>
           )}
-
           {/* Difficulty */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.15 }}
           >
-            <label className="text-xs md:text-sm font-display font-semibold text-white/60 mb-3 block">Difficulty</label>
+            <label className="text-xs md:text-sm font-display font-semibold text-muted-foreground/60 mb-3 block">Difficulty</label>
             <select
               value={selectedDifficulty}
               onChange={(e) => onDifficultyChange(e.target.value)}
-              className="w-full px-4 py-3 premium-input text-white font-body text-sm md:text-base focus:outline-none"
+              className="w-full px-4 py-3 premium-input text-foreground font-body text-sm md:text-base focus:outline-none"
             >
-              <option value="all" className="bg-gray-900">All Levels</option>
-              <option value="beginner" className="bg-gray-900">Beginner</option>
-              <option value="intermediate" className="bg-gray-900">Intermediate</option>
-              <option value="advanced" className="bg-gray-900">Advanced</option>
+              <option value="all" className="bg-card text-foreground">All Levels</option>
+              <option value="beginner" className="bg-card text-foreground">Beginner</option>
+              <option value="intermediate" className="bg-card text-foreground">Intermediate</option>
+              <option value="advanced" className="bg-card text-foreground">Advanced</option>
             </select>
           </motion.div>
 
@@ -1317,15 +1327,15 @@ function FiltersPanel({ channel, selectedSubChannel, selectedDifficulty, selecte
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <label className="text-xs md:text-sm font-display font-semibold text-white/60 mb-3 block">Company</label>
+              <label className="text-xs md:text-sm font-display font-semibold text-muted-foreground/60 mb-3 block">Company</label>
               <select
                 value={selectedCompany}
                 onChange={(e) => onCompanyChange(e.target.value)}
-                className="w-full px-4 py-3 premium-input text-white font-body text-sm md:text-base focus:outline-none"
+                className="w-full px-4 py-3 premium-input text-foreground font-body text-sm md:text-base focus:outline-none"
               >
-                <option value="all" className="bg-gray-900">All Companies</option>
+                <option value="all" className="bg-card text-foreground">All Companies</option>
                 {companiesWithCounts.map((c: any) => (
-                  <option key={c.company} value={c.company} className="bg-gray-900">
+                  <option key={c.company} value={c.company} className="bg-card text-foreground">
                     {c.company} ({c.count})
                   </option>
                 ))}
@@ -1387,7 +1397,7 @@ function QuestionContent({ question, questionNumber, totalQuestions, isMarked, i
         {question.company && (
           <motion.span 
             variants={contentItemVariants}
-            className="px-3 md:px-4 py-1.5 glass-card rounded-full text-xs font-display font-bold text-white/70"
+            className="px-3 md:px-4 py-1.5 glass-card rounded-full text-xs font-display font-bold text-muted-foreground/70"
           >
             {question.company}
           </motion.span>
@@ -1395,11 +1405,11 @@ function QuestionContent({ question, questionNumber, totalQuestions, isMarked, i
         {isCompleted && (
           <motion.span 
             variants={contentItemVariants}
-            className="px-3 md:px-4 py-1.5 rounded-full text-xs font-display font-bold text-emerald-400 flex items-center gap-1.5"
+            className="px-3 md:px-4 py-1.5 rounded-full text-xs font-display font-bold text-success flex items-center gap-1.5"
             style={{
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.15))',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
-              boxShadow: '0 0 15px rgba(16, 185, 129, 0.15)',
+              background: 'linear-gradient(135deg, color-mix(in srgb, var(--success) 20%, transparent), color-mix(in srgb, var(--success) 15%, transparent))',
+              border: '1px solid color-mix(in srgb, var(--success) 30%, transparent)',
+              boxShadow: '0 0 15px color-mix(in srgb, var(--success) 15%, transparent)',
             }}
           >
             <Check className="w-3 h-3" />
@@ -1422,7 +1432,7 @@ function QuestionContent({ question, questionNumber, totalQuestions, isMarked, i
 
       {/* Question */}
       <motion.div variants={contentItemVariants}>
-        <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-black text-white leading-tight">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-black text-foreground leading-tight">
           {question.question}
         </h2>
       </motion.div>
@@ -1441,7 +1451,7 @@ function QuestionContent({ question, questionNumber, totalQuestions, isMarked, i
           className={`px-4 md:px-5 py-2.5 rounded-xl font-display font-semibold text-sm transition-all flex items-center gap-2 ${
             isMarked
               ? 'text-yellow-400'
-              : 'glass-card text-white/70 hover:text-white hover:bg-white/10'
+              : 'glass-card text-muted-foreground/70 hover:text-foreground hover:bg-foreground/10'
           }`}
         >
           <Bookmark className={`w-4 h-4 md:w-5 md:h-4 ${isMarked ? 'fill-current' : ''}`} />
@@ -1452,10 +1462,10 @@ function QuestionContent({ question, questionNumber, totalQuestions, isMarked, i
         {hasRated ? (
           <motion.span 
             variants={contentItemVariants}
-            className="px-4 md:px-5 py-2.5 rounded-xl text-sm font-display font-semibold text-emerald-400 flex items-center gap-2"
+            className="px-4 md:px-5 py-2.5 rounded-xl text-sm font-display font-semibold text-success flex items-center gap-2"
             style={{
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1))',
-              border: '1px solid rgba(16, 185, 129, 0.25)',
+              background: 'linear-gradient(135deg, color-mix(in srgb, var(--success) 15%, transparent), color-mix(in srgb, var(--success) 10%, transparent))',
+              border: '1px solid color-mix(in srgb, var(--success) 25%, transparent)',
             }}
           >
             <Check className="w-4 h-4" />
@@ -1466,7 +1476,7 @@ function QuestionContent({ question, questionNumber, totalQuestions, isMarked, i
             variants={contentItemVariants}
             className="flex items-center gap-2 flex-wrap"
           >
-            <span className="text-xs text-white/50 font-body mr-2 hidden sm:inline">Rate your confidence:</span>
+            <span className="text-xs text-muted-foreground/50 font-body mr-2 hidden sm:inline">Rate your confidence:</span>
             {[
               { rating: 'again', color: 'red', icon: RotateCcw },
               { rating: 'hard', color: 'orange', icon: Brain },
@@ -1479,11 +1489,11 @@ function QuestionContent({ question, questionNumber, totalQuestions, isMarked, i
                 whileHover={{ scale: 1.08, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 className={`rating-btn px-3 md:px-4 py-2 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 ${
-                  color === 'red' ? 'text-red-400' :
-                  color === 'orange' ? 'text-orange-400' :
-                  color === 'green' ? 'text-green-400' : ''
+                  color === 'red' ? 'text-destructive' :
+                  color === 'orange' ? 'text-warning' :
+                  color === 'green' ? 'text-success' : ''
                 }`}
-                style={color === 'cyan' ? { color: 'hsl(190, 100%, 60%)' } : undefined}
+                style={color === 'cyan' ? { color: 'var(--primary-light)' } : undefined}
               >
                 <Icon className="w-3 h-3" />
                 <span className="hidden sm:inline capitalize">{rating}</span>
@@ -1498,7 +1508,7 @@ function QuestionContent({ question, questionNumber, totalQuestions, isMarked, i
             whileTap={{ scale: 0.95 }}
             className="px-4 md:px-5 py-2.5 rounded-xl font-display font-semibold text-sm flex items-center gap-2"
             style={{
-              color: 'hsl(270, 100%, 75%)',
+              color: 'var(--color-accent-purple-light)',
               background: 'linear-gradient(135deg, hsla(270, 100%, 65%, 0.15), hsla(270, 100%, 55%, 0.1))',
               border: '1px solid hsla(270, 100%, 65%, 0.25)',
               boxShadow: '0 0 20px hsla(270, 100%, 65%, 0.1)',
@@ -1525,7 +1535,7 @@ function QuestionContent({ question, questionNumber, totalQuestions, isMarked, i
             <motion.span
               key={tag}
               variants={contentItemVariants}
-              className="px-3 md:px-4 py-1.5 glass-card rounded-full text-xs text-white/50 font-body"
+              className="px-3 md:px-4 py-1.5 glass-card rounded-full text-xs text-muted-foreground/50 font-body"
             >
               #{tag}
             </motion.span>

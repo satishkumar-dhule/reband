@@ -45,7 +45,7 @@ const learningHistory = [
 // Design system card styles using CSS variables
 const cardBase = "relative rounded-2xl transition-all duration-300 border";
 const cardPremium = `${cardBase} bg-[var(--color-base-card)] border-[var(--color-border-subtle)] hover:border-[var(--color-border-default)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5`;
-const cardGlass = `${cardBase} bg-white/5 backdrop-blur-xl border-white/10`;
+const cardGlass = `${cardBase} bg-card/50 backdrop-blur-xl border-border`;
 
 export default function ProfileGenZ() {
   const [, setLocation] = useLocation();
@@ -164,7 +164,7 @@ export default function ProfileGenZ() {
                 {[...Array(6)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="absolute w-2 h-2 bg-white/30 rounded-full"
+                    className="absolute w-2 h-2 bg-foreground/30 rounded-full"
                     initial={{ 
                       x: Math.random() * 100 + '%', 
                       y: '110%' 
@@ -203,7 +203,7 @@ export default function ProfileGenZ() {
                       boxShadow: 'var(--shadow-md), inset 2px 2px 8px rgba(255,255,255,0.1), inset -2px -2px 8px rgba(0,0,0,0.1)'
                     }}
                   >
-                    <User className="w-16 h-16 text-white drop-shadow-lg" strokeWidth={1.5} />
+                    <User className="w-16 h-16 text-foreground" strokeWidth={1.5} />
                   </div>
                   
                   {/* Premium badge */}
@@ -218,7 +218,7 @@ export default function ProfileGenZ() {
                       boxShadow: 'var(--shadow-md)'
                     }}
                   >
-                    <Star className="w-6 h-6 text-white" fill="white" stroke="none" />
+                    <Star className="w-6 h-6 text-foreground" fill="white" stroke="none" />
                   </motion.div>
                 </motion.div>
                 
@@ -228,10 +228,10 @@ export default function ProfileGenZ() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
                   >
-                    <h1 className="text-4xl md:text-5xl font-black text-white mb-1 tracking-tight">
+                    <h1 className="text-4xl md:text-5xl font-black text-foreground mb-1 tracking-tight">
                       Level {level}
                     </h1>
-                    <p className="text-white/90 text-lg font-medium">{balance.toLocaleString()} XP • {totalCompleted} completed</p>
+                    <p className="text-foreground/90 text-lg font-medium">{balance.toLocaleString()} XP • {totalCompleted} completed</p>
                   </motion.div>
                   
                   {/* XP Progress Bar - Dark theme style */}
@@ -241,7 +241,7 @@ export default function ProfileGenZ() {
                     transition={{ delay: 0.4 }}
                     className="mt-5 max-w-sm mx-auto md:mx-0"
                   >
-                    <div className="flex justify-between text-sm text-white/70 mb-2 font-medium">
+                    <div className="flex justify-between text-sm text-foreground/70 mb-2 font-medium">
                       <span>Level {level}</span>
                       <span>{xpInLevel}/100 XP</span>
                       <span>Level {level + 1}</span>
@@ -259,9 +259,9 @@ export default function ProfileGenZ() {
                           background: 'linear-gradient(90deg, hsl(45, 100%, 50%) 0%, hsl(30, 100%, 50%) 100%)'
                         }}
                       >
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-foreground/30 to-transparent" />
                         <motion.div
-                          className="absolute inset-0 bg-white/40"
+                          className="absolute inset-0 bg-foreground/40"
                           animate={{ x: ['-100%', '100%'] }}
                           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                         />
@@ -380,8 +380,8 @@ export default function ProfileGenZ() {
                       <Crown className="w-7 h-7" style={{ color: 'hsl(45, 100%, 50%)' }} />
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-white">Upgrade to Premium</h3>
-                      <p className="text-sm text-white/80">Unlock all features & accelerate learning</p>
+                      <h3 className="text-xl font-black text-foreground">Upgrade to Premium</h3>
+                      <p className="text-sm text-foreground/80">Unlock all features & accelerate learning</p>
                     </div>
                   </div>
                   <motion.button
@@ -501,7 +501,7 @@ export default function ProfileGenZ() {
                         boxShadow: 'var(--shadow-md)'
                       }}
                     >
-                      <BookOpen className="w-7 h-7 text-white" />
+                      <BookOpen className="w-7 h-7 text-foreground" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-lg" style={{ color: 'var(--color-text-primary)' }}>{item.channel}</h3>

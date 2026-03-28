@@ -731,7 +731,7 @@ function ActiveExam({
                   }`}>
                     {showResult && isCorrect && <CheckCircle className="w-4 h-4 text-foreground" />}
                     {showResult && isSelected && !isCorrect && <XCircle className="w-4 h-4 text-foreground" />}
-                    {!showResult && isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                    {!showResult && isSelected && <div className="w-2 h-2 rounded-full bg-foreground" />}
                   </div>
                   <span className="text-sm leading-relaxed">{option.text}</span>
                 </div>

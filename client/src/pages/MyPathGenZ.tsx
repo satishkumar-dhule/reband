@@ -596,7 +596,7 @@ export default function MyPathGenZ() {
                             onClick={() => togglePathActivation(path)}
                             className={`flex-1 px-6 py-3 rounded-[16px] font-bold transition-all ${
                               isActive
-                                ? 'bg-muted border border-border hover:bg-white/20'
+                                ? 'bg-muted border border-border hover:bg-foreground/10'
                                 : 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground hover:scale-105'
                             }`}
                           >
@@ -605,18 +605,18 @@ export default function MyPathGenZ() {
                           
                           <button
                             onClick={() => openEditModal(path)}
-                            className="px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-[16px] transition-all"
+                            className="px-4 py-3 bg-primary/20 hover:bg-primary/30 border border-primary/30 rounded-[16px] transition-all"
                             title="Edit path"
                           >
-                            <Edit className="w-5 h-5 text-blue-400" />
+                            <Edit className="w-5 h-5 text-primary" />
                           </button>
                           
                           <button
                             onClick={() => deletePath(path.id)}
-                            className="px-4 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-[16px] transition-all"
+                            className="px-4 py-3 bg-destructive/20 hover:bg-destructive/30 border border-destructive/30 rounded-[16px] transition-all"
                             title="Delete path"
                           >
-                            <Trash2 className="w-5 h-5 text-red-500" />
+                            <Trash2 className="w-5 h-5 text-destructive" />
                           </button>
                         </div>
                       </div>
@@ -748,7 +748,7 @@ export default function MyPathGenZ() {
                             onClick={() => toggleCuratedPathActivation(path)}
                             className={`w-full px-6 py-3 rounded-[16px] font-bold transition-all ${
                               isActive
-                                ? 'bg-muted border border-border hover:bg-white/20'
+                                ? 'bg-muted border border-border hover:bg-foreground/10'
                                 : 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground hover:scale-105'
                             }`}
                           >

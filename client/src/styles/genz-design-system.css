@@ -102,8 +102,8 @@
 
 /* Body uses theme variables */
 body {
-  background: var(--color-base-black);
-  color: var(--color-text-primary);
+  background: var(--background);
+  color: var(--foreground);
 }
 
 /* ===== COMPONENT STYLES ===== */

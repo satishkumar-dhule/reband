@@ -13,6 +13,11 @@ on:
       - '.github/workflows/social-analytics.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 concurrency:
   group: deploy-app-${{ github.ref }}
   cancel-in-progress: false
@@ -26,22 +31,50 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node-pnpm
 
-      - name: Fetch data from Turso
-        run: |
-          node script/fetch-questions-for-build.js
-          node script/fetch-question-history.js
-          node script/generate-curated-paths.js
-          node script/generate-rss.js
-          node script/generate-sitemap.js
-          node script/fetch-bot-monitor-data.js
+      - name: Fetch questions data
+        run: node script/fetch-questions-for-build.js
         env:
           TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
           TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+      
+      - name: Fetch question history
+        run: node script/fetch-question-history.js
+        env:
+          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
+          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+      
+      - name: Generate curated paths
+        run: node script/generate-curated-paths.js
+        env:
+          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
+          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+      
+      - name: Generate RSS feed
+        run: node script/generate-rss.js
+        env:
+          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
+          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+      
+      - name: Generate sitemap
+        run: node script/generate-sitemap.js
+        env:
+          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
+          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+      
+      - name: Fetch bot monitor data
+        run: node script/fetch-bot-monitor-data.js
+        env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
 
-      - name: Install Playwright
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright (if not cached)
+        run: |
+          if [ ! -d "$HOME/.cache/ms-playwright" ] || [ -z "$(ls -A "$HOME/.cache/ms-playwright")" ]; then
+            echo "Installing Playwright browsers..."
+            pnpm exec playwright install --with-deps chromium
+          else
+            echo "Playwright browsers cached, skipping install"
+          fi
 
       - name: Build application
         run: |
@@ -55,19 +88,30 @@ jobs:
         env:
           CI: 'true'
 
+      - name: Compress test results
+        if: failure()
+        run: |
+          tar -czf test-results.tar.gz test-results/ 2>/dev/null || true
+        shell: bash
+
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: test-results
-          path: test-results/
+          path: test-results.tar.gz
           retention-days: 3
+
+      - name: Compress build artifacts
+        run: |
+          tar -czf build.tar.gz -C dist/public .
+        shell: bash
 
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
           name: build
-          path: dist/public
+          path: build.tar.gz
           retention-days: 1
 
   staging:
@@ -82,7 +126,14 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: build
-          path: dist
+          path: .
+      
+      - name: Decompress build artifacts
+        run: |
+          mkdir -p dist
+          tar -xzf build.tar.gz -C dist
+          rm build.tar.gz
+        shell: bash
 
       - uses: ./.github/actions/deploy-pages
         with:
@@ -109,7 +160,14 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: build
-          path: dist
+          path: .
+      
+      - name: Decompress build artifacts
+        run: |
+          mkdir -p dist
+          tar -xzf build.tar.gz -C dist
+          rm build.tar.gz
+        shell: bash
 
       - uses: ./.github/actions/deploy-pages
         with:

@@ -422,7 +422,7 @@ export default function LearningPathsGenZ() {
                   <button
                     onClick={handleCreateCustomPath}
                     disabled={!customPath.name || (customPath.channels.length === 0 && customPath.certifications.length === 0)}
-                    className="w-full py-4 rounded-[var(--radius-lg)] font-bold text-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all btn-primary"
+                    className="w-full py-4 rounded-[var(--radius-lg)] font-bold text-xl text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-all btn-primary"
                     style={{ 
                       background: 'var(--gradient-primary)',
                       boxShadow: 'var(--shadow-md)'

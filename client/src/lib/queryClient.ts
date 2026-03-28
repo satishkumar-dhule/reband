@@ -47,11 +47,20 @@ export const queryClient = new QueryClient({
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      retry: false,
+      staleTime: 60_000,
+      retry: 1,
+      gcTime: 300_000,
     },
     mutations: {
-      retry: false,
+      retry: 1,
     },
   },
 });
+
+export function prefetchChannels() {
+  return queryClient.prefetchQuery({
+    queryKey: ["channels"],
+    queryFn: () => fetch("/api/channels").then(r => r.json()),
+    staleTime: 120_000,
+  });
+}

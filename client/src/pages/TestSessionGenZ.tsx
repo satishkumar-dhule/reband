@@ -313,7 +313,7 @@ export default function TestSessionGenZ() {
                                   ? 'border-destructive bg-destructive'
                                   : isSelected 
                                   ? 'border-primary bg-primary' 
-                                  : 'border-white/30'
+                                  : 'border-border'
                               }`}>
                                 {showCorrect && <Check className="w-4 h-4 text-black" />}
                                 {showWrong && <X className="w-4 h-4 text-foreground" />}

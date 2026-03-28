@@ -74,7 +74,7 @@ function CircularProgress({ value, size = 140, strokeWidth = 10, color = "var(--
   return (
     <div className="relative" style={{ width: size, height: size }}>
       {/* Outer ring with glass effect */}
-      <div className="absolute inset-[-8px] rounded-full bg-gradient-to-br from-white/10 to-white/5 shadow-lg" />
+      <div className="absolute inset-[-8px] rounded-full bg-gradient-to-br from-[var(--color-foreground)]/10 to-[var(--color-foreground)]/5 shadow-lg" />
       
       <svg width={size + 16} height={size + 16} className="transform -rotate-90 absolute -inset-2">
         <defs>
@@ -113,7 +113,7 @@ function CircularProgress({ value, size = 140, strokeWidth = 10, color = "var(--
       </svg>
       
       {/* Inner gradient effect */}
-      <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/5 to-black/20" />
+      <div className="absolute inset-2 rounded-full bg-gradient-to-br from-[var(--color-foreground)]/5 to-[var(--color-background)]/20" />
       
       <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
         <motion.span 
@@ -165,7 +165,7 @@ function AnimatedBar({ label, value, maxValue, delay, color }: { label: string; 
           <motion.div 
             animate={{ x: ["-100%", "100%"] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full h-full"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-foreground)]/30 to-transparent w-full h-full"
           />
         </motion.div>
       </div>
@@ -306,14 +306,14 @@ function StatCard({ icon: Icon, value, label, accentColor, badge, delay }: {
       <div className="relative p-5 md:p-6">
         <div className="flex items-center justify-between mb-4">
           <div className={`w-12 h-12 rounded-[var(--radius-lg)] bg-gradient-to-br ${accentColor} flex items-center justify-center shadow-lg`}>
-            <Icon className="w-6 h-6 text-white" />
+            <Icon className="w-6 h-6 text-[var(--color-primary-foreground)]" />
           </div>
           {badge && (
             <motion.span 
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: delay + 0.3 }}
-              className="text-xs font-semibold px-3 py-1 rounded-full bg-white/10 text-[var(--color-text-primary)] border border-white/10"
+              className="text-xs font-semibold px-3 py-1 rounded-full bg-[var(--color-foreground)]/10 text-[var(--color-text-primary)] border border-[var(--color-foreground)]/10"
             >
               {badge}
             </motion.span>
@@ -479,7 +479,7 @@ export default function StatsGenZ() {
               >
                 {/* Complex gradient background using design system */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent-cyan)] via-[var(--color-accent-purple)] to-[var(--color-accent-pink)]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-background)]/60 via-transparent to-transparent" />
                 
                 {/* Animated orbs */}
                 <motion.div
@@ -488,7 +488,7 @@ export default function StatsGenZ() {
                     y: [0, -30, 0],
                   }}
                   transition={{ duration: 8, repeat: Infinity }}
-                  className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/20 rounded-full blur-3xl"
+                  className="absolute top-1/4 left-1/4 w-64 h-64 bg-[var(--color-foreground)]/20 rounded-full blur-3xl"
                 />
                 <motion.div
                   animate={{ 
@@ -508,7 +508,7 @@ export default function StatsGenZ() {
                 </FloatingElement>
                 
                 {/* Glass overlay for depth */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-foreground)]/10 to-transparent" />
 
                 <div className="relative z-10">
                   <motion.div
@@ -525,7 +525,7 @@ export default function StatsGenZ() {
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                        className="absolute inset-0 rounded-full border border-white/20 border-dashed"
+                        className="absolute inset-0 rounded-full border border-[var(--color-foreground)]/20 border-dashed"
                       />
                     </div>
                     
@@ -534,17 +534,17 @@ export default function StatsGenZ() {
                         initial={{ x: -20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 mb-4"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--color-foreground)]/20 backdrop-blur-md border border-[var(--color-foreground)]/30 mb-4"
                       >
                         <Sparkles className="w-4 h-4 text-[var(--color-warning)]" />
-                        <span className="text-sm font-semibold text-white">Your Learning Journey</span>
+                        <span className="text-sm font-semibold text-[var(--color-foreground)]">Your Learning Journey</span>
                       </motion.div>
                       
                       <motion.h1 
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 drop-shadow-xl"
+                        className="text-4xl md:text-5xl lg:text-6xl font-black text-[var(--color-foreground)] mb-3 drop-shadow-xl"
                       >
                         Your Progress
                       </motion.h1>
@@ -553,7 +553,7 @@ export default function StatsGenZ() {
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.5 }}
-                        className="text-white/90 text-lg md:text-xl mb-2"
+                        className="text-[var(--color-foreground)]/90 text-lg md:text-xl mb-2"
                       >
                         {totalCompleted} of {totalQuestions} questions completed
                       </motion.p>
@@ -562,7 +562,7 @@ export default function StatsGenZ() {
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.6 }}
-                        className="text-white/60"
+                        className="text-[var(--color-foreground)]/60"
                       >
                         Keep going! You're doing amazing! 🌟
                       </motion.p>
@@ -628,7 +628,7 @@ export default function StatsGenZ() {
                   <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
                     <div className="flex items-center gap-4">
                       <div className={`w-14 h-14 rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--color-accent-cyan)] to-[var(--color-accent-purple)] flex items-center justify-center shadow-lg ${ds.glowCyan}`}>
-                        <Star className="w-7 h-7 text-white" />
+                        <Star className="w-7 h-7 text-[var(--color-primary-foreground)]" />
                       </div>
                       <div>
                         <h2 className="text-2xl font-black text-[var(--color-text-primary)]">Level {level}</h2>
@@ -663,7 +663,7 @@ export default function StatsGenZ() {
                       <motion.div 
                         animate={{ x: ["-100%", "200%"] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent w-full h-full"
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-foreground)]/40 to-transparent w-full h-full"
                       />
                     </motion.div>
                   </div>
@@ -690,7 +690,7 @@ export default function StatsGenZ() {
                   <div className="relative p-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-accent-cyan)] to-[var(--color-accent-purple)] rounded-[var(--radius-md)] flex items-center justify-center">
-                        <TrendingUp className="w-5 h-5 text-white" />
+                        <TrendingUp className="w-5 h-5 text-[var(--color-primary-foreground)]" />
                       </div>
                       <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Weekly Activity</h2>
                     </div>
@@ -715,7 +715,7 @@ export default function StatsGenZ() {
                               <motion.div 
                                 animate={{ y: ["-100%", "200%"] }}
                                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                className="absolute inset-0 bg-gradient-to-t from-white/30 to-transparent w-full h-full"
+                                className="absolute inset-0 bg-gradient-to-t from-[var(--color-foreground)]/30 to-transparent w-full h-full"
                               />
                             )}
                           </motion.div>
@@ -747,7 +747,7 @@ export default function StatsGenZ() {
                   <div className="relative p-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-warning)] to-[var(--color-error)] rounded-[var(--radius-md)] flex items-center justify-center">
-                        <Flame className="w-5 h-5 text-white" />
+                        <Flame className="w-5 h-5 text-[var(--color-primary-foreground)]" />
                       </div>
                       <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Streak Tracker</h2>
                     </div>
@@ -815,7 +815,7 @@ export default function StatsGenZ() {
               >
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-warning)] to-[var(--color-warning-light)] rounded-[var(--radius-md)] flex items-center justify-center shadow-lg">
-                    <Award className="w-5 h-5 text-white" />
+                    <Award className="w-5 h-5 text-[var(--color-primary-foreground)]" />
                   </div>
                   <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Milestones</h2>
                 </div>
@@ -877,7 +877,7 @@ export default function StatsGenZ() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-black flex items-center gap-3 text-[var(--color-text-primary)]">
                     <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-accent-cyan)] to-[var(--color-accent-purple)] rounded-[var(--radius-md)] flex items-center justify-center">
-                      <BarChart2 className="w-5 h-5 text-white" />
+                      <BarChart2 className="w-5 h-5 text-[var(--color-primary-foreground)]" />
                     </div>
                     Channel Breakdown
                   </h2>
@@ -933,7 +933,7 @@ export default function StatsGenZ() {
                               className="w-9 h-9 bg-gradient-to-br from-[var(--color-warning)] to-[var(--color-warning-light)] rounded-full flex items-center justify-center shadow-lg"
                               style={{ boxShadow: 'var(--glow-warning)' }}
                             >
-                              <Trophy className="w-4 h-4 text-white" />
+                              <Trophy className="w-4 h-4 text-[var(--color-primary-foreground)]" />
                             </motion.div>
                           )}
                         </div>
@@ -961,7 +961,7 @@ export default function StatsGenZ() {
                               <motion.div 
                                 animate={{ x: ["-100%", "200%"] }}
                                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full h-full"
+                                className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-foreground)]/30 to-transparent w-full h-full"
                               />
                             </motion.div>
                           </div>
@@ -991,7 +991,7 @@ export default function StatsGenZ() {
                 <div className="relative p-6">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-success)] to-[var(--color-accent-cyan)] rounded-[var(--radius-md)] flex items-center justify-center">
-                      <Calendar className="w-5 h-5 text-white" />
+                      <Calendar className="w-5 h-5 text-[var(--color-primary-foreground)]" />
                     </div>
                     <h2 className="text-xl font-bold text-[var(--color-text-primary)]">Activity Heatmap</h2>
                     <span className="text-sm text-[var(--color-text-tertiary)] ml-auto">Last 13 weeks</span>

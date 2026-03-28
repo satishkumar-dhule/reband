@@ -48,7 +48,7 @@ if (process.env.TURSO_DATABASE_URL.includes('-ro') ||
 
 console.log('📋 Database Configuration:');
 console.log(`   URL: ${process.env.TURSO_DATABASE_URL}`);
-console.log(`   Token: ${process.env.TURSO_AUTH_TOKEN.substring(0, 20)}...`);
+console.log(`   Token: ****${process.env.TURSO_AUTH_TOKEN.slice(-4)}`);
 console.log('');
 
 // Read and display schema information

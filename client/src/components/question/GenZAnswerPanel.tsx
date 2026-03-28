@@ -443,7 +443,7 @@ export function GenZAnswerPanel({ question, isCompleted }: { question: Question;
   
   // Get current theme from context
   const { theme } = useTheme();
-  const isLightMode = theme === 'genz-light';
+  const isLightMode = theme === 'clean-light';
 
   useEffect(() => {
     BlogService.getByQuestionId(question.id).then(setBlogPost);

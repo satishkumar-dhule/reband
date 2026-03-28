@@ -386,7 +386,7 @@ export default function UnifiedLearningPathsGenZ() {
                   Paths
                 </span>
               </h1>
-              <p className="text-base md:text-xl text-gray-600 dark:text-gray-400">
+              <p className="text-base md:text-xl text-muted-foreground">
                 {activePaths.length > 0 && `${activePaths.length} active • `}
                 {customPaths.length} custom • {curatedPaths.length} curated
               </p>
@@ -405,7 +405,7 @@ export default function UnifiedLearningPathsGenZ() {
                   className={`flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-[16px] font-bold transition-all whitespace-nowrap text-sm md:text-base ${
                     view === id
                       ? 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground'
-                      : 'bg-muted/50 text-gray-600 dark:text-gray-400 hover:bg-muted'
+                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   <Icon className="w-4 h-4 md:w-5 md:h-5" />
@@ -428,7 +428,7 @@ export default function UnifiedLearningPathsGenZ() {
                   </div>
                   <div className="text-left">
                     <h3 className="text-lg md:text-2xl font-bold mb-0.5 md:mb-1">Create Custom Path</h3>
-                    <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">Build your own learning journey</p>
+                    <p className="text-sm md:text-base text-muted-foreground">Build your own learning journey</p>
                   </div>
                 </div>
                 <ChevronRight className="w-6 h-6 md:w-8 md:h-8 text-primary group-hover:translate-x-2 transition-transform" />
@@ -465,7 +465,7 @@ export default function UnifiedLearningPathsGenZ() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="text-lg md:text-2xl font-bold mb-0.5 md:mb-1 truncate">{path.name}</h3>
-                            <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{path.description || `Created ${new Date(path.createdAt).toLocaleDateString()}`}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">{path.description || `Created ${new Date(path.createdAt).toLocaleDateString()}`}</p>
                           </div>
                         </div>
 
@@ -506,7 +506,7 @@ export default function UnifiedLearningPathsGenZ() {
                         key={path.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-4 md:p-6 bg-white dark:bg-gray-900 backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-gray-200 dark:border-gray-800 hover:border-primary/30 transition-all"
+                        className="p-4 md:p-6 bg-card backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-border hover:border-primary/30 transition-all"
                       >
                         <div className="flex items-start justify-between mb-3 md:mb-4">
                           <h3 className="text-lg md:text-xl font-bold flex-1 min-w-0 truncate">{path.name}</h3>
@@ -516,7 +516,7 @@ export default function UnifiedLearningPathsGenZ() {
                                 e.stopPropagation();
                                 openPathModal(path, 'edit');
                               }}
-                              className="p-1.5 md:p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[8px] transition-all"
+                              className="p-1.5 md:p-2 hover:bg-muted rounded-[8px] transition-all"
                             >
                               <Edit className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
                             </button>
@@ -525,7 +525,7 @@ export default function UnifiedLearningPathsGenZ() {
                                 e.stopPropagation();
                                 deleteCustomPath(path.id);
                               }}
-                              className="p-1.5 md:p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-[8px] transition-all"
+                              className="p-1.5 md:p-2 hover:bg-muted rounded-[8px] transition-all"
                             >
                               <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4 text-red-500" />
                             </button>
@@ -533,7 +533,7 @@ export default function UnifiedLearningPathsGenZ() {
                         </div>
 
                         <div className="space-y-2 mb-3 md:mb-4">
-                          <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                          <div className="text-xs md:text-sm text-muted-foreground">
                             {path.channels.length} channels • {path.certifications.length} certifications
                           </div>
                         </div>
@@ -563,7 +563,7 @@ export default function UnifiedLearningPathsGenZ() {
                     <Star className="w-6 h-6 md:w-8 md:h-8 text-amber-400" />
                     Curated Career Paths
                     {curatedSearchQuery && (
-                      <span className="text-base md:text-lg font-normal text-gray-600 dark:text-gray-400">
+                      <span className="text-base md:text-lg font-normal text-muted-foreground">
                         ({filterCuratedPaths(curatedPaths, curatedSearchQuery).length} results)
                       </span>
                     )}
@@ -573,25 +573,25 @@ export default function UnifiedLearningPathsGenZ() {
                 {/* Search Box for Curated Paths - iPhone 13 FIX: Better mobile sizing */}
                 <div className="mb-4 md:mb-6">
                   <div className="relative">
-                    <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-600 dark:text-gray-400" />
+                    <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
                     <input
                       type="text"
                       placeholder="Search paths by name, company, certification, or topic..."
                       value={curatedSearchQuery}
                       onChange={(e) => setCuratedSearchQuery(e.target.value)}
-                      className="w-full pl-10 md:pl-12 pr-10 md:pr-4 py-3 md:py-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-[14px] md:rounded-[16px] text-sm md:text-base focus:outline-none focus:border-primary transition-all"
+                      className="w-full pl-10 md:pl-12 pr-10 md:pr-4 py-3 md:py-4 bg-card border border-border rounded-[14px] md:rounded-[16px] text-sm md:text-base focus:outline-none focus:border-primary transition-all"
                     />
                     {curatedSearchQuery && (
                       <button
                         onClick={() => setCuratedSearchQuery('')}
-                        className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all"
+                        className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full transition-all"
                       >
                         <X className="w-4 h-4" />
                       </button>
                     )}
                   </div>
                   {curatedSearchQuery && (
-                    <div className="mt-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                    <div className="mt-2 text-xs md:text-sm text-muted-foreground">
                       💡 Searching in: path names, descriptions, companies, certifications, topics, and skills
                     </div>
                   )}
@@ -640,7 +640,7 @@ export default function UnifiedLearningPathsGenZ() {
                         key={path.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-4 md:p-6 bg-white dark:bg-gray-900 backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-gray-200 dark:border-gray-800 hover:border-primary/30 transition-all group cursor-pointer"
+                        className="p-4 md:p-6 bg-card backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-border hover:border-primary/30 transition-all group cursor-pointer"
                         onClick={() => openPathModal(path, 'view')}
                       >
                         <div className="flex items-start gap-3 md:gap-4 mb-3 md:mb-4">
@@ -649,11 +649,11 @@ export default function UnifiedLearningPathsGenZ() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="text-lg md:text-xl font-bold mb-0.5 md:mb-1 line-clamp-2">{path.name}</h3>
-                            <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{path.description}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">{path.description}</p>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-1.5 md:gap-2 mb-3 md:mb-4 text-xs text-gray-600 dark:text-gray-400">
+                        <div className="grid grid-cols-3 gap-1.5 md:gap-2 mb-3 md:mb-4 text-xs text-muted-foreground">
                           <div>
                             <Clock className="w-3 h-3 inline mr-1" />
                             {path.duration}
@@ -675,7 +675,7 @@ export default function UnifiedLearningPathsGenZ() {
                               Active
                             </span>
                           ) : (
-                            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-600 dark:text-gray-400 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                           )}
                         </div>
                       </motion.div>
@@ -684,25 +684,25 @@ export default function UnifiedLearningPathsGenZ() {
                 </div>
                 
                 {/* No Results Message - iPhone 13 FIX: Better mobile sizing */}
-                {curatedSearchQuery && filterCuratedPaths(curatedPaths, curatedSearchQuery).length === 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center py-8 md:py-12"
-                  >
-                    <Search className="w-12 h-12 md:w-16 md:h-16 text-gray-400 mx-auto mb-3 md:mb-4" />
-                    <h3 className="text-xl md:text-2xl font-bold mb-2">No paths found</h3>
-                    <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-3 md:mb-4">
-                      Try searching for something else or{' '}
-                      <button
-                        onClick={() => setCuratedSearchQuery('')}
-                        className="text-primary hover:underline font-bold"
-                      >
-                        clear your search
-                      </button>
-                    </p>
-                  </motion.div>
-                )}
+                  {curatedSearchQuery && filterCuratedPaths(curatedPaths, curatedSearchQuery).length === 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-center py-8 md:py-12"
+                    >
+                      <Search className="w-12 h-12 md:w-16 md:h-16 text-muted mx-auto mb-3 md:mb-4" />
+                      <h3 className="text-xl md:text-2xl font-bold mb-2">No paths found</h3>
+                      <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4">
+                        Try searching for something else or{' '}
+                        <button
+                          onClick={() => setCuratedSearchQuery('')}
+                          className="text-primary hover:underline font-bold"
+                        >
+                          clear your search
+                        </button>
+                      </p>
+                    </motion.div>
+                  )}
               </div>
             )}
           </div>
@@ -724,22 +724,22 @@ export default function UnifiedLearningPathsGenZ() {
                 exit={{ y: "100%" }}
                 transition={{ type: "spring", damping: 30, stiffness: 300 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white dark:bg-gray-900 border-t md:border border-gray-200 dark:border-gray-800 rounded-t-[24px] md:rounded-[32px] max-w-4xl w-full h-[90vh] md:h-auto md:max-h-[85vh] overflow-hidden flex flex-col mb-16 md:mb-0"
+                className="bg-card border-t md:border border-border rounded-t-[24px] md:rounded-[32px] max-w-4xl w-full h-[90vh] md:h-auto md:max-h-[85vh] overflow-hidden flex flex-col mb-16 md:mb-0"
               >
                 {/* MOBILE-FIRST: Drag handle on mobile */}
                 <div className="flex justify-center pt-3 pb-2 md:hidden">
-                  <div className="w-12 h-1 bg-gray-300 dark:bg-gray-700 rounded-full" />
+                  <div className="w-12 h-1 bg-muted rounded-full" />
                 </div>
 
                 {/* Header - MOBILE-FIRST: Compact on mobile */}
-                <div className="px-4 py-3 md:p-8 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
+                <div className="px-4 py-3 md:p-8 border-b border-border flex-shrink-0">
                   <div className="flex items-center justify-between mb-2 md:mb-4">
                     <h2 className="text-lg md:text-3xl font-black truncate pr-2">
                       {modalMode === 'create' ? 'Create Path' : modalMode === 'edit' ? 'Edit Path' : selectedPath?.name}
                     </h2>
                     <button
                       onClick={closePathModal}
-                      className="w-9 h-9 md:w-10 md:h-10 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full flex items-center justify-center transition-all flex-shrink-0 touch-manipulation"
+                      className="w-9 h-9 md:w-10 md:h-10 bg-muted hover:bg-muted/80 rounded-full flex items-center justify-center transition-all flex-shrink-0 touch-manipulation"
                     >
                       <X className="w-4 h-4 md:w-5 md:h-5" />
                     </button>
@@ -757,32 +757,32 @@ export default function UnifiedLearningPathsGenZ() {
                           setEditForm(prev => ({ ...prev, name: e.target.value }));
                         }
                       }}
-                      className="w-full px-4 py-3 md:px-6 md:py-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[12px] md:rounded-[16px] text-base md:text-xl focus:outline-none focus:border-primary transition-all"
+                      className="w-full px-4 py-3 md:px-6 md:py-4 bg-muted border border-border rounded-[12px] md:rounded-[16px] text-base md:text-xl focus:outline-none focus:border-primary transition-all"
                     />
                   )}
 
                   {isReadonly && selectedPath?.description && (
                     <div className="mt-2 md:mt-4">
-                      <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">{selectedPath.description}</p>
+                      <p className="text-sm md:text-base text-muted-foreground">{selectedPath.description}</p>
                       
                       {/* Path Stats */}
                       <div className="grid grid-cols-3 gap-2 md:gap-4 mt-3 md:mt-4">
-                        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-[12px]">
-                          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs mb-1">
+                        <div className="p-3 bg-muted rounded-[12px]">
+                          <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                             <Clock className="w-3 h-3" />
                             Duration
                           </div>
                           <div className="font-bold">{selectedPath.duration}</div>
                         </div>
-                        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-[12px]">
-                          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs mb-1">
+                        <div className="p-3 bg-muted rounded-[12px]">
+                          <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                             <Target className="w-3 h-3" />
                             Questions
                           </div>
                           <div className="font-bold">{selectedPath.totalQuestions}</div>
                         </div>
-                        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-[12px]">
-                          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs mb-1">
+                        <div className="p-3 bg-muted rounded-[12px]">
+                          <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                             <Trophy className="w-3 h-3" />
                             Level
                           </div>
@@ -796,7 +796,7 @@ export default function UnifiedLearningPathsGenZ() {
                           <div className="text-sm font-bold mb-2">What you'll learn:</div>
                           <div className="space-y-2">
                             {selectedPath.jobs.map((objective: string, idx: number) => (
-                              <div key={idx} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                              <div key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
                                 <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                                 <span>{objective}</span>
                               </div>
@@ -823,13 +823,13 @@ export default function UnifiedLearningPathsGenZ() {
                 </div>
 
                 {/* Tabs - MOBILE-FIRST: Smaller text on mobile */}
-                <div className="flex border-b border-gray-200 dark:border-gray-800 px-4 md:px-8 flex-shrink-0">
+                <div className="flex border-b border-border px-4 md:px-8 flex-shrink-0">
                   <button
                     onClick={() => setModalTab('channels')}
                     className={`flex-1 py-3 md:py-4 text-xs md:text-sm font-bold transition-colors relative ${
                       modalTab === 'channels'
                         ? 'text-primary'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     Channels ({currentChannels.length})
@@ -845,7 +845,7 @@ export default function UnifiedLearningPathsGenZ() {
                     className={`flex-1 py-3 md:py-4 text-xs md:text-sm font-bold transition-colors relative ${
                       modalTab === 'certifications'
                         ? 'text-primary'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     Certifications ({currentCertifications.length})
@@ -860,15 +860,15 @@ export default function UnifiedLearningPathsGenZ() {
 
                 {/* Search - MOBILE-FIRST: Compact */}
                 {!isReadonly && (
-                  <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
+                  <div className="p-3 md:p-4 border-b border-border flex-shrink-0">
                     <div className="relative">
-                      <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-600 dark:text-gray-400" />
+                      <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
                       <input
                         type="text"
                         placeholder={`Search ${modalTab}...`}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 md:pl-12 pr-3 md:pr-4 py-2.5 md:py-3 text-sm md:text-base bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[10px] md:rounded-[12px] focus:outline-none focus:border-primary transition-all"
+                        className="w-full pl-10 md:pl-12 pr-3 md:pr-4 py-2.5 md:py-3 text-sm md:text-base bg-muted border border-border rounded-[10px] md:rounded-[12px] focus:outline-none focus:border-primary transition-all"
                       />
                     </div>
                   </div>
@@ -904,8 +904,8 @@ export default function UnifiedLearningPathsGenZ() {
                               isSelected
                                 ? 'bg-gradient-to-r from-primary/20 to-cyan-500/20 border-primary'
                                 : isReadonly
-                                  ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                                  : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary/30 cursor-pointer active:scale-95'
+                                  ? 'bg-muted border-border'
+                                  : 'bg-muted border-border hover:border-primary/30 cursor-pointer active:scale-95'
                             }`}
                           >
                             <div className="flex items-center justify-between">
@@ -944,13 +944,13 @@ export default function UnifiedLearningPathsGenZ() {
                               isSelected
                                 ? 'bg-gradient-to-r from-primary/20 to-cyan-500/20 border-primary'
                                 : isReadonly
-                                  ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                                  : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary/30 cursor-pointer active:scale-95'
+                                  ? 'bg-muted border-border'
+                                  : 'bg-muted border-border hover:border-primary/30 cursor-pointer active:scale-95'
                             }`}
                           >
                             <div className="flex items-center justify-between gap-2">
                               <div className="min-w-0 flex-1">
-                                <div className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400 mb-0.5 md:mb-1">{cert.provider}</div>
+                                <div className="text-[10px] md:text-xs text-muted-foreground mb-0.5 md:mb-1">{cert.provider}</div>
                                 <div className="font-semibold text-xs md:text-sm truncate">{cert.name}</div>
                               </div>
                               {isSelected && <Check className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />}
@@ -963,7 +963,7 @@ export default function UnifiedLearningPathsGenZ() {
                 </div>
 
                 {/* Footer - MOBILE-FIRST: Sticky button with proper safe area */}
-                <div className="p-4 md:p-8 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex-shrink-0 pb-safe-offset-4">
+                <div className="p-4 md:p-8 border-t border-border bg-card flex-shrink-0 pb-safe-offset-4">
                   {isReadonly ? (
                     <button
                       onClick={() => {

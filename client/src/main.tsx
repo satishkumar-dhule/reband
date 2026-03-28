@@ -4,12 +4,21 @@ import "./index.css";
 import { initializeAnalytics } from "./lib/analytics";
 import { registerServiceWorker } from "./lib/service-worker";
 
-// Initialize Google Analytics
-// Using Code Reels Google Analytics Measurement ID
 const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-47MSM57H95';
-initializeAnalytics(GA_MEASUREMENT_ID);
 
-// Register service worker for offline support
-registerServiceWorker();
+if (typeof window !== 'undefined') {
+  requestIdleCallback(() => {
+    initializeAnalytics(GA_MEASUREMENT_ID);
+  }, { timeout: 2000 });
+  
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      registerServiceWorker();
+    });
+  }
+}
 
-createRoot(document.getElementById("root")!).render(<App />);
+const root = document.getElementById("root");
+if (root) {
+  createRoot(root).render(<App />);
+}

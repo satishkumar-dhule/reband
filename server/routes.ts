@@ -2,6 +2,24 @@ import type { Express } from "express";
 import { type Server } from "http";
 import { client } from "./db";
 
+const channelCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL = 60_000;
+
+function getCached<T>(key: string, fetchFn: () => Promise<T>): Promise<T> {
+  const cached = channelCache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return Promise.resolve(cached.data as T);
+  }
+  return fetchFn().then(data => {
+    channelCache.set(key, { data, timestamp: Date.now() });
+    return data;
+  });
+}
+
+function invalidateChannelCache(): void {
+  channelCache.clear();
+}
+
 // Helper to parse JSON fields from DB
 function parseQuestion(row: any) {
   // Sanitize answer field - ensure no JSON/MCQ format
@@ -50,42 +68,64 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   
-  // Get all channels with question counts
+  // Keep-alive endpoint for preventing Replit sleep
+  app.get("/api/keep-alive", (_req, res) => {
+    res.json({ status: "ok", timestamp: Date.now() });
+  });
+  
+  // Get all channels with question counts (cached)
   app.get("/api/channels", async (_req, res) => {
     try {
-      const result = await client.execute(
-        "SELECT channel, COUNT(*) as count FROM questions WHERE status != 'deleted' GROUP BY channel"
-      );
-      res.json(result.rows.map(r => ({ id: r.channel, questionCount: r.count })));
+      const data = await getCached('channels', async () => {
+        const result = await client.execute({
+          sql: "SELECT channel, COUNT(*) as count FROM questions WHERE status != 'deleted' GROUP BY channel",
+          args: []
+        });
+        return result.rows.map((r: any) => ({ id: r.channel, questionCount: r.count }));
+      });
+      res.json(data);
     } catch (error) {
       console.error("Error fetching channels:", error);
       res.status(500).json({ error: "Failed to fetch channels" });
     }
   });
 
-  // Get question IDs for a channel with filters
+  // Get question IDs for a channel with filters (cached)
   app.get("/api/questions/:channelId", async (req, res) => {
     try {
       const { channelId } = req.params;
       const { subChannel, difficulty } = req.query;
-
-      let sql = "SELECT * FROM questions WHERE channel = ? AND status != 'deleted'";
-      const args: any[] = [channelId];
-
-      if (subChannel && subChannel !== "all") {
-        sql += " AND sub_channel = ?";
-        args.push(subChannel);
-      }
       
-      if (difficulty && difficulty !== "all") {
-        sql += " AND difficulty = ?";
-        args.push(difficulty);
-      }
+      const cacheKey = `questions-${channelId}-${subChannel}-${difficulty}`;
+      
+      const data = await getCached(cacheKey, async () => {
+        let sql = "SELECT id, question, difficulty, sub_channel, tags, channel FROM questions WHERE channel = ? AND status != 'deleted'";
+        const args: any[] = [channelId];
 
-      sql += " ORDER BY created_at ASC";
+        if (subChannel && subChannel !== "all") {
+          sql += " AND sub_channel = ?";
+          args.push(subChannel);
+        }
+        
+        if (difficulty && difficulty !== "all") {
+          sql += " AND difficulty = ?";
+          args.push(difficulty);
+        }
 
-      const result = await client.execute({ sql, args });
-      res.json(result.rows.map(parseQuestion));
+        sql += " ORDER BY created_at ASC";
+
+        const result = await client.execute({ sql, args });
+        return result.rows.map((r: any) => ({ 
+          id: r.id, 
+          question: r.question, 
+          difficulty: r.difficulty,
+          channel: r.channel,
+          subChannel: r.sub_channel,
+          tags: r.tags ? JSON.parse(r.tags) : []
+        }));
+      });
+      
+      res.json(data);
     } catch (error) {
       console.error("Error fetching questions:", error);
       res.status(500).json({ error: "Failed to fetch questions" });
@@ -182,43 +222,50 @@ export async function registerRoutes(
     }
   });
 
-  // Get subchannels for a channel
+  // Get subchannels for a channel (cached)
   app.get("/api/subchannels/:channelId", async (req, res) => {
     try {
       const { channelId } = req.params;
+      const cacheKey = `subchannels-${channelId}`;
       
-      const result = await client.execute({
-        sql: "SELECT DISTINCT sub_channel FROM questions WHERE channel = ? ORDER BY sub_channel",
-        args: [channelId]
+      const data = await getCached(cacheKey, async () => {
+        const result = await client.execute({
+          sql: "SELECT DISTINCT sub_channel FROM questions WHERE channel = ? ORDER BY sub_channel",
+          args: [channelId]
+        });
+        return result.rows.map((r: any) => r.sub_channel);
       });
 
-      const subChannels = result.rows.map(r => r.sub_channel);
-      res.json(subChannels);
+      res.json(data);
     } catch (error) {
       console.error("Error fetching subchannels:", error);
       res.status(500).json({ error: "Failed to fetch subchannels" });
     }
   });
 
-  // Get companies for a channel
+  // Get companies for a channel (cached)
   app.get("/api/companies/:channelId", async (req, res) => {
     try {
       const { channelId } = req.params;
+      const cacheKey = `companies-${channelId}`;
       
-      const result = await client.execute({
-        sql: "SELECT companies FROM questions WHERE channel = ? AND companies IS NOT NULL",
-        args: [channelId]
+      const data = await getCached(cacheKey, async () => {
+        const result = await client.execute({
+          sql: "SELECT companies FROM questions WHERE channel = ? AND companies IS NOT NULL",
+          args: [channelId]
+        });
+
+        const companiesSet = new Set<string>();
+        for (const row of result.rows) {
+          if (row.companies) {
+            const parsed = JSON.parse(row.companies as string);
+            parsed.forEach((c: string) => companiesSet.add(c));
+          }
+        }
+        return Array.from(companiesSet).sort();
       });
 
-      const companiesSet = new Set<string>();
-      for (const row of result.rows) {
-        if (row.companies) {
-          const parsed = JSON.parse(row.companies as string);
-          parsed.forEach((c: string) => companiesSet.add(c));
-        }
-      }
-
-      res.json(Array.from(companiesSet).sort());
+      res.json(data);
     } catch (error) {
       console.error("Error fetching companies:", error);
       res.status(500).json({ error: "Failed to fetch companies" });
@@ -261,30 +308,34 @@ export async function registerRoutes(
     };
   }
 
-  // Get all coding challenges
+  // Get all coding challenges (cached)
   app.get("/api/coding/challenges", async (req, res) => {
     try {
       const { difficulty, category } = req.query;
+      const cacheKey = `challenges-${difficulty}-${category}`;
       
-      let sql = "SELECT * FROM coding_challenges WHERE 1=1";
-      const args: any[] = [];
+      const data = await getCached(cacheKey, async () => {
+        let sql = "SELECT * FROM coding_challenges WHERE 1=1";
+        const args: any[] = [];
 
-      if (difficulty && difficulty !== "all") {
-        sql += " AND difficulty = ?";
-        args.push(difficulty);
-      }
-      if (category && category !== "all") {
-        sql += " AND category = ?";
-        args.push(category);
-      }
+        if (difficulty && difficulty !== "all") {
+          sql += " AND difficulty = ?";
+          args.push(difficulty);
+        }
+        if (category && category !== "all") {
+          sql += " AND category = ?";
+          args.push(category);
+        }
 
-      sql += " ORDER BY created_at DESC";
+        sql += " ORDER BY created_at DESC";
 
-      const result = await client.execute({ sql, args });
-      res.json(result.rows.map(parseCodingChallenge));
+        const result = await client.execute({ sql, args });
+        return result.rows.map(parseCodingChallenge);
+      });
+
+      res.json(data);
     } catch (error) {
       console.error("Error fetching coding challenges:", error);
-      // Return empty array if table doesn't exist yet
       res.json([]);
     }
   });
@@ -572,34 +623,38 @@ export async function registerRoutes(
     };
   }
 
-  // Get all certifications
+  // Get all certifications (cached)
   app.get("/api/certifications", async (req, res) => {
     try {
       const { category, difficulty, provider, status = 'active' } = req.query;
+      const cacheKey = `certifications-${category}-${difficulty}-${provider}-${status}`;
       
-      let sql = "SELECT * FROM certifications WHERE status = ?";
-      const args: any[] = [status];
+      const data = await getCached(cacheKey, async () => {
+        let sql = "SELECT * FROM certifications WHERE status = ?";
+        const args: any[] = [status];
 
-      if (category && category !== 'all') {
-        sql += " AND category = ?";
-        args.push(category);
-      }
-      if (difficulty && difficulty !== 'all') {
-        sql += " AND difficulty = ?";
-        args.push(difficulty);
-      }
-      if (provider && provider !== 'all') {
-        sql += " AND provider LIKE ?";
-        args.push(`%${provider}%`);
-      }
+        if (category && category !== 'all') {
+          sql += " AND category = ?";
+          args.push(category);
+        }
+        if (difficulty && difficulty !== 'all') {
+          sql += " AND difficulty = ?";
+          args.push(difficulty);
+        }
+        if (provider && provider !== 'all') {
+          sql += " AND provider LIKE ?";
+          args.push(`%${provider}%`);
+        }
 
-      sql += " ORDER BY name ASC";
+        sql += " ORDER BY name ASC";
 
-      const result = await client.execute({ sql, args });
-      res.json(result.rows.map(parseCertification));
+        const result = await client.execute({ sql, args });
+        return result.rows.map(parseCertification);
+      });
+
+      res.json(data);
     } catch (error) {
       console.error("Error fetching certifications:", error);
-      // Return empty array if table doesn't exist yet
       res.json([]);
     }
   });
@@ -744,7 +799,7 @@ export async function registerRoutes(
     };
   }
 
-  // Get all learning paths with filters
+  // Get all learning paths with filters (cached)
   app.get("/api/learning-paths", async (req, res) => {
     try {
       const { 
@@ -757,36 +812,42 @@ export async function registerRoutes(
         offset = '0'
       } = req.query;
       
-      let sql = "SELECT * FROM learning_paths WHERE status = 'active'";
-      const args: any[] = [];
+      const cacheKey = `learning-paths-${pathType}-${difficulty}-${company}-${jobTitle}-${search}-${limit}-${offset}`;
+      
+      const data = await getCached(cacheKey, async () => {
+        let sql = "SELECT * FROM learning_paths WHERE status = 'active'";
+        const args: any[] = [];
 
-      if (pathType && pathType !== 'all') {
-        sql += " AND path_type = ?";
-        args.push(pathType);
-      }
-      if (difficulty && difficulty !== 'all') {
-        sql += " AND difficulty = ?";
-        args.push(difficulty);
-      }
-      if (company) {
-        sql += " AND target_company = ?";
-        args.push(company);
-      }
-      if (jobTitle) {
-        sql += " AND target_job_title = ?";
-        args.push(jobTitle);
-      }
-      if (search) {
-        sql += " AND (title LIKE ? OR description LIKE ? OR tags LIKE ?)";
-        const searchPattern = `%${search}%`;
-        args.push(searchPattern, searchPattern, searchPattern);
-      }
+        if (pathType && pathType !== 'all') {
+          sql += " AND path_type = ?";
+          args.push(pathType);
+        }
+        if (difficulty && difficulty !== 'all') {
+          sql += " AND difficulty = ?";
+          args.push(difficulty);
+        }
+        if (company) {
+          sql += " AND target_company = ?";
+          args.push(company);
+        }
+        if (jobTitle) {
+          sql += " AND target_job_title = ?";
+          args.push(jobTitle);
+        }
+        if (search) {
+          sql += " AND (title LIKE ? OR description LIKE ? OR tags LIKE ?)";
+          const searchPattern = `%${search}%`;
+          args.push(searchPattern, searchPattern, searchPattern);
+        }
 
-      sql += " ORDER BY popularity DESC, created_at DESC LIMIT ? OFFSET ?";
-      args.push(parseInt(limit as string), parseInt(offset as string));
+        sql += " ORDER BY popularity DESC, created_at DESC LIMIT ? OFFSET ?";
+        args.push(parseInt(limit as string), parseInt(offset as string));
 
-      const result = await client.execute({ sql, args });
-      res.json(result.rows.map(parseLearningPath));
+        const result = await client.execute({ sql, args });
+        return result.rows.map(parseLearningPath);
+      });
+
+      res.json(data);
     } catch (error) {
       console.error("Error fetching learning paths:", error);
       res.json([]);

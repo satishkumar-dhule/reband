@@ -93,8 +93,8 @@ function PremiumProCard() {
         <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl" />
         
         <div className="relative flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-pink-500 flex items-center justify-center flex-shrink-0">
-            <Crown className="w-6 h-6 text-black" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-pink-500 flex items-center justify-center flex-shrink-0">
+            <Crown className="w-6 h-6 text-background" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -122,7 +122,7 @@ function PremiumProCard() {
                 <span>Priority Support</span>
               </div>
             </div>
-            <GenZButton className="w-full bg-gradient-to-r from-amber-400 to-pink-500 border-0 text-black hover:opacity-90">
+            <GenZButton className="w-full bg-gradient-to-r from-amber-400 to-pink-500 border-0 text-background hover:opacity-90">
               <Crown className="w-4 h-4 mr-2" />
               Upgrade to PRO
             </GenZButton>
@@ -140,13 +140,13 @@ function SessionCard({ session, onClick }: { session: VoiceSession; onClick: () 
       onClick={onClick}
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
-      className="w-full p-6 bg-gradient-to-br from-white/5 to-white/10 border border-white/10 rounded-2xl text-left hover:border-primary/50 hover:bg-primary/10 transition-all group backdrop-blur-sm"
+      className="w-full p-6 bg-gradient-to-br from-card to-card/80 border border-border rounded-2xl text-left hover:border-primary/50 hover:bg-primary/10 transition-all group backdrop-blur-sm"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center">
-              <Target className="w-5 h-5 text-black" />
+              <Target className="w-5 h-5 text-background" />
             </div>
             <div>
               <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
@@ -452,12 +452,12 @@ export default function VoiceSessionGenZ() {
               <div className="relative max-w-4xl mx-auto px-4 py-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <button onClick={() => setLocation('/')} aria-label="Go to home" className="p-2 hover:bg-white/10 rounded-xl transition-colors backdrop-blur-sm">
+                    <button onClick={() => setLocation('/')} aria-label="Go to home" className="p-2 hover:bg-muted rounded-xl transition-colors backdrop-blur-sm">
                       <Home className="w-5 h-5 text-muted-foreground" />
                     </button>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center shadow-lg shadow-primary/25">
-                        <Mic className="w-6 h-6 text-black" />
+                        <Mic className="w-6 h-6 text-background" />
                       </div>
                       <div>
                         <h1 className="text-2xl font-black text-foreground">Voice Sessions</h1>
@@ -534,7 +534,7 @@ export default function VoiceSessionGenZ() {
                 
                 <div className="relative">
                   <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/25">
-                    <Target className="w-10 h-10 text-black" />
+                    <Target className="w-10 h-10 text-background" />
                   </div>
                   <h1 className="text-2xl font-bold text-foreground mb-2">{sessionState.session.topic}</h1>
                   <p className="text-muted-foreground mb-6">
@@ -547,17 +547,17 @@ export default function VoiceSessionGenZ() {
                   
                   {/* Session Stats */}
                   <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="p-3 bg-card rounded-xl border border-border">
                       <Target className="w-5 h-5 text-primary mx-auto mb-2" />
                       <div className="text-lg font-black text-foreground">{sessionState.session.totalQuestions}</div>
                       <div className="text-xs text-muted-foreground">Questions</div>
                     </div>
-                    <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="p-3 bg-card rounded-xl border border-border">
                       <Clock className="w-5 h-5 text-cyan-400 mx-auto mb-2" />
                       <div className="text-lg font-black text-foreground">~{sessionState.session.estimatedMinutes}</div>
                       <div className="text-xs text-muted-foreground">Minutes</div>
                     </div>
-                    <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="p-3 bg-card rounded-xl border border-border">
                       <Zap className="w-5 h-5 text-amber-400 mx-auto mb-2" />
                       <div className="text-lg font-black text-foreground">{sessionState.session.difficulty}</div>
                       <div className="text-xs text-muted-foreground">Level</div>
@@ -604,18 +604,18 @@ export default function VoiceSessionGenZ() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-card rounded-full border border-border">
                       <Clock className="w-4 h-4 text-cyan-400" />
                       <span className="text-sm font-mono text-cyan-400">{sessionDuration}s</span>
                     </div>
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-card rounded-full border border-border">
                       <Mic className="w-4 h-4 text-primary" />
                       <span className="text-sm font-mono text-primary">{liveWPM} WPM</span>
                     </div>
                   </div>
                 </div>
                 <div className="pb-3">
-                  <div className="h-2 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden backdrop-blur-sm">
                     <motion.div 
                       className="h-full bg-gradient-to-r from-primary via-cyan-400 to-primary"
                       initial={{ width: 0 }}
@@ -759,8 +759,8 @@ export default function VoiceSessionGenZ() {
                       lastAnswer.isCorrect ? 'bg-gradient-to-br from-primary to-cyan-500' : 'bg-gradient-to-br from-pink-500 to-amber-400'
                     }`}>
                     {lastAnswer.isCorrect 
-                      ? <CheckCircle className="w-12 h-12 text-black" /> 
-                      : <XCircle className="w-12 h-12 text-black" />
+                      ? <CheckCircle className="w-12 h-12 text-background" /> 
+                      : <XCircle className="w-12 h-12 text-background" />
                     }
                   </motion.div>
                   
@@ -782,7 +782,7 @@ export default function VoiceSessionGenZ() {
                     <span className="text-muted-foreground">Session Progress</span>
                     <span className="text-foreground font-semibold">{sessionState.currentQuestionIndex + 1}/{sessionState.questions.length}</span>
                   </div>
-                  <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <motion.div 
                       className="h-full bg-gradient-to-r from-primary to-cyan-400"
                       initial={{ width: 0 }}
@@ -828,7 +828,7 @@ export default function VoiceSessionGenZ() {
                     transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
                     className="w-24 h-24 rounded-2xl bg-gradient-to-br from-amber-400 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-400/25"
                   >
-                    <Trophy className="w-12 h-12 text-black" />
+                    <Trophy className="w-12 h-12 text-background" />
                   </motion.div>
                   
                   <div className="text-6xl font-black bg-gradient-to-r from-primary via-cyan-400 to-amber-400 bg-clip-text text-transparent mb-2">
@@ -849,17 +849,17 @@ export default function VoiceSessionGenZ() {
 
                   {/* Session Stats */}
                   <div className="grid grid-cols-3 gap-3 mb-8">
-                    <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="p-3 bg-card rounded-xl border border-border">
                       <Target className="w-5 h-5 text-primary mx-auto mb-2" />
                       <div className="text-lg font-black text-foreground">{sessionResult.answers.length}</div>
                       <div className="text-xs text-muted-foreground">Questions</div>
                     </div>
-                    <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="p-3 bg-card rounded-xl border border-border">
                       <Clock className="w-5 h-5 text-cyan-400 mx-auto mb-2" />
                       <div className="text-lg font-black text-foreground">{Math.floor(0 / 60)}:{(0 % 60).toString().padStart(2, '0')}</div>
                       <div className="text-xs text-muted-foreground">Duration</div>
                     </div>
-                    <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="p-3 bg-card rounded-xl border border-border">
                       <TrendingUp className="w-5 h-5 text-amber-400 mx-auto mb-2" />
                       <div className="text-lg font-black text-foreground">{Math.round(0)}%</div>
                       <div className="text-xs text-muted-foreground">Avg Score</div>

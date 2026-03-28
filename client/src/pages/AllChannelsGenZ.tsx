@@ -213,7 +213,7 @@ function AnimatedGradientHeader() {
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
       
       {/* Glass morphism card layer */}
-      <div className="absolute inset-4 rounded-[2.5rem] bg-white/5 backdrop-blur-sm border border-white/10" />
+      <div className="absolute inset-4 rounded-[2.5rem] bg-card/50 backdrop-blur-sm border border-border" />
       
       <div className="relative px-10 py-14">
         <div className="flex items-center justify-between">
@@ -298,7 +298,7 @@ function AnimatedGradientHeader() {
                   boxShadow: '0 0 20px hsl(330, 100%, 65%, 0.5)'
                 }}
               >
-                <Star className="w-6 h-6 text-white fill-white" />
+                <Star className="w-6 h-6 text-foreground fill-foreground" />
               </motion.div>
             </div>
           </motion.div>
@@ -451,21 +451,21 @@ function CategoryTabs({
                 ? 'linear-gradient(135deg, hsl(190, 100%, 50%) 0%, hsl(270, 100%, 65%) 100%)'
                 : 'hsl(0, 0%, 8%)',
               border: `1px solid ${isSelected ? 'hsl(190, 100%, 50%, 0.5)' : 'hsl(0, 0%, 18%)'}`,
-              color: isSelected ? 'white' : 'hsl(0, 0%, 75%)',
+              color: isSelected ? 'var(--foreground)' : 'hsl(0, 0%, 75%)',
               boxShadow: isSelected ? '0 0 20px hsl(190, 100%, 50%, 0.3)' : '0 4px 12px rgba(0,0,0,0.2)'
             }}
           >
             <span className="flex items-center gap-2.5">
               <tab.icon 
                 className="w-4 h-4" 
-                style={{ color: isSelected ? 'white' : (colors?.text || 'hsl(0, 0%, 53%)') }} 
+                style={{ color: isSelected ? 'var(--foreground)' : (colors?.text || 'hsl(0, 0%, 53%)') }} 
               />
               {tab.name}
               <span 
                 className="px-2.5 py-0.5 rounded-full text-xs font-bold"
                 style={{ 
                   background: isSelected ? 'rgba(255,255,255,0.2)' : 'hsl(0, 0%, 12%)',
-                  color: isSelected ? 'white' : 'hsl(0, 0%, 53%)'
+                  color: isSelected ? 'var(--foreground)' : 'hsl(0, 0%, 53%)'
                 }}
               >
                 {count}
@@ -575,7 +575,7 @@ function ChannelCard({
                 }}
               >
                 <IconComponent 
-                  className="w-9 h-9 text-white drop-shadow-md" 
+                  className="w-9 h-9 text-foreground drop-shadow-md" 
                   strokeWidth={1.5} 
                 />
               </div>
@@ -595,7 +595,7 @@ function ChannelCard({
                     className="px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1"
                     style={{ 
                       background: 'linear-gradient(135deg, hsl(330, 100%, 65%) 0%, hsl(270, 100%, 65%) 100%)',
-                      color: 'white',
+                      color: 'var(--foreground)',
                       boxShadow: '0 0 15px hsl(330, 100%, 65%, 0.4)'
                     }}
                   >
@@ -747,7 +747,7 @@ function ChannelCard({
                 ? 'hsl(0, 0%, 12%)'
                 : 'linear-gradient(135deg, hsl(190, 100%, 50%) 0%, hsl(270, 100%, 65%) 100%)',
               border: `2px solid ${isSubscribed ? 'hsl(0, 0%, 18%)' : 'hsl(190, 100%, 50%, 0.5)'}`,
-              color: isSubscribed ? 'hsl(0, 0%, 75%)' : 'white',
+              color: isSubscribed ? 'hsl(0, 0%, 75%)' : 'var(--foreground)',
               boxShadow: isSubscribed ? 'none' : '0 0 20px hsl(190, 100%, 50%, 0.3)'
             }}
           >

@@ -11,6 +11,11 @@ on:
         required: false
         default: 'Manual trigger'
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     name: Deploy Website
@@ -22,30 +27,45 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js with pnpm
+        uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: '20'
+          pnpm-version: '10'
       
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-      
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      
-      - name: Fetch data from Turso
-        run: |
-          node script/fetch-questions-for-build.js
-          node script/fetch-question-history.js
-          node script/generate-curated-paths.js
-          node script/generate-rss.js
-          node script/generate-sitemap.js
-          node script/fetch-bot-monitor-data.js
+      - name: Fetch questions data
+        run: node script/fetch-questions-for-build.js
         env:
           TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
           TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+      
+      - name: Fetch question history
+        run: node script/fetch-question-history.js
+        env:
+          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
+          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+      
+      - name: Generate curated paths
+        run: node script/generate-curated-paths.js
+        env:
+          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
+          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+      
+      - name: Generate RSS feed
+        run: node script/generate-rss.js
+        env:
+          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
+          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+      
+      - name: Generate sitemap
+        run: node script/generate-sitemap.js
+        env:
+          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
+          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
+      
+      - name: Fetch bot monitor data
+        run: node script/fetch-bot-monitor-data.js
+        env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
       
@@ -58,7 +78,7 @@ jobs:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
       
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist

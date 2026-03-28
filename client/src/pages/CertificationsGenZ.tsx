@@ -262,7 +262,7 @@ export default function CertificationsGenZ() {
                           <span className="text-muted-foreground">{cert.questionCount} questions</span>
                         </div>
                         <div className="flex items-center gap-1.5 md:gap-2">
-                          <Clock className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-500 flex-shrink-0" />
+                          <Clock className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary flex-shrink-0" />
                           <span className="text-muted-foreground">{cert.estimatedHours}h</span>
                         </div>
                       </div>
@@ -271,8 +271,8 @@ export default function CertificationsGenZ() {
                       <div className="flex items-center gap-2">
                         <Target className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground flex-shrink-0" />
                         <span className={`text-xs font-semibold uppercase ${
-                          cert.difficulty === 'beginner' ? 'text-green-500' :
-                          cert.difficulty === 'intermediate' ? 'text-yellow-500' :
+                          cert.difficulty === 'beginner' ? 'text-emerald-500' :
+                          cert.difficulty === 'intermediate' ? 'text-amber-500' :
                           cert.difficulty === 'advanced' ? 'text-orange-500' :
                           'text-red-500'
                         }`}>
@@ -286,7 +286,7 @@ export default function CertificationsGenZ() {
                           onClick={() => toggleStarted(cert.id)}
                           className={`flex-1 px-4 md:px-6 py-2.5 md:py-3 rounded-[14px] md:rounded-[16px] text-sm md:text-base font-bold transition-all ${
                             isStarted
-                              ? 'bg-muted border border-border hover:bg-white/20'
+                              ? 'bg-muted border border-border hover:bg-foreground/10'
                               : 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground hover:scale-105'
                           }`}
                         >

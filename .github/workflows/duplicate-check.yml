@@ -26,6 +26,10 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   check-duplicates:
     name: 🔍 Check for Duplicates
@@ -36,6 +40,29 @@ jobs:
       - uses: actions/checkout@v4
       
       - uses: ./.github/actions/setup-node-pnpm
+      
+      - name: Validate Inputs
+        run: |
+          # Validate content_type
+          if [[ -n "${{ inputs.content_type }}" ]]; then
+            if [[ ! "${{ inputs.content_type }}" =~ ^(question|challenge|test|certification)$ ]]; then
+              echo "❌ Invalid content_type: ${{ inputs.content_type }}"
+              exit 1
+            fi
+          fi
+          # Validate channel (allow alphanumeric, hyphen, underscore)
+          if [[ -n "${{ inputs.channel }}" ]]; then
+            if [[ ! "${{ inputs.channel }}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+              echo "❌ Invalid channel: ${{ inputs.channel }}"
+              exit 1
+            fi
+          fi
+          # Validate auto_fix is boolean
+          if [[ -n "${{ inputs.auto_fix }}" && "${{ inputs.auto_fix }}" != "true" && "${{ inputs.auto_fix }}" != "false" ]]; then
+            echo "❌ Invalid auto_fix: ${{ inputs.auto_fix }}"
+            exit 1
+          fi
+          echo "✅ Inputs validated"
       
       - name: Initialize Vector DB
         env:
@@ -55,22 +82,22 @@ jobs:
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
         run: |
-          ARGS="--report"
+          ARGS=("--report")
           
           if [ -n "${{ inputs.content_type }}" ]; then
-            ARGS="$ARGS --type=${{ inputs.content_type }}"
+            ARGS+=("--type=${{ inputs.content_type }}")
           fi
           
           if [ -n "${{ inputs.channel }}" ]; then
-            ARGS="$ARGS --channel=${{ inputs.channel }}"
+            ARGS+=("--channel=${{ inputs.channel }}")
           fi
           
           if [ "${{ inputs.auto_fix }}" == "true" ]; then
-            ARGS="$ARGS --fix"
+            ARGS+=("--fix")
           fi
           
-          echo "Running: node script/check-duplicates.js $ARGS"
-          node script/check-duplicates.js $ARGS
+          echo "Running: node script/check-duplicates.js ${ARGS[*]}"
+          node script/check-duplicates.js "${ARGS[@]}"
       
       - name: Upload Duplicate Report
         if: always()

@@ -39,6 +39,11 @@ on:
         default: 'false'
         type: boolean
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 env:
   SOURCE_REPO: ${{ inputs.source_repo || 'open-interview/open-interview.github.io' }}
 
@@ -51,6 +56,34 @@ jobs:
       should_process_external: ${{ steps.check.outputs.should_process_external }}
       issue_number: ${{ steps.check.outputs.issue_number }}
     steps:
+      - name: Validate Inputs
+        run: |
+          # Validate source input
+          if [[ ! "${{ inputs.source }}" =~ ^(local|external|both)$ ]]; then
+            echo "❌ Invalid source: ${{ inputs.source }}"
+            exit 1
+          fi
+          # Validate source_repo format (owner/repo)
+          if [[ -n "${{ inputs.source_repo }}" ]]; then
+            if [[ ! "${{ inputs.source_repo }}" =~ ^[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$ ]]; then
+              echo "❌ Invalid source_repo format: ${{ inputs.source_repo }}. Must be owner/repo"
+              exit 1
+            fi
+          fi
+          # Validate max_issues is a positive integer
+          if [[ -n "${{ inputs.max_issues }}" ]]; then
+            if [[ ! "${{ inputs.max_issues }}" =~ ^[0-9]+$ ]] || [[ "${{ inputs.max_issues }}" -le 0 ]]; then
+              echo "❌ Invalid max_issues: ${{ inputs.max_issues }}. Must be positive integer"
+              exit 1
+            fi
+          fi
+          # Validate force_reprocess is boolean
+          if [[ -n "${{ inputs.force_reprocess }}" && "${{ inputs.force_reprocess }}" != "true" && "${{ inputs.force_reprocess }}" != "false" ]]; then
+            echo "❌ Invalid force_reprocess: ${{ inputs.force_reprocess }}"
+            exit 1
+          fi
+          echo "✅ Inputs validated"
+      
       - name: Determine what to process
         id: check
         uses: actions/github-script@v7

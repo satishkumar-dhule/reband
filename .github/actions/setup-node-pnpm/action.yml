@@ -37,6 +37,46 @@ runs:
         key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: ${{ runner.os }}-pnpm-
 
+    - name: Cache Vite build
+      if: inputs.install == 'true'
+      uses: actions/cache@v4
+      with:
+        path: node_modules/.vite
+        key: ${{ runner.os }}-vite-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.{ts,tsx,js,jsx,json}') }}
+        restore-keys: |
+          ${{ runner.os }}-vite-${{ hashFiles('**/pnpm-lock.yaml') }}-
+          ${{ runner.os }}-vite-
+
+    - name: Cache TypeScript build info
+      if: inputs.install == 'true'
+      uses: actions/cache@v4
+      with:
+        path: node_modules/typescript/tsbuildinfo
+        key: ${{ runner.os }}-tsbuildinfo-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.{ts,tsx}') }}
+        restore-keys: |
+          ${{ runner.os }}-tsbuildinfo-${{ hashFiles('**/pnpm-lock.yaml') }}-
+          ${{ runner.os }}-tsbuildinfo-
+
+    - name: Cache Playwright browsers
+      if: inputs.install == 'true'
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/playwright.config.ts') }}
+        restore-keys: |
+          ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}-
+          ${{ runner.os }}-playwright-
+
+    - name: Cache Pagefind build
+      if: inputs.install == 'true'
+      uses: actions/cache@v4
+      with:
+        path: dist/public/pagefind
+        key: ${{ runner.os }}-pagefind-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.{ts,tsx,js,jsx,json,md}') }}
+        restore-keys: |
+          ${{ runner.os }}-pagefind-${{ hashFiles('**/pnpm-lock.yaml') }}-
+          ${{ runner.os }}-pagefind-
+
     - name: Install dependencies
       if: inputs.install == 'true'
       shell: bash

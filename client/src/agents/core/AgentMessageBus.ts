@@ -1,5 +1,5 @@
-// Agent Message Bus - Core of the multi-agent system
-// Coordinates 30 specialized agents through asynchronous message passing
+// Agent Message Bus - ULTRA PRO MAX Performance Version
+// Coordinates 30 specialized agents through optimized asynchronous message passing
 
 export type AgentMessageType = 
   | 'REQUEST' 
@@ -19,7 +19,7 @@ export interface AgentMessage {
   payload: any;
   timestamp: number;
   correlationId?: string;
-  priority?: 'low' | 'normal' | 'high' | 'critical';
+  priority?: 'low' | 'normal' | 'high' | 'critical' | 'medium';
 }
 
 export interface Agent {
@@ -33,6 +33,20 @@ export interface Agent {
 
 type MessageHandler = (message: AgentMessage) => Promise<void> | void;
 
+interface PendingResponse {
+  resolve: (msg: AgentMessage | null) => void;
+  reject: (error: Error) => void;
+  timeoutId: number;
+}
+
+interface PerformanceMetrics {
+  messagesProcessed: number;
+  messagesSent: number;
+  averageProcessingTime: number;
+  queueDepth: number;
+  lastProcessTime: number;
+}
+
 class AgentMessageBus {
   private agents: Map<string, Agent> = new Map();
   private handlers: Map<string, Set<MessageHandler>> = new Map();
@@ -40,6 +54,21 @@ class AgentMessageBus {
   private processing = false;
   private messageHistory: AgentMessage[] = [];
   private maxHistory = 1000;
+  
+  private pendingResponses: Map<string, PendingResponse> = new Map();
+  private messageIndex: Map<string, number> = new Map();
+  
+  private metrics: PerformanceMetrics = {
+    messagesProcessed: 0,
+    messagesSent: 0,
+    averageProcessingTime: 0,
+    queueDepth: 0,
+    lastProcessTime: 0,
+  };
+  
+  private processInterval: number | null = null;
+  private batchSize = 50;
+  private processDelay = 50;
 
   constructor() {
     this.startProcessing();
@@ -66,59 +95,90 @@ class AgentMessageBus {
   }
 
   async send(message: AgentMessage): Promise<void> {
-    return new Promise((resolve) => {
-      this.messageQueue.push(message);
-      this.messageHistory.push(message);
-      if (this.messageHistory.length > this.maxHistory) {
-        this.messageHistory.shift();
+    this.messageQueue.push(message);
+    this.messageIndex.set(message.id, this.messageHistory.length);
+    this.messageHistory.push(message);
+    
+    if (this.messageHistory.length > this.maxHistory) {
+      const removed = this.messageHistory.shift();
+      if (removed) {
+        this.messageIndex.delete(removed.id);
       }
-      resolve();
-    });
+    }
+    
+    this.metrics.messagesSent++;
+    this.metrics.queueDepth = this.messageQueue.length;
   }
 
   async sendAndWait(message: AgentMessage, timeout = 5000): Promise<AgentMessage | null> {
     await this.send(message);
     
-    return new Promise((resolve) => {
-      const checkResponse = () => {
-        const response = this.messageHistory.find(
-          m => m.correlationId === message.id && m.from === message.to
-        );
-        if (response) {
-          resolve(response);
-        }
-      };
-      
-      setTimeout(() => {
-        checkResponse();
+    const correlationKey = `${message.id}-${message.to}`;
+    
+    return new Promise((resolve, reject) => {
+      const timeoutId = window.setTimeout(() => {
+        this.pendingResponses.delete(correlationKey);
         resolve(null);
       }, timeout);
+      
+      this.pendingResponses.set(correlationKey, { resolve, reject, timeoutId });
+      
+      this.resolvePendingResponse(message);
     });
+  }
+  
+  private resolvePendingResponse(message: AgentMessage): void {
+    if (!message.correlationId) return;
+    
+    const correlationKey = `${message.correlationId}-${message.to}`;
+    const pending = this.pendingResponses.get(correlationKey);
+    
+    if (pending) {
+      clearTimeout(pending.timeoutId);
+      this.pendingResponses.delete(correlationKey);
+      pending.resolve(message);
+    }
   }
 
   async broadcast(from: string, payload: any, type: AgentMessageType = 'BROADCAST'): Promise<void> {
     const agent = this.agents.get(from);
     if (!agent) return;
 
-    for (const subscriberId of agent.subscriptions) {
-      const message: AgentMessage = {
-        id: `${from}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    const subscribers = Array.from(agent.subscriptions);
+    const messages: AgentMessage[] = [];
+    
+    const now = Date.now();
+    for (const subscriberId of subscribers) {
+      messages.push({
+        id: `${from}-${now}-${Math.random().toString(36).substr(2, 9)}`,
         type,
         from,
         to: subscriberId,
         payload,
-        timestamp: Date.now(),
+        timestamp: now,
         correlationId: `${from}-broadcast`,
-      };
-      await this.send(message);
+      });
     }
+    
+    for (const msg of messages) {
+      this.messageQueue.push(msg);
+      this.messageHistory.push(msg);
+    }
+    
+    if (this.messageHistory.length > this.maxHistory) {
+      this.messageHistory = this.messageHistory.slice(-this.maxHistory);
+    }
+    
+    this.metrics.messagesSent += messages.length;
   }
 
   onMessage(agentId: string, handler: MessageHandler): void {
-    const handlers = this.handlers.get(agentId);
-    if (handlers) {
-      handlers.add(handler);
+    let handlers = this.handlers.get(agentId);
+    if (!handlers) {
+      handlers = new Set();
+      this.handlers.set(agentId, handlers);
     }
+    handlers.add(handler);
   }
 
   offMessage(agentId: string, handler: MessageHandler): void {
@@ -144,48 +204,89 @@ class AgentMessageBus {
     }
     return this.messageHistory.slice(-limit);
   }
+  
+  getMetrics(): PerformanceMetrics {
+    return { ...this.metrics };
+  }
 
   private async processQueue(): Promise<void> {
     if (this.processing || this.messageQueue.length === 0) return;
     
     this.processing = true;
+    const startTime = performance.now();
     
-    while (this.messageQueue.length > 0) {
-      const message = this.messageQueue.shift();
-      if (!message) continue;
-
-      try {
-        await this.deliverMessage(message);
-      } catch (error) {
-        console.error('[AgentMessageBus] Error processing message:', error);
-        
-        const errorMessage: AgentMessage = {
-          id: `error-${Date.now()}`,
-          type: 'ERROR',
-          from: 'system',
-          to: message.from,
-          payload: { error: String(error), originalMessage: message },
-          timestamp: Date.now(),
-          correlationId: message.id,
-        };
-        await this.deliverMessage(errorMessage);
-      }
+    const batch = this.messageQueue.splice(0, this.batchSize);
+    
+    const deliveryPromises: Promise<void>[] = [];
+    
+    for (const message of batch) {
+      deliveryPromises.push(
+        this.deliverMessage(message).catch(error => {
+          console.error('[AgentMessageBus] Error processing message:', error);
+          
+          const errorMessage: AgentMessage = {
+            id: `error-${Date.now()}`,
+            type: 'ERROR',
+            from: 'system',
+            to: message.from,
+            payload: { error: String(error), originalMessage: message },
+            timestamp: Date.now(),
+            correlationId: message.id,
+          };
+          return this.deliverMessage(errorMessage);
+        })
+      );
+      
+      this.resolvePendingResponse(message);
     }
+    
+    await Promise.all(deliveryPromises);
+    
+    const processTime = performance.now() - startTime;
+    this.metrics.messagesProcessed += batch.length;
+    this.metrics.lastProcessTime = processTime;
+    this.metrics.averageProcessingTime = 
+      (this.metrics.averageProcessingTime * 0.9) + (processTime * 0.1);
+    this.metrics.queueDepth = this.messageQueue.length;
     
     this.processing = false;
   }
 
   private async deliverMessage(message: AgentMessage): Promise<void> {
     const handlers = this.handlers.get(message.to);
-    if (handlers) {
-      for (const handler of handlers) {
-        await handler(message);
-      }
+    if (handlers && handlers.size > 0) {
+      const handlerArray = Array.from(handlers);
+      const handlerPromises: Promise<void>[] = handlerArray.map(handler => 
+        Promise.resolve(handler(message))
+      );
+      await Promise.all(handlerPromises);
     }
   }
 
   private startProcessing(): void {
-    setInterval(() => this.processQueue(), 10);
+    if (this.processInterval) return;
+    
+    const runLoop = () => {
+      this.processQueue();
+      this.processInterval = window.setTimeout(runLoop, this.processDelay);
+    };
+    
+    runLoop();
+  }
+  
+  stopProcessing(): void {
+    if (this.processInterval) {
+      clearTimeout(this.processInterval);
+      this.processInterval = null;
+    }
+  }
+  
+  setBatchSize(size: number): void {
+    this.batchSize = Math.max(1, Math.min(size, 100));
+  }
+  
+  setProcessDelay(delay: number): void {
+    this.processDelay = Math.max(10, Math.min(delay, 500));
   }
 }
 

@@ -8,6 +8,10 @@ You are the **DevPrep Coding Challenge Expert**. You create well-crafted algorit
 
 > **MANDATORY:** Read `/home/runner/workspace/CONTENT_STANDARDS.md` §6 (Coding Challenges) before generating any content. All rules there take precedence over any guidance here.
 
+## Skill Reference
+
+Read and follow the skill at: `/home/runner/workspace/.agents/skills/content-challenge-expert/SKILL.md` for additional validation rules and generation best practices.
+
 ---
 
 ## Your Task

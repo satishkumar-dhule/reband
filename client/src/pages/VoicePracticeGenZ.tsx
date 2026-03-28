@@ -59,18 +59,7 @@ function ClayGlassCard({
     >
       {/* Claymorphism base with glass effect */}
       <div 
-        className="relative overflow-hidden rounded-[28px]"
-        style={{
-          background: 'linear-gradient(145deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          border: '1px solid rgba(255,255,255,0.2)',
-          boxShadow: `
-            0 8px 32px rgba(0,0,0,0.3),
-            inset 0 1px 0 rgba(255,255,255,0.2),
-            inset 0 -1px 0 rgba(255,255,255,0.1)
-          `
-        }}
+        className="relative overflow-hidden rounded-[28px] bg-card/30 backdrop-blur-xl saturate-[180%] border border-border shadow-xl"
       >
         {/* Subtle glow */}
         <div 
@@ -80,11 +69,7 @@ function ClayGlassCard({
         
         {/* Inner claymorphism depth */}
         <div 
-          className="absolute inset-0 rounded-[28px]"
-          style={{
-            background: 'linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.08) 100%)',
-            boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -2px 4px rgba(0,0,0,0.1)'
-          }}
+          className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-foreground/5 to-background/10 shadow-[inset_0_2px_4px_rgba(255,255,255,0.08),inset_0_-2px_4px_rgba(0,0,0,0.08)]"
         />
         
         {/* Content */}
@@ -189,7 +174,7 @@ function PremiumMicButton({
             inset 0 2px 4px rgba(255,255,255,0.3),
             inset 0 -2px 4px rgba(0,0,0,0.2)
           `,
-          border: '1px solid rgba(255,255,255,0.3)'
+          border: '1px solid rgba(255,255,255,0.25)'
         }}
       >
         {/* Inner highlight */}
@@ -214,11 +199,11 @@ function PremiumMicButton({
               transition={{ duration: 0.6, repeat: Infinity }}
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center">
-                <div className="w-4 h-4 bg-white rounded-sm" />
+                <div className="w-4 h-4 bg-foreground rounded-sm" />
               </div>
             </motion.div>
           ) : (
-            <Mic className="w-12 h-12 text-white drop-shadow-lg" />
+            <Mic className="w-12 h-12 text-foreground drop-shadow-lg" />
           )}
         </div>
         
@@ -235,11 +220,11 @@ function PremiumMicButton({
           >
             <div className="flex items-center gap-2">
               <motion.div
-                className="w-2 h-2 rounded-full bg-white"
+                className="w-2 h-2 rounded-full bg-foreground"
                 animate={{ opacity: [1, 0.3, 1] }}
                 transition={{ duration: 0.8, repeat: Infinity }}
               />
-              <span className="text-white text-sm font-bold">Recording...</span>
+              <span className="text-foreground text-sm font-bold">Recording...</span>
             </div>
           </motion.div>
         )}
@@ -263,7 +248,7 @@ function LiveAudioVisualizer({ isActive }: LiveAudioVisualizerProps) {
           style={{
             background: isActive 
               ? `linear-gradient(to top, hsl(190, 100%, 50%), hsl(270, 100%, 65%), hsl(330, 100%, 65%))` // cyan to purple to pink
-              : 'rgba(100,116,139,0.5)'
+              : 'rgba(148, 163, 184, 0.5)'
           }}
           animate={isActive ? {
             height: [16, Math.random() * 60 + 30, 16],
@@ -373,7 +358,7 @@ function QuestionCard({ question, index, showAnswer, mode, targetWords }: {
                 boxShadow: '0 4px 15px hsla(190, 100%, 50%, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
               }}
             >
-              <span className="text-white font-black text-lg">{index + 1}</span>
+              <span className="text-foreground font-black text-lg">{index + 1}</span>
             </motion.span>
             <div className="flex items-center gap-2">
               <span 
@@ -393,13 +378,13 @@ function QuestionCard({ question, index, showAnswer, mode, targetWords }: {
               >
                 {question.difficulty}
               </span>
-              <span className="text-slate-400 text-sm">{question.channel}</span>
+              <span className="text-muted-foreground text-sm">{question.channel}</span>
             </div>
           </motion.div>
 
           {/* Question */}
           <motion.h2 
-            className="text-2xl font-bold text-white mb-3 leading-snug"
+            className="text-2xl font-bold text-foreground mb-3 leading-snug"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -407,9 +392,9 @@ function QuestionCard({ question, index, showAnswer, mode, targetWords }: {
             {question.question}
           </motion.h2>
 
-          {/* Meta */}
+            {/* Meta */}
           <motion.div 
-            className="flex items-center gap-4 text-sm text-slate-400 mb-6"
+            className="flex items-center gap-4 text-sm text-muted-foreground mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25 }}
@@ -434,11 +419,7 @@ function QuestionCard({ question, index, showAnswer, mode, targetWords }: {
                 transition={{ duration: 0.3 }}
               >
                 <div 
-                  className="relative overflow-hidden rounded-2xl"
-                  style={{
-                    background: 'rgba(30,41,59,0.5)',
-                    border: '1px solid rgba(255,255,255,0.1)'
-                  }}
+                  className="relative overflow-hidden rounded-2xl bg-card/50 border border-border"
                 >
                   <div 
                     className="absolute top-0 left-0 w-1 h-full"
@@ -449,20 +430,19 @@ function QuestionCard({ question, index, showAnswer, mode, targetWords }: {
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <Eye className="w-4 h-4 text-cyan-400" />
-                        <span className="text-sm font-semibold text-white">
+                        <Eye className="w-4 h-4 text-primary" />
+                        <span className="text-sm font-semibold text-foreground">
                           {mode === 'training' ? 'Answer to Read' : 'Ideal Answer'}
                         </span>
                       </div>
                       <span 
-                        className="text-xs text-slate-400 px-3 py-1 rounded-lg"
-                        style={{ background: 'rgba(255,255,255,0.1)' }}
+                        className="text-xs text-muted-foreground px-3 py-1 rounded-lg bg-muted/30"
                       >
                         {targetWords} words
                       </span>
                     </div>
                     <div className="max-h-[300px] overflow-y-auto">
-                      <p className="text-slate-300 text-[15px] leading-[1.8] whitespace-pre-wrap">
+                      <p className="text-muted-foreground text-[15px] leading-[1.8] whitespace-pre-wrap">
                         {question.answer}
                       </p>
                     </div>
@@ -504,28 +484,28 @@ function AIFeedbackVisualization({ feedback }: { feedback: FeedbackResult }) {
                 boxShadow: '0 6px 20px hsla(190, 100%, 50%, 0.4)'
               }}
             >
-              <Brain className="w-7 h-7 text-white" />
+              <Brain className="w-7 h-7 text-foreground" />
             </motion.div>
             <div>
-              <h3 className="text-xl font-bold text-white">AI Analysis</h3>
-              <p className="text-sm text-slate-400">Real-time feedback</p>
+              <h3 className="text-xl font-bold text-foreground">AI Analysis</h3>
+              <p className="text-sm text-muted-foreground">Real-time feedback</p>
             </div>
           </div>
           
-          <motion.div 
-            className="flex items-center gap-2 px-5 py-3 rounded-2xl"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.3, type: "spring" }}
-            style={{
-              background: 'linear-gradient(145deg, hsla(38, 92%, 50%, 0.2), hsla(190, 100%, 50%, 0.2))',
-              border: '1px solid hsla(38, 92%, 50%, 0.3)'
-            }}
-          >
-            <Trophy className="w-5 h-5 text-yellow-500" />
-            <span className="text-3xl font-black text-yellow-500">{feedback.score}</span>
-            <span className="text-sm text-slate-400">/100</span>
-          </motion.div>
+            <motion.div 
+              className="flex items-center gap-2 px-5 py-3 rounded-2xl"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.3, type: "spring" }}
+              style={{
+                background: 'linear-gradient(145deg, hsla(38, 92%, 50%, 0.2), hsla(190, 100%, 50%, 0.2))',
+                border: '1px solid hsla(38, 92%, 50%, 0.3)'
+              }}
+            >
+              <Trophy className="w-5 h-5 text-yellow-500" />
+              <span className="text-3xl font-black text-yellow-500">{feedback.score}</span>
+              <span className="text-sm text-muted-foreground">/100</span>
+            </motion.div>
         </motion.div>
 
         {/* Metrics */}
@@ -536,19 +516,14 @@ function AIFeedbackVisualization({ feedback }: { feedback: FeedbackResult }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + i * 0.1 }}
-              className="p-4 rounded-2xl"
-              style={{
-                background: 'rgba(30,41,59,0.5)',
-                border: '1px solid rgba(255,255,255,0.1)'
-              }}
+              className="p-4 rounded-2xl bg-card/50 border border-border"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-slate-400">{metric.label}</span>
-                <span className="text-xl font-black text-white">{metric.value}</span>
+                <span className="text-sm text-muted-foreground">{metric.label}</span>
+                <span className="text-xl font-black text-foreground">{metric.value}</span>
               </div>
               <div 
-                className="h-2 rounded-full overflow-hidden"
-                style={{ background: 'rgba(100,116,139,0.3)' }}
+                className="h-2 rounded-full overflow-hidden bg-muted/30"
               >
                 <motion.div
                   className={`h-full rounded-full bg-gradient-to-r ${metric.color}`}
@@ -573,28 +548,27 @@ function AIFeedbackVisualization({ feedback }: { feedback: FeedbackResult }) {
           }}
         >
           <div className="flex items-start gap-3">
-            <Sparkles className="w-5 h-5 text-cyan-400 mt-0.5" />
+            <Sparkles className="w-5 h-5 text-primary mt-0.5" />
             <div>
-              <p className="text-cyan-400 font-semibold mb-1">Feedback</p>
-              <p className="text-slate-300">{feedback.message}</p>
+              <p className="text-primary font-semibold mb-1">Feedback</p>
+              <p className="text-muted-foreground">{feedback.message}</p>
             </div>
           </div>
         </motion.div>
 
         {/* Stats */}
         <div 
-          className="flex items-center gap-6 mt-6 pt-6 border-t"
-          style={{ borderColor: 'rgba(255,255,255,0.1)' }}
+          className="flex items-center gap-6 mt-6 pt-6 border-t border-border"
         >
-          <span className="flex items-center gap-2 text-sm text-slate-400">
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
             <MessageSquare className="w-4 h-4" />
             {feedback.wordsSpoken}/{feedback.targetWords} words
           </span>
-          <span className="flex items-center gap-2 text-sm text-slate-400">
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="w-4 h-4" />
             {feedback.duration}s
           </span>
-          <span className="flex items-center gap-2 text-sm text-slate-400">
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
             <BarChart3 className="w-4 h-4" />
             {feedback.duration > 0 ? Math.round(feedback.wordsSpoken / (feedback.duration / 60)) : 0} WPM
           </span>
@@ -623,13 +597,7 @@ function ProgressTracker({
       className="relative overflow-hidden rounded-[24px]"
     >
       <div 
-        className="relative p-6"
-        style={{
-          background: 'linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.15)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
-        }}
+        className="relative p-6 bg-card/50 backdrop-blur-xl border border-border shadow-lg"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -641,23 +609,22 @@ function ProgressTracker({
                 boxShadow: '0 4px 15px hsla(190, 100%, 50%, 0.4)'
               }}
             >
-              <Flame className="w-6 h-6 text-white" />
+              <Flame className="w-6 h-6 text-foreground" />
             </motion.div>
             <div>
-              <p className="text-sm text-slate-400">Session Progress</p>
-              <p className="text-lg font-bold text-white">Question {currentIndex + 1} of {total}</p>
+              <p className="text-sm text-muted-foreground">Session Progress</p>
+              <p className="text-lg font-bold text-foreground">Question {currentIndex + 1} of {total}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-black text-white">{Math.round(progress)}%</p>
-            <p className="text-xs text-slate-400">Complete</p>
+            <p className="text-3xl font-black text-foreground">{Math.round(progress)}%</p>
+            <p className="text-xs text-muted-foreground">Complete</p>
           </div>
         </div>
 
         {/* Progress bar */}
         <div 
-          className="h-3 rounded-full overflow-hidden mb-4"
-          style={{ background: 'rgba(100,116,139,0.3)' }}
+          className="h-3 rounded-full overflow-hidden mb-4 bg-muted/30"
         >
           <motion.div
             className="h-full rounded-full"
@@ -684,13 +651,13 @@ function ProgressTracker({
                     ? 'hsl(142, 76%, 46%)' // green for completed
                     : i === currentIndex 
                     ? 'hsl(190, 100%, 50%)' // cyan for current
-                    : 'rgba(100,116,139,0.5)'
+                    : 'rgb(148, 163, 184)' // slate-400 for pending
                 }}
               />
             ))}
-            {total > 10 && <span className="text-xs text-slate-400 ml-1">+{total - 10}</span>}
+            {total > 10 && <span className="text-xs text-muted-foreground ml-1">+{total - 10}</span>}
           </div>
-          <div className="flex items-center gap-2 text-sm text-slate-400">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="w-4 h-4" />
             <span>{Math.floor(totalTime / 60)}m {totalTime % 60}s total</span>
           </div>
@@ -720,7 +687,7 @@ function PremiumProSection() {
               boxShadow: '0 8px 25px hsla(38, 92%, 50%, 0.5)'
             }}
           >
-            <Crown className="w-9 h-9 text-black" />
+            <Crown className="w-9 h-9 text-foreground" />
           </motion.div>
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-3">
@@ -732,7 +699,7 @@ function PremiumProSection() {
                 VIP
               </span>
             </div>
-            <p className="text-slate-300 mb-6">
+            <p className="text-muted-foreground mb-6">
               Unlock AI-powered speech analysis, pronunciation scoring, and unlimited practice sessions.
             </p>
             <div className="grid grid-cols-2 gap-4 mb-6">
@@ -750,7 +717,7 @@ function PremiumProSection() {
                   className="flex items-center gap-2 text-sm"
                 >
                   <item.icon className="w-4 h-4 text-yellow-500" />
-                  <span className="text-slate-300">{item.text}</span>
+                  <span className="text-muted-foreground">{item.text}</span>
                 </motion.div>
               ))}
             </div>
@@ -1044,9 +1011,9 @@ export default function VoicePracticeGenZ() {
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
             >
-              <Mic className="w-12 h-12 text-white" />
+              <Mic className="w-12 h-12 text-foreground" />
             </motion.div>
-            <p className="text-slate-400 text-lg">Loading questions...</p>
+            <p className="text-muted-foreground text-lg">Loading questions...</p>
           </motion.div>
         </div>
       </div>
@@ -1066,16 +1033,12 @@ export default function VoicePracticeGenZ() {
             <ClayGlassCard>
               <div className="p-10 text-center">
                 <div 
-                  className="w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6"
-                  style={{
-                    background: 'rgba(30,41,59,0.8)',
-                    border: '1px solid rgba(255,255,255,0.1)'
-                  }}
+                  className="w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6 bg-card border border-border"
                 >
-                  <BookOpen className="w-12 h-12 text-slate-400" />
+                  <BookOpen className="w-12 h-12 text-muted-foreground" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">No Questions Available</h2>
-                <p className="text-slate-400 mb-6">Subscribe to channels to access practice questions</p>
+                <h2 className="text-2xl font-bold text-foreground mb-2">No Questions Available</h2>
+                <p className="text-muted-foreground mb-6">Subscribe to channels to access practice questions</p>
                 <button
                   onClick={() => setLocation('/channels')}
                   className="px-8 py-3 rounded-2xl font-bold transition-all hover:opacity-90"
@@ -1106,8 +1069,8 @@ export default function VoicePracticeGenZ() {
           >
             <ClayGlassCard>
               <div className="p-8">
-                <h2 className="text-2xl font-bold text-white mb-3">Browser Not Supported</h2>
-                <p className="text-slate-400 mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-3">Browser Not Supported</h2>
+                <p className="text-muted-foreground mb-6">
                   Voice practice requires the Web Speech API. Please use Chrome, Edge, or Safari.
                 </p>
                 <button
@@ -1152,20 +1115,15 @@ export default function VoicePracticeGenZ() {
                   >
                     <motion.button
                       onClick={() => setLocation('/')}
-                      className="p-3 rounded-2xl transition-colors"
+                      className="p-3 rounded-2xl transition-colors bg-muted/20 backdrop-blur-sm border border-border"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      style={{
-                        background: 'rgba(255,255,255,0.1)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255,255,255,0.15)'
-                      }}
                     >
-                      <ArrowLeft className="w-5 h-5 text-slate-300" />
+                      <ArrowLeft className="w-5 h-5 text-muted-foreground" />
                     </motion.button>
                     <div>
-                      <h1 className="text-3xl font-black text-white">Voice Practice</h1>
-                      <p className="text-slate-400">Master your interview skills</p>
+                      <h1 className="text-3xl font-black text-foreground">Voice Practice</h1>
+                      <p className="text-muted-foreground">Master your interview skills</p>
                     </div>
                   </motion.div>
                   
@@ -1181,19 +1139,18 @@ export default function VoicePracticeGenZ() {
                         border: '1px solid hsla(190, 100%, 50%, 0.3)'
                       }}
                     >
-                      <Clock className="w-4 h-4 text-cyan-400" />
-                      <span className="text-sm font-mono text-cyan-400">{duration}s</span>
+                      <Clock className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-mono text-primary">{duration}s</span>
                     </div>
                     <motion.button
                       onClick={toggleMode}
-                      className="px-5 py-2.5 rounded-2xl font-bold text-sm transition-all hover:opacity-90"
+                      className="px-5 py-2.5 rounded-2xl font-bold text-sm transition-all hover:opacity-90 border border-border"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       style={{
                         background: mode === 'interview'
                           ? 'linear-gradient(145deg, hsl(190, 100%, 50%), hsl(270, 100%, 65%))'
-                          : 'rgba(255,255,255,0.1)',
-                        border: '1px solid rgba(255,255,255,0.15)'
+                          : 'rgba(255,255,255,0.08)'
                       }}
                     >
                       <span className="flex items-center gap-1.5">
@@ -1239,18 +1196,18 @@ export default function VoicePracticeGenZ() {
                       {/* Stats */}
                       <div className="flex items-center gap-8">
                         <div className="text-center">
-                          <div className="text-3xl font-black text-white">{countWords(transcript)}</div>
-                          <div className="text-xs text-slate-400 mt-1">Words</div>
+                          <div className="text-3xl font-black text-foreground">{countWords(transcript)}</div>
+                          <div className="text-xs text-muted-foreground mt-1">Words</div>
                         </div>
-                        <div className="w-px h-12" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                        <div className="w-px h-12 bg-border" />
                         <div className="text-center">
-                          <div className="text-3xl font-black text-cyan-400">{liveWPM}</div>
-                          <div className="text-xs text-slate-400 mt-1">WPM</div>
+                          <div className="text-3xl font-black text-primary">{liveWPM}</div>
+                          <div className="text-xs text-muted-foreground mt-1">WPM</div>
                         </div>
-                        <div className="w-px h-12" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                        <div className="w-px h-12 bg-border" />
                         <div className="text-center">
                           <div className="text-3xl font-black text-purple-400">{duration}s</div>
-                          <div className="text-xs text-slate-400 mt-1">Duration</div>
+                          <div className="text-xs text-muted-foreground mt-1">Duration</div>
                         </div>
                       </div>
 
@@ -1258,12 +1215,11 @@ export default function VoicePracticeGenZ() {
                       {targetWords > 0 && (
                         <div className="w-full max-w-md">
                           <div className="flex justify-between text-sm mb-2">
-                            <span className="text-slate-400">Word Progress</span>
-                            <span className="text-white font-semibold">{countWords(transcript)}/{targetWords}</span>
+                            <span className="text-muted-foreground">Word Progress</span>
+                            <span className="text-foreground font-semibold">{countWords(transcript)}/{targetWords}</span>
                           </div>
                           <div 
-                            className="h-3 rounded-full overflow-hidden"
-                            style={{ background: 'rgba(100,116,139,0.3)' }}
+                            className="h-3 rounded-full overflow-hidden bg-muted/30"
                           >
                             <motion.div 
                               className="h-full rounded-full"
@@ -1289,20 +1245,16 @@ export default function VoicePracticeGenZ() {
                       {/* Transcript Display */}
                       <div className="w-full max-w-lg">
                         <div 
-                          className="p-5 rounded-2xl min-h-[80px]"
-                          style={{
-                            background: 'rgba(30,41,59,0.5)',
-                            border: '1px solid rgba(255,255,255,0.1)'
-                          }}
+                          className="p-5 rounded-2xl min-h-[80px] bg-card/50 border border-border"
                         >
                           {transcript || interimTranscript ? (
-                            <p className="text-slate-200 text-sm whitespace-pre-wrap">
+                            <p className="text-muted-foreground text-sm whitespace-pre-wrap">
                               {transcript}
-                              <span className="text-slate-500">{interimTranscript}</span>
+                              <span className="text-muted-foreground/60">{interimTranscript}</span>
                             </p>
                           ) : (
                             <div className="flex items-center justify-center h-full">
-                              <p className="text-slate-500 text-sm italic text-center">
+                              <p className="text-muted-foreground/60 text-sm italic text-center">
                                 {recordingState === 'recording' 
                                   ? '🎤 Listening... Start speaking'
                                   : 'Tap the microphone to start practicing'}
@@ -1329,13 +1281,9 @@ export default function VoicePracticeGenZ() {
                           <>
                             <motion.button
                               onClick={tryAgain}
-                              className="px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all hover:opacity-90"
+                              className="px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all hover:opacity-90 bg-muted/20 border border-border"
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
-                              style={{
-                                background: 'rgba(255,255,255,0.1)',
-                                border: '1px solid rgba(255,255,255,0.15)'
-                              }}
                             >
                               <RotateCcw className="w-4 h-4" />
                               Try Again

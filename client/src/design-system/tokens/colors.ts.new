@@ -1,0 +1,168 @@
+/**
+ * Design Tokens - Colors
+ * WCAG AA compliant color palette with semantic naming
+ * GitHub-inspired color scheme
+ */
+
+// Primary palette - GitHub Blue
+export const colors = {
+  // Primary brand colors
+  primary: {
+    50: '#e1f0ff',
+    100: '#b6d7ff',
+    200: '#89c3ff',
+    300: '#57a6ff',
+    400: '#2f8bff',
+    500: '#0969da', // Main GitHub blue
+    600: '#0860c4',
+    700: '#074fa0',
+    800: '#063d7d',
+    900: '#052b5a',
+    contrastText: '#FFFFFF',
+  },
+
+  // Secondary brand colors - GitHub Purple (Sponsor button)
+  secondary: {
+    50: '#f5f3ff',
+    100: '#ede9fe',
+    200: '#ddd6fe',
+    300: '#c4b5fd',
+    400: '#a78bfa',
+    500: '#8b5cf6', // Main purple
+    600: '#7c3aed',
+    700: '#6d28d9',
+    800: '#5b21b6',
+    900: '#4c1d95',
+    contrastText: '#FFFFFF',
+  },
+
+  // Semantic colors - GitHub semantically meaningful colors
+  semantic: {
+    success: {
+      light: '#56d364', // GitHub green lighter
+      main: '#2da44e',  // GitHub green
+      dark: '#1a7f37',  // GitHub green darker
+      contrastText: '#FFFFFF',
+    },
+    warning: {
+      light: '#e3b341', // GitHub yellow lighter
+      main: '#d29922',  // GitHub yellow/orange
+      dark: '#9e6a03',  // GitHub yellow darker
+      contrastText: '#24292f',
+    },
+    error: {
+      light: '#ff8182', // GitHub red lighter
+      main: '#cf222e',  // GitHub red
+      dark: '#a40e26',  // GitHub red darker
+      contrastText: '#FFFFFF',
+    },
+    info: {
+      light: '#57a6ff', // GitHub blue lighter
+      main: '#0969da',  // GitHub blue
+      dark: '#0550ae',  // GitHub blue darker
+      contrastText: '#FFFFFF',
+    },
+  },
+
+  // Neutral colors - GitHub grayscale
+  neutral: {
+    0: '#ffffff',
+    50: '#f6f8fa',   // GitHub gray-50
+    100: '#e1e4e8',  // GitHub gray-100
+    200: '#d1d5da',  // GitHub gray-200
+    300: '#c4c9cf',  // GitHub gray-300
+    400: '#959da5',  // GitHub gray-400
+    500: '#6a737d',  // GitHub gray-500
+    600: '#586069',  // GitHub gray-600
+    700: '#444d56',  // GitHub gray-700
+    800: '#2f363d',  // GitHub gray-800
+    900: '#24292e',  // GitHub gray-900
+    1000: '#000000',
+  },
+
+  // Background colors - GitHub backgrounds
+  background: {
+    default: '#f6f8fa', // GitHub default background
+    paper: '#ffffff',   // GitHub surface
+    dark: '#0d1117',    // GitHub dark background
+    card: '#ffffff',    // GitHub card background
+    overlay: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  // Text colors - GitHub text colors
+  text: {
+    primary: '#24292f',   // GitHub text primary
+    secondary: '#57606a', // GitHub text secondary
+    disabled: '#8c959f',  // GitHub text disabled
+    hint: '#8c959f',      // GitHub text hint
+    inverse: '#ffffff',   // Inverse text (on dark backgrounds)
+  },
+
+  // SRS-specific colors - adjusted to GitHub palette
+  srs: {
+    again: '#cf222e', // GitHub red
+    hard: '#d29922',  // GitHub yellow/orange
+    good: '#2da44e',  // GitHub green
+    easy: '#0969da',  // GitHub blue
+    mastery: {
+      0: '#6a737d', // New/Unknown - GitHub gray-500
+      1: '#cf222e', // Learning - GitHub red
+      2: '#d29922', // Familiar - GitHub yellow
+      3: '#e3b341', // Known - GitHub yellow lighter
+      4: '#2da44e', // Mastered - GitHub green
+      5: '#1a7f37', // Expert - GitHub green darker
+    },
+  },
+
+  // Status colors - GitHub semantic colors
+  status: {
+    online: '#2da44e',  // GitHub green
+    offline: '#6a737d', // GitHub gray-500
+    away: '#d29922',    // GitHub yellow
+    busy: '#cf222e',    // GitHub red
+  },
+};
+
+// Dark mode colors - GitHub Dark
+export const darkColors = {
+  ...colors,
+  background: {
+    default: '#0d1117',   // GitHub dark default
+    paper: '#161b22',     // GitHub dark surface
+    dark: '#010409',      // GitHub darker background
+    card: '#161b22',      // GitHub dark card
+    overlay: 'rgba(0, 0, 0, 0.5)',
+  },
+  text: {
+    primary: '#c9d1d9',   // GitHub dark text primary
+    secondary: '#8b949e', // GitHub dark text secondary
+    disabled: '#6e7681',  // GitHub dark text disabled
+    hint: '#6e7681',      // GitHub dark text hint
+    inverse: '#24292f',   // Inverse text (on light backgrounds)
+  },
+  neutral: {
+    ...colors.neutral,
+    0: '#0d1117',   // GitHub dark background
+    50: '#161b22',  // GitHub dark surface
+    100: '#21262d', // GitHub dark border
+    200: '#30363d', // GitHub dark border stronger
+    300: '#484f58', // GitHub dark neutral
+    400: '#6e7681', // GitHub dark neutral lighter
+    500: '#8b949e', // GitHub dark neutral lighter
+    600: '#c9d1d9', // GitHub dark text primary
+    700: '#d1d5da', // GitHub dark text stronger
+    800: '#e1e4e8', // GitHub dark text strongest
+    900: '#f0f3f6', // GitHub dark text on dark
+    1000: '#ffffff',
+  },
+  // Override semantic colors for dark mode where needed
+  semantic: {
+    ...colors.semantic,
+    warning: {
+      ...colors.semantic.warning,
+      contrastText: '#24292f', // Keep dark text on warning
+    },
+  },
+};
+
+export default colors;

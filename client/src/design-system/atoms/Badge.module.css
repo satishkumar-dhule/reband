@@ -1,0 +1,204 @@
+/**
+ * Badge Component Styles
+ * 
+ * CSS Module for Badge component with design token integration.
+ * Supports dark mode via CSS custom properties.
+ */
+
+/* Base badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-1, 0.25rem);
+  font-family: var(--font-family-primary, 'Inter', sans-serif);
+  font-weight: var(--font-weight-semibold, 600);
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-radius: var(--spacing-8, 2rem);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--animation-duration-fast, 100ms) var(--animation-easing-ease-out, ease-out),
+              box-shadow var(--animation-duration-fast, 100ms) var(--animation-easing-ease-out, ease-out);
+}
+
+/* Size variants */
+.size-sm {
+  min-width: var(--spacing-6, 1.5rem);
+  height: var(--spacing-6, 1.5rem);
+  padding: var(--spacing-1, 0.25rem) var(--spacing-2, 0.5rem);
+  font-size: var(--font-size-xs, 0.75rem);
+}
+
+.size-md {
+  min-width: var(--spacing-8, 2rem);
+  height: var(--spacing-8, 2rem);
+  padding: var(--spacing-1, 0.25rem) var(--spacing-3, 0.75rem);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.size-lg {
+  min-width: var(--spacing-10, 2.5rem);
+  height: var(--spacing-10, 2.5rem);
+  padding: var(--spacing-2, 0.5rem) var(--spacing-4, 1rem);
+  font-size: var(--font-size-base, 1rem);
+}
+
+/* Badge types */
+.type-xp {
+  background: linear-gradient(135deg, var(--color-primary-500, #2196F3) 0%, var(--color-primary-600, #1E88E5) 100%);
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+}
+
+.type-level {
+  background: linear-gradient(135deg, var(--color-secondary-500, #E91E63) 0%, var(--color-secondary-600, #D81B60) 100%);
+  box-shadow: 0 2px 4px rgba(233, 30, 99, 0.3);
+}
+
+.type-mastery {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.type-streak {
+  background: linear-gradient(135deg, var(--color-semantic-warning-main, #FF9800) 0%, var(--color-semantic-warning-dark, #F57C00) 100%);
+  box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
+}
+
+.type-notification {
+  background: linear-gradient(135deg, var(--color-semantic-error-main, #F44336) 0%, var(--color-semantic-error-dark, #D32F2F) 100%);
+  box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+}
+
+/* Icon styles */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon svg {
+  width: 1em;
+  height: 1em;
+}
+
+/* Value styles */
+.value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animation */
+.animate {
+  animation: pulse-badge 2s var(--animation-easing-ease-in-out, ease-in-out) infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* New badge glow effect */
+.is-new::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: inherit;
+  background: inherit;
+  z-index: -1;
+  animation: glow-pulse 2s var(--animation-easing-ease-in-out, ease-in-out) infinite;
+  filter: blur(4px);
+  opacity: 0.7;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* Hover effects */
+.badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Focus styles for accessibility */
+.badge:focus-visible {
+  outline: 2px solid var(--color-primary-500, #2196F3);
+  outline-offset: 2px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .badge {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .type-xp {
+    background: linear-gradient(135deg, var(--color-primary-400, #42A5F5) 0%, var(--color-primary-500, #2196F3) 100%);
+  }
+
+  .type-level {
+    background: linear-gradient(135deg, var(--color-secondary-400, #EC407A) 0%, var(--color-secondary-500, #E91E63) 100%);
+  }
+
+  .type-streak {
+    background: linear-gradient(135deg, var(--color-semantic-warning-light, #FFB74D) 0%, var(--color-semantic-warning-main, #FF9800) 100%);
+  }
+
+  .type-notification {
+    background: linear-gradient(135deg, var(--color-semantic-error-light, #E57373) 0%, var(--color-semantic-error-main, #F44336) 100%);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .badge {
+    transition: none;
+  }
+
+  .animate,
+  .is-new::before {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .badge {
+    border-width: 3px;
+    font-weight: var(--font-weight-bold, 700);
+  }
+
+  .badge:focus-visible {
+    outline-width: 3px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .badge {
+    box-shadow: none;
+    border: 1px solid #000000;
+  }
+
+  .is-new::before {
+    display: none;
+  }
+}
