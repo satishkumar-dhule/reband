@@ -1,0 +1,232 @@
+'use client';
+
+import React from 'react';
+
+interface Column<T> {
+  key: keyof T | string;
+  header: string;
+  width?: string | number;
+  align?: 'left' | 'center' | 'right';
+  render?: (row: T, index: number) => React.ReactNode;
+}
+
+interface GitHubTableProps<T extends Record<string, unknown>> {
+  columns: Column<T>[];
+  data: T[];
+  size?: 'sm' | 'md';
+  hoverable?: boolean;
+  striped?: boolean;
+  pagination?: {
+    page: number;
+    pageSize: number;
+    total: number;
+    onPageChange: (page: number) => void;
+  };
+  emptyMessage?: string;
+  style?: React.CSSProperties;
+}
+
+const cellStyles: React.CSSProperties = {
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  fontSize: '14px',
+  color: '#24292f',
+  padding: '12px 16px',
+  borderBottom: '1px solid #d0d7de',
+};
+
+const headerStyles: React.CSSProperties = {
+  ...cellStyles,
+  fontWeight: 600,
+  backgroundColor: '#f6f8fa',
+  fontSize: '12px',
+  color: '#57606a',
+  textTransform: 'uppercase',
+  letterSpacing: '0.5px',
+};
+
+export function GitHubTable<T extends Record<string, unknown>>({
+  columns,
+  data,
+  size = 'md',
+  hoverable = true,
+  striped = false,
+  pagination,
+  emptyMessage = 'No data available',
+  style,
+}: GitHubTableProps<T>) {
+  const rowPadding = size === 'sm' ? '8px 16px' : '12px 16px';
+  const totalPages = pagination ? Math.ceil(pagination.total / pagination.pageSize) : 1;
+
+  const renderPagination = () => {
+    if (!pagination) return null;
+
+    const { page, pageSize, total, onPageChange } = pagination;
+    const startItem = (page - 1) * pageSize + 1;
+    const endItem = Math.min(page * pageSize, total);
+
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '16px',
+        borderTop: '1px solid #d0d7de',
+        backgroundColor: '#f6f8fa',
+      }}>
+        <span style={{
+          fontSize: '14px',
+          color: '#57606a',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+        }}>
+          {startItem}–{endItem} of {total} results
+        </span>
+        <div style={{ display: 'flex', gap: '4px' }}>
+          <button
+            onClick={() => onPageChange(page - 1)}
+            disabled={page === 1}
+            style={{
+              padding: '6px 12px',
+              border: '1px solid #d0d7de',
+              borderRadius: '6px',
+              backgroundColor: '#fff',
+              color: page === 1 ? '#8c959f' : '#24292f',
+              cursor: page === 1 ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+              opacity: page === 1 ? 0.5 : 1,
+            }}
+          >
+            Previous
+          </button>
+          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+            let pageNum = i + 1;
+            if (totalPages > 5) {
+              if (page > 3) {
+                pageNum = page - 2 + i;
+              }
+              if (page > totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              }
+            }
+            if (pageNum > totalPages) return null;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => onPageChange(pageNum)}
+                style={{
+                  padding: '6px 12px',
+                  border: '1px solid #d0d7de',
+                  borderRadius: '6px',
+                  backgroundColor: page === pageNum ? '#0969da' : '#fff',
+                  color: page === pageNum ? '#fff' : '#24292f',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                }}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => onPageChange(page + 1)}
+            disabled={page === totalPages}
+            style={{
+              padding: '6px 12px',
+              border: '1px solid #d0d7de',
+              borderRadius: '6px',
+              backgroundColor: '#fff',
+              color: page === totalPages ? '#8c959f' : '#24292f',
+              cursor: page === totalPages ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+              opacity: page === totalPages ? 0.5 : 1,
+            }}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ border: '1px solid #d0d7de', borderRadius: '6px', overflow: 'hidden', ...style }}>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              {columns.map((col, i) => (
+                <th
+                  key={String(col.key) + i}
+                  style={{
+                    ...headerStyles,
+                    textAlign: col.align || 'left',
+                    width: col.width ? (typeof col.width === 'number' ? `${col.width}px` : col.width) : undefined,
+                  }}
+                >
+                  {col.header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  style={{
+                    ...cellStyles,
+                    textAlign: 'center',
+                    color: '#57606a',
+                    padding: '32px 16px',
+                  }}
+                >
+                  {emptyMessage}
+                </td>
+              </tr>
+            ) : (
+              data.map((row, rowIndex) => (
+                <tr
+                  key={rowIndex}
+                  style={{
+                    backgroundColor: striped && rowIndex % 2 === 1 ? '#f6f8fa' : 'transparent',
+                    transition: 'background-color 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (hoverable) {
+                      e.currentTarget.style.backgroundColor = striped && rowIndex % 2 === 1 ? '#eaeef2' : '#f6f8fa';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (hoverable) {
+                      e.currentTarget.style.backgroundColor = striped && rowIndex % 2 === 1 ? '#f6f8fa' : 'transparent';
+                    }
+                  }}
+                >
+                  {columns.map((col, colIndex) => (
+                    <td
+                      key={String(col.key) + colIndex}
+                      style={{
+                        ...cellStyles,
+                        padding: rowPadding,
+                        textAlign: col.align || 'left',
+                      }}
+                    >
+                      {col.render
+                        ? col.render(row, rowIndex)
+                        : String(row[col.key as keyof T] ?? '')}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      {renderPagination()}
+    </div>
+  );
+}
+
+export default GitHubTable;

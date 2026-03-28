@@ -1,0 +1,262 @@
+/* GitHub Theme CSS Variables */
+/* Light Mode Variables */
+:root,
+[data-theme="light"] {
+  /* Background Colors */
+  --gh-bg-primary: #ffffff;
+  --gh-bg-secondary: #f6f8fa;
+  --gh-bg-tertiary: #eaeef2;
+  --gh-bg-emphasis: #ddf4ff;
+  --gh-bg-inset: #f6f8fa;
+  
+  /* Dark Elements (for light mode) */
+  --gh-dark-elements: #0d1117;
+  
+  /* Accent Colors */
+  --gh-accent-primary: #0969da;
+  --gh-accent-muted: #0550ae;
+  --gh-accent-secondary: #0550ae;
+  --gh-accent-tertiary: #0a3069;
+  
+  /* Border Colors */
+  --gh-border-default: #d0d7de;
+  --gh-border-muted: #d8dee4;
+  --gh-border-subtle: #eaeef2;
+  
+  /* Text Colors */
+  --gh-text-primary: #1f2328;
+  --gh-text-secondary: #656d76;
+  --gh-text-muted: #8b949e;
+  --gh-text-placeholder: #8b949e;
+  --gh-text-disabled: #8b949e;
+  
+  /* Semantic Colors */
+  --gh-success: #1a7f37;
+  --gh-success-bg: #dafbe1;
+  --gh-success-emphasis: #116329;
+  
+  --gh-warning: #9a6700;
+  --gh-warning-bg: #fff8c5;
+  --gh-warning-emphasis: #7d4e00;
+  
+  --gh-danger: #cf222e;
+  --gh-danger-bg: #ffebe9;
+  --gh-danger-emphasis: #82071e;
+  
+  --gh-info: #0969da;
+  --gh-info-bg: #ddf4ff;
+  --gh-info-emphasis: #0550ae;
+  
+  /* Focus Ring */
+  --gh-focus-ring: rgba(9, 105, 218, 0.4);
+  
+  /* Shadows */
+  --gh-shadow-xs: 0 1px 0 rgba(31, 35, 40, 0.04);
+  --gh-shadow-sm: 0 1px 0 rgba(31, 35, 40, 0.04);
+  --gh-shadow-md: 0 3px 6px rgba(140, 149, 159, 0.15);
+  --gh-shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.2);
+  --gh-shadow-xl: 0 16px 48px rgba(140, 149, 159, 0.25);
+  
+  /* Fonts */
+  --gh-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --gh-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  
+  /* Border Radius */
+  --gh-radius-sm: 4px;
+  --gh-radius-md: 6px;
+  --gh-radius-lg: 8px;
+  --gh-radius-xl: 12px;
+  --gh-radius-full: 9999px;
+  
+  /* Timing */
+  --gh-duration-fast: 100ms;
+  --gh-duration-normal: 200ms;
+  --gh-duration-slow: 300ms;
+  
+  /* Easing */
+  --gh-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --gh-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --gh-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Variables */
+[data-theme="dark"],
+[data-theme="dark"] {
+  /* Background Colors */
+  --gh-bg-primary: #0d1117;
+  --gh-bg-secondary: #161b22;
+  --gh-bg-tertiary: #21262d;
+  --gh-bg-emphasis: #388bfd33;
+  --gh-bg-inset: #010409;
+  
+  /* Light Elements (for dark mode) */
+  --gh-dark-elements: #f0f6fc;
+  
+  /* Accent Colors */
+  --gh-accent-primary: #58a6ff;
+  --gh-accent-muted: #388bfd;
+  --gh-accent-secondary: #388bfd;
+  --gh-accent-tertiary: #a4c9ff;
+  
+  /* Border Colors */
+  --gh-border-default: #30363d;
+  --gh-border-muted: #21262d;
+  --gh-border-subtle: #30363d;
+  
+  /* Text Colors */
+  --gh-text-primary: #f0f6fc;
+  --gh-text-secondary: #8b949e;
+  --gh-text-muted: #6e7681;
+  --gh-text-placeholder: #6e7681;
+  --gh-text-disabled: #484f58;
+  
+  /* Semantic Colors */
+  --gh-success: #3fb950;
+  --gh-success-bg: #1f6feb26;
+  --gh-success-emphasis: #238636;
+  
+  --gh-warning: #d29922;
+  --gh-warning-bg: #d2992226;
+  --gh-warning-emphasis: #9e6a03;
+  
+  --gh-danger: #f85149;
+  --gh-danger-bg: #f8514926;
+  --gh-danger-emphasis: #da3633;
+  
+  --gh-info: #58a6ff;
+  --gh-info-bg: #388bfd26;
+  --gh-info-emphasis: #1f6feb;
+  
+  /* Focus Ring */
+  --gh-focus-ring: rgba(88, 166, 255, 0.4);
+  
+  /* Shadows */
+  --gh-shadow-xs: 0 1px 0 rgba(1, 4, 9, 0.9);
+  --gh-shadow-sm: 0 1px 0 rgba(1, 4, 9, 0.9);
+  --gh-shadow-md: 0 3px 6px rgba(1, 4, 9, 0.4);
+  --gh-shadow-lg: 0 8px 24px rgba(1, 4, 9, 0.5);
+  --gh-shadow-xl: 0 16px 48px rgba(1, 4, 9, 0.6);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--gh-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--gh-text-primary);
+  background-color: var(--gh-bg-primary);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gh-border-default);
+  border-radius: var(--gh-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gh-text-muted);
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: 2px solid var(--gh-accent-primary);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--gh-accent-primary);
+  color: white;
+}
+
+/* Code Blocks */
+code, pre {
+  font-family: var(--gh-font-mono);
+  font-size: 0.85em;
+}
+
+/* Links */
+a {
+  color: var(--gh-accent-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Utility Classes */
+.gh-bg-primary { background-color: var(--gh-bg-primary); }
+.gh-bg-secondary { background-color: var(--gh-bg-secondary); }
+.gh-bg-tertiary { background-color: var(--gh-bg-tertiary); }
+
+.gh-text-primary { color: var(--gh-text-primary); }
+.gh-text-secondary { color: var(--gh-text-secondary); }
+.gh-text-muted { color: var(--gh-text-muted); }
+
+.gh-border { border: 1px solid var(--gh-border-default); }
+.gh-border-muted { border: 1px solid var(--gh-border-muted); }
+
+.gh-radius-sm { border-radius: var(--gh-radius-sm); }
+.gh-radius-md { border-radius: var(--gh-radius-md); }
+.gh-radius-lg { border-radius: var(--gh-radius-lg); }
+
+/* Animations */
+@keyframes gh-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes gh-slide-in {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes gh-scale-in {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.gh-animate-fade-in {
+  animation: gh-fade-in var(--gh-duration-normal) var(--gh-ease-out);
+}
+
+.gh-animate-slide-in {
+  animation: gh-slide-in var(--gh-duration-normal) var(--gh-ease-out);
+}
+
+.gh-animate-scale-in {
+  animation: gh-scale-in var(--gh-duration-normal) var(--gh-ease-out);
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
