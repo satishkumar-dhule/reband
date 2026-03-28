@@ -4,8 +4,8 @@ import React from 'react';
 
 type InputSize = 'sm' | 'md';
 
-interface GitHubInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  size?: InputSize;
+interface GitHubInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+  inputSize?: InputSize;
   validation?: 'default' | 'error';
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -33,17 +33,24 @@ const baseStyles: React.CSSProperties = {
   color: '#24292f',
   width: '100%',
   boxSizing: 'border-box',
+  transition: 'box-shadow 0.2s ease',
+};
+
+const focusStyles: React.CSSProperties = {
+  boxShadow: '0 0 0 3px rgba(9, 105, 218, 0.3)',
 };
 
 export const GitHubInput = React.forwardRef<HTMLInputElement, GitHubInputProps>(
   ({ 
-    size = 'md', 
+    inputSize = 'md', 
     validation = 'default', 
     leftIcon, 
     rightIcon,
     style,
     ...props 
   }, ref) => {
+    const [isFocused, setIsFocused] = React.useState(false);
+
     const validationStyles = validation === 'error' 
       ? { borderColor: '#cf222e', boxShadow: '0 0 0 3px rgba(207, 34, 46, 0.15)' }
       : {};
@@ -57,10 +64,11 @@ export const GitHubInput = React.forwardRef<HTMLInputElement, GitHubInputProps>(
 
     const inputStyle: React.CSSProperties = {
       ...baseStyles,
-      ...sizeStyles[size],
+      ...(isFocused ? focusStyles : {}),
+      ...sizeStyles[inputSize],
       ...validationStyles,
-      paddingLeft: leftIcon ? '36px' : sizeStyles[size].padding,
-      paddingRight: rightIcon ? '36px' : sizeStyles[size].padding,
+      paddingLeft: leftIcon ? '36px' : sizeStyles[inputSize].padding,
+      paddingRight: rightIcon ? '36px' : sizeStyles[inputSize].padding,
       ...style,
     };
 
@@ -81,6 +89,14 @@ export const GitHubInput = React.forwardRef<HTMLInputElement, GitHubInputProps>(
         <input
           ref={ref}
           style={inputStyle}
+          onFocus={(e) => {
+            setIsFocused(true);
+            props.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            props.onBlur?.(e);
+          }}
           {...props}
         />
         {rightIcon && (

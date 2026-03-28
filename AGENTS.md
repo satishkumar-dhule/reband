@@ -17,6 +17,48 @@ The Agent Message Bus (`src/agents/core/AgentMessageBus.ts`) provides:
 
 ---
 
+## GitHub Theme Migration (20+ Specialized Agents)
+
+The DevPrep GitHub-like theme migration has been completed with **20+ specialized agents** working in parallel.
+
+### GitHub Theme Migration Skills (`.agents/skills/`)
+| Skill | Used By | Description |
+|-------|---------|-------------|
+| github-theme-migration | All theme agents | GitHub design language and migration |
+| github-theme-components | All theme agents | GitHub-style component library |
+
+### GitHub Theme Migration Agents (`.opencode/agents/`)
+
+#### UI/UX Expert Agents (10)
+| Agent | Skills | Description |
+|-------|--------|-------------|
+| `devprep-github-colors-expert` | github-theme-migration, ui-ux-pro-max | GitHub color palette migration |
+| `devprep-github-typography-expert` | github-theme-migration, ui-ux-pro-max | GitHub typography system |
+| `devprep-github-layout-expert` | github-theme-migration, ui-ux-pro-max | GitHub layout patterns |
+| `devprep-github-nav-expert` | github-theme-migration, ui-ux-pro-max | GitHub navigation components |
+| `devprep-github-cards-expert` | github-theme-migration, ui-ux-pro-max | GitHub card components |
+| `devprep-github-darkmode-expert` | github-theme-migration, ui-ux-pro-max | Dark mode implementation |
+| `devprep-github-badges-expert` | github-theme-migration, ui-ux-pro-max | GitHub labels/badges |
+| `devprep-github-modals-expert` | github-theme-migration, ui-ux-pro-max | GitHub dialogs/modals |
+| `devprep-github-tables-expert` | github-theme-migration, ui-ux-pro-max | GitHub table components |
+| `devprep-github-forms-expert` | github-theme-migration, ui-ux-pro-max | GitHub form components |
+
+#### Frontend Designer Agents (10)
+| Agent | Skills | Description |
+|-------|--------|-------------|
+| `devprep-github-buttons-expert` | github-theme-migration, frontend-design | GitHub button styles |
+| `devprep-github-inputs-expert` | github-theme-migration, frontend-design | GitHub input components |
+| `devprep-github-icons-expert` | github-theme-migration, frontend-design | GitHub iconography |
+| `devprep-github-alerts-expert` | github-theme-migration, frontend-design | GitHub alert notices |
+| `devprep-github-avatar-expert` | github-theme-migration, frontend-design | GitHub avatar components |
+| `devprep-github-progress-expert` | github-theme-migration, frontend-design | GitHub progress indicators |
+| `devprep-github-tooltip-expert` | github-theme-migration, frontend-design | GitHub tooltips |
+| `devprep-github-dropdown-expert` | github-theme-migration, frontend-design | GitHub dropdown menus |
+| `devprep-github-tabs-expert` | github-theme-migration, frontend-design | GitHub tab navigation |
+| `devprep-github-utilities-expert` | github-theme-migration, frontend-design | GitHub utility classes |
+
+---
+
 ## OpenCode Agents (`.opencode/agents/`)
 
 ### Coordinator Agents (1)
@@ -125,6 +167,12 @@ The Agent Message Bus (`src/agents/core/AgentMessageBus.ts`) provides:
 | copywriting | copywriter | Marketing copy |
 | brainstorming | brainstormer | Feature design |
 | find-skills | future | Skill discovery |
+
+### GitHub Theme Skills (2)
+| Skill | Used By | Description |
+|-------|---------|-------------|
+| github-theme-migration | All theme agents | GitHub design language migration |
+| github-theme-components | All theme agents | GitHub-style component library |
 
 ---
 
@@ -237,12 +285,14 @@ New UI components in `src/pages/index.ts`:
 
 ## Key Features
 
-- ✅ **30+** autonomous specialized agents
-- ✅ **27** integrated skills (content, pipeline, frontend, SEO, etc.)
+- ✅ **50+** autonomous specialized agents
+- ✅ **29** integrated skills (content, pipeline, frontend, SEO, GitHub theme, etc.)
+- ✅ **20+** GitHub theme migration agents
 - ✅ Async message passing coordination
 - ✅ Google services integration
 - ✅ Complete database redesign
 - ✅ **10+** fully redesigned pages
+- ✅ GitHub-style UI with dark mode
 - ✅ Material Design UI (MUI)
 - ✅ Responsive layouts
 - ✅ Real-time agent status
@@ -267,8 +317,8 @@ New UI components in `src/pages/index.ts`:
 | pipeline-generator | coordinator | - |
 | pipeline-verifier | coordinator | - |
 | pipeline-processor | coordinator | - |
-| frontend-design | frontend-designer | ui-ux-expert |
-| ui-ux-pro-max | ui-ux-expert | frontend-designer |
+| frontend-design | frontend-designer | ui-ux-expert, github theme agents |
+| ui-ux-pro-max | ui-ux-expert | frontend-designer, github theme agents |
 | web-design-guidelines | web-reviewer | - |
 | vercel-react-best-practices | react-optimizer | frontend-designer |
 | next-best-practices | react-optimizer | frontend-designer |
@@ -282,6 +332,8 @@ New UI components in `src/pages/index.ts`:
 | agent-tools | ai-tools | coordinator |
 | copywriting | copywriter | blog-generator |
 | brainstorming | brainstormer | coordinator |
+| github-theme-migration | github theme agents (20+) | frontend-designer |
+| github-theme-components | github theme agents (20+) | ui-ux-expert |
 
 ---
 

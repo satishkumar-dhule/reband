@@ -48,9 +48,10 @@ const githubColors = {
   },
 };
 
-// System font stack (GitHub uses this)
-const systemFontStack = `-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"`;
-const monoFontStack = `"SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace`;
+// System font stack
+const systemFontStack = `-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif`;
+// Code font stack
+const monoFontStack = `"SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace`;
 
 export const lightTheme = createTheme({
   palette: {
@@ -86,6 +87,13 @@ export const lightTheme = createTheme({
   } as ThemeOptions['palette'],
   typography: {
     fontFamily: systemFontStack,
+    htmlFontSize: 14,
+    fontSize: 14,
+    fontWeightLight: 400,
+    fontWeightRegular: 400,
+    fontWeightMedium: 500,
+    fontWeightBold: 600,
+    lineHeight: 1.5,
     h1: {
       fontSize: '2rem',
       fontWeight: 600,
@@ -119,16 +127,20 @@ export const lightTheme = createTheme({
       lineHeight: 1.5,
     },
     body1: {
-      fontSize: '0.875rem',
+      fontSize: '1rem',
       lineHeight: 1.5,
     },
     body2: {
-      fontSize: '0.75rem',
+      fontSize: '0.875rem',
       lineHeight: 1.5,
     },
     button: {
       textTransform: 'none',
       fontWeight: 500,
+    },
+    code: {
+      fontFamily: monoFontStack,
+      fontSize: '0.875rem',
     },
   },
   shape: {
@@ -140,6 +152,9 @@ export const lightTheme = createTheme({
         body: {
           scrollbarWidth: 'thin',
           scrollbarColor: '#6e7781 #24292f',
+          fontFamily: systemFontStack,
+          fontSize: '1rem',
+          lineHeight: 1.5,
           '&::-webkit-scrollbar': {
             width: '8px',
             height: '8px',
@@ -151,6 +166,23 @@ export const lightTheme = createTheme({
             background: '#6e7781',
             borderRadius: '4px',
           },
+        },
+        code: {
+          fontFamily: monoFontStack,
+          fontSize: '0.875rem',
+        },
+        pre: {
+          fontFamily: monoFontStack,
+          fontSize: '0.875rem',
+        },
+        ':root': {
+          '--github-bg': '#ffffff',
+          '--github-bg-secondary': '#f6f8fa',
+          '--github-dark-elements': '#0d1117',
+          '--github-accent': '#0969da',
+          '--github-border': '#d0d7de',
+          '--github-text-primary': '#1f2328',
+          '--github-text-secondary': '#656d76',
         },
       },
     },
@@ -315,6 +347,13 @@ export const darkTheme = createTheme({
   } as ThemeOptions['palette'],
   typography: {
     fontFamily: systemFontStack,
+    htmlFontSize: 14,
+    fontSize: 14,
+    fontWeightLight: 400,
+    fontWeightRegular: 400,
+    fontWeightMedium: 500,
+    fontWeightBold: 600,
+    lineHeight: 1.5,
     h1: {
       fontSize: '2rem',
       fontWeight: 600,
@@ -348,16 +387,20 @@ export const darkTheme = createTheme({
       lineHeight: 1.5,
     },
     body1: {
-      fontSize: '0.875rem',
+      fontSize: '1rem',
       lineHeight: 1.5,
     },
     body2: {
-      fontSize: '0.75rem',
+      fontSize: '0.875rem',
       lineHeight: 1.5,
     },
     button: {
       textTransform: 'none',
       fontWeight: 500,
+    },
+    code: {
+      fontFamily: monoFontStack,
+      fontSize: '0.875rem',
     },
   },
   shape: {
@@ -369,6 +412,9 @@ export const darkTheme = createTheme({
         body: {
           scrollbarWidth: 'thin',
           scrollbarColor: '#484f58 #0d1117',
+          fontFamily: systemFontStack,
+          fontSize: '1rem',
+          lineHeight: 1.5,
           '&::-webkit-scrollbar': {
             width: '8px',
             height: '8px',
@@ -380,6 +426,23 @@ export const darkTheme = createTheme({
             background: '#484f58',
             borderRadius: '4px',
           },
+        },
+        code: {
+          fontFamily: monoFontStack,
+          fontSize: '0.875rem',
+        },
+        pre: {
+          fontFamily: monoFontStack,
+          fontSize: '0.875rem',
+        },
+        ':root': {
+          '--github-bg': '#0d1117',
+          '--github-bg-secondary': '#161b22',
+          '--github-dark-elements': '#f0f6fc',
+          '--github-accent': '#58a6ff',
+          '--github-border': '#30363d',
+          '--github-text-primary': '#f0f6fc',
+          '--github-text-secondary': '#8b949e',
         },
       },
     },

@@ -40,10 +40,9 @@ on:
       difficulty:
         description: 'Filter by difficulty (for linkedin-poll)'
         required: false
-        default: ''
+        default: 'beginner'
         type: choice
         options:
-          - ''
           - beginner
           - intermediate
           - advanced

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-interface Tab {
+export interface Tab {
   id: string;
   label: string;
   icon?: React.ReactNode;
@@ -10,7 +10,7 @@ interface Tab {
   disabled?: boolean;
 }
 
-interface GitHubTabsProps {
+export interface GitHubTabsProps {
   tabs: Tab[];
   activeTab?: string;
   onChange?: (tabId: string) => void;

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-interface Column<T> {
+export interface Column<T> {
   key: keyof T | string;
   header: string;
   width?: string | number;
@@ -10,7 +10,7 @@ interface Column<T> {
   render?: (row: T, index: number) => React.ReactNode;
 }
 
-interface GitHubTableProps<T extends Record<string, unknown>> {
+export interface GitHubTableProps<T extends Record<string, unknown>> {
   columns: Column<T>[];
   data: T[];
   size?: 'sm' | 'md';
