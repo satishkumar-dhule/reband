@@ -72,18 +72,18 @@ Right after the activation announcement, present the plan BEFORE calling session
 **Role emoji reference:**
 | Role | Emoji | Example |
 |------|-------|---------|
-| Researcher | 🔍 | 🔍 研究员A（GLM）— Research XX |
-| Analyst | 📊 | 📊 分析师（Kimi）— Deep comparison |
-| Writer | ✍️ | ✍️ 写作者（Gemini）— Draft the report |
-| Coder | 💻 | 💻 程序员（Kimi）— Implement the logic |
-| Reviewer | 🔎 | 🔎 审核员（GLM）— Quality check |
-| Planner | 📋 | 📋 规划师（Sonnet）— Break down tasks |
+| Researcher | 🔍 | 🔍 Researcher A (GLM) — Research XX |
+| Analyst | 📊 | 📊 Analyst (Kimi) — Deep comparison |
+| Writer | ✍️ | ✍️ Writer (Gemini) — Draft the report |
+| Coder | 💻 | 💻 Programmer (Kimi) — Implement the logic |
+| Reviewer | 🔎 | 🔎 Reviewer (GLM) — Quality check |
+| Planner | 📋 | 📋 Planner (Sonnet) — Break down tasks |
 
 **Key rules:**
 - ✅ Always list each agent with: emoji + role + **model name** + one-line task
-- ✅ State the mode (指挥官/流水线/混合) and estimated time
-- ✅ End announcement with: `正在派出 Agent 小队...`
-- ✅ Note sequential agents as: "先等前N个结果，单独召唤"
+- ✅ State the mode (Orchestrator/Pipeline/Hybrid) and estimated time
+- ✅ End announcement with: `Deploying Agent team...`
+- ✅ Note sequential agents as: "Wait for first N results, spawn separately"
 - ❌ Never silently call sessions_spawn without announcing
 
 ### While waiting — brief note
@@ -209,39 +209,39 @@ Always pick the right model for each agent. State the model explicitly in the an
 
 ### Model roster
 
-| 模型 | 别名 | 特点 | 适合角色 |
-|------|------|------|---------|
-| `glm` | GLM | 便宜、速度快、中文好 | 搜索、简单调研、状态检查 |
-| `kimi` | Kimi | 长上下文（128k）、代码强 | 深度分析、代码、长文整合 |
-| `gemini` | Gemini | 创意好、多模态 | 写作、文案、图像理解 |
-| `sonnet` | Claude Sonnet | 均衡、工具调用稳 | 复杂推理、规划、审核 |
-| `opus` | Claude Opus | 最强推理 | 极复杂分析、架构设计 |
+| Model | Alias | Characteristics | Best for |
+|-------|-------|----------------|----------|
+| `glm` | GLM | Cheap, fast, good Chinese | Search, simple research, status check |
+| `kimi` | Kimi | Long context (128k), strong code | Deep analysis, code, long text integration |
+| `gemini` | Gemini | Good creativity, multimodal | Writing, copy, image understanding |
+| `sonnet` | Claude Sonnet | Balanced, stable tool calling | Complex reasoning, planning, review |
+| `opus` | Claude Opus | Strongest reasoning | Extremely complex analysis, architecture design |
 
 ### Role → Model mapping (default)
 
-| 角色 | 默认模型 | 原因 |
-|------|---------|------|
-| 🔍 研究员 / Researcher | **GLM** | 轻量搜索，够用且便宜 |
-| 📊 分析师 / Analyst | **Kimi** | 长上下文，处理大量资料 |
-| ✍️ 写作者 / Writer | **Gemini** | 创意写作效果最好 |
-| 💻 程序员 / Coder | **Kimi** | 长上下文代码理解 |
-| 🔎 审核员 / Reviewer | **GLM** | 简单判断，不需重炮 |
-| 📋 规划师 / Planner | **Sonnet** | 结构化规划能力强 |
-| 🧐 批评者 / Critic | **Sonnet** | 逻辑严谨，挑战假设 |
+| Role | Default model | Reason |
+|------|--------------|--------|
+| 🔍 Researcher | **GLM** | Lightweight search, sufficient and cheap |
+| 📊 Analyst | **Kimi** | Long context, processing large amounts of data |
+| ✍️ Writer | **Gemini** | Best for creative writing |
+| 💻 Coder | **Kimi** | Long context code understanding |
+| 🔎 Reviewer | **GLM** | Simple judgment, no heavy artillery needed |
+| 📋 Planner | **Sonnet** | Strong structured planning ability |
+| 🧐 Critic | **Sonnet** | Rigorous logic, challenging assumptions |
 
 ### When to override defaults
 
-- 任务很简单 → 降级到 GLM（省成本）
-- 需要最高质量 → 升级到 Opus
-- 用户明确指定模型 → 照用户说的来
-- 多模型对比场景 → 每个 Agent 用不同模型，在公告里说明
+- Task is very simple → downgrade to GLM (save cost)
+- Need highest quality → upgrade to Opus
+- User explicitly specifies a model → follow the user's instructions
+- Multi-model comparison scenario → each agent uses a different model, explain in the announcement
 
 ### Always announce the model
 
 In the pre-spawn announcement, every agent line must include the model:
 ```
-✅ 这样：🔍 研究员A（GLM）— 调研 LangChain
-❌ 这样：🔍 研究员A — 调研 LangChain
+✅ Do this: 🔍 Researcher A (GLM) — Research LangChain
+❌ Not this: 🔍 Researcher A — Research LangChain
 ```
 
 ---
@@ -293,18 +293,18 @@ User says anything
 
 | Signal | Examples | Mode triggered |
 |--------|---------|---------------|
-| Multi-draft intent | "几个版本", "多个角度", "让我挑", "各自写", "different styles" | Pipeline or Hybrid |
-| Search intent | "搜索", "最新", "调研", "联网", "search", "latest" | Orchestrator or Hybrid |
-| Both | "搜索后给我几版报告", "research then write multiple drafts" | **Hybrid** |
-| Neither | "翻译", "分析", "写作", plain text tasks | Pipeline |
+| Multi-draft intent | "several versions", "multiple angles", "let me pick", "each write", "different styles" | Pipeline or Hybrid |
+| Search intent | "search", "latest", "research", "web lookup", "search", "latest" | Orchestrator or Hybrid |
+| Both | "search and give me several versions", "research then write multiple drafts" | **Hybrid** |
+| Neither | "translate", "analyze", "write", plain text tasks | Pipeline |
 
 You can also check with the router directly:
 ```bash
-python scripts/router.py mode "搜索竞品资料，帮我写3个版本的分析"
+python scripts/router.py mode "research competitors, write 3 versions of analysis"
 # → 🔀 HYBRID
-python scripts/router.py mode "调研LangChain并写一份报告"
+python scripts/router.py mode "research LangChain and write a report"
 # → 🎯 ORCHESTRATOR
-python scripts/router.py mode "用三个角度分析这个方案"
+python scripts/router.py mode "analyze this plan from three angles"
 # → 🔄 PIPELINE
 ```
 
@@ -439,10 +439,10 @@ Main agent: compare drafts → pick best or synthesize
 **CLI usage:**
 ```bash
 # Auto: router detects hybrid intent and runs both phases
-python run.py --mode hybrid --task "调研主流AI框架，给我3个不同风格的对比报告" --num-drafts 3
+python run.py --mode hybrid --task "research major AI frameworks, give me 3 comparison reports in different styles" --num-drafts 3
 
 # Auto-mode: let router decide the mode automatically
-python run.py --auto-mode --task "搜索竞品资料后写几个版本的分析"
+python run.py --auto-mode --task "search competitor info then write several versions of analysis"
 ```
 
 **In conversation (sessions_spawn approach):**

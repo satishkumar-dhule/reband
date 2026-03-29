@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@opencode-ai/plugin": "1.3.3",
+    "@opencode-ai/plugin": "1.3.4",
     "@kilocode/plugin": "7.1.8"
   }
 }
