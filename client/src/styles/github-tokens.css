@@ -89,6 +89,11 @@
   --gh-bg-elevated: #ffffff;
   --gh-bg-muted: #f6f8fa;
   --gh-bg-inset: #f6f8fa;
+  
+  /* Skeleton backgrounds - optimized for loading states */
+  /* Light mode: subtle gray with good contrast on white */
+  --gh-skeleton-bg: #e8eaed;
+  --gh-skeleton-bg-dark: #30363d;
 }
 
 /* ===== DARK MODE ===== */

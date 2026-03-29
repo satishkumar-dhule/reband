@@ -74,7 +74,7 @@ export function MobileChannels() {
   })).filter(group => group.channels.length > 0);
 
   return (
-    <div className="pb-20">
+    <div className="pb-20 pb-safe">
       {/* Search Bar */}
       <div className="sticky top-14 z-30 bg-background px-4 py-3 border-b border-border/50">
         <div className="relative">
@@ -84,7 +84,7 @@ export function MobileChannels() {
             placeholder="Search channels…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-muted/60 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            className="w-full bg-muted/60 rounded-lg pl-10 pr-4 py-3 min-h-[44px] text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
             autoComplete="off"
             name="search-channels"
           />
@@ -198,12 +198,13 @@ function CategoryPill({
     <button
       onClick={onClick}
       className={`
-        flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0
+        flex items-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0
         ${isActive 
           ? 'bg-primary text-primary-foreground' 
           : 'bg-muted/60 text-muted-foreground hover:bg-muted'
         }
       `}
+      aria-pressed={isActive}
     >
       {icon}
       {label}
@@ -340,14 +341,15 @@ function ChannelListCard({
             onToggle();
           }}
           className={`
-            p-2 rounded-full flex-shrink-0 transition-all
+            p-2.5 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center flex-shrink-0 transition-all
             ${isSubscribed 
               ? 'bg-primary text-primary-foreground' 
               : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary'
             }
           `}
+          aria-label={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
         >
-          {isSubscribed ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+          {isSubscribed ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
         </button>
       </div>
 

@@ -10,7 +10,7 @@ const RadioGroup = React.forwardRef<
 >(({ className, ...props }, ref) => {
   return (
     <RadioGroupPrimitive.Root
-      className={cn("grid gap-2", className)}
+      className={cn("grid gap-3", className)}
       {...props}
       ref={ref}
     />
@@ -23,18 +23,32 @@ const RadioGroupItem = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
 >(({ className, ...props }, ref) => {
   return (
-    <RadioGroupPrimitive.Item
-      ref={ref}
-      className={cn(
-        "aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow focus:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-        className
-      )}
-      {...props}
-    >
-      <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-        <Circle className="h-3.5 w-3.5 fill-primary" />
-      </RadioGroupPrimitive.Indicator>
-    </RadioGroupPrimitive.Item>
+    <div className="relative flex items-center min-h-11 min-w-11">
+      <RadioGroupPrimitive.Item
+        ref={ref}
+        className={cn(
+          // Base styles - 18px visual size for visual clarity
+          "peer h-[18px] w-[18px] shrink-0 rounded-full border-2 transition-all duration-150",
+          // Border colors - light mode
+          "border-[var(--gh-border)] bg-[var(--gh-canvas)]",
+          // Focus state - GitHub focus ring
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gh-focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gh-canvas)]",
+          // Checked state - light mode
+          "data-[state=checked]:border-[var(--gh-accent-emphasis)] data-[state=checked]:bg-[var(--gh-canvas)]",
+          // Disabled state
+          "disabled:cursor-not-allowed disabled:opacity-40 disabled:data-[state=checked]:opacity-60",
+          // Dark mode
+          "dark:border-[var(--gh-border)] dark:bg-[var(--gh-canvas)]",
+          "dark:data-[state=checked]:border-[var(--gh-accent-emphasis)] dark:data-[state=checked]:bg-[var(--gh-canvas)]",
+          className
+        )}
+        {...props}
+      >
+        <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
+          <Circle className="h-2.5 w-2.5 fill-[var(--gh-accent-emphasis)] text-[var(--gh-accent-emphasis)] dark:fill-[var(--gh-accent-emphasis)] dark:text-[var(--gh-accent-emphasis)]" />
+        </RadioGroupPrimitive.Indicator>
+      </RadioGroupPrimitive.Item>
+    </div>
   )
 })
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName

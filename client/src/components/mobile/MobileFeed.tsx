@@ -207,7 +207,8 @@ function StoryItem({ channel, onClick }: { channel: any; onClick: () => void }) 
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-1.5 flex-shrink-0"
+      className="flex flex-col items-center gap-1.5 flex-shrink-0 min-w-[68px] py-2"
+      aria-label={`Open ${channel.name} channel`}
     >
       <div className={`
         w-16 h-16 rounded-full p-[2px] flex items-center justify-center
@@ -215,7 +216,7 @@ function StoryItem({ channel, onClick }: { channel: any; onClick: () => void }) 
           ? 'bg-gradient-to-br from-primary to-primary/60' 
           : 'bg-border'
         }
-      `}>
+      `} role="img" aria-hidden="true">
         <div className="w-full h-full rounded-full bg-card flex items-center justify-center">
           <span className={hasProgress ? 'text-primary' : 'text-muted-foreground'}>
             {iconMap[channel.icon] || <Code className="w-5 h-5" />}
@@ -242,7 +243,7 @@ function StatsCard({
   topicsCount: number;
 }) {
   return (
-    <section className="mx-4 my-3">
+    <section className="px-3 sm:mx-4 my-3">
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         {/* Header */}
         <div className="px-4 py-3 border-b border-border/50">
@@ -294,14 +295,15 @@ function ContinueLearningSection({
   onSeeAll: () => void;
 }) {
   return (
-    <section className="mx-4 my-3">
+    <section className="px-3 sm:mx-4 my-3">
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <button 
           onClick={onSeeAll}
           className="w-full px-4 py-3 border-b border-border/50 flex items-center justify-between hover:bg-muted/50 transition-colors"
+          aria-label="See all channels"
         >
           <h3 className="font-semibold text-sm">Continue Learning</h3>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
         </button>
         
         <div className="divide-y divide-border/50">
@@ -374,19 +376,20 @@ function RecommendedSection({
   if (channels.length === 0) return null;
 
   return (
-    <section className="mx-4 my-3">
+    <section className="px-3 sm:mx-4 my-3">
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between">
           <h3 className="font-semibold text-sm">Recommended for You</h3>
           <button 
             onClick={onSeeAll}
             className="text-xs text-primary font-medium"
+            aria-label="See all recommended channels"
           >
             See all
           </button>
         </div>
         
-        <div className="p-3 flex gap-3 overflow-x-auto no-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="p-3 flex gap-3 overflow-x-auto no-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }} role="list" aria-label="Recommended channels">
           {channels.map((channel) => (
             <RecommendedCard
               key={channel.id}
@@ -404,7 +407,8 @@ function RecommendedCard({ channel, onClick }: { channel: any; onClick: () => vo
   return (
     <button
       onClick={onClick}
-      className="flex-shrink-0 w-32 p-3 bg-muted/50 rounded-xl hover:bg-muted transition-colors text-left"
+      className="flex-shrink-0 w-32 p-3 bg-muted/50 rounded-xl hover:bg-muted transition-colors text-left min-h-[90px]"
+      aria-label={`Learn ${channel.name}`}
     >
       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-2">
         {iconMap[channel.icon] || <Code className="w-5 h-5" />}
@@ -426,7 +430,7 @@ function QuickActionsCard({
   onBadges: () => void;
 }) {
   return (
-    <section className="mx-4 my-3">
+    <section className="px-3 sm:mx-4 my-3">
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <div className="px-4 py-3 border-b border-border/50">
           <h3 className="font-semibold text-sm">Quick Actions</h3>
@@ -437,16 +441,19 @@ function QuickActionsCard({
             icon={<Code className="w-5 h-5" />}
             label="Coding"
             onClick={onCoding}
+            ariaLabel="Start coding practice"
           />
           <QuickActionItem 
             icon={<Target className="w-5 h-5" />}
             label="Tests"
             onClick={onTests}
+            ariaLabel="Take practice tests"
           />
           <QuickActionItem 
             icon={<Trophy className="w-5 h-5" />}
             label="Badges"
             onClick={onBadges}
+            ariaLabel="View your badges"
           />
         </div>
       </div>
@@ -457,16 +464,19 @@ function QuickActionsCard({
 function QuickActionItem({ 
   icon, 
   label, 
-  onClick 
+  onClick,
+  ariaLabel
 }: { 
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
+  ariaLabel?: string;
 }) {
   return (
     <button
       onClick={onClick}
-      className="py-4 flex flex-col items-center gap-2 hover:bg-muted/50 transition-colors"
+      className="py-4 min-h-[72px] flex flex-col items-center gap-2 hover:bg-muted/50 transition-colors active:bg-muted"
+      aria-label={ariaLabel || label}
     >
       <div className="text-primary">{icon}</div>
       <span className="text-xs font-medium">{label}</span>

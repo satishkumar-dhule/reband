@@ -52,9 +52,9 @@ export function FloatingButton({
   }, [lastScrollY, hideOnScroll]);
 
   const positionClasses = {
-    'bottom-right': 'bottom-20 right-4 md:bottom-6 md:right-6',
-    'bottom-left': 'bottom-20 left-4 md:bottom-6 md:left-6',
-    'bottom-center': 'bottom-20 left-1/2 -translate-x-1/2 md:bottom-6'
+    'bottom-right': 'bottom-[5.5rem] pb-safe right-4 md:bottom-6 md:right-6',
+    'bottom-left': 'bottom-[5.5rem] pb-safe left-4 md:bottom-6 md:left-6',
+    'bottom-center': 'bottom-[5.5rem] pb-safe left-1/2 -translate-x-1/2 md:bottom-6'
   };
 
   const handleClick = () => {

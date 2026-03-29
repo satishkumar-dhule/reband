@@ -12,20 +12,30 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="input-group"
       role="group"
       className={cn(
-        "group/input-group border-input dark:bg-input/30 shadow-xs relative flex w-full items-center rounded-md border outline-none transition-[color,box-shadow]",
-        "h-9 has-[>textarea]:h-auto",
+        // Base container with GitHub tokens
+        "group/input-group relative flex w-full items-center rounded-md border border-[var(--gh-border)] bg-transparent outline-none transition-all duration-200",
+        // Height behavior
+        "h-9 has-[>textarea]:h-auto has-[>textarea]:flex-col",
 
-        // Variants based on alignment.
+        // Variants based on alignment - inline start
         "has-[>[data-align=inline-start]]:[&>input]:pl-2",
+        // Variants based on alignment - inline end  
         "has-[>[data-align=inline-end]]:[&>input]:pr-2",
+        // Variants based on alignment - block start (top stacked)
         "has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3",
+        // Variants based on alignment - block end (bottom stacked)
         "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3",
 
-        // Focus state.
-        "has-[[data-slot=input-group-control]:focus-visible]:ring-ring has-[[data-slot=input-group-control]:focus-visible]:ring-1",
+        // Focus state using GitHub focus ring token
+        "has-[[data-slot=input-group-control]:focus-visible]:border-[var(--gh-accent-fg)] has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-[var(--gh-focus-ring)]",
 
-        // Error state.
-        "has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40",
+        // Error state using GitHub danger tokens
+        "has-[[data-slot][aria-invalid=true]]:border-[var(--gh-danger-emphasis)] has-[[data-slot][aria-invalid=true]]:ring-2 has-[[data-slot][aria-invalid=true]]:ring-[var(--gh-danger-subtle)]",
+        // Dark mode error state
+        "dark:has-[[data-slot][aria-invalid=true]]:border-[var(--gh-danger-fg)] dark:has-[[data-slot][aria-invalid=true]]:ring-[var(--gh-danger-subtle)]",
+
+        // Dark mode border
+        "dark:border-[var(--gh-border)]",
 
         className
       )}
@@ -35,18 +45,19 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 const inputGroupAddonVariants = cva(
-  "text-muted-foreground flex h-auto cursor-text select-none items-center justify-center gap-2 py-1.5 text-sm font-medium group-data-[disabled=true]/input-group:opacity-50 [&>kbd]:rounded-[calc(var(--radius)-5px)] [&>svg:not([class*='size-'])]:size-4",
+  // GitHub muted text token for addon
+  "flex h-auto cursor-text select-none items-center justify-center gap-2 py-1.5 text-sm font-medium text-[var(--gh-fg-muted)] group-data-[disabled=true]/input-group:opacity-50",
   {
     variants: {
       align: {
         "inline-start":
-          "order-first pl-3 has-[>button]:ml-[-0.45rem] has-[>kbd]:ml-[-0.35rem]",
+          "order-first pl-3 has-[>button]:ml-[-0.45rem] has-[>kbd]:ml-[-0.35rem] rounded-l-[calc(var(--radius)-5px)]",
         "inline-end":
-          "order-last pr-3 has-[>button]:mr-[-0.4rem] has-[>kbd]:mr-[-0.35rem]",
+          "order-last pr-3 has-[>button]:mr-[-0.4rem] has-[>kbd]:mr-[-0.35rem] rounded-r-[calc(var(--radius)-5px)]",
         "block-start":
-          "[.border-b]:pb-3 order-first w-full justify-start px-3 pt-3 group-has-[>input]/input-group:pt-2.5",
+          "order-first w-full justify-start px-3 pt-3 group-has-[>input]/input-group:pt-2.5 rounded-t-[calc(var(--radius)-5px)]",
         "block-end":
-          "[.border-t]:pt-3 order-last w-full justify-start px-3 pb-3 group-has-[>input]/input-group:pb-2.5",
+          "order-last w-full justify-start px-3 pb-3 group-has-[>input]/input-group:pb-2.5 rounded-b-[calc(var(--radius)-5px)]",
       },
     },
     defaultVariants: {
@@ -118,7 +129,8 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       className={cn(
-        "text-muted-foreground flex items-center gap-2 text-sm [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none",
+        // GitHub muted text for group text
+        "flex items-center gap-2 text-sm text-[var(--gh-fg-muted)] [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none",
         className
       )}
       {...props}
@@ -128,13 +140,16 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
 
 function InputGroupInput({
   className,
+  isInvalid,
   ...props
-}: React.ComponentProps<"input">) {
+}: React.ComponentProps<"input"> & { isInvalid?: boolean }) {
   return (
     <Input
       data-slot="input-group-control"
+      isInvalid={isInvalid}
       className={cn(
-        "flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent",
+        // Remove border from inner input since container has it
+        "flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent focus-visible:outline-none",
         className
       )}
       {...props}
@@ -150,7 +165,8 @@ function InputGroupTextarea({
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        "flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0 dark:bg-transparent",
+        // Remove border from inner textarea since container has it
+        "flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0 dark:bg-transparent focus-visible:outline-none",
         className
       )}
       {...props}

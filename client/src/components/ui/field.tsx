@@ -6,6 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { AlertCircle, Info } from "lucide-react"
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
   return (
@@ -32,8 +33,12 @@ function FieldLegend({
       data-variant={variant}
       className={cn(
         "mb-3 font-medium",
+        // GitHub design tokens for text colors
+        "text-[var(--gh-fg)] dark:text-[var(--gh-fg)]",
         "data-[variant=legend]:text-base",
         "data-[variant=label]:text-sm",
+        // Focus visible ring
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gh-accent-emphasis)] focus-visible:ring-offset-2",
         className
       )}
       {...props}
@@ -55,7 +60,8 @@ function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 const fieldVariants = cva(
-  "group/field data-[invalid=true]:text-destructive flex w-full gap-3",
+  // Base styles - use data attribute for invalid state
+  "group/field data-[invalid=true]:text-[var(--gh-danger-fg)] flex w-full gap-3",
   {
     variants: {
       orientation: {
@@ -109,15 +115,22 @@ function FieldContent({ className, ...props }: React.ComponentProps<"div">) {
 
 function FieldLabel({
   className,
+  required,
   ...props
-}: React.ComponentProps<typeof Label>) {
+}: React.ComponentProps<typeof Label> & { required?: boolean }) {
   return (
     <Label
       data-slot="field-label"
       className={cn(
-        "group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50",
-        "has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col has-[>[data-slot=field]]:rounded-md has-[>[data-slot=field]]:border [&>[data-slot=field]]:p-4",
-        "has-data-[state=checked]:bg-primary/5 has-data-[state=checked]:border-primary dark:has-data-[state=checked]:bg-primary/10",
+        // Base styles using GitHub design tokens
+        "group/field-label peer/field-label flex w-fit gap-2 leading-snug",
+        "text-[var(--gh-fg)] dark:text-[var(--gh-fg)]",
+        // Disabled state
+        "group-data-[disabled=true]/field:opacity-50",
+        // Focus visible ring for accessibility
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gh-accent-emphasis)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gh-canvas)]",
+        // Required indicator
+        required && "after:content-['*'] after:ml-0.5 after:text-[var(--gh-danger-fg)]",
         className
       )}
       {...props}
@@ -130,7 +143,11 @@ function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="field-label"
       className={cn(
-        "flex w-fit items-center gap-2 text-sm font-medium leading-snug group-data-[disabled=true]/field:opacity-50",
+        // Base styles with GitHub tokens
+        "flex w-fit items-center gap-2 text-sm font-medium leading-snug",
+        "text-[var(--gh-fg)] dark:text-[var(--gh-fg)]",
+        // Disabled state
+        "group-data-[disabled=true]/field:opacity-50",
         className
       )}
       {...props}
@@ -143,9 +160,13 @@ function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="field-description"
       className={cn(
-        "text-muted-foreground text-sm font-normal leading-normal group-has-[[data-orientation=horizontal]]/field:text-balance",
-        "nth-last-2:-mt-1 last:mt-0 [[data-variant=legend]+&]:-mt-1.5",
-        "[&>a:hover]:text-primary [&>a]:underline [&>a]:underline-offset-4",
+        // Base styles - GitHub muted text with dark mode support
+        "text-sm font-normal leading-normal",
+        "text-[var(--gh-fg-muted)] dark:text-[var(--gh-fg-muted)]",
+        // Better text balance for horizontal layouts
+        "group-has-[[data-orientation=horizontal]]/field:text-balance",
+        // Link styling
+        "[&>a:hover]:text-[var(--gh-accent-fg)] [&>a]:underline [&>a]:underline-offset-4",
         className
       )}
       {...props}
@@ -165,7 +186,12 @@ function FieldSeparator({
       data-slot="field-separator"
       data-content={!!children}
       className={cn(
-        "relative -my-2 h-5 text-sm group-data-[variant=outline]/field-group:-mb-2",
+        // Base styles
+        "relative -my-2 h-5 text-sm",
+        // GitHub muted text
+        "text-[var(--gh-fg-muted)] dark:text-[var(--gh-fg-muted)]",
+        // Variant-specific styling
+        "group-data-[variant=outline]/field-group:-mb-2",
         className
       )}
       {...props}
@@ -173,7 +199,7 @@ function FieldSeparator({
       <Separator className="absolute inset-0 top-1/2" />
       {children && (
         <span
-          className="bg-background text-muted-foreground relative mx-auto block w-fit px-2"
+          className="bg-[var(--gh-canvas)] text-[var(--gh-fg-muted)] dark:bg-[var(--gh-canvas)] dark:text-[var(--gh-fg-muted)] relative mx-auto block w-fit px-2"
           data-slot="field-separator-content"
         >
           {children}
@@ -221,11 +247,53 @@ function FieldError({
   return (
     <div
       role="alert"
+      aria-live="polite"
       data-slot="field-error"
-      className={cn("text-destructive text-sm font-normal", className)}
+      className={cn(
+        // Base styles using GitHub danger tokens with dark mode support
+        "flex items-start gap-1.5 text-sm font-normal",
+        "text-[var(--gh-danger-fg)] dark:text-[var(--gh-danger-fg)]",
+        // Animation for attention
+        "animate-in fade-in slide-in-from-top-1 duration-200",
+        className
+      )}
       {...props}
     >
+      <AlertCircle
+        className="h-4 w-4 flex-shrink-0 mt-0.5"
+        aria-hidden="true"
+      />
       {content}
+    </div>
+  )
+}
+
+function FieldHelp({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"div">) {
+  if (!children) {
+    return null
+  }
+
+  return (
+    <div
+      data-slot="field-help"
+      className={cn(
+        // Base styles
+        "flex items-center gap-1.5 text-sm",
+        // GitHub muted text with dark mode
+        "text-[var(--gh-fg-muted)] dark:text-[var(--gh-fg-muted)]",
+        className
+      )}
+      {...props}
+    >
+      <Info
+        className="h-4 w-4 flex-shrink-0"
+        aria-hidden="true"
+      />
+      {children}
     </div>
   )
 }
@@ -235,6 +303,7 @@ export {
   FieldLabel,
   FieldDescription,
   FieldError,
+  FieldHelp,
   FieldGroup,
   FieldLegend,
   FieldSeparator,

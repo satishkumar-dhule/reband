@@ -9,7 +9,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { CreditsProvider } from "@/context/CreditsContext";
 import { AchievementProvider } from "@/context/AchievementContext";
 import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
-import { UnifiedNotificationProvider } from "@/components/UnifiedNotificationManager";
+import { UnifiedNotificationManager } from "@/components/UnifiedNotificationManager";
 import { LiveRegionProvider } from "@/components/LiveRegion";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import { OfflineBanner } from "@/components/OfflineBanner";
@@ -136,7 +136,7 @@ function FullApp() {
     <LiveRegionProvider>
       <CreditsProvider>
         <AchievementProvider>
-          <UnifiedNotificationProvider>
+          <UnifiedNotificationManager>
             <ProtectedRoute protectedRoutes={["/review", "/stats", "/bookmarks", "/profile", "/learning-paths", "/badges", "/my-path", "/certifications", "/tests"]}>
               <PublicRoute publicOnlyRoutes={["/onboarding"]} redirectTo="/">
                 <OfflineBanner />
@@ -145,7 +145,7 @@ function FullApp() {
                 </OnboardingGuard>
               </PublicRoute>
             </ProtectedRoute>
-          </UnifiedNotificationProvider>
+          </UnifiedNotificationManager>
         </AchievementProvider>
       </CreditsProvider>
     </LiveRegionProvider>

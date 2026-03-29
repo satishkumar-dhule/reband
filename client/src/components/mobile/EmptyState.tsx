@@ -80,7 +80,7 @@ export function EmptyState({ type, title, description }: EmptyStateProps) {
 
       <button
         onClick={() => setLocation(config.path)}
-        className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-full font-medium text-sm shadow-sm hover:bg-primary/90 transition-colors"
+        className="flex items-center gap-2 px-6 py-3 min-h-[44px] bg-primary text-primary-foreground rounded-full font-medium text-sm shadow-sm hover:bg-primary/90 transition-colors"
       >
         {config.action}
         <ChevronRight className="w-4 h-4" />
@@ -104,7 +104,8 @@ export function InlineEmptyState({
       <span className="text-sm text-muted-foreground">{message}</span>
       <button
         onClick={onAction}
-        className="text-sm text-primary font-medium flex items-center gap-1"
+        className="text-sm text-primary font-medium flex items-center gap-1 min-h-[44px] px-2 -mr-2"
+        aria-label={actionLabel}
       >
         {actionLabel}
         <ChevronRight className="w-3 h-3" />
@@ -134,7 +135,7 @@ export function WelcomeBanner({ onGetStarted }: { onGetStarted: () => void }) {
           
           <button
             onClick={onGetStarted}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm"
+            className="flex items-center gap-2 px-5 py-3 min-h-[44px] bg-primary text-primary-foreground rounded-lg font-medium text-sm"
           >
             Get Started
             <ChevronRight className="w-4 h-4" />

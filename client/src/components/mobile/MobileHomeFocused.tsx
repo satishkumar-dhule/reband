@@ -32,7 +32,8 @@ import {
   Layers, Smartphone, Shield, Brain, Workflow, Box, Cloud, Code,
   Network, MessageCircle, Users, Sparkles, Eye, FileText, CheckCircle, 
   Monitor, Zap, Gauge, ChevronRight, Play, Compass, ArrowRight,
-  RefreshCw, Flame, Target, X, Check, Mic, Coins, Award, BookOpen, Volume2
+  RefreshCw, Flame, Target, X, Check, Mic, Coins, Award, BookOpen, Volume2,
+  Lightbulb
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -606,6 +607,8 @@ function QuickQuizCard({
                       key={option.id}
                       onClick={() => handleOptionSelect(option.id)}
                       disabled={showFeedback !== null}
+                      aria-disabled={showFeedback !== null}
+                      aria-label={option.text}
                       className={`w-full p-2.5 sm:p-3 text-left border rounded-lg transition-all text-sm ${
                         showCorrect
                           ? 'border-green-500 bg-green-500/20'
@@ -614,7 +617,7 @@ function QuickQuizCard({
                           : isSelected
                           ? 'border-primary bg-primary/10'
                           : 'border-border hover:border-primary/50'
-                      } ${showFeedback ? 'cursor-default' : ''}`}
+                      } ${showFeedback ? 'cursor-default opacity-75' : ''}`}
                     >
                       <div className="flex items-center gap-2.5">
                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
@@ -646,13 +649,16 @@ function QuickQuizCard({
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
-                      <span className="font-medium text-foreground">💡 </span>
+                      <span className="font-medium text-foreground inline-flex items-center gap-1">
+                        <Lightbulb className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                      </span>
                       {currentQuestion.explanation}
                     </div>
                     <ListenIconButton 
                       text={currentQuestion.explanation} 
                       size="sm"
                       className="flex-shrink-0 mt-0.5"
+                      aria-label="Listen to explanation"
                     />
                   </div>
                 </motion.div>
@@ -1014,7 +1020,8 @@ function CodingChallengeCardCompact({ onStart }: { onStart: () => void }) {
   return (
     <button
       onClick={onStart}
-      className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-xl border border-purple-500/20 p-3 flex flex-col items-center gap-2 hover:from-purple-500/15 hover:to-blue-500/15 transition-colors text-center"
+      className="min-h-[80px] bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-xl border border-purple-500/20 p-3 flex flex-col items-center gap-2 hover:from-purple-500/15 hover:to-blue-500/15 transition-colors text-center active:scale-[0.98]"
+      aria-label="Start coding practice"
     >
       <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
         <Code className="w-5 h-5 text-purple-500" />
@@ -1032,7 +1039,8 @@ function CertificationCardCompact({ onStart }: { onStart: () => void }) {
   return (
     <button
       onClick={onStart}
-      className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-xl border border-amber-500/20 p-3 flex flex-col items-center gap-2 hover:from-amber-500/15 hover:to-orange-500/15 transition-colors text-center"
+      className="min-h-[80px] bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-xl border border-amber-500/20 p-3 flex flex-col items-center gap-2 hover:from-amber-500/15 hover:to-orange-500/15 transition-colors text-center active:scale-[0.98]"
+      aria-label="View certifications"
     >
       <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
         <Award className="w-5 h-5 text-amber-500" />
@@ -1050,7 +1058,8 @@ function TrainingModeCardCompact({ onStart }: { onStart: () => void }) {
   return (
     <button
       onClick={onStart}
-      className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-500/20 p-3 flex flex-col items-center gap-2 hover:from-blue-500/15 hover:to-purple-500/15 transition-colors text-center"
+      className="min-h-[80px] bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-500/20 p-3 flex flex-col items-center gap-2 hover:from-blue-500/15 hover:to-purple-500/15 transition-colors text-center active:scale-[0.98]"
+      aria-label="Start training mode"
     >
       <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
         <BookOpen className="w-5 h-5 text-blue-500" />
@@ -1066,10 +1075,10 @@ function TrainingModeCardCompact({ onStart }: { onStart: () => void }) {
 // Quick Links - Compact inline version
 function QuickLinksCompact({ onNavigate }: { onNavigate: (path: string) => void }) {
   return (
-    <div className="bg-card rounded-xl border border-border p-2 flex flex-wrap justify-center gap-1.5">
+    <div className="bg-card rounded-xl border border-border p-2 flex flex-wrap justify-center gap-1.5" role="navigation" aria-label="Quick links">
       <button
         onClick={() => onNavigate('/badges')}
-        className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center"
         aria-label="Badges"
         title="Badges"
       >
@@ -1077,7 +1086,7 @@ function QuickLinksCompact({ onNavigate }: { onNavigate: (path: string) => void 
       </button>
       <button
         onClick={() => onNavigate('/bookmarks')}
-        className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center"
         aria-label="Bookmarks"
         title="Bookmarks"
       >
@@ -1085,7 +1094,7 @@ function QuickLinksCompact({ onNavigate }: { onNavigate: (path: string) => void 
       </button>
       <button
         onClick={() => onNavigate('/tests')}
-        className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center"
         aria-label="Tests"
         title="Tests"
       >
@@ -1093,9 +1102,9 @@ function QuickLinksCompact({ onNavigate }: { onNavigate: (path: string) => void 
       </button>
       <button
         onClick={() => onNavigate('/stats')}
-        className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
-        aria-label="Stats"
-        title="Stats"
+        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center"
+        aria-label="Statistics"
+        title="Statistics"
       >
         <Activity className="w-4 h-4 text-purple-500" />
       </button>

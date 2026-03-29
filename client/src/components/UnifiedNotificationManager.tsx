@@ -71,6 +71,9 @@ export function UnifiedNotificationManager({ children }: { children: ReactNode }
   );
 }
 
+// Alias for backward compatibility
+export const UnifiedNotificationProvider = UnifiedNotificationManager;
+
 export function useUnifiedNotifications() {
   const context = useContext(UnifiedNotificationsContext);
   if (!context) {

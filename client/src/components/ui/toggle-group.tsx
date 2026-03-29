@@ -14,14 +14,30 @@ const ToggleGroupContext = React.createContext<
   variant: "default",
 })
 
+interface ToggleGroupProps
+  extends React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root>,
+    VariantProps<typeof toggleVariants> {
+  /**
+   * Accessible label for the toggle group.
+   * Required for accessibility when no visible label is present.
+   */
+  "aria-label"?: string
+}
+
 const ToggleGroup = React.forwardRef<
   React.ElementRef<typeof ToggleGroupPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root> &
-    VariantProps<typeof toggleVariants>
->(({ className, variant, size, children, ...props }, ref) => (
+  ToggleGroupProps
+>(({ className, variant, size, children, "aria-label": ariaLabel, ...props }, ref) => (
   <ToggleGroupPrimitive.Root
     ref={ref}
-    className={cn("flex items-center justify-center gap-1", className)}
+    className={cn(
+      // Base layout - GitHub-inspired
+      "inline-flex items-center justify-center gap-1 rounded-md",
+      // Smooth transitions
+      "transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]",
+      className
+    )}
+    aria-label={ariaLabel}
     {...props}
   >
     <ToggleGroupContext.Provider value={{ variant, size }}>
@@ -32,11 +48,20 @@ const ToggleGroup = React.forwardRef<
 
 ToggleGroup.displayName = ToggleGroupPrimitive.Root.displayName
 
+interface ToggleGroupItemProps
+  extends React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item>,
+    VariantProps<typeof toggleVariants> {
+  /**
+   * Accessible label for the toggle group item.
+   * Required for accessibility when no visible label is present.
+   */
+  "aria-label"?: string
+}
+
 const ToggleGroupItem = React.forwardRef<
   React.ElementRef<typeof ToggleGroupPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item> &
-    VariantProps<typeof toggleVariants>
->(({ className, children, variant, size, ...props }, ref) => {
+  ToggleGroupItemProps
+>(({ className, children, variant, size, "aria-label": ariaLabel, ...props }, ref) => {
   const context = React.useContext(ToggleGroupContext)
 
   return (
@@ -47,8 +72,11 @@ const ToggleGroupItem = React.forwardRef<
           variant: context.variant || variant,
           size: context.size || size,
         }),
+        // Additional styles for toggle group items
+        "focus-visible:z-10",
         className
       )}
+      aria-label={ariaLabel}
       {...props}
     >
       {children}

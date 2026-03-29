@@ -12,6 +12,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
+import { AlertCircle, CheckCircle2 } from "lucide-react"
 
 const Form = FormProvider
 
@@ -78,7 +79,17 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("space-y-2", className)} {...props} />
+      <div
+        ref={ref}
+        className={cn(
+          // Base spacing
+          "space-y-2",
+          // Ensure proper touch target minimum
+          "min-h-[44px]",
+          className
+        )}
+        {...props}
+      />
     </FormItemContext.Provider>
   )
 })
@@ -86,17 +97,39 @@ FormItem.displayName = "FormItem"
 
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
+    required?: boolean
+  }
+>(({ className, required, ...props }, ref) => {
   const { error, formItemId } = useFormField()
 
   return (
     <Label
       ref={ref}
-      className={cn(error && "text-destructive", className)}
       htmlFor={formItemId}
+      className={cn(
+        // Base styles - use GitHub design tokens for consistency
+        "text-sm font-medium leading-snug",
+        // Dark mode support - ensure proper contrast in both modes
+        "dark:text-[var(--gh-fg)]",
+        // Error state styling with GitHub danger tokens
+        error && "text-[var(--gh-danger-fg)] dark:text-[var(--gh-danger-fg)]",
+        // Focus visible ring for accessibility
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gh-accent-emphasis)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gh-canvas)]",
+        className
+      )}
       {...props}
-    />
+    >
+      {props.children}
+      {required && (
+        <span
+          aria-hidden="true"
+          className="text-[var(--gh-danger-fg)] dark:text-[var(--gh-danger-fg)] ml-0.5"
+        >
+          *
+        </span>
+      )}
+    </Label>
   )
 })
 FormLabel.displayName = "FormLabel"
@@ -117,6 +150,8 @@ const FormControl = React.forwardRef<
           : `${formDescriptionId} ${formMessageId}`
       }
       aria-invalid={!!error}
+      // Ensure proper focus styling - the input component should handle this
+      data-invalid={error ? "true" : "false"}
       {...props}
     />
   )
@@ -133,7 +168,15 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn("text-[0.8rem] text-muted-foreground", className)}
+      className={cn(
+        // Base styles
+        "text-[0.8rem]",
+        // Use GitHub muted text token for consistency
+        "text-[var(--gh-fg-muted)]",
+        // Dark mode - ensure proper contrast
+        "dark:text-[var(--gh-fg-muted)]",
+        className
+      )}
       {...props}
     />
   )
@@ -155,9 +198,38 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-[0.8rem] font-medium text-destructive", className)}
+      role="alert"
+      aria-live="polite"
+      className={cn(
+        // Base styles - flex for icon alignment
+        "flex items-center gap-1.5 text-[0.8rem] font-medium",
+        // Error state - use GitHub danger tokens for consistency
+        error && [
+          "text-[var(--gh-danger-fg)]",
+          "dark:text-[var(--gh-danger-fg)]",
+        ],
+        // Success state (when no error but has children)
+        !error && children && [
+          "text-[var(--gh-success-fg)]",
+          "dark:text-[var(--gh-success-fg)]",
+        ],
+        // Animation for attention
+        "animate-in fade-in slide-in-from-top-1 duration-200",
+        className
+      )}
       {...props}
     >
+      {error ? (
+        <AlertCircle
+          className="h-4 w-4 flex-shrink-0"
+          aria-hidden="true"
+        />
+      ) : children ? (
+        <CheckCircle2
+          className="h-4 w-4 flex-shrink-0"
+          aria-hidden="true"
+        />
+      ) : null}
       {body}
     </p>
   )
