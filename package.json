@@ -67,8 +67,9 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "vite dev --port 5001",
-    "dev:server": "NODE_ENV=development tsx server/index.ts",
+    "dev": "PORT=5000 NODE_ENV=development ./node_modules/.bin/tsx server/index.ts",
+    "dev:vite": "vite dev --port 5001",
+    "dev:server": "NODE_ENV=development ./node_modules/.bin/tsx server/index.ts",
     "build": "vite build",
     "build:static": "node script/fetch-questions-for-build.js && node script/fetch-question-history.js && node script/generate-curated-paths.js && node script/generate-rss.js && node script/generate-sitemap.js && vite build && node script/generate-pagefind-index.js && node script/build-pagefind.js",
     "build:pagefind": "node script/generate-pagefind-index.js && node script/build-pagefind.js",
