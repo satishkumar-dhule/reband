@@ -60,3 +60,7 @@ coverage/
 playwright-report/
 .kiro/
 playwright-report/index.html
+.local/
+.config/
+*.db
+*.log
