@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { 
   BookOpen, Lightbulb, Baby, Code2, Play, FileText, 
   ExternalLink, Copy, Check, ChevronDown, ChevronUp
@@ -49,6 +49,7 @@ export function UnifiedAnswerPanel({
   mode,
   onHideAnswer 
 }: UnifiedAnswerPanelProps) {
+  const shouldReduceMotion = useReducedMotion();
   const [activeTab, setActiveTab] = useState<ContentTab>('answer');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['main']));
@@ -86,9 +87,9 @@ export function UnifiedAnswerPanel({
     <div className="w-full px-4 py-6 space-y-6">
       {/* Tab navigation */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
         className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar"
       >
         {tabs.filter(tab => tab.available).map((tab) => {
@@ -116,9 +117,9 @@ export function UnifiedAnswerPanel({
       {/* Content area */}
       <motion.div
         key={activeTab}
-        initial={{ opacity: 0, x: 20 }}
+        initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
         className="space-y-4"
       >
         {/* Main Answer */}

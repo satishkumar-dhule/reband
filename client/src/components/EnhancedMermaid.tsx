@@ -8,20 +8,22 @@ const appThemeToMermaid: Record<string, MermaidTheme> = {
   'premium-dark': 'dark',
 };
 
+// Lazy-loaded mermaid instance - singleton pattern for lazy loading
 let mermaid: any = null;
-let mermaidLoadPromise: Promise<any> | null = null;
 
-async function loadMermaid() {
-  if (mermaid) return mermaid;
-  if (!mermaidLoadPromise) {
-    // @ts-ignore - mermaid types are incomplete
-    mermaidLoadPromise = import('mermaid/dist/mermaid.esm.mjs').then(m => {
-      mermaid = m.default || m;
-      return mermaid;
-    });
+async function getMermaid() {
+  if (!mermaid) {
+    // Dynamic import - only loads when first diagram is rendered
+    const m = await import('mermaid/dist/mermaid.esm.mjs');
+    mermaid = m.default || m;
+    // Initialize once on first load
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
   }
-  return mermaidLoadPromise;
+  return mermaid;
 }
+
+// Backward compatibility alias
+const loadMermaid = getMermaid;
 
 let currentMermaidTheme: MermaidTheme | null = null;
 

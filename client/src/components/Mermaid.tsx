@@ -103,25 +103,22 @@ const appThemeToMermaid: Record<string, MermaidTheme> = {
   'premium-dark': 'dark',
 };
 
-// Lazy-loaded mermaid instance
+// Lazy-loaded mermaid instance - singleton pattern for lazy loading
 let mermaidInstance: any = null;
-let mermaidLoadPromise: Promise<any> | null = null;
-let currentMermaidTheme: MermaidTheme | null = null;
 
-// Lazy load mermaid only when needed
-async function loadMermaid(): Promise<any> {
-  if (mermaidInstance) return mermaidInstance;
-  
-  if (!mermaidLoadPromise) {
-    // @ts-ignore - Use the full ESM bundle to avoid dynamic import issues on GitHub Pages
-    mermaidLoadPromise = import('mermaid/dist/mermaid.esm.mjs').then(m => {
-      mermaidInstance = m.default;
-      return mermaidInstance;
-    });
+async function getMermaid() {
+  if (!mermaidInstance) {
+    // Dynamic import - only loads when first diagram is rendered
+    const m = await import('mermaid/dist/mermaid.esm.mjs');
+    mermaidInstance = m.default;
+    // Initialize once on first load
+    mermaidInstance.initialize({ startOnLoad: false, theme: 'dark' });
   }
-  
-  return mermaidLoadPromise;
+  return mermaidInstance;
 }
+
+// Backward compatibility alias
+const loadMermaid = getMermaid;
 
 async function initMermaid(mermaidTheme: MermaidTheme, force = false) {
   if (currentMermaidTheme === mermaidTheme && !force) return;

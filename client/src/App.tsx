@@ -6,11 +6,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ThemeProvider } from "@/context/ThemeContext";
-import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
 import { CreditsProvider } from "@/context/CreditsContext";
+import { AchievementProvider } from "@/context/AchievementContext";
+import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
+import { UnifiedNotificationProvider } from "@/components/UnifiedNotificationManager";
 import { LiveRegionProvider } from "@/components/LiveRegion";
-import { UnifiedNotificationManager } from "@/components/UnifiedNotificationManager";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import NotFound from "@/pages/not-found";
 import { SkeletonLoader } from "@/components/mobile/SkeletonLoader";
 
@@ -36,27 +38,33 @@ const BotActivity = lazy(() => import("@/pages/BotActivity"));
  * OnboardingGuard - Redirects new users to onboarding
  * Handles user journey: new users get guided to onboarding flow
  */
+function isCrawler(): boolean {
+  if (typeof window === 'undefined') return false;
+  const userAgent = navigator.userAgent.toLowerCase();
+  return /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|sogou|exabot|facebot|facebookexternalhit|ia_archiver|msnbot|ahrefsbot|semrushbot|dotbot|rogerbot|screaming frog|lighthouse|chrome-lighthouse|pagespeed|gtmetrix|pingdom/i.test(userAgent);
+}
+
 function OnboardingGuard({ children }: { children: ReactNode }) {
   const { needsOnboarding } = useUserPreferences();
   const [location, setLocation] = useLocation();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Wait for hydration
     setIsReady(true);
   }, []);
 
-  // BUG-FIX: Added { replace: true } to prevent history pollution
-  // Without this, users would have duplicate /onboarding entries in browser history
-  // when navigating back after completing onboarding
   useEffect(() => {
+    // Skip redirect for crawlers - let them see the onboarding page
+    if (isCrawler()) return;
+    
     if (isReady && needsOnboarding && location !== '/onboarding') {
-      // Redirect new users to onboarding
-      setLocation('/onboarding', { replace: true });
+      setLocation('/onboarding');
     }
   }, [isReady, needsOnboarding, location, setLocation]);
 
-  // Don't render children until ready to prevent flash
+  // Skip loading state for crawlers
+  if (isCrawler()) return <>{children}</>;
+
   if (isReady && needsOnboarding && location !== '/onboarding') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--gh-canvas-subtle)]">
@@ -75,42 +83,48 @@ function MinimalApp() {
   const [location] = useLocation();
 
   useEffect(() => {
-    // Scroll to top on route change
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   }, [location]);
 
   return (
     <Suspense fallback={<SkeletonLoader />}>
       <Switch>
-        {/* Public routes - no auth required */}
-        <Route path="/" component={Home} />
+        {/* Channels */}
         <Route path="/channels" component={Channels} />
+        
+        {/* Channel routes */}
         <Route path="/channel/:id" component={QuestionViewer} />
         <Route path="/channel/:id/:questionId" component={QuestionViewer} />
+        
+        {/* Voice routes */}
         <Route path="/voice-interview" component={VoicePractice} />
         <Route path="/voice-session" component={VoiceSession} />
+        
+        {/* Coding routes */}
         <Route path="/coding" component={CodingChallenge} />
         <Route path="/coding/:id" component={CodingChallenge} />
         
         {/* Protected routes - require user data */}
-        <ProtectedRoute protectedRoutes={["/review", "/stats", "/bookmarks", "/profile", "/learning-paths", "/badges", "/my-path", "/certifications", "/tests"]}>
-          <Route path="/review" component={ReviewSession} />
-          <Route path="/stats" component={Stats} />
-          <Route path="/bookmarks" component={Bookmarks} />
-          <Route path="/profile" component={Profile} />
-          <Route path="/learning-paths" component={LearningPaths} />
-          <Route path="/badges" component={Badges} />
-          <Route path="/certifications" component={Certifications} />
-          <Route path="/tests" component={Tests} />
-          <Route path="/my-path" component={MyPath} />
-        </ProtectedRoute>
+        <Route path="/review" component={ReviewSession} />
+        <Route path="/stats" component={Stats} />
+        <Route path="/bookmarks" component={Bookmarks} />
+        <Route path="/profile" component={Profile} />
+        <Route path="/learning-paths" component={LearningPaths} />
+        <Route path="/badges" component={Badges} />
+        <Route path="/certifications" component={Certifications} />
+        <Route path="/tests" component={Tests} />
+        <Route path="/my-path" component={MyPath} />
         
-        {/* Public-only route - redirect authenticated users away */}
-        <PublicRoute publicOnlyRoutes={["/onboarding"]} redirectTo="/">
-          <Route path="/onboarding" component={Onboarding} />
-        </PublicRoute>
+        {/* Public-only route */}
+        <Route path="/onboarding" component={Onboarding} />
         
+        {/* Bot activity */}
         <Route path="/bot-activity" component={BotActivity} />
+        
+        {/* Home must be LAST - catches all unmatched routes */}
+        <Route path="/" component={Home} />
+        
+        {/* 404 - must be LAST */}
         <Route component={NotFound} />
       </Switch>
     </Suspense>
@@ -120,9 +134,20 @@ function MinimalApp() {
 function FullApp() {
   return (
     <LiveRegionProvider>
-      <OnboardingGuard>
-        <MinimalApp />
-      </OnboardingGuard>
+      <CreditsProvider>
+        <AchievementProvider>
+          <UnifiedNotificationProvider>
+            <ProtectedRoute protectedRoutes={["/review", "/stats", "/bookmarks", "/profile", "/learning-paths", "/badges", "/my-path", "/certifications", "/tests"]}>
+              <PublicRoute publicOnlyRoutes={["/onboarding"]} redirectTo="/">
+                <OfflineBanner />
+                <OnboardingGuard>
+                  <MinimalApp />
+                </OnboardingGuard>
+              </PublicRoute>
+            </ProtectedRoute>
+          </UnifiedNotificationProvider>
+        </AchievementProvider>
+      </CreditsProvider>
     </LiveRegionProvider>
   );
 }
@@ -132,10 +157,8 @@ export default function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <UserPreferencesProvider>
-          <CreditsProvider>
-            <QueryClientProvider client={queryClient}>
+          <QueryClientProvider client={queryClient}>
             <TooltipProvider>
-              <UnifiedNotificationManager>
               <div className="min-h-screen">
                 {/* Skip Navigation Link - P0 Accessibility Fix */}
                 <a
@@ -146,10 +169,8 @@ export default function App() {
                 </a>
                 <FullApp />
               </div>
-              </UnifiedNotificationManager>
             </TooltipProvider>
-            </QueryClientProvider>
-          </CreditsProvider>
+          </QueryClientProvider>
         </UserPreferencesProvider>
       </ThemeProvider>
     </ErrorBoundary>

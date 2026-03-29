@@ -31,8 +31,8 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
         setStatus('loading');
         setError(null);
 
-        // Clear container safely
-        containerRef.current.textContent = '';
+        // Clear container
+        containerRef.current.innerHTML = '';
 
         // Extract mermaid code from markdown if needed
         let mermaidCode = content.trim();
@@ -52,11 +52,11 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
         console.log(`📝 [Attempt ${attemptId}] Code length: ${mermaidCode.length} chars`);
         console.log(`📝 [Attempt ${attemptId}] First 100 chars:`, mermaidCode.substring(0, 100));
 
-        // Dynamic import with error handling
+        // Dynamic import with error handling - lazy loads mermaid library
         let mermaid;
         try {
-          console.log(`📦 [Attempt ${attemptId}] Importing Mermaid...`);
-          const mermaidModule = await import('mermaid');
+          console.log(`📦 [Attempt ${attemptId}] Importing Mermaid (lazy)...`);
+          const mermaidModule = await import('mermaid/dist/mermaid.esm.mjs');
           // Handle both default and named exports
           mermaid = mermaidModule.default || mermaidModule;
           
@@ -66,7 +66,7 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
             throw new Error('Mermaid module does not have required methods');
           }
           
-          console.log(`✅ [Attempt ${attemptId}] Mermaid imported successfully`);
+          console.log(`✅ [Attempt ${attemptId}] Mermaid imported successfully (lazy loaded)`);
         } catch (importError: any) {
           console.error('Import error details:', importError);
           throw new Error(`Failed to import Mermaid: ${importError.message}`);
@@ -132,16 +132,9 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
           throw new Error('Render returned no SVG');
         }
 
-        // Insert SVG safely using DOMPurify if available, otherwise use innerHTML
+        // Insert SVG
         if (containerRef.current) {
-          // Check if DOMPurify is available for sanitization
-          if (typeof DOMPurify !== 'undefined') {
-            const clean = DOMPurify.sanitize(result.svg, { USE_PROFILES: { svg: true } });
-            containerRef.current.innerHTML = clean;
-          } else {
-            // Fallback: Mermaid generates safe SVG, but this is less secure
-            containerRef.current.innerHTML = result.svg;
-          }
+          containerRef.current.innerHTML = result.svg;
           console.log(`✅ [Attempt ${attemptId}] Diagram rendered successfully!`);
           console.log(`📊 [Attempt ${attemptId}] SVG length: ${result.svg.length} chars`);
           setStatus('success');
@@ -158,23 +151,19 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
         setError(err.message || 'Unknown error');
         setStatus('error');
 
-        // Show error in container safely - escape user content
+        // Show error in container - use textContent to prevent XSS
         if (containerRef.current) {
-          // Escape any HTML in error message to prevent XSS
-          const escapeHtml = (str: string) => str
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-          
-          containerRef.current.innerHTML = `
-            <div style="color: #ff0080; padding: 20px; text-align: center;">
-              <div style="font-size: 24px; margin-bottom: 10px;">⚠️</div>
-              <div style="font-weight: bold; margin-bottom: 5px;">Diagram Render Error</div>
-              <div style="font-size: 12px; opacity: 0.8;">${escapeHtml(err.message || 'Unknown error')}</div>
-            </div>
+          containerRef.current.innerHTML = '';
+          const errorDiv = document.createElement('div');
+          errorDiv.style.cssText = 'color: #ff0080; padding: 20px; text-align: center;';
+          errorDiv.innerHTML = `
+            <div style="font-size: 24px; margin-bottom: 10px;">⚠️</div>
+            <div style="font-weight: bold; margin-bottom: 5px;">Diagram Render Error</div>
+            <div style="font-size: 12px; opacity: 0.8;"></div>
           `;
+          // Safely set error message using textContent to prevent XSS
+          errorDiv.lastElementChild!.textContent = err.message || 'Unknown error';
+          containerRef.current.appendChild(errorDiv);
         }
       }
     };
@@ -195,7 +184,7 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
     <div className={`mermaid-diagram-wrapper ${className}`}>
       {status === 'loading' && (
         <div className="flex flex-col items-center justify-center p-8 gap-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 dark:border-green-400"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ff88]"></div>
           <p className="text-xs text-muted-foreground">Rendering diagram...</p>
         </div>
       )}
@@ -216,7 +205,7 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
           <summary className="text-sm text-red-400 cursor-pointer hover:text-red-300">
             Show diagram code
           </summary>
-          <pre className="mt-2 text-xs text-cyan-500 dark:text-cyan-400 overflow-x-auto p-2 bg-background/30 rounded">
+          <pre className="mt-2 text-xs text-[#00d4ff] overflow-x-auto p-2 bg-background/30 rounded">
             {content}
           </pre>
         </details>

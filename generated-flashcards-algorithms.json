@@ -1,0 +1,132 @@
+[
+  {
+    "id": "fla-algo-001",
+    "channelId": "algorithms",
+    "front": "What is the time complexity of quicksort's average case?",
+    "back": "O(n log n) is quicksort's average-case time complexity. This occurs when pivot selection consistently divides the array into balanced partitions. The divide step creates log n levels, and each level processes n elements. Worst case (O(n²)) happens with already sorted input using bad pivot selection like first or last element.",
+    "hint": "Consider how balanced partitions affect the recursion depth",
+    "difficulty": "intermediate",
+    "tags": ["algorithms", "sorting", "complexity"],
+    "codeExample": {
+      "language": "python",
+      "code": "def quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quicksort(left) + middle + quicksort(right)"
+    }
+  },
+  {
+    "id": "fla-algo-002",
+    "channelId": "algorithms",
+    "front": "When should you use binary search instead of linear search?",
+    "back": "Use binary search when searching sorted data structures and needing faster lookup. It achieves O(log n) compared to linear search's O(n). Binary search halves the search space each iteration by comparing the target to the middle element. Requires random access (array or balanced tree), so not suitable for linked lists. Best for frequent searches on stable, sorted datasets.",
+    "hint": "Think about what binary search requires from the data structure",
+    "difficulty": "intermediate",
+    "tags": ["algorithms", "searching", "complexity"],
+    "codeExample": {
+      "language": "python",
+      "code": "def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1"
+    }
+  },
+  {
+    "id": "fla-algo-003",
+    "channelId": "algorithms",
+    "front": "What is the difference between DFS and BFS traversal?",
+    "back": "DFS explores deep before wide using a stack (or recursion), visiting all descendants before siblings. BFS explores wide before deep using a queue, visiting all neighbors before children. DFS uses less memory for wide trees but can get stuck in deep paths. BFS guarantees finding shortest paths in unweighted graphs but requires more memory to store the queue.",
+    "hint": "Consider which data structure each uses and what it guarantees",
+    "difficulty": "intermediate",
+    "tags": ["algorithms", "graphs", "trees"],
+    "codeExample": {
+      "language": "python",
+      "code": "# BFS uses queue, explores level by level\nfrom collections import deque\ndef bfs(graph, start):\n    queue = deque([start])\n    visited = {start}\n    while queue:\n        node = queue.popleft()\n        for neighbor in graph[node]:\n            if neighbor not in visited:\n                visited.add(neighbor)\n                queue.append(neighbor)"
+    }
+  },
+  {
+    "id": "fla-algo-004",
+    "channelId": "algorithms",
+    "front": "What is memoization and when does it optimize recursion?",
+    "back": "Memoization caches function results to avoid recomputation. It optimizes recursion when subproblems repeat—like in Fibonacci or factorial calculations. Without memoization, Fibonacci has O(2^n) complexity; with it, drops to O(n). Best applied when: subproblems overlap, same inputs recur frequently, and computation cost outweighs cache storage.",
+    "hint": "Think about Fibonacci numbers and how many times each value is computed",
+    "difficulty": "intermediate",
+    "tags": ["algorithms", "dynamic-programming", "recursion"],
+    "codeExample": {
+      "language": "python",
+      "code": "def fib_memo(n, memo={}):\n    if n in memo:\n        return memo[n]\n    if n <= 1:\n        return n\n    memo[n] = fib_memo(n-1, memo) + fib_memo(n-2, memo)\n    return memo[n]"
+    }
+  },
+  {
+    "id": "fla-algo-005",
+    "channelId": "algorithms",
+    "front": "What is the space complexity of merge sort?",
+    "back": "Merge sort has O(n) space complexity due to the auxiliary array needed for merging. Unlike in-place quicksort, merge sort creates temporary arrays at each recursive level. The space grows with input size because merge operations need a separate buffer. This makes merge sort less memory-efficient than heapsort (O(1)) but provides stable sorting and consistent O(n log n) performance.",
+    "hint": "Consider what happens during the merge step",
+    "difficulty": "intermediate",
+    "tags": ["algorithms", "sorting", "complexity"],
+    "codeExample": {
+      "language": "python",
+      "code": "def merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    return merge(left, right)\n\ndef merge(left, right):\n    result = []  # O(n) auxiliary space\n    i = j = 0\n    while i < len(left) and j < len(right):\n        pass\n    return result"
+    }
+  },
+  {
+    "id": "fla-algo-006",
+    "channelId": "algorithms",
+    "front": "How does a max-heap differ from a min-heap?",
+    "back": "A max-heap maintains the largest element at the root, with each parent ≥ children. A min-heap keeps the smallest at the root, with each parent ≤ children. Both use the same structure and operations (insert O(log n), extract O(log n), peek O(1)). Max-heaps suit priority queues where higher priority wins. Min-heaps suit Dijkstra's algorithm and event simulation.",
+    "hint": "Think about which heap property each uses for the root",
+    "difficulty": "intermediate",
+    "tags": ["algorithms", "trees", "data-structures"],
+    "codeExample": {
+      "language": "python",
+      "code": "import heapq\n\n# Min-heap (default)\nmin_heap = []\nheapq.heappush(min_heap, 5)\nheapq.heappush(min_heap, 2)\nprint(heapq.heappop(min_heap))  # 2\n\n# Max-heap: negate values\nmax_heap = []\nheapq.heappush(max_heap, -5)"
+    }
+  },
+  {
+    "id": "fla-algo-007",
+    "channelId": "algorithms",
+    "front": "What is topological sort and when is it used?",
+    "back": "Topological sort orders directed acyclic graph (DAG) vertices so all edges point from earlier to later vertices. It's used for dependency resolution: build systems, task scheduling, course prerequisites. Kahn's algorithm uses BFS with in-degree counting; DFS-based version uses finishing times. Only valid for DAGs—if a cycle exists, topological order is impossible. Time complexity is O(V + E).",
+    "hint": "Consider what DAGs represent in real-world dependencies",
+    "difficulty": "intermediate",
+    "tags": ["algorithms", "graphs", "sorting"],
+    "codeExample": {
+      "language": "python",
+      "code": "from collections import deque\n\ndef topological_sort(graph):\n    in_degree = {node: 0 for node in graph}\n    for node in graph:\n        for neighbor in graph[node]:\n            in_degree[neighbor] += 1\n    queue = deque([n for n in graph if in_degree[n] == 0])\n    result = []\n    while queue:\n        node = queue.popleft()\n        result.append(node)\n        for neighbor in graph[node]:\n            in_degree[neighbor] -= 1\n            if in_degree[neighbor] == 0:\n                queue.append(neighbor)\n    return result"
+    }
+  },
+  {
+    "id": "fla-algo-008",
+    "channelId": "algorithms",
+    "front": "What is dynamic programming's optimal substructure property?",
+    "back": "Optimal substructure means an optimal solution to a problem can be constructed from optimal solutions of its subproblems. This property makes problems DP-solvable. Example: shortest path has this—optimal path through A→B→C equals optimal A→B plus optimal B→C. Without optimal substructure, DP fails; greedy or other approaches may be needed.",
+    "hint": "Think about whether combining subproblem solutions gives the full solution",
+    "difficulty": "intermediate",
+    "tags": ["algorithms", "dynamic-programming"],
+    "codeExample": {
+      "language": "python",
+      "code": "# Optimal substructure: shortest path\n# Shortest A->D through B->C\n# = shortest A->B + shortest B->C + shortest C->D\n\ndef shortest_path(graph, start, end, memo={}):\n    if start == end:\n        return 0\n    if start in memo:\n        return memo[start]\n    min_dist = float('inf')\n    for neighbor, weight in graph[start]:\n        dist = weight + shortest_path(graph, neighbor, end, memo)\n        min_dist = min(min_dist, dist)\n    memo[start] = min_dist\n    return min_dist"
+    }
+  },
+  {
+    "id": "fla-algo-009",
+    "channelId": "algorithms",
+    "front": "What is the time complexity of Dijkstra's algorithm?",
+    "back": "Dijkstra's algorithm runs in O((V + E) log V) with a binary heap priority queue. With an array implementation, it degrades to O(V²). The algorithm finds shortest paths from a source vertex to all other vertices in weighted graphs with non-negative weights. It greedily selects the nearest unvisited vertex, updating distances through relaxation. Cannot handle negative weights—use Bellman-Ford instead.",
+    "hint": "Consider the data structure used for tracking unvisited vertices",
+    "difficulty": "intermediate",
+    "tags": ["algorithms", "graphs", "complexity"],
+    "codeExample": {
+      "language": "python",
+      "code": "import heapq\n\ndef dijkstra(graph, start):\n    dist = {node: float('inf') for node in graph}\n    dist[start] = 0\n    pq = [(0, start)]\n    while pq:\n        d, u = heapq.heappop(pq)\n        if d > dist[u]:\n            continue\n        for v, weight in graph[u]:\n            if dist[u] + weight < dist[v]:\n                dist[v] = dist[u] + weight\n                heapq.heappush(pq, (dist[v], v))\n    return dist"
+    }
+  },
+  {
+    "id": "fla-algo-010",
+    "channelId": "algorithms",
+    "front": "What is the master theorem for divide-and-conquer recurrences?",
+    "back": "The Master Theorem solves recurrences of form T(n) = aT(n/b) + f(n), where a≥1 and b>1. Three cases: If f(n) = O(n^{log_b a - ε}), then T(n) = Θ(n^{log_b a}). If f(n) = Θ(n^{log_b a}), then T(n) = Θ(n^{log_b a} log n). If f(n) = Ω(n^{log_b a + ε}), then T(n) = Θ(f(n)).",
+    "hint": "Compare f(n) growth rate to n raised to log base b of a",
+    "difficulty": "intermediate",
+    "tags": ["algorithms", "complexity", "recursion"],
+    "codeExample": {
+      "language": "python",
+      "code": "# Merge sort T(n) = 2T(n/2) + O(n)\n# a=2, b=2, f(n)=n, n^(log_2 2)=n\n# Case 2: f(n) = Theta(n) => T(n) = Theta(n log n)\n\n# Binary search T(n) = T(n/2) + O(1)\n# a=1, b=2, f(n)=1, n^(log_2 1)=n^0=1\n# Case 2: f(n) = Theta(1) => T(n) = Theta(log n)"
+    }
+  }
+]

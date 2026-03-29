@@ -34,6 +34,11 @@ export async function setupVite(server: Server, app: Express) {
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
+    // Skip Vite HMR and API routes - let Vite handle client-side routing
+    if (url.startsWith('/@') || url.startsWith('/vite-hmr') || url.startsWith('/api')) {
+      return next();
+    }
+
     try {
       const clientTemplate = path.resolve(
         import.meta.dirname,

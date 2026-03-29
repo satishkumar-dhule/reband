@@ -18,11 +18,8 @@ import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrappe
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { ChannelService } from '../services/api.service';
 import { useToast } from '@/hooks/use-toast';
+import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import type { Question } from '../types';
-
-// Speech recognition support check
-const isSpeechSupported = typeof window !== 'undefined' && 
-  ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
 type PracticeMode = 'training' | 'interview';
 type RecordingState = 'idle' | 'recording' | 'recorded';
@@ -82,7 +79,6 @@ export default function VoicePractice() {
   const [showAnswer, setShowAnswer] = useState(false);
   
   // Refs
-  const recognitionRef = useRef<any>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
   const recordingStateRef = useRef<RecordingState>('idle');
@@ -140,170 +136,53 @@ export default function VoicePractice() {
     loadQuestions();
   }, [getSubscribedChannels]);
 
-  // Initialize speech recognition ONCE
+  // Use speech recognition hook
+  const {
+    transcript: hookTranscript,
+    interimTranscript: hookInterim,
+    start: startRecognition,
+    stop: stopRecognition,
+    isListening
+  } = useSpeechRecognition({
+    continuous: true,
+    interimResults: true,
+    lang: 'en-US',
+    autoRestart: true,
+    onFinal: (text) => {
+      setTranscript(prev => (prev + ' ' + text).trim());
+    },
+    onInterim: (text) => setInterimTranscript(text),
+    onError: (error) => {
+      console.error('Speech recognition error:', error);
+      if (error === 'not-allowed' || error === 'permission-denied') {
+        toast({
+          title: "Microphone Access Denied",
+          description: "Please allow microphone access in your browser settings and refresh the page.",
+          variant: "destructive",
+        });
+      } else if (error === 'network') {
+        toast({
+          title: "Network Error",
+          description: "Speech recognition requires an active internet connection.",
+          variant: "destructive",
+        });
+      }
+    },
+    onStart: () => {
+      console.log('Speech recognition started');
+      setRecognitionReady(true);
+    }
+  });
+
   useEffect(() => {
-    console.log('=== INITIALIZING SPEECH RECOGNITION ===');
-    console.log('Window location:', window.location.href);
-    console.log('Protocol:', window.location.protocol);
-    console.log('isSpeechSupported:', isSpeechSupported);
-    console.log('SpeechRecognition available:', 'SpeechRecognition' in window);
-    console.log('webkitSpeechRecognition available:', 'webkitSpeechRecognition' in window);
-    console.log('Browser:', navigator.userAgent);
-    
-    if (!isSpeechSupported) {
-      console.error('❌ Speech recognition not supported in this browser');
-      console.error('Browser:', navigator.userAgent);
+    if (!isSpeechRecognitionSupported) {
       toast({
         title: "Speech Recognition Not Supported",
         description: "Your browser does not support the Web Speech API. Please use Chrome, Edge, or Safari.",
         variant: "destructive",
       });
-      return;
     }
-    
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    console.log('SpeechRecognition constructor:', typeof SpeechRecognition);
-    
-    if (!SpeechRecognition) {
-      console.error('❌ SpeechRecognition constructor not found');
-      toast({
-        title: "Speech Recognition Not Available",
-        description: "The Web Speech API is not available in your browser. Please use Chrome, Edge, or Safari.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    try {
-      const recognition = new SpeechRecognition();
-      console.log('✅ Recognition instance created successfully');
-      
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US';
-      recognition.maxAlternatives = 1;
-      console.log('✅ Recognition configured:', {
-        continuous: recognition.continuous,
-        interimResults: recognition.interimResults,
-        lang: recognition.lang
-      });
-      
-      recognition.onstart = () => {
-        console.log('🎤 Speech recognition STARTED');
-        console.log('Recording state:', recordingStateRef.current);
-      };
-      
-      recognition.onresult = (event: any) => {
-        console.log('📝 Speech result received:', {
-          resultIndex: event.resultIndex,
-          resultsLength: event.results.length,
-          timestamp: new Date().toISOString()
-        });
-        
-        let interim = '';
-        let final = '';
-        
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const result = event.results[i];
-          const transcript = result[0].transcript;
-          
-          if (result.isFinal) {
-            final += transcript + ' ';
-            console.log('✅ Final transcript:', transcript);
-          } else {
-            interim += transcript;
-            console.log('⏳ Interim transcript:', transcript);
-          }
-        }
-        
-        if (final) {
-          setTranscript(prev => {
-            const updated = (prev + final).trim();
-            console.log('📊 Total transcript now:', updated.length, 'chars');
-            return updated;
-          });
-        }
-        
-        if (interim) {
-          setInterimTranscript(interim);
-        }
-      };
-      
-      recognition.onerror = (event: any) => {
-        console.error('❌ Speech recognition ERROR:', {
-          error: event.error,
-          message: event.message,
-          timestamp: new Date().toISOString()
-        });
-        
-        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
-          toast({
-            title: "Microphone Access Denied",
-            description: "Please allow microphone access in your browser settings and refresh the page.",
-            variant: "destructive",
-          });
-        } else if (event.error === 'no-speech') {
-          console.log('⚠️ No speech detected, will retry...');
-        } else if (event.error === 'network') {
-          toast({
-            title: "Network Error",
-            description: "Speech recognition requires an active internet connection.",
-            variant: "destructive",
-          });
-        } else if (event.error === 'aborted') {
-          console.log('ℹ️ Speech recognition aborted (normal when stopping)');
-        } else {
-          toast({
-            title: "Speech Recognition Error",
-            description: `Error: ${event.error}. Please refresh the page and try again.`,
-            variant: "destructive",
-          });
-        }
-      };
-      
-      recognition.onend = () => {
-        console.log('🛑 Speech recognition ENDED');
-        console.log('Current recording state:', recordingStateRef.current);
-        
-        // Only restart if we're still in recording state
-        if (recordingStateRef.current === 'recording') {
-          console.log('🔄 Attempting to restart recognition...');
-          try { 
-            recognition.start();
-            console.log('✅ Recognition restarted successfully');
-          } catch (e) { 
-            console.error('❌ Failed to restart recognition:', e);
-          }
-        } else {
-          console.log('ℹ️ Not restarting - recording state is:', recordingStateRef.current);
-        }
-      };
-      
-      recognitionRef.current = recognition;
-      console.log('✅ Recognition stored in ref and ready to use');
-      setRecognitionReady(true);
-      console.log('✅ Recognition ready state set to true');
-      
-      return () => {
-        console.log('🧹 Cleaning up speech recognition');
-        try { 
-          if (recognition) {
-            recognition.stop();
-            console.log('✅ Recognition stopped');
-          }
-        } catch (e) { 
-          console.log('ℹ️ Recognition cleanup (already stopped)');
-        }
-      };
-    } catch (error) {
-      console.error('❌ Failed to create SpeechRecognition instance:', error);
-      toast({
-        title: "Failed to Initialize Speech Recognition",
-        description: "Please use Chrome, Edge, or Safari browser and ensure you're on HTTPS or localhost.",
-        variant: "destructive",
-      });
-    }
-  }, []); // Only initialize once
+  }, []);
 
   // Timer
   useEffect(() => {
@@ -327,18 +206,6 @@ export default function VoicePractice() {
   const startRecording = useCallback(() => {
     console.log('=== START RECORDING CLICKED ===');
     console.log('Timestamp:', new Date().toISOString());
-    console.log('recognitionRef.current exists:', !!recognitionRef.current);
-    console.log('recognitionRef.current type:', typeof recognitionRef.current);
-    
-    if (!recognitionRef.current) {
-      console.error('❌ Recognition not initialized!');
-      toast({
-        title: "Speech Recognition Not Initialized",
-        description: "Please refresh the page and try again.",
-        variant: "destructive",
-      });
-      return;
-    }
     
     // Check microphone permissions first
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -384,7 +251,7 @@ export default function VoicePractice() {
           startTimeRef.current = Date.now();
           
           try {
-            recognitionRef.current.start();
+            startRecognition();
             console.log('✅ recognition.start() called');
             setRecordingState('recording');
             console.log('✅ Recording state set to "recording"');
@@ -393,10 +260,10 @@ export default function VoicePractice() {
             if (err.message && err.message.includes('already started')) {
               console.log('⚠️ Recognition already running, stopping first...');
               try {
-                recognitionRef.current.stop();
+                stopRecognition();
                 setTimeout(() => {
                   try {
-                    recognitionRef.current.start();
+                    startRecognition();
                     setRecordingState('recording');
                     console.log('✅ Recognition restarted successfully');
                   } catch (e) {
@@ -440,11 +307,11 @@ export default function VoicePractice() {
 
   // Stop recording
   const stopRecording = useCallback(() => {
-    if (!recognitionRef.current) return;
-    
     try {
-      recognitionRef.current.stop();
-    } catch (e) { /* ignore */ }
+      stopRecognition();
+    } catch (e) {
+      console.warn('Speech recognition stop failed:', e);
+    }
     
     // Stop media recorder
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
@@ -609,7 +476,7 @@ export default function VoicePractice() {
   }
 
   // Browser not supported
-  if (!isSpeechSupported) {
+  if (!isSpeechRecognitionSupported) {
     return (
       <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center p-4">
         <div className="max-w-md text-center">
@@ -698,7 +565,7 @@ export default function VoicePractice() {
                 <div className="flex-1">
                   <h3 className="text-sm font-semibold text-[var(--gh-fg)] mb-2">System Status</h3>
                   <div className="grid grid-cols-2 gap-2 text-xs font-mono text-[var(--gh-fg-muted)]">
-                    <div>Speech API: <span className={isSpeechSupported ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}>{isSpeechSupported ? '✓ Available' : '✗ Not Available'}</span></div>
+                    <div>Speech API: <span className={isSpeechRecognitionSupported ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}>{isSpeechRecognitionSupported ? '✓ Available' : '✗ Not Available'}</span></div>
                     <div>Recognition: <span className={recognitionReady ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-attention-fg)]'}>{recognitionReady ? '✓ Ready' : '⏳ Initializing...'}</span></div>
                     <div>Protocol: <span className="text-[var(--gh-fg)]">{typeof window !== 'undefined' ? window.location.protocol : 'unknown'}</span></div>
                     <div>Recording: <span className="text-[var(--gh-fg)]">{recordingState}</span></div>
@@ -706,7 +573,7 @@ export default function VoicePractice() {
                 </div>
               </div>
               
-              {!isSpeechSupported && (
+              {!isSpeechRecognitionSupported && (
                 <div className="p-3 bg-[var(--gh-danger-fg)]/10 border border-[var(--gh-danger-fg)]/30 rounded-lg text-sm">
                   <div className="font-semibold text-[var(--gh-danger-fg)] mb-1">⚠️ Browser Not Supported</div>
                   <div className="text-[var(--gh-fg-muted)]">
@@ -715,7 +582,7 @@ export default function VoicePractice() {
                 </div>
               )}
               
-              {isSpeechSupported && !recognitionReady && (
+              {isSpeechRecognitionSupported && !recognitionReady && (
                 <div className="p-3 bg-[var(--gh-attention-fg)]/10 border border-[var(--gh-attention-fg)]/30 rounded-lg text-sm">
                   <div className="font-semibold text-[var(--gh-attention-fg)] mb-1">⏳ Initializing...</div>
                   <div className="text-[var(--gh-fg-muted)]">
@@ -724,7 +591,7 @@ export default function VoicePractice() {
                 </div>
               )}
               
-              {isSpeechSupported && recognitionReady && (
+              {isSpeechRecognitionSupported && recognitionReady && (
                 <div className="p-3 bg-[var(--gh-success-fg)]/10 border border-[var(--gh-success-fg)]/30 rounded-lg text-sm">
                   <div className="font-semibold text-[var(--gh-success-fg)] mb-1">✓ Ready to Record</div>
                   <div className="text-[var(--gh-fg-muted)]">

@@ -7,6 +7,21 @@ import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useUnifiedToast } from '@/hooks/use-unified-toast';
 import { allChannelsConfig } from '../lib/channels-config';
 
+// Safe HTML component - strips script tags to prevent XSS
+function SafeHTML({ html }: { html: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      // Strip script tags manually to prevent XSS
+      const stripped = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+      ref.current.innerHTML = stripped;
+    }
+  }, [html]);
+
+  return <div ref={ref} />;
+}
+
 // Pagefind types
 interface PagefindResult {
   id: string;
@@ -290,7 +305,7 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
                   <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{result.channel}</span>
                 </div>
                 <p className="text-sm text-foreground line-clamp-2">{result.title}</p>
-                <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{result.excerpt.replace(/<[^>]*>/g, '')}</p>
+                <p className="text-xs text-muted-foreground line-clamp-2 mt-1"><SafeHTML html={result.excerpt} /></p>
               </div>
               <ArrowRight className={`w-4 h-4 shrink-0 mt-1 ${index === selectedIndex ? 'text-primary' : 'text-muted-foreground/30'}`} />
             </button>
@@ -404,7 +419,7 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90dvh] max-h-[90svh] pb-safe"
+          className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
           onClick={e => e.stopPropagation()}
         >
           {/* Desktop Search Input */}

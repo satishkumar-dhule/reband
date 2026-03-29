@@ -9,13 +9,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mic, MicOff, Play, Square, RotateCcw, Home, ChevronRight,
   CheckCircle, XCircle, AlertCircle, Volume2, Loader2, Sparkles,
-  ThumbsUp, ThumbsDown, Minus, Target, MessageSquare, Edit3,
+  ThumbsUp, ThumbsDown, Minus, Target, MessageSquare, Coins, Edit3,
   SkipForward, ExternalLink, Shuffle, ChevronLeft, MoreHorizontal, User,
-  BarChart3, Brain, Lightbulb, Zap
+  BarChart3, Brain, Lightbulb, Zap, Award
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { getAllQuestionsAsync } from '../lib/questions-loader';
-
+import { useCredits } from '../context/CreditsContext';
 import { useAchievementContext } from '../context/AchievementContext';
 import { useUserPreferences } from '../hooks/use-user-preferences';
 import { CreditsDisplay } from '../components/CreditsDisplay';
@@ -23,8 +23,8 @@ import { ListenButton } from '../components/ListenButton';
 import { evaluateVoiceAnswer, type EvaluationResult } from '../lib/voice-evaluation';
 import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrapper';
 import { QuestionHistoryIcon } from '../components/unified/QuestionHistory';
+import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import type { Question } from '../types';
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
 interface InterviewerComments {
   skip: string[];
@@ -40,9 +40,6 @@ interface InterviewerComments {
 }
 
 type InterviewState = 'loading' | 'ready' | 'recording' | 'editing' | 'processing' | 'evaluated';
-
-const isSpeechSupported = typeof window !== 'undefined' && 
-  ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
 function getRandomComment(comments: string[]): string {
   return comments[Math.floor(Math.random() * comments.length)];
@@ -66,15 +63,14 @@ export default function VoiceInterview() {
   const [earnedCredits, setEarnedCredits] = useState<{ total: number; bonus: number } | null>(null);
   const [interviewerComment, setInterviewerComment] = useState<string | null>(null);
   const [comments, setComments] = useState<InterviewerComments | null>(null);
+  const [showActions, setShowActions] = useState(false);
   const [sessionId, setSessionId] = useState<string>('voice-session-state');
   const [showAnswer, setShowAnswer] = useState(false); // Hide answer until after recording
   
-  const recognitionRef = useRef<any>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const commentTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const stateRef = useRef(state);
-  stateRef.current = state;
   
+  const { onVoiceInterview, config } = useCredits();
   const { trackEvent } = useAchievementContext();
   const { preferences } = useUserPreferences();
 
@@ -143,92 +139,44 @@ export default function VoiceInterview() {
     }
   }, [state, currentIndex, questions.length, comments, showComment]);
 
-  useEffect(() => {
-    if (!isSpeechSupported) return;
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-    
-    recognition.onresult = (event: any) => {
-      console.log('Speech recognition result received:', event.results.length);
-      let interim = '';
-      let final = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          final += result[0].transcript + ' ';
-          console.log('Final transcript:', result[0].transcript);
-        } else {
-          interim += result[0].transcript;
-          console.log('Interim transcript:', result[0].transcript);
-        }
-      }
-      if (final) {
-        setTranscript(prev => {
-          const updated = prev + final;
-          console.log('Updated transcript:', updated);
-          return updated;
-        });
-      }
-      setInterimTranscript(interim);
-    };
-    
-    recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
-      if (event.error === 'not-allowed') {
+  const {
+    transcript: speechTranscript,
+    interimTranscript: speechInterim,
+    isListening: speechIsListening,
+    start: startRecognition,
+    stop: stopRecognition,
+    reset: resetRecognition,
+    isSupported: speechSupported
+  } = useSpeechRecognition({
+    continuous: true,
+    interimResults: true,
+    lang: 'en-US',
+    autoRestart: true,
+    onError: (error) => {
+      console.error('Speech recognition error:', error);
+      if (error === 'not-allowed') {
         setError('Microphone access denied. Please allow microphone access and try again.');
         setState('ready');
-      } else if (event.error === 'no-speech') {
+      } else if (error === 'no-speech') {
         console.log('No speech detected, continuing...');
       } else {
-        setError(`Speech recognition error: ${event.error}`);
+        setError(`Speech recognition error: ${error}`);
       }
-    };
-    
-    recognition.onstart = () => {
-      console.log('Speech recognition started');
-    };
-    
-    const checkAndRestart = () => {
-      setState(currentState => {
-        if (currentState === 'recording') {
-          try { 
-            console.log('Restarting recognition...');
-            recognition.start(); 
-          } catch (e) { 
-            console.error('Failed to restart recognition:', e);
-          }
-        }
-        return currentState;
-      });
-    };
-    
-    recognition.onend = () => {
-      console.log('Speech recognition ended');
-      setState(currentState => {
-        if (currentState === 'recording') {
-          try { 
-            console.log('Restarting recognition...');
-            recognition.start(); 
-          } catch (e) { 
-            console.error('Failed to restart recognition:', e);
-          }
-        }
-        return currentState;
-      });
-    };
-    
-    recognitionRef.current = recognition;
-    return () => { 
-      try {
-        recognition.stop(); 
-      } catch (e) {
-        console.log('Recognition already stopped');
-      }
-    };
-  }, []);
+    }
+  });
+
+  // Sync hook transcript with local state
+  useEffect(() => {
+    if (speechTranscript) {
+      setTranscript(speechTranscript);
+    }
+  }, [speechTranscript]);
+
+  useEffect(() => {
+    if (speechInterim) {
+      setInterimTranscript(speechInterim);
+    }
+  }, [speechInterim]);
 
   useEffect(() => {
     if (timerRef.current) {
@@ -241,24 +189,23 @@ export default function VoiceInterview() {
   }, [state]);
 
   const startRecording = useCallback(() => {
-    if (!recognitionRef.current) return;
-    setTranscript('');
-    setInterimTranscript('');
+    if (!speechSupported) return;
+    resetRecognition();
     setEvaluation(null);
     setError(null);
     try {
-      recognitionRef.current.start();
+      startRecognition();
       setState('recording');
     } catch (err) {
       setError('Failed to start recording. Please check microphone permissions.');
     }
-  }, []);
+  }, [speechSupported, resetRecognition, startRecognition]);
 
   const stopRecording = useCallback(() => {
-    if (!recognitionRef.current) return;
-    recognitionRef.current.stop();
+    if (!speechSupported) return;
+    stopRecognition();
     setState('editing');
-  }, []);
+  }, [speechSupported, stopRecognition]);
 
   const submitAnswer = useCallback(() => {
     if (!currentQuestion || !transcript.trim()) {
@@ -270,14 +217,15 @@ export default function VoiceInterview() {
       const questionType = getQuestionType(currentQuestion.channel);
       const result = evaluateVoiceAnswer(transcript, currentQuestion.answer, currentQuestion.voiceKeywords, questionType);
       setEvaluation(result);
-      setEarnedCredits(null);
+      const credits = onVoiceInterview(result.verdict);
+      setEarnedCredits({ total: credits.totalCredits, bonus: credits.bonusCredits });
       trackEvent({ type: 'voice_interview_completed', timestamp: new Date().toISOString() });
       if (result.score >= 60) showComment('good_score');
       else showComment('bad_score');
       setShowAnswer(true); // Reveal answer after evaluation
       setState('evaluated');
     }, 800);
-  }, [transcript, currentQuestion, showComment, trackEvent]);
+  }, [transcript, currentQuestion, onVoiceInterview, showComment, trackEvent]);
 
   const nextQuestion = useCallback(() => {
     if (currentIndex < questions.length - 1) {
@@ -304,12 +252,13 @@ export default function VoiceInterview() {
       setEarnedCredits(null);
       setShowAnswer(false); // Hide answer for previous question
       setState('ready');
+      setShowActions(false);
       saveSessionProgress();
     }
   }, [currentIndex]);
 
   const skipQuestion = useCallback(() => {
-    if (recognitionRef.current && stateRef.current === 'recording') recognitionRef.current.stop();
+    if (state === 'recording') stopRecognition();
     if (currentIndex < questions.length - 1) {
       showComment('skip');
       setCurrentIndex(prev => prev + 1);
@@ -317,11 +266,13 @@ export default function VoiceInterview() {
       setInterimTranscript('');
       setEvaluation(null);
       setEarnedCredits(null);
-      setShowAnswer(false);
+      setShowAnswer(false); // Hide answer for skipped question
+      setEarnedCredits(null);
       setState('ready');
+      setShowActions(false);
       saveSessionProgress();
     }
-  }, [currentIndex, questions.length, showComment]);
+  }, [currentIndex, questions.length, state, showComment, stopRecognition]);
 
   const saveSessionProgress = useCallback(() => {
     if (questions.length === 0) return;
@@ -355,6 +306,7 @@ export default function VoiceInterview() {
     setEvaluation(null);
     setEarnedCredits(null);
     setState('ready');
+    setShowActions(false);
   }, [questions, showComment]);
 
   const retryQuestion = useCallback(() => {
@@ -369,7 +321,7 @@ export default function VoiceInterview() {
 
 
   // Unsupported browser
-  if (!isSpeechSupported) {
+  if (!isSpeechRecognitionSupported) {
     return (
       <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center p-4">
         <div className="max-w-md text-center">
@@ -559,55 +511,58 @@ export default function VoiceInterview() {
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-[var(--muted-foreground)] font-mono">Q{currentIndex + 1}/{questions.length}</span>
                   
-                  {/* Actions Dropdown - Radix DropdownMenu for keyboard accessibility */}
-                  <DropdownMenu.Root>
-                    <DropdownMenu.Trigger asChild>
-                      <button
-                        aria-label="Actions menu"
-                        className="p-1.5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] rounded-lg transition-colors"
-                      >
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Portal>
-                      <DropdownMenu.Content
-                        className="min-w-[160px] bg-popover border border-border rounded-xl shadow-xl p-1 z-50"
-                        sideOffset={4}
-                      >
-                        <DropdownMenu.Item
-                          onClick={previousQuestion}
-                          disabled={currentIndex === 0}
-                          className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg cursor-pointer transition-colors outline-none disabled:opacity-30 disabled:cursor-not-allowed"
+                  {/* Actions Dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowActions(!showActions)}
+                      className="p-1.5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] rounded-lg transition-colors"
+                    >
+                      <MoreHorizontal className="w-4 h-4" />
+                    </button>
+                    
+                    <AnimatePresence>
+                      {showActions && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -5 }}
+                          className="absolute left-0 top-full mt-1 bg-[var(--popover)] border border-[var(--border)] rounded-xl shadow-xl py-1 z-10 min-w-[160px]"
                         >
-                          <ChevronLeft className="w-4 h-4" />
-                          Previous
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item
-                          onClick={skipQuestion}
-                          disabled={currentIndex >= questions.length - 1}
-                          className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg cursor-pointer transition-colors outline-none disabled:opacity-30 disabled:cursor-not-allowed"
-                        >
-                          <SkipForward className="w-4 h-4" />
-                          Skip Question
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item
-                          onClick={shuffleQuestions}
-                          className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg cursor-pointer transition-colors outline-none"
-                        >
-                          <Shuffle className="w-4 h-4" />
-                          Shuffle All
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Separator className="h-px bg-border my-1" />
-                        <DropdownMenu.Item
-                          onClick={goToOriginalQuestion}
-                          className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg cursor-pointer transition-colors outline-none"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          View Full Question
-                        </DropdownMenu.Item>
-                      </DropdownMenu.Content>
-                    </DropdownMenu.Portal>
-                  </DropdownMenu.Root>
+                          <button
+                            onClick={previousQuestion}
+                            disabled={currentIndex === 0}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors disabled:opacity-30"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                            Previous
+                          </button>
+                          <button
+                            onClick={skipQuestion}
+                            disabled={currentIndex >= questions.length - 1}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors disabled:opacity-30"
+                          >
+                            <SkipForward className="w-4 h-4" />
+                            Skip Question
+                          </button>
+                          <button
+                            onClick={shuffleQuestions}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors"
+                          >
+                            <Shuffle className="w-4 h-4" />
+                            Shuffle All
+                          </button>
+                          <div className="border-t border-[var(--gh-border)] my-1" />
+                          <button
+                            onClick={goToOriginalQuestion}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            View Full Question
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
@@ -688,7 +643,7 @@ export default function VoiceInterview() {
                     placeholder="Edit your transcribed answer here..."
                   />
                 ) : (
-                  <div className="p-4 bg-[var(--gh-canvas)] rounded-xl min-h-[120px] max-h-[200px] overflow-y-auto momentum-scroll border border-[var(--gh-border)]">
+                  <div className="p-4 bg-[var(--gh-canvas)] rounded-xl min-h-[120px] max-h-[200px] overflow-y-auto border border-[var(--gh-border)]">
                     {transcript || interimTranscript ? (
                       <p className="text-sm text-[var(--gh-fg)] whitespace-pre-wrap leading-relaxed">
                         {transcript}
@@ -787,6 +742,30 @@ export default function VoiceInterview() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-4"
               >
+                {/* Credits Earned Banner */}
+                {earnedCredits && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="p-4 bg-gradient-to-r from-[var(--gh-attention-fg)]/20 to-[var(--gh-attention-fg)]/20 border border-[var(--gh-attention-fg)]/30 rounded-2xl flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-[var(--gh-attention-fg)]/20 flex items-center justify-center">
+                        <Coins className="w-6 h-6 text-[var(--gh-attention-fg)]" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-[var(--gh-attention-fg)] text-lg">+{earnedCredits.total} Credits Earned!</div>
+                        <div className="text-xs text-[var(--gh-fg-muted)]">
+                          {earnedCredits.bonus > 0 
+                            ? `${config.VOICE_ATTEMPT} base + ${earnedCredits.bonus} success bonus`
+                            : 'Thanks for practicing!'}
+                        </div>
+                      </div>
+                    </div>
+                    <Award className="w-8 h-8 text-[var(--gh-attention-fg)]/50" />
+                  </motion.div>
+                )}
+
                 {/* Verdict Card */}
                 <div className={`p-6 rounded-2xl border ${getVerdictStyle(evaluation.verdict)}`}>
                   <div className="flex items-center justify-between mb-6">
@@ -1029,7 +1008,7 @@ function getVerdictStyle(verdict: EvaluationResult['verdict']): string {
     case 'strong-hire': return 'bg-[var(--gh-success-emphasis)]/20 border-[var(--gh-success-emphasis)]/50';
     case 'hire': return 'bg-[var(--gh-success-fg)]/20 border-[var(--gh-success-fg)]/50';
     case 'lean-hire': return 'bg-[var(--gh-attention-fg)]/20 border-[var(--gh-attention-fg)]/50';
-    case 'lean-no-hire': return 'bg-[var(--gh-attention-fg)]/20 border-[var(--gh-attention-fg)]/50';
+    case 'lean-no-hire': return 'bg-[var(--gh-attention-fg)]/20 border-[#f0883e]/50';
     case 'no-hire': return 'bg-[var(--gh-danger-fg)]/20 border-[var(--gh-danger-fg)]/50';
   }
 }

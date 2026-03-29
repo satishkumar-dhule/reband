@@ -8,6 +8,7 @@ import {
   Circle, Star, GitFork, AlertCircle
 } from "lucide-react";
 import { AppLayout } from "../components/layout/AppLayout";
+import { SEOHead } from "@/components/SEOHead";
 import { allChannelsConfig } from "../lib/channels-config";
 import { cn } from "../lib/utils";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "../components/ui/breadcrumb";
@@ -257,7 +258,12 @@ export default function Home() {
   }).format(new Date());
 
   return (
-    <AppLayout>
+    <>
+      <SEOHead
+        title="DevPrep - Free Technical Interview Prep"
+        description="Master technical interviews with 1000+ questions, spaced repetition flashcards, and voice practice. Free forever, no sign-up required."
+      />
+      <AppLayout>
       <div className="min-h-screen bg-[var(--gh-canvas-subtle)]" id="main-content">
         <div className="max-w-6xl mx-auto px-4 py-8 lg:px-8">
           {/* Breadcrumb */}
@@ -496,5 +502,6 @@ export default function Home() {
         </div>
       </div>
     </AppLayout>
+    </>
   );
 }

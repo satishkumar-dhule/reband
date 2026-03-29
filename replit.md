@@ -1,39 +1,145 @@
-# Open Interview (Code Reels)
+# DevPrep / Open-Interview
 
-## Overview
-An AI-powered technical interview preparation platform with swipe-based learning, voice interview practice, spaced repetition (SRS), coding challenges, and gamified progress tracking.
+Free, GitHub-native technical interview prep — swipe learning, voice practice, spaced repetition, coding challenges.
 
-## Architecture
-- **Frontend**: React 19 + Vite, Tailwind CSS v4, Radix UI, Framer Motion, TanStack Query
-- **Backend**: Express.js server that also hosts Vite in development (middleware mode)
-- **Database**: Turso (libSQL) with Drizzle ORM; falls back to local SQLite (`file:local.db`) if `TURSO_DATABASE_URL` is not set
-- **Auth**: Passport.js (local strategy)
+**URL**: https://open-interview.github.io/
 
-## How to Run
-The `npm run dev` command starts the Express server on port 5000. In development, the server also runs Vite as middleware (hot reload included). The API and frontend are served from the same origin.
+---
 
-- **Dev**: `npm run dev` → Express + Vite on port 5000
-- **Build**: `npm run build` → Vite builds to `dist/public/`
-- **Production**: `npm run start` → `node dist/index.cjs`
+## Project Type: Static Website (GitHub Pages)
 
-## Key Configuration
-- **Port**: App runs on `PORT` env var (defaults to 5173, dev script sets to 5000 to match Replit workflow)
-- **Database**: Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` for production Turso DB; without them a local SQLite file is used
-- **Vite config**: `vite.config.ts` at root, client source in `client/`, builds to `dist/public/`
+**No backend API server.** This is a pure static SPA deployed to GitHub Pages.
 
-## Environment Variables
-- `TURSO_DATABASE_URL` — Turso database connection URL (e.g. `libsql://...`)
-- `TURSO_AUTH_TOKEN` — Turso auth token
-- `PORT` — Server port (set to 5000 in dev script)
-- `NODE_ENV` — `development` or `production`
+- Content is stored in SQLite/Turso database.
+- At build time, content is exported to static JSON files in `public/data/`.
+- The frontend fetches these static JSON files in production.
+- GitHub design system for look & feel, colors, typography
 
-## Project Structure
+---
+
+## Stack
+
+| Layer | Tech |
+|-------|------|
+| Frontend | React 19 + Vite 7, TypeScript, Tailwind CSS 4, shadcn/ui |
+| Database | SQLite in browser (sql.js WASM) + Turso sync |
+| Sync | Background sync from Turso remote DB |
+| ORM | Drizzle ORM |
+| Deployment | GitHub Pages (static) |
+| Search | Pagefind (static search index) |
+
+---
+
+## Agent Orchestration System
+
+**Replit acts as Supervisor/Coordinator** — it plans work, delegates to opencode agents, monitors outputs, and synthesizes results.
+
+### Supervisor Pattern
 ```
-client/          React frontend source
-server/          Express backend (routes, db, auth)
-shared/          Shared TypeScript types and schema
-script/          Build and data automation scripts
-scripts/         Shell scripts
-blog-output/     Generated static blog HTML
-artifacts/       Sub-artifacts (devprep, mockup-sandbox, api-server)
+REPLIT (Supervisor)
+├── ANALYZE     — Which agent(s) own this work?
+├── PLAN        — Write task breakdown with agent assignments
+├── DELEGATE    — opencode run --agent <name> "task"
+├── MONITOR     — Review outputs; send corrections if needed
+├── SYNTHESIZE  — Combine results, write summary
+└── UPDATE      — Update docs if architecture changed
 ```
+
+### Key Agents
+
+| Agent | Purpose |
+|-------|---------|
+| `devprep-supervisor` | Master orchestrator — plans and delegates |
+| `devprep-coordinator` | Content pipeline (questions, flashcards, challenges) |
+| `devprep-static-deployment` | GitHub Pages static build |
+| `devprep-frontend-designer` | React components and pages |
+| `devprep-github-*-expert` | GitHub-themed UI (20+ agents) |
+| `devprep-db-optimizer` | Database schema and queries |
+| `devprep-seo-audit` | SEO, search, performance |
+| `devprep-e2e-tester` | Playwright tests |
+| `devprep-tech-writer` | Documentation |
+
+Full agent list in `AGENTS.md`.
+
+### Delegation Commands
+```bash
+# Delegate to specific agent
+opencode run --agent devprep-frontend-designer "Add dark mode toggle"
+
+# Or via helper script
+./script/delegate.sh devprep-coordinator "Generate 10 questions for algorithms"
+```
+
+---
+
+## Data Architecture
+
+1. **Browser SQLite**: sql.js runs SQLite in browser via WASM
+2. **Initial sync**: Fetch DB from Turso CDN/storage
+3. **Local storage**: SQLite in IndexedDB
+4. **Background sync**: Periodic or on-demand sync
+5. **Offline-first**: Works fully after sync
+
+---
+
+## Build Pipeline
+
+```bash
+# Full static build
+npm run build:static
+
+# Steps:
+# 1. vite build              SPA → dist/
+# 2. Copy pre-synced SQLite to public/ (optional, faster first load)
+# 3. node script/build-pagefind.js   search index
+# 4. tsx script/deploy-pages.ts     push to gh-pages branch
+```
+
+---
+
+## Architecture Rules (Iron Laws)
+
+1. **Static-first**: NO backend API. Pure static SPA on GitHub Pages
+2. **Browser SQLite**: All data in sql.js running in browser
+3. **Sync from Turso**: Remote DB synced to browser SQLite
+4. **GitHub theme**: CSS tokens, system font stack, Primer-inspired components
+5. **Offline support**: Full functionality after initial sync
+
+---
+
+## Key Files
+
+```
+shared/schema.ts             Drizzle ORM schema (DB source of truth)
+client/src/App.tsx           React app with wouter routing
+client/src/pages/            All page components
+client/src/components/       UI components
+client/src/lib/db/           Browser SQLite (sql.js, sync, queries)
+script/                      Build scripts
+.github/workflows/           GitHub Actions CI/CD
+.opencode/agents/           All agent definitions
+.agents/skills/             Agent skills
+```
+
+---
+
+## Development
+
+```bash
+npm run dev          # Start Vite dev server
+npm run sync-db     # Sync from remote Turso
+```
+
+---
+
+## Features
+
+- Swipe-based learning (TikTok-style)
+- 20+ topic channels (System Design, Algorithms, Frontend, Backend, DevOps, K8s, AWS, ML...)
+- Voice interview practice
+- Spaced repetition system (SRS)
+- Coding challenges (JS/Python) with Monaco editor
+- GitHub-themed UI (dark/light mode)
+- Full offline support
+- Static search (Pagefind)
+- SEO-optimized (sitemap, RSS, Open Graph)

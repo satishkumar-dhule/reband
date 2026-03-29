@@ -11,6 +11,7 @@ import { getAllQuestionsAsync } from '../lib/questions-loader';
 import { useCredits } from '../context/CreditsContext';
 import { useAchievementContext } from '../context/AchievementContext';
 import { useUserPreferences } from '../hooks/use-user-preferences';
+import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import { CreditsDisplay } from '../components/CreditsDisplay';
 import { AppLayout } from '../components/layout/AppLayout';
 import { Button } from '../components/unified/Button';
@@ -35,9 +36,6 @@ import {
 import type { Question } from '../types';
 
 type PageState = 'loading' | 'select' | 'intro' | 'recording' | 'editing' | 'feedback' | 'results';
-
-const isSpeechSupported = typeof window !== 'undefined' && 
-  ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
 // GitHub Style Card
 function GHCard({ children, className = "", title, subtitle, footer }: { children: React.ReactNode, className?: string, title?: string, subtitle?: string, footer?: React.ReactNode }) {
@@ -116,13 +114,35 @@ export default function VoiceSessionGenZ() {
   const [liveWPM, setLiveWPM] = useState(0);
   const [sessionDuration, setSessionDuration] = useState(0);
   
-  const recognitionRef = useRef<any>(null);
   const sessionTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   const { onVoiceInterview } = useCredits();
   const { trackEvent } = useAchievementContext();
 
   const currentQuestion = sessionState ? getCurrentQuestion(sessionState) : null;
+
+  const {
+    transcript: hookTranscript,
+    interimTranscript: hookInterim,
+    start: startRecognition,
+    stop: stopRecognition
+  } = useSpeechRecognition({
+    continuous: true,
+    interimResults: true,
+    lang: 'en-US',
+    autoRestart: true,
+    onFinal: (text) => {
+      setTranscript(prev => prev + text + ' ');
+    },
+    onInterim: (text) => setInterimTranscript(text),
+    onError: (err) => {
+      console.error('Speech recognition error:', err);
+      if (err === 'not-allowed') {
+        setError('Microphone access denied.');
+        setPageState('editing');
+      }
+    }
+  });
 
   useEffect(() => {
     async function loadData() {
@@ -156,79 +176,17 @@ export default function VoiceSessionGenZ() {
   }, [preferences.subscribedChannels]);
 
   useEffect(() => {
-    if (!isSpeechSupported) return;
-    
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-    
-    recognition.onresult = (event: any) => {
-      let interim = '';
-      let final = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          final += result[0].transcript + ' ';
-        } else {
-          interim += result[0].transcript;
-        }
-      }
-      if (final) {
-        setTranscript(prev => {
-          const newTranscript = prev + final;
-          const words = newTranscript.trim().split(/\s+/).length;
-          // Calculate WPM using functional update for sessionDuration
-          setSessionDuration(prevDuration => {
-            const elapsed = prevDuration / 60;
-            if (elapsed > 0) setLiveWPM(Math.round(words / elapsed));
-            return prevDuration;
-          });
-          return newTranscript;
-        });
-      }
-      setInterimTranscript(interim);
-    };
-    
-    recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
-      if (event.error === 'not-allowed') {
-        setError('Microphone access denied.');
-        setPageState('editing');
-      }
-    };
-    
-    recognition.onend = () => {
-      // Use ref to track recording state without stale closure issues
-      const isRecording = recognitionRef.current && recognitionRef.current.recording;
-      if (isRecording) {
-        try { recognition.start(); } catch (e) { }
-      }
-    };
-    
-    recognitionRef.current = recognition;
-    return () => { try { recognition.stop(); } catch (e) { } };
-  }, []);
-
-  useEffect(() => {
-    // Clear any existing timer first
-    if (sessionTimerRef.current) {
-      clearInterval(sessionTimerRef.current);
-      sessionTimerRef.current = null;
-    }
-    
     if (pageState === 'recording') {
       sessionTimerRef.current = setInterval(() => {
         setSessionDuration(prev => prev + 1);
       }, 1000);
-    }
-    
-    return () => {
+    } else {
       if (sessionTimerRef.current) {
         clearInterval(sessionTimerRef.current);
-        sessionTimerRef.current = null;
       }
+    }
+    return () => {
+      if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
     };
   }, [pageState]);
 
@@ -254,21 +212,19 @@ export default function VoiceSessionGenZ() {
     setInterimTranscript('');
     setLiveWPM(0);
     
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.start();
-        setPageState('recording');
-      } catch (err) {
-        setError('Failed to start recording.');
-        setPageState('editing');
-      }
+    try {
+      startRecognition();
+      setPageState('recording');
+    } catch (err) {
+      setError('Failed to start recording.');
+      setPageState('editing');
     }
-  }, [sessionState]);
+  }, [sessionState, startRecognition]);
 
   const stopRecording = useCallback(() => {
-    if (recognitionRef.current) recognitionRef.current.stop();
+    stopRecognition();
     setPageState('editing');
-  }, []);
+  }, [stopRecognition]);
 
   const submitCurrentAnswer = useCallback(() => {
     if (!sessionState || !transcript.trim()) {
@@ -302,25 +258,24 @@ export default function VoiceSessionGenZ() {
       setInterimTranscript('');
       setLiveWPM(0);
       
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.start();
-          setPageState('recording');
-        } catch (err) {
-          setPageState('editing');
-        }
+      try {
+        startRecognition();
+        setPageState('recording');
+      } catch (err) {
+        setPageState('editing');
       }
     }
-  }, [sessionState, onVoiceInterview, trackEvent]);
+  }, [sessionState, onVoiceInterview, trackEvent, startRecognition]);
 
   const exitSession = useCallback(() => {
+    stopRecognition();
     clearSessionState();
     setSessionState(null);
     setSessionResult(null);
     setPageState('select');
   }, []);
 
-  if (!isSpeechSupported) {
+  if (!isSpeechRecognitionSupported) {
     return (
       <AppLayout>
         <div className="max-w-md mx-auto py-16 px-4 text-center">

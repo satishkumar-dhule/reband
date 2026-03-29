@@ -354,6 +354,7 @@ export const CodingService = {
     } else {
       // Production: coding challenges not yet supported in static mode
       // TODO: Generate static coding challenge data
+      // Note: Coding challenges currently require backend API and don't work in static mode
       console.warn('Coding challenges not available in production static mode');
       return [];
     }

@@ -11,7 +11,7 @@
  * - Reduced layout shifts
  */
 
-import { motion, type Variants } from 'framer-motion';
+import { motion, useReducedMotion, type Variants } from 'framer-motion';
 import { 
   Sparkles, Target, Brain, Zap, Building2, Hash, Award
 } from 'lucide-react';
@@ -73,6 +73,7 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
   mode,
   onRevealAnswer 
 }: UnifiedQuestionPanelProps) {
+  const shouldReduceMotion = useReducedMotion();
   const diffConfig = difficultyConfig[question.difficulty as keyof typeof difficultyConfig] || difficultyConfig.intermediate;
   const DiffIcon = diffConfig.icon;
 
@@ -114,8 +115,8 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
         <div className="flex items-center gap-2 flex-wrap">
           {/* Difficulty badge - COMPACT */}
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
+            whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
             className={cn(
               'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border',
               diffConfig.bg,
@@ -130,8 +131,8 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
 
           {/* Channel badge - COMPACT */}
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
+            whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary shadow-sm"
           >
             <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -146,9 +147,9 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
           {/* New badge if applicable */}
           {question.isNew && (
             <motion.div
-              initial={{ scale: 0, rotate: -180 }}
+              initial={shouldReduceMotion ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring' as const, stiffness: 260, damping: 20 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring' as const, stiffness: 260, damping: 20 }}
               className="flex items-center gap-1 px-2 py-1 rounded-md bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30"
             >
               <Sparkles className="w-3 h-3 text-amber-400" />
@@ -163,8 +164,8 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
             {question.tags.slice(0, 6).map((tag, idx) => (
               <motion.div
                 key={idx}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
+                whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
                 className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary/60 text-muted-foreground text-xs whitespace-nowrap flex-shrink-0"
               >
                 <Hash className="w-3 h-3 flex-shrink-0" />
@@ -186,8 +187,8 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
             {question.companies.slice(0, 4).map((company, idx) => (
               <motion.span
                 key={idx}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
+                whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
                 className="px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary text-xs font-semibold whitespace-nowrap flex-shrink-0"
               >
                 {company}
@@ -211,8 +212,8 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
           <div className="flex items-start gap-3 sm:gap-4">
             <motion.div 
               className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center"
-              whileHover={{ rotate: 180, scale: 1.1 }}
-              transition={{ duration: 0.3 }}
+              whileHover={shouldReduceMotion ? {} : { rotate: 180, scale: 1.1 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
             >
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             </motion.div>
@@ -249,8 +250,8 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
         <motion.button
           variants={itemVariants}
           onClick={onRevealAnswer}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+          whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
           className="w-full py-3.5 sm:py-4 rounded-xl bg-gradient-to-r from-primary via-purple-500 to-pink-500 text-white font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-200 touch-manipulation mt-2"
         >
           <span className="flex items-center justify-center gap-2">

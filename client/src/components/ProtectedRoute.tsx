@@ -1,119 +1,98 @@
 import { ReactNode, useEffect } from "react";
 import { useLocation } from "wouter";
 
+// Auth token keys and configuration
+const AUTH_TOKEN_KEY = 'devprep-auth-token';
+const AUTH_EXPIRY_KEY = 'devprep-auth-expiry';
+const AUTH_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+/**
+ * Set authentication token with expiry timestamp
+ * Call this after successful login/onboarding completion
+ */
+export function setAuthToken(token: string): void {
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+  localStorage.setItem(AUTH_EXPIRY_KEY, String(Date.now() + AUTH_DURATION_MS));
+}
+
+/**
+ * Check if user is currently authenticated with valid (non-expired) token
+ */
+export function isAuthenticated(): boolean {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  const expiry = localStorage.getItem(AUTH_EXPIRY_KEY);
+  
+  if (!token || !expiry) return false;
+  
+  // Check if token has expired
+  if (Date.now() > parseInt(expiry, 10)) {
+    clearAuthToken();
+    return false;
+  }
+  
+  return true;
+}
+
+/**
+ * Clear authentication token and expiry
+ */
+export function clearAuthToken(): void {
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+  localStorage.removeItem(AUTH_EXPIRY_KEY);
+}
+
 interface ProtectedRouteProps {
   children: ReactNode;
-  // Routes that require authentication
   protectedRoutes?: string[];
-  // Route to redirect to if not authenticated
   redirectTo?: string;
 }
 
 /**
- * Check if user has any stored data (preferences, progress, or bookmarks)
- * This is used as a proxy for "authentication" in this static app.
- */
-function hasUserData(): boolean {
-  if (typeof window === 'undefined') return false;
-  
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && (
-        key.startsWith("progress-") || 
-        key.startsWith("marked-") || 
-        key === "user-preferences"
-      )) {
-        return true;
-      }
-    }
-  } catch {
-    // localStorage may not be available (private browsing, etc.)
-    return false;
-  }
-  return false;
-}
-
-/**
- * Check if user has completed onboarding by checking user-preferences
- */
-function hasCompletedOnboarding(): boolean {
-  if (typeof window === 'undefined') return false;
-  
-  try {
-    const prefs = localStorage.getItem("user-preferences");
-    if (prefs) {
-      const parsed = JSON.parse(prefs);
-      return parsed.onboardingComplete === true;
-    }
-  } catch {
-    return false;
-  }
-  return false;
-}
-
-/**
- * ProtectedRoute component - wraps routes that require authentication
- * 
- * For this static app, we check localStorage for user progress/preferences
- * as a proxy for "authentication". In a real app, this would check
- * an auth context or JWT token.
+ * ProtectedRoute wrapper - redirects unauthenticated users away from protected routes
  */
 export function ProtectedRoute({
   children,
-  protectedRoutes = ["/profile", "/bookmarks", "/stats", "/badges", "/learning-paths", "/my-path"],
+  protectedRoutes = ["/review", "/stats", "/bookmarks", "/profile", "/learning-paths", "/badges", "/my-path", "/certifications", "/tests"],
   redirectTo = "/onboarding",
 }: ProtectedRouteProps) {
   const [location, setLocation] = useLocation();
 
-  // BUG-FIX: Moved hasUserData outside useEffect to prevent recreation on every render
-  // BUG-FIX: Added isHydrated state to prevent hydration mismatch
-  const isProtectedRoute = protectedRoutes.some(route => 
-    location === route || location.startsWith(route + "/")
-  );
-
   useEffect(() => {
-    // Skip during initial hydration to prevent flash of wrong content
-    if (!isProtectedRoute) return;
-    
-    if (!hasUserData()) {
-      // User is accessing protected route without any data - redirect to onboarding
+    const isProtectedRoute = protectedRoutes.some(route => 
+      location === route || location.startsWith(route + "/")
+    );
+
+    if (isProtectedRoute && !isAuthenticated()) {
       setLocation(redirectTo, { replace: true });
     }
-  }, [location, isProtectedRoute, redirectTo, setLocation]);
+  }, [location, protectedRoutes, redirectTo, setLocation]);
 
   return <>{children}</>;
 }
 
+interface PublicRouteProps {
+  children: ReactNode;
+  publicOnlyRoutes?: string[];
+  redirectTo?: string;
+}
+
 /**
- * PublicRoute component - redirects already authenticated users away
- * (e.g., from /onboarding if user already has data)
+ * PublicRoute wrapper - redirects authenticated users away from public-only routes
  */
 export function PublicRoute({
   children,
   publicOnlyRoutes = ["/onboarding"],
   redirectTo = "/",
-}: {
-  children: ReactNode;
-  publicOnlyRoutes?: string[];
-  redirectTo?: string;
-}) {
+}: PublicRouteProps) {
   const [location, setLocation] = useLocation();
 
-  // BUG-FIX: Pre-compute route check to avoid recalculating in useEffect
-  const isPublicOnlyRoute = publicOnlyRoutes.includes(location);
-
   useEffect(() => {
-    // Skip if not on a public-only route
-    if (!isPublicOnlyRoute) return;
-    
-    // Only redirect if user has completed onboarding (not just any data)
-    // This prevents redirect loop: user completes onboarding → check runs before state updates
-    if (hasCompletedOnboarding()) {
-      // User is on public-only route (like onboarding) but already has data
+    const isPublicOnlyRoute = publicOnlyRoutes.includes(location);
+
+    if (isPublicOnlyRoute && isAuthenticated()) {
       setLocation(redirectTo, { replace: true });
     }
-  }, [location, isPublicOnlyRoute, redirectTo, setLocation]);
+  }, [location, publicOnlyRoutes, redirectTo, setLocation]);
 
   return <>{children}</>;
 }

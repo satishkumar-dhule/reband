@@ -6,6 +6,7 @@
 import { BaseSkillAgent, type SkillContext, type SkillResult } from './SkillAgent';
 import { browserDB } from '../../services/browser-db';
 import { storage } from '../../services/storage.service';
+import { fetchWithRetry } from '../../lib/api-client';
 
 interface QuestionDBRecord {
   id: string;
@@ -279,17 +280,20 @@ class CodingChallengeAgent extends BaseSkillAgent {
         const difficulty = data?.difficulty as string;
         const category = data?.category as string;
         
-        const challenges = await fetch('/api/coding/challenges')
-          .then(r => r.json())
-          .catch(() => []);
-        
-        const filtered = challenges.filter((c: Record<string, unknown>) => {
-          if (difficulty && c.difficulty !== difficulty) return false;
-          if (category && c.category !== category) return false;
-          return true;
-        });
-        
-        return { success: true, data: filtered[0] || null };
+        try {
+          const challenges = await fetchWithRetry<Record<string, unknown>[]>('/api/coding/challenges', {}, 3, 1000);
+          
+          const filtered = challenges.filter((c) => {
+            if (difficulty && c.difficulty !== difficulty) return false;
+            if (category && c.category !== category) return false;
+            return true;
+          });
+          
+          return { success: true, data: filtered[0] || null };
+        } catch (error) {
+          console.error('Failed to fetch challenges:', error);
+          return { success: true, data: null };
+        }
       }
 
       case 'validate-solution': {
@@ -520,10 +524,13 @@ class CertificationAgent extends BaseSkillAgent {
 
     switch (action) {
       case 'get-certifications': {
-        const certifications = await fetch('/api/certifications')
-          .then(r => r.json())
-          .catch(() => []);
-        return { success: true, data: certifications };
+        try {
+          const certifications = await fetchWithRetry<Record<string, unknown>[]>('/api/certifications', {}, 3, 1000);
+          return { success: true, data: certifications };
+        } catch (error) {
+          console.error('Failed to fetch certifications:', error);
+          return { success: true, data: [] };
+        }
       }
 
       case 'track-progress': {

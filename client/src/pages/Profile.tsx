@@ -42,10 +42,8 @@ export default function Profile() {
   
   const [couponCode, setCouponCode] = useState('');
   const [couponMessage, setCouponMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [couponError, setCouponError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const couponFormRef = useRef<HTMLFormElement>(null);
-  const couponInputRef = useRef<HTMLInputElement>(null);
 
   const handleToggleShuffle = () => {
     toggleShuffleQuestions();
@@ -74,12 +72,8 @@ export default function Profile() {
   // Calculate stats
   const totalQuestions = channelStats.reduce((sum, s) => sum + s.total, 0);
   const totalCompleted = subscribedChannels.reduce((sum, channel) => {
-    try {
-      const channelProgress = JSON.parse(localStorage.getItem(`progress-${channel.id}`) || '[]');
-      return sum + (Array.isArray(channelProgress) ? channelProgress.length : 0);
-    } catch {
-      return sum;
-    }
+    const channelProgress = JSON.parse(localStorage.getItem(`progress-${channel.id}`) || '[]');
+    return sum + channelProgress.length;
   }, 0);
 
   const streak = (() => {
@@ -346,13 +340,8 @@ export default function Profile() {
               ref={couponFormRef}
               onSubmit={(e) => {
                 e.preventDefault();
-                // Clear previous errors
-                setCouponError(null);
-                setCouponMessage(null);
-                
                 if (!couponCode.trim()) {
-                  setCouponError('Please enter a coupon code');
-                  couponInputRef.current?.focus();
+                  toast({ title: 'Error', description: 'Please enter a coupon code', variant: 'destructive' });
                   return;
                 }
                 setIsSubmitting(true);
@@ -380,19 +369,12 @@ export default function Profile() {
               <div className="flex gap-2">
                 <label htmlFor="coupon-code" className="sr-only">Coupon code</label>
                 <input
-                  ref={couponInputRef}
                   id="coupon-code"
                   type="text"
                   value={couponCode}
-                  onChange={(e) => {
-                    setCouponCode(e.target.value.toUpperCase());
-                    // Clear error when user starts typing
-                    if (couponError) setCouponError(null);
-                  }}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                   placeholder="Enter code"
-                  aria-invalid={!!couponError}
-                  aria-describedby={couponError ? 'coupon-error' : undefined}
-                  className={`flex-1 px-3 py-2 bg-black/20 border rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed ${couponError ? 'border-red-400 focus:ring-red-400' : 'border-border'}`}
+                  className="flex-1 px-3 py-2 bg-black/20 border border-border rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
                 <button
                   type="submit"
@@ -409,13 +391,9 @@ export default function Profile() {
                   )}
                 </button>
               </div>
-              {(couponError || couponMessage) && (
-                <p 
-                  id="coupon-error"
-                  className={`text-xs mt-2 ${couponError ? 'text-red-400' : couponMessage?.type === 'success' ? 'text-green-400' : 'text-red-400'}`} 
-                  role={couponError ? 'alert' : undefined}
-                >
-                  {couponError || couponMessage?.text}
+              {couponMessage && (
+                <p className={`text-xs mt-2 ${couponMessage.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                  {couponMessage.text}
                 </p>
               )}
             </form>

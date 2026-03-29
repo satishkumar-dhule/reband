@@ -253,15 +253,24 @@ export function BadgeProvider({ children }: { children: ReactNode }) {
     [badgeProgress]
   );
 
+  const value = useMemo(() => ({
+    badgeProgress, 
+    checkForNewUnlocks, 
+    totalUnlocked, 
+    resetShownBadges,
+    pendingBadges,
+    consumePendingBadge,
+  }), [
+    badgeProgress,
+    checkForNewUnlocks,
+    totalUnlocked,
+    resetShownBadges,
+    pendingBadges,
+    consumePendingBadge,
+  ]);
+
   return (
-    <BadgeContext.Provider value={{ 
-      badgeProgress, 
-      checkForNewUnlocks, 
-      totalUnlocked, 
-      resetShownBadges,
-      pendingBadges,
-      consumePendingBadge,
-    }}>
+    <BadgeContext.Provider value={value}>
       {children}
     </BadgeContext.Provider>
   );

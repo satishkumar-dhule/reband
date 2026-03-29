@@ -137,6 +137,13 @@ class BrowserDB {
     }
   }
 
+  public stopSync(): void {
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+      this.syncInterval = null;
+    }
+  }
+
   async ready(): Promise<void> {
     await this.dbReady;
   }
@@ -267,9 +274,6 @@ class BrowserDB {
         
         if (response.ok) {
           await this.markSynced(sync.id);
-        } else {
-          const errorText = await response.text().catch(() => 'Unknown error');
-          console.warn(`Sync failed for ${sync.id}: ${response.status} - ${errorText}`);
         }
       } catch (error) {
         console.warn('Sync failed, will retry:', error);
@@ -287,42 +291,25 @@ class BrowserDB {
   }
 
   async updateProgress(userId: string, channelId: string, updates: Partial<ProgressDBRecord>): Promise<void> {
-    const MAX_RETRIES = 3;
-    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      const existing = await this.getProgress(userId, channelId);
-      const progress: ProgressDBRecord = {
-        id: existing?.id || `${userId}-${channelId}`,
-        userId,
-        channelId,
-        completedQuestions: existing?.completedQuestions || [],
-        markedQuestions: existing?.markedQuestions || [],
-        lastVisitedIndex: existing?.lastVisitedIndex || 0,
-        lastUpdated: Date.now(),
-        ...updates,
-      };
-      
-      try {
-        await this.put('progress', progress);
-        await this.queueSync('progress', progress.id, 'update', progress);
-        
-        const verify = await this.getProgress(userId, channelId);
-        if (verify && verify.lastUpdated === progress.lastUpdated) {
-          return;
-        }
-      } catch {
-        // Retry on conflict
-      }
-    }
+    const existing = await this.getProgress(userId, channelId);
+    const progress: ProgressDBRecord = {
+      id: existing?.id || `${userId}-${channelId}`,
+      userId,
+      channelId,
+      completedQuestions: existing?.completedQuestions || [],
+      markedQuestions: existing?.markedQuestions || [],
+      lastVisitedIndex: existing?.lastVisitedIndex || 0,
+      lastUpdated: Date.now(),
+      ...updates,
+    };
+    await this.put('progress', progress);
+    await this.queueSync('progress', progress.id, 'update', progress);
   }
 
   destroy(): void {
-    if (this.syncInterval !== null) {
-      clearInterval(this.syncInterval);
-      this.syncInterval = null;
-    }
+    this.stopSync();
     if (this.db) {
       this.db.close();
-      this.db = null;
     }
   }
 }

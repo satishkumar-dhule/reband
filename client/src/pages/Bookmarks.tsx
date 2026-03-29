@@ -129,7 +129,11 @@ export default function Bookmarks() {
               <div className="bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border)] px-4 py-3 flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2 flex-1 min-w-[200px]">
                   <Filter className="w-4 h-4 text-[var(--gh-fg-muted)]" />
+                  <label htmlFor="filter-channel" className="sr-only">
+                    Filter by channel
+                  </label>
                   <select
+                    id="filter-channel"
                     value={filterChannel}
                     onChange={e => setFilterChannel(e.target.value)}
                     className="h-8 px-2 text-sm rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-[var(--gh-fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-emphasis)]"
@@ -140,7 +144,11 @@ export default function Bookmarks() {
                       <option key={ch} value={ch}>{fmt(ch)}</option>
                     ))}
                   </select>
+                  <label htmlFor="filter-difficulty" className="sr-only">
+                    Filter by difficulty
+                  </label>
                   <select
+                    id="filter-difficulty"
                     value={filterDifficulty}
                     onChange={e => setFilterDifficulty(e.target.value)}
                     className="h-8 px-2 text-sm rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-[var(--gh-fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-emphasis)]"

@@ -1,0 +1,20 @@
+{
+  "name": "DevPrep - Technical Interview Prep",
+  "short_name": "DevPrep",
+  "description": "Free technical interview prep with 1000+ questions, spaced repetition, and voice practice",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#00ff00",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "lang": "en-US"
+}

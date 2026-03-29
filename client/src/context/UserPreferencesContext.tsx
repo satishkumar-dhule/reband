@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { allChannelsConfig, getRecommendedChannels } from '../lib/channels-config';
 import { PreferencesStorage } from '../services/storage.service';
 import { DEFAULTS } from '../lib/constants';
@@ -204,26 +204,48 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
     return (preferences.subscribedCertifications || []).includes(certId);
   }, [preferences.subscribedCertifications]);
 
+  const value = useMemo(() => ({
+    preferences,
+    setRole,
+    subscribeChannel,
+    unsubscribeChannel,
+    toggleSubscription,
+    isSubscribed,
+    getSubscribedChannels,
+    subscribeCertification,
+    unsubscribeCertification,
+    toggleCertificationSubscription,
+    isCertificationSubscribed,
+    resetPreferences,
+    skipOnboarding,
+    needsOnboarding: !preferences.onboardingComplete,
+    toggleShuffleQuestions,
+    togglePrioritizeUnvisited,
+    toggleHideCertifications
+  }), [
+    preferences,
+    preferences.onboardingComplete,
+    preferences.subscribedChannels,
+    preferences.subscribedCertifications,
+    setRole,
+    subscribeChannel,
+    unsubscribeChannel,
+    toggleSubscription,
+    isSubscribed,
+    getSubscribedChannels,
+    subscribeCertification,
+    unsubscribeCertification,
+    toggleCertificationSubscription,
+    isCertificationSubscribed,
+    resetPreferences,
+    skipOnboarding,
+    toggleShuffleQuestions,
+    togglePrioritizeUnvisited,
+    toggleHideCertifications
+  ]);
+
   return (
-    <UserPreferencesContext.Provider value={{
-      preferences,
-      setRole,
-      subscribeChannel,
-      unsubscribeChannel,
-      toggleSubscription,
-      isSubscribed,
-      getSubscribedChannels,
-      subscribeCertification,
-      unsubscribeCertification,
-      toggleCertificationSubscription,
-      isCertificationSubscribed,
-      resetPreferences,
-      skipOnboarding,
-      needsOnboarding: !preferences.onboardingComplete,
-      toggleShuffleQuestions,
-      togglePrioritizeUnvisited,
-      toggleHideCertifications
-    }}>
+    <UserPreferencesContext.Provider value={value}>
       {children}
     </UserPreferencesContext.Provider>
   );

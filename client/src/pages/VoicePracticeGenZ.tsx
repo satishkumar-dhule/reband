@@ -10,11 +10,9 @@ import { SEOHead } from '../components/SEOHead';
 import { AppLayout } from '../components/layout/AppLayout';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { getAllQuestions } from '../lib/questions-loader';
+import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import type { Question } from '../types';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
-
-const isSpeechSupported = typeof window !== 'undefined' && 
-  ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
 type PracticeMode = 'training' | 'interview';
 type RecordingState = 'idle' | 'recording' | 'recorded';
@@ -79,10 +77,26 @@ export default function VoicePracticeGenZ() {
   const [sessionStartTime, setSessionStartTime] = useState<number>(0);
   const [sessionTotalTime, setSessionTotalTime] = useState(0);
 
-  const recognitionRef = useRef<any>(null);
-
   const currentQuestion = questions[currentIndex];
   const targetWords = currentQuestion?.answer.split(' ').length || 100;
+
+  const {
+    transcript: hookTranscript,
+    interimTranscript: hookInterim,
+    start: startRecognition,
+    stop: stopRecognition
+  } = useSpeechRecognition({
+    continuous: true,
+    interimResults: true,
+    lang: 'en-US',
+    autoRestart: true,
+    onFinal: (text) => setTranscript(prev => prev + ' ' + text),
+    onInterim: (text) => setInterimTranscript(text),
+    onError: (err) => {
+      console.error(err);
+      setIsRecording(false);
+    }
+  });
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -104,113 +118,59 @@ export default function VoicePracticeGenZ() {
     fetchQuestions();
   }, [preferences.subscribedChannels]);
 
-  useEffect(() => {
-    if (!isSpeechSupported) return;
-    
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-    
-    recognition.onresult = (event: any) => {
-      let interim = '';
-      let final = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          final += event.results[i][0].transcript;
-        } else {
-          interim += event.results[i][0].transcript;
-        }
-      }
-      if (final) setTranscript(prev => prev + ' ' + final);
-      setInterimTranscript(interim);
-    };
-    
-    recognition.onerror = (event: any) => {
-      console.error(event.error);
-      setIsRecording(false);
-    };
-    
-    recognition.onend = () => {
-      setIsRecording(prev => {
-        if (prev) {
-          try {
-            recognition.start();
-          } catch (e) {
-            console.error(e);
-          }
-        }
-        return prev;
-      });
-    };
-    
-    recognitionRef.current = recognition;
-    return () => {
-      if (recognitionRef.current) recognitionRef.current.stop();
-    };
-  }, []);
-
-  const startRecording = useCallback(() => {
+  const startRecording = () => {
     setTranscript('');
     setInterimTranscript('');
     setFeedback(null);
     setIsRecording(true);
     setRecordingState('recording');
     setSessionStartTime(Date.now());
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.start();
-      } catch (e) {
-        console.error(e);
-      }
+    try {
+      startRecognition();
+    } catch (e) {
+      console.error(e);
     }
-  }, []);
+  };
 
-  const stopRecording = useCallback(() => {
+  const stopRecording = () => {
     setIsRecording(false);
     setRecordingState('recorded');
-    if (recognitionRef.current) recognitionRef.current.stop();
+    stopRecognition();
     
-    setTranscript(prevTranscript => {
-      const duration = Math.round((Date.now() - sessionStartTime) / 1000);
-      setSessionTotalTime(prev => prev + duration);
-      
-      const words = prevTranscript.trim().split(/\s+/).length;
-      const score = Math.min(100, Math.round((words / targetWords) * 100));
-      
-      setFeedback({
-        wordsSpoken: words,
-        targetWords,
-        duration,
-        score,
-        clarity: 85 + Math.random() * 10,
-        fluency: 80 + Math.random() * 15,
-        pace: 90 + Math.random() * 5,
-        message: score > 80 ? "Excellent job! Your answer was comprehensive and well-paced." : 
-                 score > 50 ? "Good effort. Try to elaborate more on your technical points." :
-                 "Keep practicing. Aim for a more detailed explanation of the concept."
-      });
-      
-      return prevTranscript;
+    const duration = Math.round((Date.now() - sessionStartTime) / 1000);
+    setSessionTotalTime(prev => prev + duration);
+    
+    const words = transcript.trim().split(/\s+/).length;
+    const score = Math.min(100, Math.round((words / targetWords) * 100));
+    
+    setFeedback({
+      wordsSpoken: words,
+      targetWords,
+      duration,
+      score,
+      clarity: 85 + Math.random() * 10,
+      fluency: 80 + Math.random() * 15,
+      pace: 90 + Math.random() * 5,
+      message: score > 80 ? "Excellent job! Your answer was comprehensive and well-paced." : 
+               score > 50 ? "Good effort. Try to elaborate more on your technical points." :
+               "Keep practicing. Aim for a more detailed explanation of the concept."
     });
-  }, [sessionStartTime, targetWords]);
+  };
 
-  const nextQuestion = useCallback(() => {
+  const nextQuestion = () => {
     if (currentIndex < questions.length - 1) {
+      setCurrentIndex(prev => prev + 1);
       setRecordingState('idle');
       setTranscript('');
       setInterimTranscript('');
       setFeedback(null);
       setShowAnswer(false);
-      setCurrentIndex(prev => prev + 1);
     } else {
-      // All questions completed - navigate to home
       setLocation('/');
     }
-  }, [currentIndex, questions.length, setLocation]);
+  };
 
-  if (!isSpeechSupported) {
+  if (!isSpeechRecognitionSupported) {
     return (
       <AppLayout>
         <div className="max-w-2xl mx-auto px-4 py-8">

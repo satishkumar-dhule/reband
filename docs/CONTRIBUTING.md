@@ -1,6 +1,6 @@
-# Contributing to Learn_Reels
+# Contributing to DevPrep
 
-Thank you for your interest in contributing to Learn_Reels! We welcome contributions from everyone. This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to DevPrep! We welcome contributions from everyone. This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -66,41 +66,7 @@ ppnpm run build
 
 ## Adding Questions
 
-### Manual Addition
-
-1. **Locate the channel file** in `client/src/lib/questions/`
-   - `system-design.json`
-   - `algorithms.json`
-   - `frontend.json`
-   - `database.json`
-   - `devops.json`
-   - `sre.json`
-
-2. **Add a new question object:**
-```json
-{
-  "id": "ch-XXX",
-  "question": "Your question here?",
-  "answer": "Concise answer (50-150 chars)",
-  "explanation": "Detailed markdown explanation with **bold** and bullet points",
-  "tags": ["tag1", "tag2"],
-  "difficulty": "beginner|intermediate|advanced",
-  "channel": "channel-name",
-  "subChannel": "sub-channel-name",
-  "diagram": "graph TD\n    A[Node] --> B[Node]",
-  "lastUpdated": "2025-12-12T09:07:04.186Z"
-}
-```
-
-3. **Guidelines:**
-   - Use unique IDs (e.g., `sy-1`, `al-2`, `fe-3`)
-   - Keep answers concise (50-150 characters)
-   - Provide comprehensive explanations with markdown formatting
-   - Include mermaid diagrams where applicable
-   - Add relevant tags
-   - Set difficulty level appropriately
-
-### Automated Generation
+Content is database-driven. See `CONTENT_STANDARDS.md` for content creation guidelines.
 
 Questions can be automatically generated using OpenCode:
 
@@ -253,4 +219,4 @@ Contributors will be recognized in:
 - GitHub contributors page
 - Release notes
 
-Thank you for contributing to Learn_Reels! 🚀
+Thank you for contributing to DevPrep! 🚀

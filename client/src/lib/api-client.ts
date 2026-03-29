@@ -71,6 +71,35 @@ const channelCache = new Map<string, ChannelData>();
 const statsCache: { data: ChannelDetailedStats[] | null } = { data: null };
 const questionIdToChannel = new Map<string, string>();
 
+/**
+ * Fetch with retry logic and exponential backoff
+ * @param url - The URL to fetch
+ * @param options - Fetch options
+ * @param retries - Number of retry attempts (default: 3)
+ * @param backoff - Initial backoff delay in ms (default: 1000)
+ */
+export async function fetchWithRetry<T>(
+  url: string,
+  options: RequestInit = {},
+  retries = 3,
+  backoff = 1000
+): Promise<T> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      console.warn(`Fetch failed (attempt ${i + 1}/${retries}), retrying in ${backoff * Math.pow(2, i)}ms...`, error);
+      await new Promise(r => setTimeout(r, backoff * Math.pow(2, i)));
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
 async function fetchJson<T>(url: string): Promise<T> {
   // Simple cache busting - add build timestamp
   const cacheBuster = `v=${BUILD_VERSION}`;

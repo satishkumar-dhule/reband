@@ -7,6 +7,88 @@
 export type Difficulty = 'easy' | 'medium';
 export type Language = 'javascript' | 'python';
 
+// =============================================================================
+// SANDBOXED CODE EXECUTION - SECURITY FIX
+// Replaces unsafe `new Function()` with Web Worker isolation
+// =============================================================================
+
+export interface SandboxResult {
+  success: boolean;
+  output?: unknown;
+  error?: string;
+  logs?: string[];
+}
+
+/**
+ * Execute JavaScript code in a sandboxed Web Worker.
+ * This prevents malicious code from accessing the main thread or parent context.
+ * 
+ * @param code - The JavaScript code to execute
+ * @param timeout - Maximum execution time in ms (default: 5000)
+ * @returns Promise with execution result
+ */
+export async function executeCodeSandboxed(
+  userCode: string,
+  timeout = 5000
+): Promise<SandboxResult> {
+  return new Promise((resolve) => {
+    // Worker code that receives and executes user code in isolation
+    const workerCode = `
+      self.onmessage = function(msg) {
+        try {
+          const logs = [];
+          const console = { 
+            log: (...a) => logs.push(a.join(' ')), 
+            error: (...a) => logs.push('ERROR: ' + a.join(' ')),
+            warn: (...a) => logs.push('WARN: ' + a.join(' ')),
+            info: (...a) => logs.push(a.join(' '))
+          };
+          
+          // Execute user code in strict mode with sandboxed environment
+          const result = (function() {
+            'use strict';
+            return eval(msg.data.code);
+          })();
+          
+          self.postMessage({ success: true, output: result, logs: logs });
+        } catch (err) {
+          self.postMessage({ success: false, error: err.message, logs: logs || [] });
+        }
+      }
+    `;
+    
+    try {
+      const blob = new Blob([workerCode], { type: 'application/javascript' });
+      const workerUrl = URL.createObjectURL(blob);
+      const worker = new Worker(workerUrl);
+      
+      const timeoutId = setTimeout(() => {
+        worker.terminate();
+        URL.revokeObjectURL(workerUrl);
+        resolve({ success: false, error: `Execution timed out after ${timeout}ms` });
+      }, timeout);
+      
+      worker.onmessage = (evt) => {
+        clearTimeout(timeoutId);
+        worker.terminate();
+        URL.revokeObjectURL(workerUrl);
+        resolve(evt.data);
+      };
+      
+      worker.onerror = (evt) => {
+        clearTimeout(timeoutId);
+        worker.terminate();
+        URL.revokeObjectURL(workerUrl);
+        resolve({ success: false, error: evt.message || 'Worker execution error' });
+      };
+      
+      worker.postMessage({ code: userCode });
+    } catch (err) {
+      resolve({ success: false, error: 'Failed to create sandbox worker' });
+    }
+  });
+}
+
 export interface CodingChallenge {
   id: string;
   title: string;
@@ -53,6 +135,7 @@ export interface TestResult {
   actualOutput?: string;
   error?: string;
   executionTime?: number;
+  logs?: string[];
 }
 
 // Challenge templates for generation
@@ -896,100 +979,48 @@ export async function getChallengeByIdAsync(id: string): Promise<CodingChallenge
   return challenges.find(c => c.id === id) || null;
 }
 
-// Execute JavaScript code in a sandboxed Web Worker to prevent XSS
+// Execute JavaScript code safely in browser using sandboxed Web Worker
 export async function executeJavaScript(code: string, testCase: TestCase): Promise<TestResult> {
   const startTime = performance.now();
   
-  const dangerousPatterns = [
-    /fetch\s*\(/i, /XMLHttpRequest/i, /import\s*\(/i, /require\s*\(/i,
-    /eval\s*\(/i, /Function\s*\(/i, /document\./i, /window\./i,
-    /localStorage\./i, /sessionStorage\./i, /cookie/i,
-    /setTimeout\s*\(\s*["']/i, /setInterval\s*\(\s*["']/i,
-    /console\.log\s*\(/i, /console\./i, /\.prototype\./i,
-  ];
+  // Extract function name from code
+  const fnNameMatch = code.match(/function\s+(\w+)/);
+  const fnName = fnNameMatch ? fnNameMatch[1] : null;
   
-  for (const pattern of dangerousPatterns) {
-    if (pattern.test(code)) {
-      return {
-        testCaseId: testCase.id,
-        passed: false,
-        error: 'Code contains disallowed patterns for security reasons',
-        executionTime: performance.now() - startTime
-      };
-    }
+  // Build execution code that calls the function with test input
+  const execCode = fnName
+    ? `${code}\nreturn ${fnName}(${testCase.input});`
+    : `${code}\nreturn null;`;
+  
+  const result = await executeCodeSandboxed(execCode);
+  const executionTime = performance.now() - startTime;
+  
+  if (result.success) {
+    const actualOutput = JSON.stringify(result.output);
+    const passed = actualOutput === testCase.expectedOutput;
+    
+    return {
+      testCaseId: testCase.id,
+      passed,
+      actualOutput,
+      executionTime,
+      logs: result.logs
+    };
+  } else {
+    return {
+      testCaseId: testCase.id,
+      passed: false,
+      error: result.error,
+      executionTime
+    };
   }
-  
-  const workerCode = `
-    self.onmessage = function(e) {
-      const { code, testInput, expectedOutput, testCaseId } = e.data;
-      try {
-        const restrictedConsole = { log: () => {}, error: () => {}, warn: () => {} };
-        const fn = new Function('console', code);
-        const result = fn(restrictedConsole);
-        const actualOutput = JSON.stringify(result);
-        const passed = actualOutput === expectedOutput;
-        self.postMessage({ testCaseId, passed, actualOutput, error: null });
-      } catch (err) {
-        self.postMessage({ testCaseId, passed: false, actualOutput: null, error: err.message });
-      }
-    };
-  `;
-  
-  const blob = new Blob([workerCode], { type: 'application/javascript' });
-  const workerUrl = URL.createObjectURL(blob);
-  const worker = new Worker(workerUrl);
-  
-  return new Promise<TestResult>((resolve) => {
-    const timeout = setTimeout(() => {
-      worker.terminate();
-      URL.revokeObjectURL(workerUrl);
-      resolve({
-        testCaseId: testCase.id,
-        passed: false,
-        error: 'Execution timeout (5 seconds max)',
-        executionTime: performance.now() - startTime
-      });
-    }, 5000);
-    
-    worker.onmessage = (e) => {
-      clearTimeout(timeout);
-      worker.terminate();
-      URL.revokeObjectURL(workerUrl);
-      resolve({
-        testCaseId: e.data.testCaseId,
-        passed: e.data.passed,
-        actualOutput: e.data.actualOutput || null,
-        error: e.data.error,
-        executionTime: performance.now() - startTime
-      });
-    };
-    
-    worker.onerror = (e) => {
-      clearTimeout(timeout);
-      worker.terminate();
-      URL.revokeObjectURL(workerUrl);
-      resolve({
-        testCaseId: testCase.id,
-        passed: false,
-        error: 'Worker error: ' + e.message,
-        executionTime: performance.now() - startTime
-      });
-    };
-    
-    worker.postMessage({
-      code,
-      testInput: testCase.input,
-      expectedOutput: testCase.expectedOutput,
-      testCaseId: testCase.id
-    });
-  });
 }
 
-// Run all test cases
-export function runTests(code: string, challenge: CodingChallenge, language: Language): TestResult[] {
+// Run all test cases (async for JavaScript to use sandboxed execution)
+export async function runTests(code: string, challenge: CodingChallenge, language: Language): Promise<TestResult[]> {
   if (language === 'python') {
     // Python execution is handled asynchronously via runTestsAsync
-    // This sync version returns placeholder - use runTestsAsync instead
+    // This async version returns placeholder - use runTestsAsync instead
     return challenge.testCases.map(tc => ({
       testCaseId: tc.id,
       passed: false,
@@ -997,17 +1028,20 @@ export function runTests(code: string, challenge: CodingChallenge, language: Lan
     }));
   }
   
-  return challenge.testCases.map(tc => {
+  const results: TestResult[] = [];
+  for (const tc of challenge.testCases) {
     try {
-      return executeTestCase(code, tc, challenge);
+      const result = await executeTestCase(code, tc, challenge);
+      results.push(result);
     } catch (error) {
-      return {
+      results.push({
         testCaseId: tc.id,
         passed: false,
         error: error instanceof Error ? error.message : 'Execution error'
-      };
+      });
     }
-  });
+  }
+  return results;
 }
 
 // Normalize JSON string for comparison (removes whitespace differences)
@@ -1026,6 +1060,7 @@ export async function runTestsAsync(
   language: Language
 ): Promise<TestResult[]> {
   if (language === 'javascript') {
+    // JavaScript uses sandboxed Web Worker execution
     return runTests(code, challenge, language);
   }
   
@@ -1073,137 +1108,39 @@ export async function runTestsAsync(
   return results;
 }
 
-// Execute a single test case with security validation
-function executeTestCase(code: string, testCase: TestCase, challenge: CodingChallenge): TestResult {
+// Execute a single test case using sandboxed execution
+async function executeTestCase(code: string, testCase: TestCase, challenge: CodingChallenge): Promise<TestResult> {
   const startTime = performance.now();
   
-  // Validate code doesn't contain dangerous patterns
-  const dangerousPatterns = [
-    /fetch\s*\(/i, /XMLHttpRequest/i, /import\s*\(/i, /require\s*\(/i,
-    /eval\s*\(/i, /Function\s*\(/i, /document\./i, /window\./i,
-    /localStorage\./i, /sessionStorage\./i, /cookie/i,
-    /setTimeout\s*\(\s*["']/i, /setInterval\s*\(\s*["']/i,
-    /console\.log\s*\(/i, /console\./i, /\.prototype\./i,
-  ];
+  // Extract function name from starter code
+  const fnNameMatch = challenge.starterCode.javascript.match(/function\s+(\w+)/);
+  const fnName = fnNameMatch ? fnNameMatch[1] : 'solution';
   
-  for (const pattern of dangerousPatterns) {
-    if (pattern.test(code)) {
-      return {
-        testCaseId: testCase.id,
-        passed: false,
-        error: 'Code contains disallowed patterns for security reasons',
-        executionTime: performance.now() - startTime
-      };
-    }
-  }
+  // Build the execution code that calls the function with test input
+  const execCode = `${code}\nreturn ${fnName}(${testCase.input});`;
   
-  try {
-    // Extract function name from starter code
-    const fnNameMatch = challenge.starterCode.javascript.match(/function\s+(\w+)/);
-    const fnName = fnNameMatch ? fnNameMatch[1] : 'solution';
+  const result = await executeCodeSandboxed(execCode);
+  const executionTime = performance.now() - startTime;
+  
+  if (result.success) {
+    // Normalize output for comparison
+    const actualOutput = JSON.stringify(result.output);
+    const expectedNormalized = testCase.expectedOutput;
+    const passed = actualOutput === expectedNormalized;
     
-    // Create a sandboxed Web Worker for safer execution
-    const workerCode = `
-      self.onmessage = function(e) {
-        const { code, fnName, testInput, expectedOutput, testCaseId } = e.data;
-        try {
-          // Create restricted globals
-          const restrictedConsole = { log: () => {}, error: () => {}, warn: () => {} };
-          
-          // Execute code with restricted console
-          const fn = new Function('console', code);
-          fn(restrictedConsole);
-          
-          // Now call the function
-          const callFn = new Function('return ' + fnName + '(' + testInput + ')');
-          const result = callFn();
-          
-          const actualOutput = JSON.stringify(result);
-          const passed = actualOutput === expectedOutput;
-          
-          self.postMessage({ testCaseId, passed, actualOutput, error: null, executionTime: 0 });
-        } catch (err) {
-          self.postMessage({ testCaseId, passed: false, actualOutput: null, error: err.message, executionTime: 0 });
-        }
-      };
-    `;
-    
-    const blob = new Blob([workerCode], { type: 'application/javascript' });
-    const workerUrl = URL.createObjectURL(blob);
-    const worker = new Worker(workerUrl);
-    
-    // Synchronous timeout fallback
-    const timeoutMs = 5000;
-    let resolved = false;
-    let timeoutId: ReturnType<typeof setTimeout>;
-    
-    const timeoutPromise = new Promise<TestResult>((_, reject) => {
-      timeoutId = setTimeout(() => {
-        if (!resolved) {
-          resolved = true;
-          worker.terminate();
-          URL.revokeObjectURL(workerUrl);
-          reject(new Error('timeout'));
-        }
-      }, timeoutMs);
-    });
-    
-    const workerPromise = new Promise<TestResult>((resolve) => {
-      worker.onmessage = (e) => {
-        if (!resolved) {
-          resolved = true;
-          clearTimeout(timeoutId);
-          worker.terminate();
-          URL.revokeObjectURL(workerUrl);
-          resolve({
-            testCaseId: e.data.testCaseId,
-            passed: e.data.passed,
-            actualOutput: e.data.actualOutput || null,
-            error: e.data.error,
-            executionTime: performance.now() - startTime
-          });
-        }
-      };
-      
-      worker.onerror = (e) => {
-        if (!resolved) {
-          resolved = true;
-          clearTimeout(timeoutId);
-          worker.terminate();
-          URL.revokeObjectURL(workerUrl);
-          resolve({
-            testCaseId: testCase.id,
-            passed: false,
-            error: 'Worker error: ' + e.message,
-            executionTime: performance.now() - startTime
-          });
-        }
-      };
-      
-      worker.postMessage({
-        code,
-        fnName,
-        testInput: testCase.input,
-        expectedOutput: testCase.expectedOutput,
-        testCaseId: testCase.id
-      });
-    });
-    
-    // For sync context, use Promise.race with timeout
-    return Promise.race([workerPromise, timeoutPromise])
-      .catch(() => ({
-        testCaseId: testCase.id,
-        passed: false,
-        error: 'Execution timeout',
-        executionTime: performance.now() - startTime
-      })) as unknown as TestResult;
-      
-  } catch (error) {
+    return {
+      testCaseId: testCase.id,
+      passed,
+      actualOutput,
+      executionTime,
+      logs: result.logs
+    };
+  } else {
     return {
       testCaseId: testCase.id,
       passed: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      executionTime: performance.now() - startTime
+      error: result.error,
+      executionTime
     };
   }
 }
@@ -1250,7 +1187,7 @@ export function getCodingStats(): {
   averageTime: number;
   byDifficulty: Record<Difficulty, { attempted: number; passed: number }>;
 } {
-const attempts = getChallengeAttempts();
+  const attempts = getChallengeAttempts();
   const passed = attempts.filter(a => a.passed);
   const avgTime = attempts.length > 0 
     ? Math.round(attempts.reduce((sum, a) => sum + a.timeSpent, 0) / attempts.length)

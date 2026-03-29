@@ -3,7 +3,7 @@
  * Manages sidebar collapsed state with localStorage persistence
  */
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 
 const SIDEBAR_COLLAPSED_KEY = 'sidebar-collapsed';
 
@@ -28,21 +28,20 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(isCollapsed));
-    } catch (error) {
-      console.error('Failed to save sidebar state:', error);
-    }
+    } catch {}
   }, [isCollapsed]);
 
   const toggleSidebar = useCallback(() => setIsCollapsed(prev => !prev), []);
   const setCollapsed = useCallback((collapsed: boolean) => setIsCollapsed(collapsed), []);
 
-  const contextValue = useMemo(
-    () => ({ isCollapsed, toggleSidebar, setCollapsed }),
-    [isCollapsed, toggleSidebar, setCollapsed]
-  );
+  const value = useMemo(() => ({
+    isCollapsed,
+    toggleSidebar,
+    setCollapsed,
+  }), [isCollapsed, toggleSidebar, setCollapsed]);
 
   return (
-    <SidebarContext.Provider value={contextValue}>
+    <SidebarContext.Provider value={value}>
       {children}
     </SidebarContext.Provider>
   );

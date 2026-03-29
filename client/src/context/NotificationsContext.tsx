@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { NotificationsStorage } from '../services/storage.service';
 import { LIMITS } from '../lib/constants';
 import type { Notification, NotificationType } from '../types';
@@ -62,18 +62,31 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     setNotifications([]);
   }, []);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = useMemo(
+    () => notifications.filter(n => !n.read).length,
+    [notifications]
+  );
+
+  const value = useMemo(() => ({
+    notifications,
+    unreadCount,
+    addNotification,
+    markAsRead,
+    markAllAsRead,
+    clearNotification,
+    clearAll,
+  }), [
+    notifications,
+    unreadCount,
+    addNotification,
+    markAsRead,
+    markAllAsRead,
+    clearNotification,
+    clearAll,
+  ]);
 
   return (
-    <NotificationsContext.Provider value={{
-      notifications,
-      unreadCount,
-      addNotification,
-      markAsRead,
-      markAllAsRead,
-      clearNotification,
-      clearAll,
-    }}>
+    <NotificationsContext.Provider value={value}>
       {children}
     </NotificationsContext.Provider>
   );

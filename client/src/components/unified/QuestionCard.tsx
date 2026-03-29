@@ -9,7 +9,7 @@
  */
 
 import { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { 
   Bookmark, Building2, Hash, Clock, Check, Sparkles
 } from 'lucide-react';
@@ -195,6 +195,7 @@ export function QuestionCard({
   className = '',
   animated = true
 }: QuestionCardProps) {
+  const shouldReduceMotion = useReducedMotion();
   const sizeConfig = sizeClasses[size];
   
   // Determine title size based on question length
@@ -273,9 +274,9 @@ export function QuestionCard({
     if (animated) {
       return (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
           className="w-full h-full motion-reduce:transition-none"
         >
           {loadingContent}
@@ -448,9 +449,9 @@ export function QuestionCard({
   if (animated) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
         className="w-full h-full motion-reduce:transition-none"
       >
         {content}
@@ -485,10 +486,11 @@ export function CompactQuestionCard({
   questionType = 'question',
   className = ''
 }: CompactQuestionCardProps) {
+  const shouldReduceMotion = useReducedMotion();
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+      whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
       onClick={onClick}
       className={`
         p-4 bg-card border border-border rounded-xl cursor-pointer

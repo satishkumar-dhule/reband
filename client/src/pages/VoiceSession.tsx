@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Mic, Square, RotateCcw, Home, ChevronRight,
   CheckCircle, XCircle, AlertCircle, Loader2,
@@ -18,6 +18,7 @@ import { getAllQuestionsAsync } from '../lib/questions-loader';
 import { useCredits } from '../context/CreditsContext';
 import { useAchievementContext } from '../context/AchievementContext';
 import { useUserPreferences } from '../hooks/use-user-preferences';
+import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import { CreditsDisplay } from '../components/CreditsDisplay';
 import { ListenButton } from '../components/ListenButton';
 import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrapper';
@@ -44,10 +45,8 @@ import type { Question } from '../types';
 
 type PageState = 'loading' | 'select' | 'intro' | 'recording' | 'editing' | 'feedback' | 'practice' | 'results';
 
-const isSpeechSupported = typeof window !== 'undefined' && 
-  ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
-
 export default function VoiceSession() {
+  const shouldReduceMotion = useReducedMotion();
   const [, setLocation] = useLocation();
   const { preferences } = useUserPreferences();
   
@@ -62,7 +61,6 @@ export default function VoiceSession() {
   const [error, setError] = useState<string | null>(null);
   const [practiceTranscript, setPracticeTranscript] = useState('');
   
-  const recognitionRef = useRef<any>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
   const { onVoiceInterview } = useCredits();
@@ -102,83 +100,36 @@ export default function VoiceSession() {
     loadData();
   }, [preferences.subscribedChannels]);
 
-  // Initialize speech recognition
-  useEffect(() => {
-    if (!isSpeechSupported) return;
-    
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-    
-    recognition.onresult = (event: any) => {
-      console.log('Speech recognition result received:', event.results.length);
-      let interim = '';
-      let final = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          final += result[0].transcript + ' ';
-          console.log('Final transcript:', result[0].transcript);
-        } else {
-          interim += result[0].transcript;
-          console.log('Interim transcript:', result[0].transcript);
-        }
+  // Use speech recognition hook
+  const {
+    transcript: hookTranscript,
+    interimTranscript: hookInterim,
+    isListening,
+    start: startRecognition,
+    stop: stopRecognition,
+    reset: resetRecognition
+  } = useSpeechRecognition({
+    continuous: true,
+    interimResults: true,
+    lang: 'en-US',
+    autoRestart: true,
+    onFinal: (text) => {
+      if (pageState === 'practice') {
+        setPracticeTranscript(prev => prev + text + ' ');
+      } else {
+        setTranscript(prev => prev + text + ' ');
       }
-      if (final) {
-        // Use functional updates to avoid stale closure
-        setPracticeTranscript(prev => {
-          const updated = prev + final;
-          console.log('Updated practice transcript:', updated);
-          return updated;
-        });
-        setTranscript(prev => {
-          const updated = prev + final;
-          console.log('Updated transcript:', updated);
-          return updated;
-        });
-      }
-      setInterimTranscript(interim);
-    };
-    
-    recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
-      if (event.error === 'not-allowed') {
+    },
+    onInterim: (text) => setInterimTranscript(text),
+    onError: (error) => {
+      if (error === 'not-allowed') {
         setError('Microphone access denied.');
         setPageState('select');
-      } else if (event.error === 'no-speech') {
-        console.log('No speech detected, continuing...');
-      } else {
-        setError(`Speech recognition error: ${event.error}`);
+      } else if (error !== 'no-speech') {
+        setError(`Speech recognition error: ${error}`);
       }
-    };
-    
-    recognition.onstart = () => {
-      console.log('Speech recognition started');
-    };
-    
-    recognition.onend = () => {
-      console.log('Speech recognition ended, pageState:', pageState);
-      if (pageState === 'recording' || pageState === 'practice') {
-        try { 
-          console.log('Restarting recognition...');
-          recognition.start(); 
-        } catch (e) { 
-          console.error('Failed to restart recognition:', e);
-        }
-      }
-    };
-    
-    recognitionRef.current = recognition;
-    return () => { 
-      try {
-        recognition.stop(); 
-      } catch (e) {
-        console.log('Recognition already stopped');
-      }
-    };
-  }, [pageState]);
+    }
+  });
 
   // Recording timer removed - keeping only recording indicator
   useEffect(() => {
@@ -208,21 +159,19 @@ export default function VoiceSession() {
     setTranscript('');
     setInterimTranscript('');
     
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.start();
-        setPageState('recording');
-      } catch (err) {
-        setError('Failed to start recording.');
-        setPageState('editing');
-      }
+    try {
+      startRecognition();
+      setPageState('recording');
+    } catch (err) {
+      setError('Failed to start recording.');
+      setPageState('editing');
     }
-  }, [sessionState]);
+  }, [sessionState, startRecognition]);
 
   const stopRecording = useCallback(() => {
-    if (recognitionRef.current) recognitionRef.current.stop();
+    stopRecognition();
     setPageState('editing');
-  }, []);
+  }, [stopRecognition]);
 
   const submitCurrentAnswer = useCallback(() => {
     if (!sessionState || !transcript.trim()) {
@@ -255,31 +204,28 @@ export default function VoiceSession() {
       setTranscript('');
       setInterimTranscript('');
       
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.start();
-          setPageState('recording');
-        } catch (err) {
-          setPageState('editing');
-        }
-      }
-    }
-  }, [sessionState, onVoiceInterview, trackEvent]);
-
-  const retryQuestion = useCallback(() => {
-    setTranscript('');
-    setInterimTranscript('');
-    if (recognitionRef.current) {
       try {
-        recognitionRef.current.start();
+        startRecognition();
         setPageState('recording');
       } catch (err) {
         setPageState('editing');
       }
     }
-  }, []);
+  }, [sessionState, onVoiceInterview, trackEvent, startRecognition]);
+
+  const retryQuestion = useCallback(() => {
+    setTranscript('');
+    setInterimTranscript('');
+    try {
+      startRecognition();
+      setPageState('recording');
+    } catch (err) {
+      setPageState('editing');
+    }
+  }, [startRecognition]);
 
   const exitSession = useCallback(() => {
+    stopRecognition();
     clearSessionState();
     setSessionState(null);
     setSessionResult(null);
@@ -289,7 +235,7 @@ export default function VoiceSession() {
 
 
   // Unsupported browser
-  if (!isSpeechSupported) {
+  if (!isSpeechRecognitionSupported) {
     return (
       <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center p-4">
         <div className="max-w-md text-center">
@@ -381,8 +327,8 @@ export default function VoiceSession() {
                         <motion.button
                           key={session.id}
                           onClick={() => startNewSession(session)}
-                          whileHover={{ scale: 1.01 }}
-                          whileTap={{ scale: 0.99 }}
+                          whileHover={shouldReduceMotion ? {} : { scale: 1.01 }}
+                          whileTap={shouldReduceMotion ? {} : { scale: 0.99 }}
                           className="p-5 bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-2xl text-left hover:border-[var(--gh-accent-fg)]/50 transition-all group"
                         >
                           <div className="flex items-start justify-between gap-4">
@@ -433,8 +379,9 @@ export default function VoiceSession() {
         <SEOHead title={`${sessionState.session.topic} | Voice Session`} description="Voice interview session practice" />
         <div className="min-h-screen bg-[var(--gh-canvas)] text-[var(--gh-fg)] flex items-center justify-center p-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={shouldReduceMotion ? { duration: 0 } : undefined}
             className="max-w-lg w-full"
           >
             <div className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] overflow-hidden">
@@ -532,8 +479,9 @@ export default function VoiceSession() {
               <div className="pb-3">
                 <div className="h-1.5 bg-[var(--gh-canvas-inset)] rounded-full overflow-hidden">
                   <motion.div
-                    initial={{ width: 0 }}
+                    initial={shouldReduceMotion ? { width: `${progress}%` } : { width: 0 }}
                     animate={{ width: `${progress}%` }}
+                    transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
                     className="h-full bg-gradient-to-r from-[var(--gh-done-fg)] to-[var(--gh-danger-fg)] rounded-full"
                   />
                 </div>
@@ -544,7 +492,7 @@ export default function VoiceSession() {
           <main className="max-w-4xl mx-auto px-4 py-6">
             {/* Question */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] p-6 mb-6"
             >
@@ -587,12 +535,18 @@ export default function VoiceSession() {
               {/* Transcript */}
               <div className="mb-6">
                 {pageState === 'editing' ? (
-                  <textarea
-                    value={transcript}
-                    onChange={(e) => setTranscript(e.target.value)}
-                    className="w-full p-4 bg-[var(--gh-canvas)] border border-[var(--gh-attention-fg)]/30 rounded-md min-h-[100px] text-sm text-[var(--gh-fg)] resize-y focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--gh-attention-fg)]/50"
-                    placeholder="Edit your answer..."
-                  />
+                  <>
+                    <label htmlFor="transcript" className="sr-only">
+                      Edit your transcript
+                    </label>
+                    <textarea
+                      id="transcript"
+                      value={transcript}
+                      onChange={(e) => setTranscript(e.target.value)}
+                      className="w-full p-4 bg-[var(--gh-canvas)] border border-[var(--gh-attention-fg)]/30 rounded-md min-h-[100px] text-sm text-[var(--gh-fg)] resize-y focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--gh-attention-fg)]/50"
+                      placeholder="Edit your answer..."
+                    />
+                  </>
                 ) : (
                   <div className="p-4 bg-[var(--gh-canvas)] rounded-xl min-h-[80px] border border-[var(--gh-border)]">
                     {transcript || interimTranscript ? (
@@ -665,9 +619,7 @@ export default function VoiceSession() {
       setPracticeTranscript('');
       setInterimTranscript('');
       setPageState('practice');
-      if (recognitionRef.current) {
-        try { recognitionRef.current.start(); } catch (e) { /* ignore */ }
-      }
+      try { startRecognition(); } catch (e) { /* ignore */ }
     };
     
     return (
@@ -675,8 +627,9 @@ export default function VoiceSession() {
         <SEOHead title="Feedback | Voice Session" description="Review your answer feedback" />
         <div className="min-h-screen bg-[var(--gh-canvas)] text-[var(--gh-fg)] flex items-center justify-center p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={shouldReduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
+            transition={shouldReduceMotion ? { duration: 0 } : undefined}
             className="max-w-lg w-full"
           >
             <div className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] overflow-hidden">
@@ -803,12 +756,12 @@ export default function VoiceSession() {
     const isLastQuestion = sessionState.currentQuestionIndex >= sessionState.questions.length - 1;
     
     const stopPractice = () => {
-      if (recognitionRef.current) recognitionRef.current.stop();
+      stopRecognition();
       setPageState('feedback');
     };
     
     const finishPractice = () => {
-      if (recognitionRef.current) recognitionRef.current.stop();
+      stopRecognition();
       setPracticeTranscript('');
       setInterimTranscript('');
       goToNextQuestion();
@@ -844,8 +797,9 @@ export default function VoiceSession() {
           <main className="max-w-4xl mx-auto px-4 py-6">
             {/* Ideal Answer */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={shouldReduceMotion ? { duration: 0 } : undefined}
               className="rounded-2xl bg-[var(--gh-accent-fg)]/10 border border-[var(--gh-accent-fg)]/30 p-6 mb-6"
             >
               <div className="flex items-center justify-between mb-4">
@@ -956,8 +910,9 @@ export default function VoiceSession() {
           <main className="max-w-4xl mx-auto px-4 py-6">
             {/* Overall Score */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={shouldReduceMotion ? { duration: 0 } : undefined}
               className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] p-8 mb-6 text-center"
             >
               <div className={`w-28 h-28 rounded-2xl ${verdictStyle.bg} flex items-center justify-center mx-auto mb-6`}>
