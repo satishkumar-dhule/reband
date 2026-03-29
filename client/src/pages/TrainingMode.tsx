@@ -344,7 +344,11 @@ export default function TrainingMode() {
       saveSessionProgress();
     } else {
       // Clear session when completed
-      localStorage.removeItem(sessionId);
+      try {
+        localStorage.removeItem(sessionId);
+      } catch {
+        // Storage unavailable
+      }
       setLocation('/');
     }
   };
@@ -366,7 +370,11 @@ export default function TrainingMode() {
       lastAccessedAt: new Date().toISOString(),
     };
     
-    localStorage.setItem(sessionId, JSON.stringify(sessionData));
+    try {
+      localStorage.setItem(sessionId, JSON.stringify(sessionData));
+    } catch {
+      // Storage quota exceeded or unavailable
+    }
   };
 
   const exitTraining = () => {

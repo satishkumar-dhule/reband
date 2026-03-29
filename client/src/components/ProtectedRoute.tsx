@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useCallback } from "react";
+import { ReactNode, useEffect } from "react";
 import { useLocation } from "wouter";
 
 interface ProtectedRouteProps {
@@ -100,25 +100,20 @@ export function PublicRoute({
 }) {
   const [location, setLocation] = useLocation();
 
+  // BUG-FIX: Pre-compute route check to avoid recalculating in useEffect
+  const isPublicOnlyRoute = publicOnlyRoutes.includes(location);
+
   useEffect(() => {
-    // Check if user has any progress stored
-    const hasUserData = () => {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith("progress-") || key.startsWith("marked-") || key === "user-preferences")) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    const isPublicOnlyRoute = publicOnlyRoutes.includes(location);
-
-    if (isPublicOnlyRoute && hasUserData()) {
+    // Skip if not on a public-only route
+    if (!isPublicOnlyRoute) return;
+    
+    // Only redirect if user has completed onboarding (not just any data)
+    // This prevents redirect loop: user completes onboarding → check runs before state updates
+    if (hasCompletedOnboarding()) {
       // User is on public-only route (like onboarding) but already has data
       setLocation(redirectTo, { replace: true });
     }
-  }, [location, publicOnlyRoutes, redirectTo, setLocation]);
+  }, [location, isPublicOnlyRoute, redirectTo, setLocation]);
 
   return <>{children}</>;
 }

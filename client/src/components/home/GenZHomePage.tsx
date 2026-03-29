@@ -11,7 +11,7 @@ import { useCredits } from '../../context/CreditsContext';
 import { ProgressStorage } from '../../services/storage.service';
 import {
   Flame, Zap, Trophy, Target, Mic, Code, Brain, 
-  ChevronRight, Sparkles, TrendingUp, Star, Award, Rocket, Server, Plus, RotateCcw, Check, X
+  ChevronRight, Sparkles, TrendingUp, Star, Award, Rocket, Server, Plus, RotateCcw, Check, X, AlertTriangle, RefreshCw
 } from 'lucide-react';
 import { PullToRefresh, SwipeableCard, SkeletonList } from '../mobile';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
@@ -98,24 +98,31 @@ export function GenZHomePage() {
   const [activePaths, setActivePaths] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   
-  React.useEffect(() => {
-    async function loadCuratedPaths() {
-      try {
-        setIsLoading(true);
-        const basePath = import.meta.env.BASE_URL || '/';
-        const response = await fetch(`${basePath}data/learning-paths.json`);
-        if (response.ok) {
-          const data = await response.json();
-          setCuratedPaths(data);
-        }
-      } catch (e) {
-        console.error('Failed to load curated paths:', e);
-      } finally {
-        setIsLoading(false);
+  const [curatedPathsError, setCuratedPathsError] = React.useState<string | null>(null);
+  
+  const loadCuratedPaths = React.useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setCuratedPathsError(null);
+      const basePath = import.meta.env.BASE_URL || '/';
+      const response = await fetch(`${basePath}data/learning-paths.json`);
+      if (response.ok) {
+        const data = await response.json();
+        setCuratedPaths(data);
+      } else {
+        setCuratedPathsError(`Failed to load learning paths (${response.status})`);
       }
+    } catch (e) {
+      console.error('Failed to load curated paths:', e);
+      setCuratedPathsError('Failed to load learning paths. Check your connection.');
+    } finally {
+      setIsLoading(false);
     }
-    loadCuratedPaths();
   }, []);
+  
+  React.useEffect(() => {
+    loadCuratedPaths();
+  }, [loadCuratedPaths]);
   
   // Update active paths when curated paths load
   React.useEffect(() => {
@@ -577,8 +584,24 @@ export function GenZHomePage() {
                 </div>
 
                 {/* Loading state */}
-                {isLoading ? (
+                {isLoading && !curatedPathsError ? (
                   <SkeletonList count={2} />
+                ) : curatedPathsError ? (
+                  /* Error state - show error with retry option */
+                  <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                    <div className="bg-[var(--gh-danger-subtle)] border border-[var(--gh-danger-fg)]/20 p-6 rounded-2xl mb-4 max-w-md">
+                      <AlertTriangle className="w-12 h-12 text-[var(--gh-danger-fg)] mx-auto mb-3" />
+                      <h3 className="text-lg font-bold text-[var(--gh-fg)] mb-2">Failed to load curated paths</h3>
+                      <p className="text-sm text-[var(--gh-fg-muted)]">{curatedPathsError}</p>
+                    </div>
+                    <button
+                      onClick={() => loadCuratedPaths()}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      Try Again
+                    </button>
+                  </div>
                 ) : (
                   /* MOBILE: Grid layout - smaller cards adjacent to each other */
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -116,7 +116,8 @@ export default function OnboardingPage() {
       setRole(selectedRole);
     }
     skipOnboarding();
-    setLocation('/channels');
+    // Navigate to channels with replace to prevent back navigation to onboarding
+    setLocation('/channels', { replace: true });
   };
 
   return (

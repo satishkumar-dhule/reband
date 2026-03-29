@@ -174,8 +174,12 @@ export default function QuestionViewer() {
   const [markedQuestions, setMarkedQuestions] = useState<string[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem(`marked-${channelId}`);
-    setMarkedQuestions(saved ? JSON.parse(saved) : []);
+    try {
+      const saved = localStorage.getItem(`marked-${channelId}`);
+      setMarkedQuestions(saved ? JSON.parse(saved) : []);
+    } catch {
+      setMarkedQuestions([]);
+    }
   }, [channelId]);
 
   // Mobile swipe to switch between question and answer
@@ -271,7 +275,11 @@ export default function QuestionViewer() {
       const newMarked = prev.includes(currentQuestion.id)
         ? prev.filter(id => id !== currentQuestion.id)
         : [...prev, currentQuestion.id];
-      localStorage.setItem(`marked-${channelId}`, JSON.stringify(newMarked));
+      try {
+        localStorage.setItem(`marked-${channelId}`, JSON.stringify(newMarked));
+      } catch {
+        // Storage quota exceeded or unavailable
+      }
       return newMarked;
     });
   };

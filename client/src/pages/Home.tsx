@@ -327,6 +327,20 @@ export default function Home() {
                       <div key={i} className="h-32 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] animate-pulse" />
                     ))}
                   </div>
+                ) : error ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="bg-[var(--gh-danger-subtle)] border border-[var(--gh-danger-fg)]/20 p-6 rounded-xl mb-4 max-w-md">
+                      <AlertCircle className="w-10 h-10 text-[var(--gh-danger-fg)] mx-auto mb-3" />
+                      <h3 className="text-base font-semibold text-[var(--gh-fg)] mb-2">Failed to load channels</h3>
+                      <p className="text-sm text-[var(--gh-fg-muted)]">{error}</p>
+                    </div>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--gh-accent-fg)] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+                    >
+                      Try Again
+                    </button>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {pinnedChannels.map((channel) => (

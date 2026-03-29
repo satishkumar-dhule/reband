@@ -307,12 +307,12 @@ function EngagementSummary({ className = '' }: { className?: string }) {
   return (
     <div className={`flex items-center gap-4 p-3 rounded-lg bg-muted border-border ${className}`}>
       <TrendingUp className="w-4 h-4 text-[var(--gh-success-fg,#1a7f37)]" />
-      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+      <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <span>
-          <span className="text-gray-700 dark:text-gray-200 font-medium">{summary.totalChannelsVisited}</span> channels explored
+          <span className="font-medium">{summary.totalChannelsVisited}</span> channels explored
         </span>
         <span>
-          <span className="text-gray-700 dark:text-gray-200 font-medium">{summary.totalQuestionsCompleted}</span> completed
+          <span className="font-medium">{summary.totalQuestionsCompleted}</span> completed
         </span>
         {summary.currentStreak > 0 && (
           <span>

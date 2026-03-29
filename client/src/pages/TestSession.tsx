@@ -61,7 +61,21 @@ function getAutoSubmitPref(): boolean {
   }
 }
 function setAutoSubmitPref(value: boolean): void {
-  localStorage.setItem(AUTO_SUBMIT_KEY, String(value));
+  try {
+    localStorage.setItem(AUTO_SUBMIT_KEY, String(value));
+  } catch {
+    // Storage quota exceeded or unavailable
+  }
+}
+
+// Safe localStorage session check helper
+function hasSessionData(sessionId: string | null | undefined): boolean {
+  if (!sessionId) return false;
+  try {
+    return localStorage.getItem(sessionId) !== null;
+  } catch {
+    return false;
+  }
 }
 
 export default function TestSession() {
@@ -398,7 +412,7 @@ export default function TestSession() {
                 )}
 
                 {/* Resume banner */}
-                {sessionId && localStorage.getItem(sessionId) && (
+                {hasSessionData(sessionId) && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -453,7 +467,7 @@ export default function TestSession() {
                 </div>
 
                 <div className="space-y-2">
-                  {sessionId && localStorage.getItem(sessionId) && (
+                  {hasSessionData(sessionId) && (
                     <button
                       onClick={() => startTest(true)}
                       className={`w-full py-3 ${theme.badge} text-white font-bold rounded hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg ${theme.glow}`}
@@ -463,19 +477,19 @@ export default function TestSession() {
                   )}
                   <button
                     onClick={() => {
-                      if (sessionId && localStorage.getItem(sessionId)) {
+                      if (hasSessionData(sessionId)) {
                         // Clear old session before starting new
                         clearSession();
                       }
                       startTest(false);
                     }}
-                    className={`w-full py-3 ${sessionId && localStorage.getItem(sessionId) ? 'bg-muted text-foreground' : `${theme.badge} text-white shadow-lg ${theme.glow}`} font-bold rounded hover:opacity-90 transition-all flex items-center justify-center gap-2`}
+                    className={`w-full py-3 ${hasSessionData(sessionId) ? 'bg-muted text-foreground' : `${theme.badge} text-white shadow-lg ${theme.glow}`} font-bold rounded hover:opacity-90 transition-all flex items-center justify-center gap-2`}
                   >
                     {isExpired ? (
                       <>
                         <RefreshCw className="w-5 h-5" /> Retake Test
                       </>
-                    ) : sessionId && localStorage.getItem(sessionId) ? (
+                    ) : hasSessionData(sessionId) ? (
                       <>
                         <Zap className="w-5 h-5" /> Start New Test
                       </>

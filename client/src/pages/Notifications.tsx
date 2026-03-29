@@ -65,7 +65,11 @@ export default function Notifications() {
   // Save notifications
   const saveNotifications = (updated: Notification[]) => {
     setNotifications(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    } catch {
+      // Storage quota exceeded or unavailable
+    }
   };
 
   const markAsRead = (id: string) => {

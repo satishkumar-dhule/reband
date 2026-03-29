@@ -11,6 +11,7 @@ import { useLocation } from 'wouter';
 
 import { QuestionEditor } from '../components/QuestionEditor';
 import type { Question } from '@/lib/answer-formatting/types';
+import { toast } from '@/hooks/use-toast';
 
 // Sample questions for demo
 const sampleQuestions: Partial<Question>[] = [
@@ -48,6 +49,7 @@ export default function QuestionEditorDemo() {
   const [currentQuestion, setCurrentQuestion] = useState<Partial<Question> | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [savedQuestions, setSavedQuestions] = useState<Question[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreateNew = () => {
     setCurrentQuestion({});
@@ -60,16 +62,30 @@ export default function QuestionEditorDemo() {
   };
 
   const handleSaveQuestion = (question: Question) => {
-    setSavedQuestions(prev => {
-      const existing = prev.find(q => q.id === question.id);
-      if (existing) {
-        return prev.map(q => q.id === question.id ? question : q);
-      } else {
-        return [...prev, question];
-      }
-    });
-    setIsEditing(false);
-    setCurrentQuestion(null);
+    setIsSubmitting(true);
+    
+    // Simulate brief processing
+    setTimeout(() => {
+      setSavedQuestions(prev => {
+        const existing = prev.find(q => q.id === question.id);
+        if (existing) {
+          return prev.map(q => q.id === question.id ? question : q);
+        } else {
+          return [...prev, question];
+        }
+      });
+      
+      toast({
+        title: 'Question Saved',
+        description: question.id?.startsWith('demo-') 
+          ? 'Sample question updated successfully' 
+          : 'Your question has been saved',
+      });
+      
+      setIsEditing(false);
+      setCurrentQuestion(null);
+      setIsSubmitting(false);
+    }, 300);
   };
 
   const handleCancelEdit = () => {

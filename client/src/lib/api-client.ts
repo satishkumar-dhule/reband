@@ -84,8 +84,8 @@ async function fetchJson<T>(url: string): Promise<T> {
   return response.json();
 }
 
-// Build version for cache busting (updated on each build)
-const BUILD_VERSION = '20260113';
+// Build version for cache busting - use timestamp to ensure fresh data on rebuild
+const BUILD_VERSION = import.meta.env.VITE_BUILD_TIMESTAMP || Date.now().toString();
 
 // Sanitize answer field if it contains MCQ JSON format
 function sanitizeAnswer(answer: string | undefined): string {

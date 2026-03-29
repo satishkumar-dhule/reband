@@ -40,11 +40,15 @@ export default function Bookmarks() {
     const bookmarked: BookmarkedQuestion[] = [];
     const channelIds = new Set<string>();
     subscribedChannels.forEach(c => channelIds.add(c.id));
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith(STORAGE_KEYS.MARKED_PREFIX)) {
-        channelIds.add(key.replace(STORAGE_KEYS.MARKED_PREFIX, ''));
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key?.startsWith(STORAGE_KEYS.MARKED_PREFIX)) {
+          channelIds.add(key.replace(STORAGE_KEYS.MARKED_PREFIX, ''));
+        }
       }
+    } catch {
+      // localStorage access error - skip marked prefix scan
     }
     channelIds.forEach(channelId => {
       const markedIds = ProgressStorage.getMarked(channelId);

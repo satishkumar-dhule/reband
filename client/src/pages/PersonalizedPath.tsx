@@ -20,6 +20,7 @@ export default function PersonalizedPath() {
   const [, setLocation] = useLocation();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [showSetup, setShowSetup] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Setup form state
   const [selectedJobTitle, setSelectedJobTitle] = useState('');
@@ -38,13 +39,23 @@ export default function PersonalizedPath() {
   const handleCreateProfile = () => {
     if (!selectedJobTitle) return;
     
-    const newProfile = createUserProfile(
-      selectedJobTitle,
-      selectedExperience,
-      targetCompany || undefined
-    );
-    setProfile(newProfile);
-    setShowSetup(false);
+    setIsSubmitting(true);
+    
+    // Simulate brief processing for better UX
+    setTimeout(() => {
+      const newProfile = createUserProfile(
+        selectedJobTitle,
+        selectedExperience,
+        targetCompany || undefined
+      );
+      setProfile(newProfile);
+      setShowSetup(false);
+      setIsSubmitting(false);
+      toast({
+        title: 'Profile Created',
+        description: 'Your personalized learning path is ready!',
+      });
+    }, 300);
   };
 
   const learningPath = profile ? getPersonalizedLearningPath(profile) : [];
@@ -134,11 +145,20 @@ export default function PersonalizedPath() {
 
                 <button
                   onClick={handleCreateProfile}
-                  disabled={!selectedJobTitle}
+                  disabled={isSubmitting || !selectedJobTitle}
                   className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  Create My Learning Path
-                  <ArrowRight className="w-5 h-5" />
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      Create My Learning Path
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
                 </button>
               </div>
             </motion.div>

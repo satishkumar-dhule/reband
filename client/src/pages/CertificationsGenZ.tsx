@@ -11,7 +11,7 @@ import { SEOHead } from '../components/SEOHead';
 import {
   Search, Award, Clock, ChevronRight, Sparkles, TrendingUp, Check, Plus,
   Cloud, Shield, Database, Brain, Code, Users, Box, Terminal, Server, Cpu,
-  Layers, Network, GitBranch, Loader2, Target
+  Layers, Network, GitBranch, Loader2, Target, AlertTriangle, RefreshCw
 } from 'lucide-react';
 
 // Certification type
@@ -60,21 +60,24 @@ const categories = [
   { id: 'management', name: 'Management' }
 ];
 
-// Fetch certifications
+// Fetch certifications with proper error handling
 function useCertifications() {
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchCertifications() {
       try {
         const basePath = import.meta.env.BASE_URL || '/';
         const response = await fetch(`${basePath}data/certifications.json`);
-        if (!response.ok) throw new Error('Failed to fetch');
+        if (!response.ok) throw new Error(`Failed to fetch certifications (${response.status})`);
         const data = await response.json();
         setCertifications(data);
       } catch (err) {
-        console.error('Failed to load certifications:', err);
+        const message = err instanceof Error ? err.message : 'Unknown error occurred';
+        console.error('Failed to load certifications:', message);
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -82,12 +85,12 @@ function useCertifications() {
     fetchCertifications();
   }, []);
 
-  return { certifications, loading };
+  return { certifications, loading, error };
 }
 
 export default function CertificationsGenZ() {
   const [, navigate] = useLocation();
-  const { certifications, loading } = useCertifications();
+  const { certifications, loading, error } = useCertifications();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [startedCerts, setStartedCerts] = useState<Set<string>>(new Set());
@@ -136,6 +139,28 @@ export default function CertificationsGenZ() {
       <AppLayout>
         <div className="min-h-screen bg-background flex items-center justify-center pt-safe pb-safe">
           <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-primary animate-spin" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Show error state with retry option
+  if (error) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center pt-safe pb-safe px-4">
+          <div className="bg-[var(--gh-danger-subtle)] border border-[var(--gh-danger-fg)]/20 p-6 rounded-2xl mb-6 max-w-md text-center">
+            <AlertTriangle className="w-12 h-12 text-[var(--gh-danger-fg)] mx-auto mb-4" />
+            <h2 className="text-lg font-semibold text-[var(--gh-fg)] mb-2">Failed to load certifications</h2>
+            <p className="text-sm text-[var(--gh-fg-muted)]">{error}</p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </button>
         </div>
       </AppLayout>
     );

@@ -162,6 +162,25 @@ export default function TestsGenZ() {
                   <p className="text-muted-foreground">Loading tests...</p>
                 </div>
               </div>
+            ) : error ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center min-h-[50vh] text-center"
+              >
+                <div className="bg-red-500/10 border border-red-500/30 p-6 rounded-xl mb-6 max-w-md">
+                  <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-2">Failed to load tests</h3>
+                  <p className="text-muted-foreground mb-4">{error}</p>
+                </div>
+                <button
+                  onClick={loadTestsData}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Try Again
+                </button>
+              </motion.div>
             ) : filteredTests.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0 }}

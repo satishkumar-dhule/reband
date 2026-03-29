@@ -46,10 +46,13 @@ function OnboardingGuard({ children }: { children: ReactNode }) {
     setIsReady(true);
   }, []);
 
+  // BUG-FIX: Added { replace: true } to prevent history pollution
+  // Without this, users would have duplicate /onboarding entries in browser history
+  // when navigating back after completing onboarding
   useEffect(() => {
     if (isReady && needsOnboarding && location !== '/onboarding') {
       // Redirect new users to onboarding
-      setLocation('/onboarding');
+      setLocation('/onboarding', { replace: true });
     }
   }, [isReady, needsOnboarding, location, setLocation]);
 
@@ -72,7 +75,8 @@ function MinimalApp() {
   const [location] = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Scroll to top on route change
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location]);
 
   return (

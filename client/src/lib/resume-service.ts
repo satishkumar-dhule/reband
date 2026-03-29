@@ -59,40 +59,50 @@ export function getInProgressSessions(): ResumeSession[] {
 function getTestSessions(): ResumeSession[] {
   const sessions: ResumeSession[] = [];
   
-  // Scan localStorage for test session keys
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key?.startsWith('test-session-')) {
-      try {
-        const data = JSON.parse(localStorage.getItem(key) || '{}');
-        
-        // Only include if session is active (not completed)
-        if (data.questions && data.questions.length > 0 && 
-            data.currentIndex !== undefined && 
-            data.currentIndex < data.questions.length) {
-          
-          const channelId = data.channelId || key.replace('test-session-', '');
-          const progress = (data.currentIndex / data.questions.length) * 100;
-          const answeredCount = Object.keys(data.answers || {}).length;
-          
-          sessions.push({
-            id: key,
-            type: 'test',
-            title: `${data.channelName || channelId} Test`,
-            subtitle: `Question ${data.currentIndex + 1} of ${data.questions.length} • ${answeredCount} answered`,
-            progress: Math.round(progress),
-            totalItems: data.questions.length,
-            completedItems: data.currentIndex,
-            lastAccessedAt: data.lastAccessedAt || new Date().toISOString(),
-            channelId,
-            sessionData: data,
-            icon: 'clipboard-list',
-            color: getChannelColor(channelId)
-          });
-        }
-      } catch (e) {
-        console.error('Error parsing test session:', e);
+  // Scan localStorage for test session keys - collect keys first to avoid mutation issues
+  const sessionKeys: string[] = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('test-session-')) {
+        sessionKeys.push(key);
       }
+    }
+  } catch {
+    return sessions;
+  }
+  
+  // Process collected keys
+  for (const key of sessionKeys) {
+    try {
+      const data = JSON.parse(localStorage.getItem(key) || '{}');
+      
+      // Only include if session is active (not completed)
+      if (data.questions && data.questions.length > 0 && 
+          data.currentIndex !== undefined && 
+          data.currentIndex < data.questions.length) {
+        
+        const channelId = data.channelId || key.replace('test-session-', '');
+        const progress = (data.currentIndex / data.questions.length) * 100;
+        const answeredCount = Object.keys(data.answers || {}).length;
+        
+        sessions.push({
+          id: key,
+          type: 'test',
+          title: `${data.channelName || channelId} Test`,
+          subtitle: `Question ${data.currentIndex + 1} of ${data.questions.length} • ${answeredCount} answered`,
+          progress: Math.round(progress),
+          totalItems: data.questions.length,
+          completedItems: data.currentIndex,
+          lastAccessedAt: data.lastAccessedAt || new Date().toISOString(),
+          channelId,
+          sessionData: data,
+          icon: 'clipboard-list',
+          color: getChannelColor(channelId)
+        });
+      }
+    } catch (e) {
+      console.error('Error parsing test session:', e);
     }
   }
   
