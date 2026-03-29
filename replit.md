@@ -14,9 +14,9 @@ A technical interview prep platform with 1000+ questions, swipe-based learning, 
 
 The app runs via the "Start application" workflow:
 ```
-NODE_ENV=development npx tsx server/index.ts
+npm run dev:server
 ```
-The server listens on port 5000 (or `$PORT` env variable). In development it uses Vite as middleware to serve the frontend.
+The server listens on port 5173 (or `$PORT` env variable), mapped to external port 80 in Replit. In development it uses Vite as middleware to serve the frontend.
 
 ## Key Files
 
