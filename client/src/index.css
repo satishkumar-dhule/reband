@@ -643,8 +643,8 @@ body {
 
 /* ===== GITHUB DARK THEME ===== */
 :root,
-[data-theme='clean-dark'],
-.clean-dark {
+[data-theme='dark'],
+.dark {
   --background: hsl(216 28% 7%);
   --foreground: hsl(213 27% 90%);
   --card: hsl(216 25% 10%);
@@ -683,8 +683,8 @@ body {
 }
 
 /* ===== GITHUB LIGHT THEME ===== */
-[data-theme='clean-light'],
-.clean-light {
+[data-theme='light'],
+.light {
   --background: hsl(0 0% 100%);
   --foreground: hsl(215 14% 14%);
   --card: hsl(0 0% 100%);
@@ -804,14 +804,14 @@ body {
 }
 
 /* Light mode body background - remove dark gradient overlay */
-[data-theme='clean-light'] body,
-.clean-light body {
+[data-theme='light'] body,
+.light body {
   background-image: none;
 }
 
 /* Dark mode body background - add subtle gradient overlay */
-[data-theme='clean-dark'] body,
-.clean-dark body {
+[data-theme='dark'] body,
+.dark body {
   background-image: 
     radial-gradient(ellipse at 20% 20%, rgba(150, 255, 150, 0.02) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 80%, rgba(100, 200, 255, 0.02) 0%, transparent 50%);

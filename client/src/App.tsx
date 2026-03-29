@@ -25,6 +25,10 @@ const CodingChallenge = lazy(() => import("@/pages/CodingChallengeGenZ"));
 const LearningPaths = lazy(() => import("@/pages/LearningPathsGenZ"));
 const Badges = lazy(() => import("@/pages/BadgesGenZ"));
 const Onboarding = lazy(() => import("@/pages/Onboarding"));
+const Certifications = lazy(() => import("@/pages/CertificationsGenZ"));
+const Tests = lazy(() => import("@/pages/TestsGenZ"));
+const MyPath = lazy(() => import("@/pages/MyPathGenZ"));
+const BotActivity = lazy(() => import("@/pages/BotActivity"));
 
 function MinimalApp() {
   const [location] = useLocation();
@@ -51,6 +55,10 @@ function MinimalApp() {
         <Route path="/learning-paths" component={LearningPaths} />
         <Route path="/badges" component={Badges} />
         <Route path="/onboarding" component={Onboarding} />
+        <Route path="/certifications" component={Certifications} />
+        <Route path="/tests" component={Tests} />
+        <Route path="/my-path" component={MyPath} />
+        <Route path="/bot-activity" component={BotActivity} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
