@@ -83,10 +83,10 @@ const progressSubNav: NavItem[] = [
 
 function getActiveSection(location: string): string {
   if (location === '/') return 'home';
-  if (location === '/learning-paths' || location.startsWith('/learning-path/')) return 'paths';
+  if (location === '/learning-paths' || location.startsWith('/learning-paths/')) return 'paths';
   if (location === '/channels' || location.startsWith('/channel/') || location === '/certifications' || location.startsWith('/certification/') || location === '/my-path') return 'learn';
-  if (location.startsWith('/voice') || location.startsWith('/test') || location.startsWith('/coding') || location === '/review' || location === '/training') return 'practice';
-  if (location === '/stats' || location === '/badges' || location === '/bookmarks' || location === '/profile' || location === '/about') return 'progress';
+  if (location.startsWith('/voice') || location.startsWith('/test') || location.startsWith('/coding') || location === '/review') return 'practice';
+  if (location === '/stats' || location === '/badges' || location === '/bookmarks' || location === '/profile') return 'progress';
   if (location === '/bot-activity') return 'bots';
   return 'home';
 }

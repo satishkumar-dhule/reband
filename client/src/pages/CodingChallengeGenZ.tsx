@@ -30,7 +30,9 @@ function getStoredLanguage(): Language {
   try {
     const stored = localStorage.getItem(CODING_LANGUAGE_KEY);
     if (stored === 'javascript' || stored === 'python') return stored;
-  } catch {}
+  } catch (error) {
+    console.error('Failed to get stored language:', error);
+  }
   return 'javascript';
 }
 
@@ -38,7 +40,9 @@ function getStoredCode(challengeId: string, language: Language): string | null {
   try {
     const key = `${CODING_PROGRESS_PREFIX}${challengeId}-${language}`;
     return localStorage.getItem(key);
-  } catch {}
+  } catch (error) {
+    console.error('Failed to get stored code:', error);
+  }
   return null;
 }
 
@@ -46,7 +50,9 @@ function saveCodeProgress(challengeId: string, language: Language, code: string)
   try {
     const key = `${CODING_PROGRESS_PREFIX}${challengeId}-${language}`;
     localStorage.setItem(key, code);
-  } catch {}
+  } catch (error) {
+    console.error('Failed to save code progress:', error);
+  }
 }
 
 export default function CodingChallengeGenZ() {
@@ -91,7 +97,9 @@ export default function CodingChallengeGenZ() {
   useEffect(() => {
     try {
       localStorage.setItem(CODING_LANGUAGE_KEY, language);
-    } catch {}
+    } catch (error) {
+      console.error('Failed to save language preference:', error);
+    }
   }, [language]);
 
   useEffect(() => {
@@ -197,7 +205,9 @@ export default function CodingChallengeGenZ() {
       try {
         const key = `${CODING_PROGRESS_PREFIX}${currentChallenge.id}-${language}`;
         localStorage.removeItem(key);
-      } catch {}
+      } catch (error) {
+        console.error('Failed to clear code progress:', error);
+      }
     }
   }, [currentChallenge, language]);
 

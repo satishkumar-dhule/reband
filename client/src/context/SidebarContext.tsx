@@ -28,7 +28,9 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(isCollapsed));
-    } catch {}
+    } catch (error) {
+      console.error('Failed to save sidebar state:', error);
+    }
   }, [isCollapsed]);
 
   const toggleSidebar = useCallback(() => setIsCollapsed(prev => !prev), []);

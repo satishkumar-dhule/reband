@@ -504,8 +504,9 @@ const EditTab: React.FC<EditTabProps> = ({
       {/* Basic Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-2">Channel</label>
+          <label htmlFor="channel-select" className="block text-sm font-medium mb-2">Channel</label>
           <select
+            id="channel-select"
             value={formData.channel || ''}
             onChange={(e) => onInputChange('channel', e.target.value)}
             className="w-full px-3 py-2 border border-border rounded-md bg-background"
@@ -523,8 +524,9 @@ const EditTab: React.FC<EditTabProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Difficulty</label>
+          <label htmlFor="difficulty-select" className="block text-sm font-medium mb-2">Difficulty</label>
           <select
+            id="difficulty-select"
             value={formData.difficulty || ''}
             onChange={(e) => onInputChange('difficulty', e.target.value)}
             className="w-full px-3 py-2 border border-border rounded-md bg-background"
@@ -538,7 +540,7 @@ const EditTab: React.FC<EditTabProps> = ({
 
       {/* Question */}
       <div>
-        <label className="block text-sm font-medium mb-2">
+        <label htmlFor="question-input" className="block text-sm font-medium mb-2">
           Question
           {detectedPattern && (
             <span className="ml-2 px-2 py-0.5 text-xs bg-primary/10 text-primary rounded">

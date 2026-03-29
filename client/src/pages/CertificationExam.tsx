@@ -19,7 +19,6 @@ import {
   CertificationDomain,
   CertificationExamConfig,
 } from '../lib/certification-questions';
-import { useCredits } from '../context/CreditsContext';
 import { SEOHead } from '../components/SEOHead';
 import {
   ArrowLeft, Award, Target, CheckCircle, XCircle,

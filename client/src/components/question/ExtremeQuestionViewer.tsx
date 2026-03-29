@@ -10,7 +10,6 @@ import { getChannel } from '../../lib/data';
 import { useQuestionsWithPrefetch, useSubChannels, useCompaniesWithCounts } from '../../hooks/use-questions';
 import { useProgress, trackActivity } from '../../hooks/use-progress';
 import { useUserPreferences } from '../../context/UserPreferencesContext';
-import { useCredits } from '../../context/CreditsContext';
 import { useAchievementContext } from '../../context/AchievementContext';
 import { RecommendationService } from '../../services/recommendation.service';
 import { ExtremeQuestionPanel } from './ExtremeQuestionPanel';
@@ -108,7 +107,9 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
     try {
       const saved = localStorage.getItem(checkpointsKey);
       if (saved) setPassedCheckpoints(new Set(JSON.parse(saved)));
-    } catch {}
+    } catch (error) {
+      console.error('Failed to load checkpoints:', error);
+    }
   }, [checkpointsKey]);
 
   // Save checkpoints when they change
@@ -130,8 +131,10 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
   const shuffleEnabled = preferences.shuffleQuestions !== false;
   const prioritizeUnvisited = preferences.prioritizeUnvisited !== false;
 
-  // Credits system
-  const { onQuestionSwipe, onQuestionView, balance, formatCredits, refreshBalance } = useCredits();
+  // Credits system (mock for static build)
+  const onQuestionSwipe = useCallback(() => {}, []);
+  const onQuestionView = useCallback(() => {}, []);
+  const refreshBalance = useCallback(() => {}, []);
   
   // Achievement system
   const { trackEvent } = useAchievementContext();

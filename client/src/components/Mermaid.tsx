@@ -426,7 +426,7 @@ export function Mermaid({ chart, themeOverride }: MermaidProps) {
           <div 
             className="mermaid-container transition-transform duration-200"
             style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center center' }}
-            dangerouslySetInnerHTML={{ __html: svgContent }}
+            dangerouslySetInnerHTML={{ __html: typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(svgContent, { USE_PROFILES: { svg: true } }) : svgContent }}
           />
         </div>
       </div>
@@ -442,7 +442,7 @@ export function Mermaid({ chart, themeOverride }: MermaidProps) {
         ref={ref}
         className={`w-full flex justify-center my-1 sm:my-4 overflow-x-auto mermaid-container mermaid-mobile-fit ${!isMobile ? 'cursor-pointer' : ''}`}
         onClick={() => !isMobile && setIsExpanded(true)}
-        dangerouslySetInnerHTML={{ __html: svgContent }}
+        dangerouslySetInnerHTML={{ __html: typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(svgContent, { USE_PROFILES: { svg: true } }) : svgContent }}
       />
       {/* Expand button - hidden on mobile */}
       <button

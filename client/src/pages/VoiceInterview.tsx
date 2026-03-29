@@ -9,13 +9,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mic, MicOff, Play, Square, RotateCcw, Home, ChevronRight,
   CheckCircle, XCircle, AlertCircle, Volume2, Loader2, Sparkles,
-  ThumbsUp, ThumbsDown, Minus, Target, MessageSquare, Coins, Edit3,
+  ThumbsUp, ThumbsDown, Minus, Target, MessageSquare, Edit3,
   SkipForward, ExternalLink, Shuffle, ChevronLeft, MoreHorizontal, User,
-  BarChart3, Brain, Lightbulb, Zap, Award
+  BarChart3, Brain, Lightbulb, Zap
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { getAllQuestionsAsync } from '../lib/questions-loader';
-import { useCredits } from '../context/CreditsContext';
+
 import { useAchievementContext } from '../context/AchievementContext';
 import { useUserPreferences } from '../hooks/use-user-preferences';
 import { CreditsDisplay } from '../components/CreditsDisplay';
@@ -75,7 +75,6 @@ export default function VoiceInterview() {
   const stateRef = useRef(state);
   stateRef.current = state;
   
-  const { onVoiceInterview, config } = useCredits();
   const { trackEvent } = useAchievementContext();
   const { preferences } = useUserPreferences();
 
@@ -271,15 +270,14 @@ export default function VoiceInterview() {
       const questionType = getQuestionType(currentQuestion.channel);
       const result = evaluateVoiceAnswer(transcript, currentQuestion.answer, currentQuestion.voiceKeywords, questionType);
       setEvaluation(result);
-      const credits = onVoiceInterview(result.verdict);
-      setEarnedCredits({ total: credits.totalCredits, bonus: credits.bonusCredits });
+      setEarnedCredits(null);
       trackEvent({ type: 'voice_interview_completed', timestamp: new Date().toISOString() });
       if (result.score >= 60) showComment('good_score');
       else showComment('bad_score');
       setShowAnswer(true); // Reveal answer after evaluation
       setState('evaluated');
     }, 800);
-  }, [transcript, currentQuestion, onVoiceInterview, showComment, trackEvent]);
+  }, [transcript, currentQuestion, showComment, trackEvent]);
 
   const nextQuestion = useCallback(() => {
     if (currentIndex < questions.length - 1) {
@@ -795,30 +793,6 @@ export default function VoiceInterview() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-4"
               >
-                {/* Credits Earned Banner */}
-                {earnedCredits && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="p-4 bg-gradient-to-r from-[var(--gh-attention-fg)]/20 to-[var(--gh-attention-fg)]/20 border border-[var(--gh-attention-fg)]/30 rounded-2xl flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-[var(--gh-attention-fg)]/20 flex items-center justify-center">
-                        <Coins className="w-6 h-6 text-[var(--gh-attention-fg)]" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-[var(--gh-attention-fg)] text-lg">+{earnedCredits.total} Credits Earned!</div>
-                        <div className="text-xs text-[var(--gh-fg-muted)]">
-                          {earnedCredits.bonus > 0 
-                            ? `${config.VOICE_ATTEMPT} base + ${earnedCredits.bonus} success bonus`
-                            : 'Thanks for practicing!'}
-                        </div>
-                      </div>
-                    </div>
-                    <Award className="w-8 h-8 text-[var(--gh-attention-fg)]/50" />
-                  </motion.div>
-                )}
-
                 {/* Verdict Card */}
                 <div className={`p-6 rounded-2xl border ${getVerdictStyle(evaluation.verdict)}`}>
                   <div className="flex items-center justify-between mb-6">

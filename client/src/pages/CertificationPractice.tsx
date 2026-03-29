@@ -11,7 +11,7 @@ import {
   getCertificationById, 
   getPrerequisiteCertifications,
 } from '../lib/certifications-config';
-import { useCredits } from '../context/CreditsContext';
+
 import { SEOHead } from '../components/SEOHead';
 import { QuestionPanel } from '../components/QuestionPanel';
 import { AnswerPanel } from '../components/AnswerPanel';
@@ -142,7 +142,9 @@ export default function CertificationPractice() {
     try {
       const saved = localStorage.getItem(checkpointsKey);
       if (saved) setPassedCheckpoints(new Set(JSON.parse(saved)));
-    } catch {}
+    } catch (error) {
+      console.error('Failed to load checkpoints:', error);
+    }
   }, [checkpointsKey]);
 
   useEffect(() => {
@@ -183,7 +185,9 @@ export default function CertificationPractice() {
             
             const count = Math.ceil(channelQuestions.length * (mapping.weight / 100));
             allQuestions.push(...channelQuestions.slice(0, count));
-          } catch {}
+          } catch (error) {
+            console.error('Failed to fetch channel data:', error);
+          }
         }
 
         const allTests = await loadTests();

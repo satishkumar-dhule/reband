@@ -200,34 +200,57 @@ class DatabaseStorageSync {
       markedQuestions: data.markedQuestions,
       lastVisitedIndex: data.lastVisitedIndex,
     });
+    await browserDB.queueSync('progress', `${this.userId}-${channelId}`, 'update', {
+      userId: this.userId,
+      channelId,
+      ...data,
+    });
   }
 
   async markQuestionComplete(channelId: string, questionId: string): Promise<void> {
-    const existing = await browserDB.getProgress(this.userId, channelId);
-    const completed = existing?.completedQuestions || [];
-    
-    if (!completed.includes(questionId)) {
-      completed.push(questionId);
-      await browserDB.updateProgress(this.userId, channelId, { completedQuestions: completed });
+    const MAX_RETRIES = 3;
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      const existing = await browserDB.getProgress(this.userId, channelId);
+      const completed = existing?.completedQuestions || [];
+      
+      if (!completed.includes(questionId)) {
+        const updated = [...completed, questionId];
+        await browserDB.updateProgress(this.userId, channelId, { completedQuestions: updated });
+        
+        const verify = await browserDB.getProgress(this.userId, channelId);
+        if (verify?.completedQuestions.includes(questionId)) {
+          return;
+        }
+      } else {
+        return;
+      }
     }
   }
 
   async toggleBookmark(channelId: string, questionId: string): Promise<boolean> {
-    const existing = await browserDB.getProgress(this.userId, channelId);
-    const marked = existing?.markedQuestions || [];
-    
-    const index = marked.indexOf(questionId);
-    const isBookmarked = index === -1;
-    
-    if (isBookmarked) {
-      marked.push(questionId);
-    } else {
-      marked.splice(index, 1);
+    const MAX_RETRIES = 3;
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      const existing = await browserDB.getProgress(this.userId, channelId);
+      const marked = [...(existing?.markedQuestions || [])];
+      
+      const index = marked.indexOf(questionId);
+      const isBookmarked = index === -1;
+      
+      if (isBookmarked) {
+        marked.push(questionId);
+      } else {
+        marked.splice(index, 1);
+      }
+      
+      await browserDB.updateProgress(this.userId, channelId, { markedQuestions: marked });
+      
+      const verify = await browserDB.getProgress(this.userId, channelId);
+      const markedNow = verify?.markedQuestions || [];
+      if ((isBookmarked && markedNow.includes(questionId)) || (!isBookmarked && !markedNow.includes(questionId))) {
+        return isBookmarked;
+      }
     }
-    
-    await browserDB.updateProgress(this.userId, channelId, { markedQuestions: marked });
-    
-    return isBookmarked;
+    return false;
   }
 
   async getQuestions(channel: string): Promise<QuestionData[]> {

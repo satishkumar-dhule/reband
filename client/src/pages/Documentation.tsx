@@ -49,7 +49,7 @@ export default function Documentation() {
             </button>
             <Link href="/">
               <a className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-var(--gh-58a6ff] to-var(--gh-a371f7] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--gh-blue)] to-[var(--gh-purple)] flex items-center justify-center">
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
                 <div className="hidden sm:block">

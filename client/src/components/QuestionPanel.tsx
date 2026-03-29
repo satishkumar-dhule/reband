@@ -263,8 +263,9 @@ export function QuestionPanel({
                 ? 'bg-primary/10 text-primary border border-primary/20'
                 : 'bg-muted text-muted-foreground hover:text-primary'
             }`}
+            aria-label={isMarked ? "Remove bookmark" : "Bookmark question"}
           >
-            <Bookmark className={`w-4 h-4 ${isMarked ? 'fill-current' : ''}`} />
+            <Bookmark className={`w-4 h-4 ${isMarked ? 'fill-current' : ''}`} aria-hidden="true" />
           </button>
         </div>
       </div>

@@ -65,6 +65,7 @@ export function BadgeRing({ progress, size = 'md', showProgress = true, onClick 
       onClick={onClick}
       onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
       style={{ width: s.ring }}
+      aria-label={`${badge.name} badge${isUnlocked ? ' (unlocked)' : ' (locked)'}`}
     >
       {/* Ring container - use relative positioning */}
       <div 

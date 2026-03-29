@@ -107,7 +107,7 @@ export function ListenButton({
         ${className}
         disabled:opacity-50
       `}
-      title={isPlaying ? 'Stop listening' : 'Listen to answer'}
+      aria-label={isPlaying ? 'Stop listening' : 'Listen to answer'}
     >
       {isLoading ? (
         <Loader2 className={`${iconSizes[size]} animate-spin`} />
@@ -210,7 +210,7 @@ export function ListenIconButton({
         ${className}
         disabled:opacity-50
       `}
-      title={isPlaying ? 'Stop listening' : 'Listen to answer'}
+      aria-label={isPlaying ? 'Stop listening' : 'Listen to answer'}
     >
       {isLoading ? (
         <Loader2 className={`${iconSizes[size]} animate-spin`} />

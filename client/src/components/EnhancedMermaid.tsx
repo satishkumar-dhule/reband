@@ -428,7 +428,7 @@ export function EnhancedMermaid({ chart, compact = false, onRenderResult }: Enha
           onClick={() => setShowThemePicker(false)}
         >
           <div style={{ transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`, transformOrigin: 'center center', transition: isDragging ? 'none' : 'transform 0.2s ease-out' }}>
-            <div className="mermaid-container" dangerouslySetInnerHTML={{ __html: svgContent }} />
+            <div className="mermaid-container" dangerouslySetInnerHTML={{ __html: typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(svgContent, { USE_PROFILES: { svg: true } }) : svgContent }} />
           </div>
         </div>
 
@@ -457,7 +457,7 @@ export function EnhancedMermaid({ chart, compact = false, onRenderResult }: Enha
             transform: `scale(${inlineZoom})`, 
             transformOrigin: 'top left',
           }}
-          dangerouslySetInnerHTML={{ __html: svgContent }} 
+          dangerouslySetInnerHTML={{ __html: typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(svgContent, { USE_PROFILES: { svg: true } }) : svgContent }} 
         />
       </div>
       

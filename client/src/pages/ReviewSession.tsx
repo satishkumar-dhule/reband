@@ -19,7 +19,6 @@ import {
   type ReviewCard, type ConfidenceRating 
 } from '../lib/spaced-repetition';
 import { getQuestionById } from '../lib/questions-loader';
-import { useCredits } from '../context/CreditsContext';
 import { useAchievementContext } from '../context/AchievementContext';
 import { ListenButton } from '../components/ListenButton';
 import type { Question } from '../types';

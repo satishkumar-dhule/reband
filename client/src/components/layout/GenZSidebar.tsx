@@ -79,7 +79,7 @@ export function GenZSidebar() {
       <nav className="flex-1 overflow-y-auto p-4 space-y-6">
         {/* Home - Special */}
         {navItems.filter(item => item.section === 'main').map((item) => {
-          const isActive = location === item.path;
+          const isActive = item.path === "/" ? location === "/" : location.startsWith(item.path);
           const Icon = item.icon;
           
           return (

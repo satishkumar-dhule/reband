@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
+import { CreditsProvider } from "@/context/CreditsContext";
 import { LiveRegionProvider } from "@/components/LiveRegion";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import NotFound from "@/pages/not-found";
@@ -126,7 +127,8 @@ export default function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <UserPreferencesProvider>
-          <QueryClientProvider client={queryClient}>
+          <CreditsProvider>
+            <QueryClientProvider client={queryClient}>
             <TooltipProvider>
               <div className="min-h-screen">
                 {/* Skip Navigation Link - P0 Accessibility Fix */}
@@ -139,7 +141,8 @@ export default function App() {
                 <FullApp />
               </div>
             </TooltipProvider>
-          </QueryClientProvider>
+            </QueryClientProvider>
+          </CreditsProvider>
         </UserPreferencesProvider>
       </ThemeProvider>
     </ErrorBoundary>

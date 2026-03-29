@@ -69,6 +69,7 @@ interface ChannelData {
 // Cache for loaded data
 const channelCache = new Map<string, ChannelData>();
 const statsCache: { data: ChannelDetailedStats[] | null } = { data: null };
+const questionIdToChannel = new Map<string, string>();
 
 async function fetchJson<T>(url: string): Promise<T> {
   // Simple cache busting - add build timestamp
@@ -123,6 +124,11 @@ async function loadChannelData(channelId: string): Promise<ChannelData> {
     }));
   }
   
+  // Build question ID to channel mapping for fast lookups
+  for (const q of data.questions) {
+    questionIdToChannel.set(q.id, channelId);
+  }
+  
   channelCache.set(channelId, data);
   return data;
 }
@@ -160,7 +166,24 @@ export async function fetchQuestionIds(
 
 // Get a single question by ID
 export async function fetchQuestion(questionId: string): Promise<Question> {
-  // Find which channel has this question
+  // Fast path: check if we've already loaded this question's channel
+  const cachedChannel = questionIdToChannel.get(questionId);
+  if (cachedChannel && channelCache.has(cachedChannel)) {
+    const data = channelCache.get(cachedChannel)!;
+    const question = data.questions.find(q => q.id === questionId);
+    if (question) return question;
+  }
+  
+  // Slow path: search through all loaded channels
+  for (const [channelId, data] of channelCache) {
+    const question = data.questions.find(q => q.id === questionId);
+    if (question) {
+      questionIdToChannel.set(questionId, channelId);
+      return question;
+    }
+  }
+  
+  // Fallback: load channels from index and search
   const channels = await fetchChannels();
   
   for (const channel of channels) {

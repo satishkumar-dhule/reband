@@ -302,8 +302,9 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
                 onClick={onClose} 
                 className="p-2 -mr-2 hover:bg-muted rounded-xl transition-colors"
                 data-testid="search-close-btn"
+                aria-label="Close search"
               >
-                <X className="w-5 h-5 text-muted-foreground" />
+                <X className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
               </button>
             </div>
 
@@ -324,8 +325,8 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
                   data-testid="search-input-mobile"
                 />
                 {query && (
-                  <button onClick={() => setQuery('')} className="p-1.5 hover:bg-muted/80 rounded-full flex-shrink-0">
-                    <X className="w-4 h-4 text-muted-foreground" />
+                  <button onClick={() => setQuery('')} className="p-1.5 hover:bg-muted/80 rounded-full flex-shrink-0" aria-label="Clear search">
+                    <X className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
                   </button>
                 )}
               </div>
@@ -417,8 +418,8 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
                   data-testid="search-input-desktop"
                 />
                 {query && (
-                  <button onClick={() => setQuery('')} className="p-1.5 hover:bg-muted rounded-full">
-                    <X className="w-4 h-4 text-muted-foreground" />
+                  <button onClick={() => setQuery('')} className="p-1.5 hover:bg-muted rounded-full" aria-label="Clear search">
+                    <X className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
                   </button>
                 )}
                 <kbd className="px-2 py-1 text-[10px] text-muted-foreground bg-muted border border-border rounded">ESC</kbd>

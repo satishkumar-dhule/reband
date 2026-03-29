@@ -217,29 +217,22 @@ export const QuestionService = {
 
       return questions;
     } else {
-      // Production: use static client with filtering
-      const questionItems = await fetchQuestionIds(
-        channelId,
-        filters.subChannel,
-        filters.difficulty
-      );
+      // Production: use static client - fetch all questions once and filter in memory
+      const allQuestions = await fetchChannelQuestions(channelId);
+      
+      let questions = allQuestions;
 
-      // Get full question data for filtered items
-      const questions: Question[] = [];
-      for (const item of questionItems) {
-        try {
-          const q = await fetchStaticQuestion(item.id);
-          // Additional company filter if needed
-          if (filters.company && filters.company !== 'all') {
-            if (!q.companies?.includes(filters.company)) continue;
-          }
-          questions.push(castQuestion(q));
-        } catch {
-          // Skip if question not found
-        }
+      if (filters.subChannel && filters.subChannel !== 'all') {
+        questions = questions.filter(q => q.subChannel === filters.subChannel);
+      }
+      if (filters.difficulty && filters.difficulty !== 'all') {
+        questions = questions.filter(q => q.difficulty === filters.difficulty);
+      }
+      if (filters.company && filters.company !== 'all') {
+        questions = questions.filter(q => q.companies?.includes(filters.company));
       }
 
-      return questions;
+      return questions.map(castQuestion);
     }
   },
 

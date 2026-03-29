@@ -4,7 +4,6 @@ import { getChannel } from '../lib/data';
 import { useQuestionsWithPrefetch, useSubChannels, useCompaniesWithCounts } from '../hooks/use-questions';
 import { useProgress, trackActivity } from '../hooks/use-progress';
 import { useUserPreferences } from '../context/UserPreferencesContext';
-import { useCredits } from '../context/CreditsContext';
 import { useAchievementContext } from '../context/AchievementContext';
 import { SEOHead } from '../components/SEOHead';
 import { UnifiedSearch } from '../components/UnifiedSearch';
@@ -69,7 +68,6 @@ export default function QuestionViewerGenZ() {
   const shuffleEnabled = preferences.shuffleQuestions !== false;
   const prioritizeUnvisited = preferences.prioritizeUnvisited !== false;
 
-  const { onQuestionSwipe, onQuestionView } = useCredits();
   const { trackEvent } = useAchievementContext();
   const { completed, markCompleted, saveLastVisitedIndex } = useProgress(channelId || '');
   const { toast } = useUnifiedToast();
@@ -168,8 +166,6 @@ export default function QuestionViewerGenZ() {
   const nextQuestion = () => {
     if (currentIndex < totalQuestions - 1) {
       setCurrentIndex(prev => prev + 1);
-      onQuestionSwipe();
-      onQuestionView();
     }
   };
 
@@ -554,7 +550,7 @@ export default function QuestionViewerGenZ() {
                   <div className="gh-progress">
                     <div 
                       className="gh-progress-bar" 
-                      style={{ width: `${(completed.length / totalQuestions) * 100}%` }} 
+                      style={{ width: `${totalQuestions > 0 ? (completed.length / totalQuestions) * 100 : 0}%` }} 
                     />
                   </div>
                 </div>

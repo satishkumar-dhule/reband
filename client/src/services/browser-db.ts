@@ -287,19 +287,32 @@ class BrowserDB {
   }
 
   async updateProgress(userId: string, channelId: string, updates: Partial<ProgressDBRecord>): Promise<void> {
-    const existing = await this.getProgress(userId, channelId);
-    const progress: ProgressDBRecord = {
-      id: existing?.id || `${userId}-${channelId}`,
-      userId,
-      channelId,
-      completedQuestions: existing?.completedQuestions || [],
-      markedQuestions: existing?.markedQuestions || [],
-      lastVisitedIndex: existing?.lastVisitedIndex || 0,
-      lastUpdated: Date.now(),
-      ...updates,
-    };
-    await this.put('progress', progress);
-    await this.queueSync('progress', progress.id, 'update', progress);
+    const MAX_RETRIES = 3;
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      const existing = await this.getProgress(userId, channelId);
+      const progress: ProgressDBRecord = {
+        id: existing?.id || `${userId}-${channelId}`,
+        userId,
+        channelId,
+        completedQuestions: existing?.completedQuestions || [],
+        markedQuestions: existing?.markedQuestions || [],
+        lastVisitedIndex: existing?.lastVisitedIndex || 0,
+        lastUpdated: Date.now(),
+        ...updates,
+      };
+      
+      try {
+        await this.put('progress', progress);
+        await this.queueSync('progress', progress.id, 'update', progress);
+        
+        const verify = await this.getProgress(userId, channelId);
+        if (verify && verify.lastUpdated === progress.lastUpdated) {
+          return;
+        }
+      } catch {
+        // Retry on conflict
+      }
+    }
   }
 
   destroy(): void {

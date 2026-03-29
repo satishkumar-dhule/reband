@@ -17,7 +17,7 @@ import {
   Test, loadTests, getAllTestProgress, TestProgress, getTestStats,
   getChannelTheme, checkAndExpireTests, checkTestExpiration
 } from '../lib/tests';
-import { useCredits } from '../context/CreditsContext';
+
 
 export default function Tests() {
   const [_, setLocation] = useLocation();
@@ -26,7 +26,7 @@ export default function Tests() {
   const [expiredChannels, setExpiredChannels] = useState<string[]>([]);
   const progress = getAllTestProgress();
   const stats = getTestStats();
-  const { balance, formatCredits, config } = useCredits();
+
 
   useEffect(() => {
     let cancelled = false;
@@ -108,7 +108,7 @@ export default function Tests() {
               className="border border-amber-500/30 p-3 bg-gradient-to-br from-amber-500/10 to-yellow-500/5 rounded-lg text-center hover:from-amber-500/20 hover:to-yellow-500/10 transition-all"
             >
               <Coins className="w-5 h-5 mx-auto mb-1 text-amber-500" />
-              <div className="text-lg font-bold text-amber-500">{formatCredits(balance)}</div>
+              <div className="text-lg font-bold text-amber-500">--</div>
               <div className="text-[9px] text-muted-foreground uppercase">Credits</div>
             </button>
           </motion.div>
@@ -156,7 +156,7 @@ export default function Tests() {
             </div>
             <div className="flex flex-col items-end gap-1">
               <span className="text-xs font-bold text-green-400 flex items-center gap-1">
-                <Coins className="w-3 h-3" />+{config.VOICE_ATTEMPT}
+                <Coins className="w-3 h-3" />+50
               </span>
               <ChevronRight className="w-5 h-5 text-emerald-500 group-hover:translate-x-1 transition-transform" />
             </div>

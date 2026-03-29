@@ -61,9 +61,15 @@ function ContributionGrid() {
   const levels = [0, 1, 2, 3, 4];
   
   const cells = useMemo(() => {
+    const seed = 12345;
+    let random = seed;
+    const nextRandom = () => {
+      random = (random * 1103515245 + 12345) & 0x7fffffff;
+      return random / 0x7fffffff;
+    };
     return Array.from({ length: weeks }, (_, w) =>
       Array.from({ length: days }, (_, d) => {
-        const val = Math.random();
+        const val = nextRandom();
         if (val < 0.4) return 0;
         if (val < 0.6) return 1;
         if (val < 0.75) return 2;
