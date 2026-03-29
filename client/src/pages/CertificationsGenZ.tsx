@@ -234,7 +234,7 @@ export default function CertificationsGenZ() {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: Math.min(i * 0.05, 0.5) }}
-                    className="group relative p-4 md:p-6 bg-muted/50 backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-border hover:border-border transition-all overflow-hidden"
+                    className="group relative p-4 md:p-6 bg-muted/50 backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-border hover:border-primary/50 hover:scale-[1.02] transition-all duration-200 overflow-hidden"
                   >
                     {/* Background gradient on hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -248,8 +248,8 @@ export default function CertificationsGenZ() {
                             <IconComponent className="w-6 h-6 md:w-7 md:h-7 text-primary" strokeWidth={2} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="text-xs text-muted-foreground mb-1">{cert.provider}</div>
-                            <h3 className="text-base md:text-xl font-bold leading-tight line-clamp-2">{cert.name}</h3>
+                            <div className="text-xs text-muted-foreground mb-1 truncate min-w-0">{cert.provider}</div>
+                            <h3 className="text-base md:text-xl font-bold leading-tight line-clamp-2 min-w-0">{cert.name}</h3>
                           </div>
                         </div>
                       </div>
@@ -326,11 +326,13 @@ export default function CertificationsGenZ() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center py-12 md:py-20"
+                className="flex items-center justify-center min-h-[40vh]"
               >
-                <div className="text-4xl md:text-6xl mb-3 md:mb-4">🔍</div>
-                <h3 className="text-xl md:text-2xl font-bold mb-2">No certifications found</h3>
-                <p className="text-sm md:text-base text-muted-foreground">Try a different search or category</p>
+                <div className="text-center px-4">
+                  <div className="text-4xl md:text-6xl mb-3 md:mb-4">🔍</div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2">No certifications found</h3>
+                  <p className="text-sm md:text-base text-muted-foreground">Try a different search or category</p>
+                </div>
               </motion.div>
             )}
           </div>

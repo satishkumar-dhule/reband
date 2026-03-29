@@ -111,7 +111,7 @@ export default function StatsGenZ() {
 
           {/* Stats Overview Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm">
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default">
               <div className="flex items-center gap-2 text-[var(--gh-fg-muted)] mb-2">
                 <CheckCircle2 className="w-4 h-4" />
                 <span className="text-sm font-medium">Total Completed</span>
@@ -122,7 +122,7 @@ export default function StatsGenZ() {
               </div>
             </div>
 
-            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm">
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default">
               <div className="flex items-center gap-2 text-[var(--gh-fg-muted)] mb-2">
                 <Flame className="w-4 h-4 text-[var(--gh-attention-fg)]" />
                 <span className="text-sm font-medium">Current Streak</span>
@@ -130,7 +130,7 @@ export default function StatsGenZ() {
               <div className="text-2xl font-bold text-[var(--gh-fg)]">{streak} days</div>
             </div>
 
-            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm">
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default">
               <div className="flex items-center gap-2 text-[var(--gh-fg-muted)] mb-2">
                 <Zap className="w-4 h-4 text-[var(--gh-accent-fg)]" />
                 <span className="text-sm font-medium">Total XP</span>
@@ -138,7 +138,7 @@ export default function StatsGenZ() {
               <div className="text-2xl font-bold text-[var(--gh-fg)]">{balance.toLocaleString()}</div>
             </div>
 
-            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm">
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default">
               <div className="flex items-center gap-2 text-[var(--gh-fg-muted)] mb-2">
                 <Trophy className="w-4 h-4 text-[var(--gh-attention-fg)]" />
                 <span className="text-sm font-medium">Level</span>
@@ -153,8 +153,8 @@ export default function StatsGenZ() {
               <Target className="w-5 h-5 text-[var(--gh-fg-muted)]" />
               <h2 className="text-lg font-semibold text-[var(--gh-fg)]">Channel Breakdown</h2>
             </div>
-            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md overflow-hidden shadow-sm">
-              <div className="overflow-x-auto">
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-sm overflow-x-auto">
+              <div>
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border)]">

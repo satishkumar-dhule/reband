@@ -39,9 +39,9 @@ export function MobileHeader({
             <h1 className="text-base font-semibold text-foreground truncate flex-1">{title}</h1>
           )}
           
-          <button aria-label="Notifications" className="p-2.5 hover:bg-primary/10 rounded-xl transition-colors relative">
-            <Bell className="w-4.5 h-4.5 text-muted-foreground" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
+          <button aria-label="Notifications" className="p-3 hover:bg-primary/10 rounded-xl transition-colors relative touch-manipulation min-w-[44px] min-h-[44px] -m-1.5 flex items-center justify-center">
+            <Bell className="w-5 h-5 text-muted-foreground" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
           </button>
         </div>
       </header>
@@ -83,17 +83,17 @@ export function MobileHeader({
           <button 
             aria-label="Search" 
             onClick={onSearchClick}
-            className="p-3 hover:bg-primary/10 rounded-xl transition-all duration-200 group"
+            className="p-3 hover:bg-primary/10 rounded-xl transition-all duration-200 group touch-manipulation min-w-[44px] min-h-[44px] -m-1.5 flex items-center justify-center"
           >
-            <Search className="w-4.5 h-4.5 text-muted-foreground group-hover:text-primary transition-colors" />
+            <Search className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
           </button>
           
           <button 
             aria-label="Menu" 
             onClick={onMenuClick}
-            className="p-3 hover:bg-primary/10 rounded-xl transition-colors"
+            className="p-3 hover:bg-primary/10 rounded-xl transition-colors touch-manipulation min-w-[44px] min-h-[44px] -m-1.5 flex items-center justify-center"
           >
-            <Menu className="w-4.5 h-4.5 text-muted-foreground" />
+            <Menu className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
       </div>

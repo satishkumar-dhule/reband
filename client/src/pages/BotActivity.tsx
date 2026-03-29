@@ -447,14 +447,18 @@ export default function BotActivity() {
                   </h3>
                 </div>
                 {loading ? (
-                  <div className="p-8 text-center">
-                    <RefreshCw className="w-6 h-6 animate-spin mx-auto text-primary mb-2" />
-                    <p className="text-sm text-muted-foreground">Loading...</p>
+                  <div className="flex items-center justify-center min-h-[30vh]">
+                    <div className="text-center">
+                      <RefreshCw className="w-6 h-6 animate-spin mx-auto text-primary mb-2" />
+                      <p className="text-sm text-muted-foreground">Loading...</p>
+                    </div>
                   </div>
                 ) : recentRuns.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <Bot className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">No recent runs</p>
+                  <div className="flex items-center justify-center min-h-[30vh]">
+                    <div className="text-center">
+                      <Bot className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground">No recent runs</p>
+                    </div>
                   </div>
                 ) : (
                   <div className="divide-y divide-border">
@@ -526,9 +530,11 @@ export default function BotActivity() {
                   </div>
                 </div>
                 {workQueue.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <CheckCircle className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
-                    <p className="text-sm text-muted-foreground">Queue is empty</p>
+                  <div className="flex items-center justify-center min-h-[30vh]">
+                    <div className="text-center">
+                      <CheckCircle className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
+                      <p className="text-sm text-muted-foreground">Queue is empty</p>
+                    </div>
                   </div>
                 ) : (
                   <div className="divide-y divide-border">

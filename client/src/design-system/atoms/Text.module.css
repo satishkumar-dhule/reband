@@ -95,7 +95,13 @@
 
 /* Color variants */
 .color-default {
-  color: var(--color-text-primary, #f0f6fc);
+  color: var(--color-text-primary, var(--foreground, #f0f6fc));
+}
+
+/* Light mode support for color-default */
+[data-theme='light'] .color-default,
+.light .color-default {
+  color: var(--gh-fg, #1f2328);
 }
 
 .color-muted {
@@ -202,5 +208,14 @@
   .text {
     color: #000000 !important;
     background-color: transparent !important;
+  }
+  
+  /* Ensure light mode colors in print */
+  .color-default {
+    color: #000000 !important;
+  }
+  
+  .color-muted {
+    color: #333333 !important;
   }
 }

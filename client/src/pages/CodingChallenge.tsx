@@ -719,7 +719,7 @@ export default function CodingChallenge() {
 
         {/* Challenge View */}
         {viewState === 'challenge' && currentChallenge && (
-          <main className="h-screen flex flex-col" data-testid="challenge-view">
+          <main className="min-h-screen min-h-dvh flex flex-col" data-testid="challenge-view">
             {/* Header */}
             <header className="border-b border-border p-3 flex items-center justify-between flex-shrink-0">
               <button
@@ -1145,7 +1145,7 @@ export default function CodingChallenge() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                  className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 pb-safe"
                   onClick={() => setShowSolution(false)}
                   data-testid="solution-modal"
                 >
@@ -1154,7 +1154,7 @@ export default function CodingChallenge() {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.95, opacity: 0 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="bg-card border border-border rounded-xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl"
+                    className="bg-card border border-border rounded-xl max-w-2xl w-full max-h-[80dvh] max-h-[80svh] overflow-hidden shadow-2xl pb-safe"
                   >
                     <div className="p-4 border-b border-border flex items-center justify-between">
                       <h2 className="font-bold text-lg">✨ Sample Solution</h2>
@@ -1166,7 +1166,7 @@ export default function CodingChallenge() {
                         <XCircle className="w-5 h-5" />
                       </button>
                     </div>
-                    <div className="p-4 overflow-y-auto max-h-[60vh]">
+                    <div className="p-4 overflow-y-auto max-h-[60dvh] max-h-[60svh]">
                       <CodeDisplay
                         code={currentChallenge.sampleSolution[language]}
                         language={language}
@@ -1204,14 +1204,14 @@ export default function CodingChallenge() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                  className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 pb-safe"
                   data-testid="success-modal"
                 >
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.9, opacity: 0 }}
-                    className="bg-card border border-border rounded-xl max-w-md w-full p-6 text-center shadow-2xl"
+                    className="bg-card border border-border rounded-xl max-w-md w-full max-h-[90dvh] max-h-[90svh] p-6 text-center shadow-2xl overflow-y-auto pb-safe"
                   >
                     <motion.div
                       initial={{ scale: 0 }}

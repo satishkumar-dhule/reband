@@ -148,19 +148,23 @@ export default function TestsGenZ() {
 
             {/* Tests Grid */}
             {loading ? (
-              <div className="text-center py-20">
-                <div className="text-4xl mb-4">⏳</div>
-                <p className="text-muted-foreground">Loading tests...</p>
+              <div className="flex items-center justify-center min-h-[50vh]">
+                <div className="text-center">
+                  <div className="text-4xl mb-4">⏳</div>
+                  <p className="text-muted-foreground">Loading tests...</p>
+                </div>
               </div>
             ) : filteredTests.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center py-20"
+                className="flex items-center justify-center min-h-[50vh]"
               >
-                <div className="text-6xl mb-4">🔍</div>
-                <h3 className="text-2xl font-bold mb-2">No tests found</h3>
-                <p className="text-muted-foreground">Try a different search term</p>
+                <div className="text-center">
+                  <div className="text-6xl mb-4">🔍</div>
+                  <h3 className="text-2xl font-bold mb-2">No tests found</h3>
+                  <p className="text-muted-foreground">Try a different search term</p>
+                </div>
               </motion.div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -188,11 +192,11 @@ export default function TestsGenZ() {
                       <div className="relative space-y-4">
                         {/* Header */}
                         <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="text-xs font-semibold mb-1 uppercase tracking-wider text-primary">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-semibold mb-1 uppercase tracking-wider text-primary truncate min-w-0">
                               {test.channelName}
                             </div>
-                            <h3 className="text-xl font-bold mb-2">{test.title}</h3>
+                            <h3 className="text-xl font-bold mb-2 truncate min-w-0">{test.title}</h3>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <Clock className="w-4 h-4" />
                               <span>{test.questions.length} questions</span>

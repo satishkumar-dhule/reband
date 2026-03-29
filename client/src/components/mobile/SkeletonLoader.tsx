@@ -1,6 +1,7 @@
 /**
  * Skeleton Loader Component - Mobile-First
  * Pattern: Facebook, LinkedIn, Instagram
+ * Uses GitHub theme colors for proper dark mode support
  */
 
 import { cn } from '../../lib/utils';
@@ -34,7 +35,7 @@ export function Skeleton({
       aria-busy="true"
       aria-label="Loading content"
       className={cn(
-        'bg-gray-200 dark:bg-gray-800',
+        'bg-[var(--gh-neutral-muted)]',
         variantClasses[variant],
         animationClasses[animation],
         className
@@ -47,7 +48,7 @@ export function Skeleton({
 export function SkeletonCard() {
   return (
     <div 
-      className="p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+      className="p-4 bg-card rounded-xl border border-border"
       role="status"
       aria-busy="true"
       aria-label="Loading card"

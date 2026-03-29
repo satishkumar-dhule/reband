@@ -24,32 +24,32 @@ export function SRSReviewButtons({ card, onRate, compact = false }: SRSReviewBut
       label: 'Again', 
       preview: previews.again,
       icon: <RotateCcw className="w-4 h-4" />,
-      color: 'text-red-500',
-      bg: 'bg-red-500/10 hover:bg-red-500/20 border-red-500/30'
+      color: 'text-[var(--gh-danger-fg)]',
+      bg: 'bg-[var(--gh-danger-subtle)] hover:bg-[var(--gh-danger-fg)]/20 border-[var(--gh-danger-fg)]/30'
     },
     { 
       rating: 'hard', 
       label: 'Hard', 
       preview: previews.hard,
       icon: <Brain className="w-4 h-4" />,
-      color: 'text-orange-500',
-      bg: 'bg-orange-500/10 hover:bg-orange-500/20 border-orange-500/30'
+      color: 'text-[var(--gh-attention-fg)]',
+      bg: 'bg-[var(--gh-attention-subtle)] hover:bg-[var(--gh-attention-fg)]/20 border-[var(--gh-attention-fg)]/30'
     },
     { 
       rating: 'good', 
       label: 'Good', 
       preview: previews.good,
       icon: <Check className="w-4 h-4" />,
-      color: 'text-green-500',
-      bg: 'bg-green-500/10 hover:bg-green-500/20 border-green-500/30'
+      color: 'text-[var(--gh-success-fg)]',
+      bg: 'bg-[var(--gh-success-subtle)] hover:bg-[var(--gh-success-fg)]/20 border-[var(--gh-success-fg)]/30'
     },
     { 
       rating: 'easy', 
       label: 'Easy', 
       preview: previews.easy,
       icon: <Zap className="w-4 h-4" />,
-      color: 'text-blue-500',
-      bg: 'bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/30'
+      color: 'text-[var(--gh-accent-fg)]',
+      bg: 'bg-[var(--gh-accent-subtle)] hover:bg-[var(--gh-accent-fg)]/20 border-[var(--gh-accent-fg)]/30'
     }
   ];
 

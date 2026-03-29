@@ -554,7 +554,7 @@ function ConfirmationDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pb-safe">
       {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -569,7 +569,7 @@ function ConfirmationDialog({
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-md bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md max-h-[90dvh] max-h-[90svh] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden pb-safe"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -608,7 +608,7 @@ function ConfirmationDialog({
             }}
             className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors ${
               type === "danger"
-                ? "bg-red-500 hover:bg-red-600 text-white"
+                ? "bg-[var(--gh-danger-emphasis)] hover:bg-[var(--gh-danger-hover)] text-white"
                 : "bg-primary hover:bg-primary/90 text-primary-foreground"
             }`}
           >

@@ -264,7 +264,7 @@ export default function ReviewSessionOptimized() {
               className="flex-1 flex flex-col overflow-hidden"
             >
               {/* Question - COMPACT */}
-              <div className="flex-1 overflow-y-auto p-3">
+              <div className="flex-1 overflow-y-auto p-3 momentum-scroll">
                 <div className="max-w-2xl mx-auto space-y-3">
                   {/* Tags - COMPACT & CLICKABLE */}
                   <div className="flex items-center gap-2 flex-wrap">
@@ -599,7 +599,7 @@ function CheckpointTest({
       </div>
 
       {!showResult ? (
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="flex-1 overflow-y-auto momentum-scroll p-3">
           <div className="max-w-2xl mx-auto">
             {/* Progress */}
             <div className="mb-3">

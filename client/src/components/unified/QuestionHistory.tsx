@@ -65,16 +65,16 @@ interface QuestionHistoryProps {
 let historyIndexCache: HistoryIndex | null = null;
 const historyDataCache = new Map<string, QuestionHistoryData>();
 
-// Event icons and colors
+// Event icons and colors - using CSS variables for brand consistency
 const eventConfig: Record<EventType, { icon: typeof Plus; text: string; bg: string; border: string; label: string }> = {
-  created: { icon: Plus, text: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/30', label: 'Created' },
-  updated: { icon: Edit, text: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30', label: 'Updated' },
-  improved: { icon: Sparkles, text: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/30', label: 'Improved' },
-  flagged: { icon: AlertTriangle, text: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30', label: 'Flagged' },
-  verified: { icon: CheckCircle, text: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', label: 'Verified' },
-  enriched: { icon: RefreshCw, text: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', label: 'Enriched' },
-  deleted: { icon: Trash2, text: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30', label: 'Deleted' },
-  restored: { icon: RefreshCw, text: 'text-teal-400', bg: 'bg-teal-500/10', border: 'border-teal-500/30', label: 'Restored' },
+  created: { icon: Plus, text: 'text-[var(--gh-success-fg)]', bg: 'bg-[var(--gh-success-fg)]/10', border: 'border-[var(--gh-success-fg)]/30', label: 'Created' },
+  updated: { icon: Edit, text: 'text-[var(--gh-accent-fg)]', bg: 'bg-[var(--gh-accent-fg)]/10', border: 'border-[var(--gh-accent-fg)]/30', label: 'Updated' },
+  improved: { icon: Sparkles, text: 'text-[var(--gh-done-fg)]', bg: 'bg-[var(--gh-done-fg)]/10', border: 'border-[var(--gh-done-fg)]/30', label: 'Improved' },
+  flagged: { icon: AlertTriangle, text: 'text-[var(--gh-attention-fg)]', bg: 'bg-[var(--gh-attention-fg)]/10', border: 'border-[var(--gh-attention-fg)]/30', label: 'Flagged' },
+  verified: { icon: CheckCircle, text: 'text-[var(--gh-success-fg)]', bg: 'bg-[var(--gh-success-fg)]/10', border: 'border-[var(--gh-success-fg)]/30', label: 'Verified' },
+  enriched: { icon: RefreshCw, text: 'text-[var(--gh-accent-fg)]', bg: 'bg-[var(--gh-accent-fg)]/10', border: 'border-[var(--gh-accent-fg)]/30', label: 'Enriched' },
+  deleted: { icon: Trash2, text: 'text-[var(--gh-danger-fg)]', bg: 'bg-[var(--gh-danger-fg)]/10', border: 'border-[var(--gh-danger-fg)]/30', label: 'Deleted' },
+  restored: { icon: RefreshCw, text: 'text-[var(--gh-success-fg)]', bg: 'bg-[var(--gh-success-fg)]/10', border: 'border-[var(--gh-success-fg)]/30', label: 'Restored' },
 };
 
 const sourceIcons: Record<EventSource, typeof Bot> = {
@@ -226,7 +226,7 @@ export function QuestionHistoryIcon({
         className={`
           p-2 rounded-lg transition-all inline-flex items-center gap-1.5
           ${historyCount > 0 
-            ? 'bg-green-500/10 text-green-500 border border-green-500/30 hover:bg-green-500/20'
+            ? 'bg-[var(--gh-success-fg)]/10 text-[var(--gh-success-fg)] border border-[var(--gh-success-fg)]/30 hover:bg-[var(--gh-success-fg)]/20'
             : 'bg-card text-muted-foreground hover:text-foreground border border-border hover:bg-muted'
           }
           ${className}
@@ -261,7 +261,7 @@ export function QuestionHistoryIcon({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="relative w-full max-w-md max-h-[80vh] overflow-hidden
+              className="relative w-full max-w-md max-h-[80dvh] max-h-[80svh] overflow-hidden pb-safe
                          bg-var(--gh-canvas-overlay) border border-var(--gh-border) rounded-2xl shadow-2xl"
               onClick={(e) => e.stopPropagation()}
               role="dialog"
@@ -290,7 +290,7 @@ export function QuestionHistoryIcon({
               </div>
 
               {/* Content */}
-              <div className="overflow-y-auto max-h-[calc(80vh-80px)] p-4">
+              <div className="overflow-y-auto max-h-[calc(80dvh-80px)] max-h-[calc(80svh-80px)] p-4">
                 {loading ? (
                   <div className="flex flex-col items-center justify-center py-12 gap-3">
                     <RefreshCw className="w-6 h-6 animate-spin text-var(--gh-accent-fg)" />

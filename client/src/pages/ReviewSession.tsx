@@ -395,7 +395,7 @@ export default function ReviewSession() {
                 className="flex-1 flex flex-col overflow-hidden"
               >
                 {/* Question Card */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 momentum-scroll">
                   <div className="max-w-3xl mx-auto space-y-4">
                     {/* Card header badges */}
                     <div className="flex items-center gap-2 flex-wrap">

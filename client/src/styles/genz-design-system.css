@@ -242,9 +242,9 @@ body {
   color: var(--color-base-black);
 }
 
-/* Focus Outline */
+/* Focus Outline - use theme-aware ring variable */
 *:focus-visible {
-  outline: 2px solid var(--color-accent-cyan);
+  outline: 2px solid var(--ring, var(--color-accent-cyan));
   outline-offset: 2px;
 }
 
@@ -383,13 +383,15 @@ body {
 .badge-warning {
   background: hsla(38, 92%, 60%, 0.1);
   border-color: hsla(38, 92%, 60%, 0.3);
-  color: var(--color-warning-light);
+  /* Fixed: Use darker warning color for WCAG AA compliance (was 60% lightness, now 50%) */
+  color: hsl(38, 92%, 50%);
 }
 
 .badge-error {
   background: hsla(0, 84%, 60%, 0.1);
   border-color: hsla(0, 84%, 60%, 0.3);
-  color: var(--color-error-light);
+  /* Fixed: Use darker error color for WCAG AA compliance (was 70% lightness, now 55%) */
+  color: hsl(0, 84%, 55%);
 }
 
 /* Utility Classes */
@@ -419,19 +421,43 @@ body {
 
 @media (max-width: 768px) {
   .text-hero {
-    font-size: 3rem;
+    font-size: 2.5rem;
+    line-height: 1.15;
   }
   
   .text-display {
-    font-size: 2.5rem;
+    font-size: 2rem;
+    line-height: 1.2;
   }
   
   .text-title {
-    font-size: 2rem;
+    font-size: 1.75rem;
+    line-height: 1.25;
   }
   
   .text-heading {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
+    line-height: 1.3;
+  }
+}
+
+/* Ensure minimum 14px text on mobile for all body content */
+@media (max-width: 640px) {
+  /* Base body text minimum */
+  body {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  /* Ensure all text elements respect minimum readable size */
+  p, span, div, li {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Form inputs on mobile */
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
   }
 }
 
@@ -574,4 +600,39 @@ a:hover {
   .glass-card a {
     min-height: 48px;
   }
+}
+
+/* ===== MOBILE MOMENTUM SCROLL UTILITIES ===== */
+/* These classes enable native momentum scrolling on mobile devices */
+
+.momentum-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+.momentum-scroll-x {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Touch gesture handling utilities */
+.touch-pan-y {
+  touch-action: pan-y;
+}
+
+.touch-pan-x {
+  touch-action: pan-x;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Allow vertical scroll while detecting horizontal swipes */
+.swipe-scroll-container {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overflow-y: auto;
+  overflow-x: hidden;
 }

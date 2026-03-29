@@ -162,22 +162,24 @@ export default function Bookmarks() {
 
               {/* Content */}
               {bookmarkedQuestions.length === 0 ? (
-                <div className="p-12 text-center bg-[var(--gh-canvas)]">
-                  <Bookmark className="w-12 h-12 text-[var(--gh-fg-subtle)] mx-auto mb-4" />
-                  <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-2">No bookmarks yet</h2>
-                  <p className="text-[var(--gh-fg-muted)] mb-6 max-w-sm mx-auto">
-                    Bookmark questions while studying to build your personalized study list.
-                  </p>
-                  <button
-                    onClick={() => setLocation('/channels')}
-                    className="gh-btn gh-btn-primary"
-                    data-testid="button-browse"
-                  >
-                    Browse Channels
-                  </button>
+                <div className="flex items-center justify-center min-h-[40vh] bg-[var(--gh-canvas)]">
+                  <div className="text-center max-w-sm px-4">
+                    <Bookmark className="w-12 h-12 text-[var(--gh-fg-subtle)] mx-auto mb-4" />
+                    <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-2">No bookmarks yet</h2>
+                    <p className="text-[var(--gh-fg-muted)] mb-6">
+                      Bookmark questions while studying to build your personalized study list.
+                    </p>
+                    <button
+                      onClick={() => setLocation('/channels')}
+                      className="gh-btn gh-btn-primary"
+                      data-testid="button-browse"
+                    >
+                      Browse Channels
+                    </button>
+                  </div>
                 </div>
               ) : filteredQuestions.length === 0 ? (
-                <div className="p-12 text-center bg-[var(--gh-canvas)]">
+                <div className="flex items-center justify-center min-h-[20vh] bg-[var(--gh-canvas)]">
                   <p className="text-[var(--gh-fg-muted)]">No questions match your selected filters</p>
                 </div>
               ) : (

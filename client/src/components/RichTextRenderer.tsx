@@ -280,7 +280,7 @@ function renderBlock(block: Block, index: number): React.ReactNode {
   switch (block.type) {
     case 'paragraph':
       return (
-        <p key={index} className="text-[#d0d0d0] leading-[1.8] text-[15px]">
+        <p key={index} className="text-gray-300 dark:text-gray-300 leading-[1.8] text-[15px]">
           {renderInlineFormatting(block.content)}
         </p>
       );
@@ -309,9 +309,9 @@ function renderBlock(block: Block, index: number): React.ReactNode {
     case 'list':
       if (block.ordered) {
         return (
-          <ol key={index} className="space-y-3 my-5 pl-6 list-decimal marker:text-[#00d4ff] marker:font-bold">
+          <ol key={index} className="space-y-3 my-5 pl-6 list-decimal marker:text-cyan-400 dark:marker:text-cyan-400 marker:font-bold">
             {block.items.map((item, i) => (
-              <li key={i} className="leading-[1.8] text-[#d0d0d0] pl-2">
+              <li key={i} className="leading-[1.8] text-gray-300 dark:text-gray-300 pl-2">
                 {renderListItemContent(item)}
               </li>
             ))}
@@ -320,9 +320,9 @@ function renderBlock(block: Block, index: number): React.ReactNode {
       }
       
       return (
-        <ul key={index} className="space-y-3 my-5 pl-6 list-disc marker:text-[#00d4ff]">
+        <ul key={index} className="space-y-3 my-5 pl-6 list-disc marker:text-cyan-400 dark:marker:text-cyan-400">
           {block.items.map((item, i) => (
-            <li key={i} className="leading-[1.8] text-[#d0d0d0] pl-2">
+            <li key={i} className="leading-[1.8] text-gray-300 dark:text-gray-300 pl-2">
               {renderListItemContent(item)}
             </li>
           ))}
@@ -333,13 +333,13 @@ function renderBlock(block: Block, index: number): React.ReactNode {
       return (
         <div key={index} className="my-8 p-6 bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/10 rounded-[20px]">
           <div className="flex items-start gap-3 mb-4">
-            <span className="text-[#00ff88] text-2xl mt-0.5 flex-shrink-0">▸</span>
+            <span className="text-green-400 dark:text-green-400 text-2xl mt-0.5 flex-shrink-0">▸</span>
             <div className="flex-1">
-              <h4 className="font-bold text-xl text-white leading-tight">
+              <h4 className="font-bold text-xl text-white dark:text-white leading-tight">
                 {block.title}
               </h4>
               {block.subtitle && (
-                <p className="text-[#a0a0a0] text-sm mt-2 leading-relaxed">
+                <p className="text-gray-400 dark:text-gray-400 text-sm mt-2 leading-relaxed">
                   {renderInlineFormatting(block.subtitle)}
                 </p>
               )}
@@ -348,7 +348,7 @@ function renderBlock(block: Block, index: number): React.ReactNode {
           {block.items.length > 0 && (
             <ul className="space-y-3 pl-8">
               {block.items.map((item, i) => (
-                <li key={i} className="leading-[1.8] text-[#d0d0d0] list-disc marker:text-[#00d4ff] pl-2">
+                <li key={i} className="leading-[1.8] text-gray-300 dark:text-gray-300 list-disc marker:text-cyan-400 dark:marker:text-cyan-400 pl-2">
                   {renderListItemContent(item)}
                 </li>
               ))}
@@ -386,11 +386,11 @@ function renderListItemContent(item: ListItem): React.ReactNode {
   if (item.bold) {
     return (
       <>
-        <span className="font-bold text-[#00ff88]">{item.bold}</span>
+        <span className="font-bold text-green-400 dark:text-green-400">{item.bold}</span>
         {item.description && (
           <>
-            <span className="text-[#00d4ff] mx-1">:</span>
-            <span className="text-[#d0d0d0]">{renderInlineFormatting(item.description)}</span>
+            <span className="text-cyan-400 dark:text-cyan-400 mx-1">:</span>
+            <span className="text-gray-300 dark:text-gray-300">{renderInlineFormatting(item.description)}</span>
           </>
         )}
       </>
@@ -446,7 +446,7 @@ function processCodeInText(text: string, baseKey: number): React.ReactNode {
       return (
         <code 
           key={`${baseKey}-${i}`} 
-          className="bg-black/40 border border-[#00d4ff]/20 px-2 py-0.5 rounded-md text-[#00d4ff] text-[13px] font-mono mx-0.5"
+          className="bg-black/40 border border-cyan-400/20 dark:border-cyan-400/20 px-2 py-0.5 rounded-md text-cyan-400 dark:text-cyan-400 text-[13px] font-mono mx-0.5"
         >
           {codeMatch[1]}
         </code>

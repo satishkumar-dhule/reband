@@ -331,17 +331,17 @@ export function QuestionCard({
 
             {/* Completed indicator */}
             {showCompleted && isCompleted && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-green-500/10 border border-green-500/20 rounded-md">
-                <Check className="w-3 h-3 text-green-500 dark:text-green-400" />
-                <span className={`font-medium text-green-500 dark:text-green-400 ${sizeConfig.meta}`}>Done</span>
+              <div className="flex items-center gap-1 px-2 py-1 bg-[var(--gh-success-fg)]/10 border border-[var(--gh-success-fg)]/20 rounded-md">
+                <Check className="w-3 h-3 text-[var(--gh-success-fg)]" />
+                <span className={`font-medium text-[var(--gh-success-fg)] ${sizeConfig.meta}`}>Done</span>
               </div>
             )}
 
             {/* NEW badge - show for new questions */}
             {question.isNew && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-violet-500/10 to-pink-500/10 border border-violet-500/20 rounded-md">
-                <Sparkles className="w-3 h-3 text-violet-500 dark:text-violet-400" />
-                <span className={`font-bold bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent ${sizeConfig.meta}`}>NEW</span>
+              <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-[var(--gh-accent-fg)]/10 to-pink-500/10 border border-[var(--gh-accent-fg)]/20 rounded-md">
+                <Sparkles className="w-3 h-3 text-[var(--gh-accent-fg)]" />
+                <span className={`font-bold bg-gradient-to-r from-[var(--gh-accent-fg)] to-pink-500 bg-clip-text text-transparent ${sizeConfig.meta}`}>NEW</span>
               </div>
             )}
 
@@ -505,7 +505,7 @@ export function CompactQuestionCard({
               size="xs"
             />
             {isCompleted && (
-              <Check className="w-3.5 h-3.5 text-green-500 dark:text-green-400" />
+              <Check className="w-3.5 h-3.5 text-[var(--gh-success-fg)]" />
             )}
           </div>
           <h3 className="font-semibold text-sm line-clamp-2 mb-1">

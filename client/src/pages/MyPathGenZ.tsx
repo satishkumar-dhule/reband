@@ -337,7 +337,7 @@ export default function MyPathGenZ() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 pb-safe"
               onClick={() => setShowEditModal(false)}
             >
               <motion.div
@@ -345,7 +345,7 @@ export default function MyPathGenZ() {
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-background border border-border rounded-[32px] max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+                className="bg-background border border-border rounded-[32px] max-w-4xl w-full max-h-[90dvh] max-h-[90svh] overflow-hidden flex flex-col pb-safe"
               >
                 {/* Header */}
                 <div className="p-8 border-b border-border">
@@ -370,7 +370,7 @@ export default function MyPathGenZ() {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-8 space-y-8">
+                <div className="flex-1 overflow-y-auto momentum-scroll p-8 space-y-8">
                   {/* Search */}
                   <div className="relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -630,19 +630,21 @@ export default function MyPathGenZ() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-center py-20"
+                className="flex items-center justify-center min-h-[50vh]"
               >
-                <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Brain className="w-12 h-12 text-primary" />
+                <div className="text-center max-w-md px-4">
+                  <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Brain className="w-12 h-12 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2">No custom paths yet</h3>
+                  <p className="text-muted-foreground mb-6">Create your first custom learning path to get started</p>
+                  <button
+                    onClick={() => setLocation('/learning-paths')}
+                    className="px-8 py-4 bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground rounded-[16px] font-bold hover:scale-105 transition-all"
+                  >
+                    Create Your First Path
+                  </button>
                 </div>
-                <h3 className="text-2xl font-bold mb-2">No custom paths yet</h3>
-                <p className="text-muted-foreground mb-6">Create your first custom learning path to get started</p>
-                <button
-                  onClick={() => setLocation('/learning-paths')}
-                  className="px-8 py-4 bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground rounded-[16px] font-bold hover:scale-105 transition-all"
-                >
-                  Create Your First Path
-                </button>
               </motion.div>
             )}
 

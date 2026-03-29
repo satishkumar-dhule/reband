@@ -228,18 +228,8 @@ function CategorySection({
   onToggle: (id: string) => void;
   onNavigate: (id: string) => void;
 }) {
-  // Show all channels - let scroll handle overflow
+  // Show all channels - let scroll handle overflow naturally
   const displayedChannels = channels;
-  
-  // Calculate optimal height based on content
-  const itemHeight = 64; // Approximate height of each channel item
-  const optimalHeight = Math.min(displayedChannels.length * itemHeight, 320);
-  const minHeight = Math.min(itemHeight * 2, optimalHeight); // Show at least 2 items or actual content
-  
-  const dynamicStyle = {
-    '--category-height': `${optimalHeight}px`,
-    '--category-min-height': `${minHeight}px`,
-  } as React.CSSProperties;
 
   return (
     <section>
@@ -253,22 +243,22 @@ function CategorySection({
         <span className="text-xs text-muted-foreground">{channels.length} channels</span>
       </div>
       
-      <div className="px-4" style={dynamicStyle}>
-        <div className="space-y-2 overflow-y-auto force-scrollbar dynamic-category-height">
-          {displayedChannels.map((channel, index) => (
-            <ChannelListCard
-              key={channel.id}
-              channel={channel}
-              isSubscribed={isSubscribed(channel.id)}
-              onToggle={() => onToggle(channel.id)}
-              questionCount={questionCounts[channel.id] || 0}
-              newThisWeek={newThisWeekCounts[channel.id]}
-              index={index}
-              onNavigate={() => onNavigate(channel.id)}
-              compact
-            />
-          ))}
-        </div>
+      {/* Removed fixed height container - let content flow naturally */}
+      {/* This fixes scroll momentum issues on mobile */}
+      <div className="px-4 space-y-2">
+        {displayedChannels.map((channel, index) => (
+          <ChannelListCard
+            key={channel.id}
+            channel={channel}
+            isSubscribed={isSubscribed(channel.id)}
+            onToggle={() => onToggle(channel.id)}
+            questionCount={questionCounts[channel.id] || 0}
+            newThisWeek={newThisWeekCounts[channel.id]}
+            index={index}
+            onNavigate={() => onNavigate(channel.id)}
+            compact
+          />
+        ))}
       </div>
     </section>
   );
@@ -331,9 +321,9 @@ function ChannelListCard({
 
         {/* Content */}
         <button onClick={onNavigate} className="flex-1 min-w-0 text-left">
-          <h3 className="font-medium text-sm truncate">{channel.name}</h3>
+          <h3 className="font-medium text-sm truncate min-w-0 block">{channel.name}</h3>
           {!compact && (
-            <p className="text-xs text-muted-foreground truncate">{channel.description}</p>
+            <p className="text-xs text-muted-foreground truncate min-w-0 block">{channel.description}</p>
           )}
           <div className="flex items-center gap-2 mt-1">
             <span className="text-xs text-muted-foreground">{questionCount} questions</span>

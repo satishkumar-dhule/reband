@@ -14,6 +14,7 @@ import {
   ChevronRight, Sparkles, TrendingUp, Star, Award, Rocket, Server, Plus, RotateCcw, Check, X
 } from 'lucide-react';
 import { PullToRefresh, SwipeableCard, SkeletonList } from '../mobile';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 // Learning Paths - Role-based journeys
 const learningPaths = [
@@ -341,7 +342,7 @@ export function GenZHomePage() {
                 <span>AI Voice Interviews</span>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full border border-border">
-                <Award className="w-4 h-4 text-[#ffd700]" />
+                <Award className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                 <span>Certification Prep</span>
               </div>
             </motion.div>
@@ -390,7 +391,7 @@ export function GenZHomePage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-[#ffd700]" />
+                <Trophy className="w-5 h-5 text-amber-500 dark:text-amber-400" />
                 <div className="text-left">
                   <div className="font-bold text-lg">500K+</div>
                   <div className="text-muted-foreground">Questions Solved</div>
@@ -469,55 +470,67 @@ export function GenZHomePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               {/* Streak - PROBLEM 2 FIXED: Explain value */}
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-full border border-orange-500/30 cursor-pointer group relative"
-                title="Daily practice streak - Keep it going to build consistency!"
-              >
-                <Flame className="w-5 h-5 text-orange-500" />
-                <div className="flex flex-col">
-                  <span className="font-bold text-lg leading-none">{streak}</span>
-                  <span className="text-[10px] text-muted-foreground leading-none">day streak</span>
-                </div>
-                {/* PROBLEM 8 FIXED: Show benefit */}
-                <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-popover border border-border rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  🔥 Consistency = Success
-                </div>
-              </motion.div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-full border border-orange-500/30 cursor-pointer"
+                    role="button"
+                    aria-label="Daily practice streak"
+                  >
+                    <Flame className="w-5 h-5 text-orange-500" />
+                    <div className="flex flex-col">
+                      <span className="font-bold text-lg leading-none">{streak}</span>
+                      <span className="text-[10px] text-muted-foreground leading-none">day streak</span>
+                    </div>
+                  </motion.div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="bg-popover border-border">
+                  <p>🔥 Consistency = Success</p>
+                </TooltipContent>
+              </Tooltip>
 
               {/* XP - PROBLEM 2 & 8 FIXED: Explain what XP unlocks */}
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/20 to-cyan-500/20 rounded-full border border-primary/30 cursor-pointer group relative"
-                title="Experience Points - Earn XP to unlock advanced features"
-              >
-                <Sparkles className="w-5 h-5 text-primary" />
-                <div className="flex flex-col">
-                  <span className="font-bold text-lg leading-none">{balance}</span>
-                  <span className="text-[10px] text-muted-foreground leading-none">XP earned</span>
-                </div>
-                {/* PROBLEM 8 FIXED: Show what XP unlocks */}
-                <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-popover border border-border rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  ✨ Unlock AI feedback & mock interviews
-                </div>
-              </motion.div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/20 to-cyan-500/20 rounded-full border border-primary/30 cursor-pointer"
+                    role="button"
+                    aria-label="Experience Points"
+                  >
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    <div className="flex flex-col">
+                      <span className="font-bold text-lg leading-none">{balance}</span>
+                      <span className="text-[10px] text-muted-foreground leading-none">XP earned</span>
+                    </div>
+                  </motion.div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="bg-popover border-border">
+                  <p>✨ Unlock AI feedback & mock interviews</p>
+                </TooltipContent>
+              </Tooltip>
 
               {/* Level - PROBLEM 2 & 8 FIXED: Show progression benefit */}
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full border border-purple-500/30 cursor-pointer group relative"
-                title="Your skill level - Higher levels unlock harder problems"
-              >
-                <Trophy className="w-5 h-5 text-purple-400" />
-                <div className="flex flex-col">
-                  <span className="font-bold text-lg leading-none">Level {level}</span>
-                  <span className="text-[10px] text-muted-foreground leading-none">skill tier</span>
-                </div>
-                {/* PROBLEM 8 FIXED: Show benefit */}
-                <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-popover border border-border rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  🏆 Higher levels = Harder challenges
-                </div>
-              </motion.div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full border border-purple-500/30 cursor-pointer"
+                    role="button"
+                    aria-label="Skill level"
+                  >
+                    <Trophy className="w-5 h-5 text-purple-400" />
+                    <div className="flex flex-col">
+                      <span className="font-bold text-lg leading-none">Level {level}</span>
+                      <span className="text-[10px] text-muted-foreground leading-none">skill tier</span>
+                    </div>
+                  </motion.div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="bg-popover border-border">
+                  <p>🏆 Higher levels = Harder challenges</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
 
             {/* Level Progress - PROBLEM 9 FIXED: Better hierarchy */}
@@ -631,7 +644,7 @@ export function GenZHomePage() {
                                    whileHover={{ scale: 1.05 }}
                                    whileTap={{ scale: 0.95 }}
                                    onClick={() => removeActivePath(path.id)}
-                                   className="px-2 md:px-3 py-1 md:py-1.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-[8px] text-[10px] md:text-xs font-semibold transition-all flex-shrink-0"
+                                   className="px-2 md:px-3 py-1 md:py-1.5 bg-[var(--gh-danger-subtle)] hover:bg-[var(--gh-danger-fg)]/20 border border-[var(--gh-danger-fg)]/30 rounded-[8px] text-[10px] md:text-xs font-semibold transition-all flex-shrink-0"
                                    aria-label="Remove"
                                  >
                                   Remove
@@ -880,15 +893,15 @@ export function GenZHomePage() {
                   onClick={() => setLocation(action.path)}
                   className="group relative p-6 bg-muted/50 backdrop-blur-xl rounded-[24px] border border-border hover:border-primary/50 transition-all overflow-hidden text-left"
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
+                    <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-hover:opacity-10 transition-opacity`} />
                   <div className="relative space-y-3">
-                    <div className={`w-14 h-14 bg-gradient-to-br ${action.color} rounded-[16px] flex items-center justify-center`}>
+                    <div className={`w-14 h-14 bg-gradient-to-br ${action.color} rounded-[16px] flex items-center justify-center flex-shrink-0`}>
                       <action.icon className="w-7 h-7 text-foreground" strokeWidth={2.5} />
                     </div>
-                    <div>
-                      <div className="text-xl font-bold mb-1">{action.label}</div>
-                      <div className="text-xs text-muted-foreground mb-2">{action.description}</div>
-                      <div className="text-xs font-semibold text-primary">{action.benefit} →</div>
+                    <div className="min-w-0">
+                      <div className="text-xl font-bold mb-1 truncate min-w-0">{action.label}</div>
+                      <div className="text-xs text-muted-foreground mb-2 truncate min-w-0">{action.description}</div>
+                      <div className="text-xs font-semibold text-primary truncate min-w-0">{action.benefit} →</div>
                     </div>
                   </div>
                 </motion.button>
@@ -944,11 +957,11 @@ export function GenZHomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="p-8 bg-gradient-to-br from-[#ffd700]/20 to-[#ff8c00]/20 backdrop-blur-xl rounded-[24px] border border-[#ffd700]/30"
+              className="p-8 bg-gradient-to-br from-amber-500/20 to-orange-600/20 dark:from-amber-400/20 dark:to-orange-500/20 backdrop-blur-xl rounded-[24px] border border-amber-500/30 dark:border-amber-400/30"
             >
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#ffd700] to-[#ff8c00] rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 dark:from-amber-400 dark:to-orange-500 rounded-full flex items-center justify-center">
                     <Trophy className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <div>
@@ -998,34 +1011,34 @@ export function GenZHomePage() {
 
                     <div className="relative space-y-4">
                       {/* Icon */}
-                      <div className={`w-16 h-16 bg-gradient-to-br ${path.color} rounded-[16px] flex items-center justify-center`}>
+                      <div className={`w-16 h-16 bg-gradient-to-br ${path.color} rounded-[16px] flex items-center justify-center flex-shrink-0`}>
                         <Icon className="w-8 h-8 text-foreground" strokeWidth={2.5} />
                       </div>
 
                       {/* Content */}
-                      <div>
-                        <h3 className="text-xl font-bold mb-2">{path.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-4">{path.description}</p>
+                      <div className="min-w-0">
+                        <h3 className="text-xl font-bold mb-2 truncate min-w-0">{path.name}</h3>
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-w-0">{path.description}</p>
                       </div>
 
                       {/* Meta */}
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <Target className="w-3 h-3" />
                           <span>{path.difficulty}</span>
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <Sparkles className="w-3 h-3" />
                           <span>{path.duration}</span>
                         </div>
                       </div>
 
                       {/* Jobs */}
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 overflow-hidden">
                         {path.jobs.slice(0, 2).map((job) => (
                           <span
                             key={job}
-                            className="px-2 py-1 bg-muted/50 rounded-full text-xs font-medium"
+                            className="px-2 py-1 bg-muted/50 rounded-full text-xs font-medium whitespace-nowrap"
                           >
                             {job}
                           </span>
@@ -1044,12 +1057,12 @@ export function GenZHomePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative p-8 bg-gradient-to-br from-[#ff0080]/20 to-[#ff8c00]/20 backdrop-blur-xl rounded-[24px] border border-[#ff0080]/30 overflow-hidden"
+            className="relative p-8 bg-gradient-to-br from-pink-600/20 to-orange-600/20 dark:from-pink-500/20 dark:to-orange-500/20 backdrop-blur-xl rounded-[24px] border border-pink-600/30 dark:border-pink-500/30 overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#ff0080] to-[#ff8c00] rounded-full blur-3xl opacity-20" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-pink-600 to-orange-600 dark:from-pink-500 dark:to-orange-500 rounded-full blur-3xl opacity-20" />
             <div className="relative space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#ff0080] to-[#ff8c00] rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-600 to-orange-600 dark:from-pink-500 dark:to-orange-500 rounded-full flex items-center justify-center">
                   <Star className="w-6 h-6 text-foreground" />
                 </div>
                 <div>
@@ -1065,12 +1078,12 @@ export function GenZHomePage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setLocation('/training')}
-                  className="px-8 py-4 bg-gradient-to-r from-[#ff0080] to-[#ff8c00] rounded-[16px] font-bold text-lg"
+                  className="px-8 py-4 bg-gradient-to-r from-pink-600 to-orange-600 dark:from-pink-500 dark:to-orange-500 rounded-[16px] font-bold text-lg"
                 >
                   Accept Challenge
                 </motion.button>
                 <div className="flex items-center gap-2 text-sm">
-                  <Award className="w-5 h-5 text-[#ffd700]" />
+                  <Award className="w-5 h-5 text-amber-500 dark:text-amber-400" />
                   <span className="text-muted-foreground">+50 XP reward</span>
                 </div>
               </div>

@@ -81,6 +81,7 @@ export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const recommendedChannels = selectedRole 
     ? getRecommendedChannels(selectedRole)
@@ -92,6 +93,22 @@ export default function OnboardingPage() {
         ? prev.filter(c => c !== channelId)
         : [...prev, channelId]
     );
+    // Clear validation error when user selects a channel
+    setValidationError(null);
+  };
+
+  const handleContinue = () => {
+    // Validate before proceeding
+    if (currentStep === 2 && !selectedRole) {
+      setValidationError('Please select a career path to continue');
+      return;
+    }
+    if (currentStep === 3 && selectedChannels.length === 0) {
+      setValidationError('Please select at least one focus area to continue');
+      return;
+    }
+    setValidationError(null);
+    setCurrentStep(prev => prev + 1);
   };
 
   const handleComplete = () => {
@@ -190,7 +207,10 @@ export default function OnboardingPage() {
                         return (
                           <button
                             key={role.id}
-                            onClick={() => setSelectedRole(role.id)}
+                            onClick={() => {
+                              setSelectedRole(role.id);
+                              setValidationError(null);
+                            }}
                             className={`flex flex-col items-start p-6 rounded-md border text-left transition-all ${
                               isSelected 
                                 ? 'bg-[var(--gh-canvas-subtle)] border-[var(--gh-accent-fg)] ring-1 ring-[var(--gh-accent-fg)]' 
@@ -280,43 +300,55 @@ export default function OnboardingPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="p-6 bg-[var(--gh-canvas-subtle)] border-t border-[var(--gh-border)] flex items-center justify-between">
-                <div className="flex gap-3">
-                  {currentStep === 1 ? (
+              <div className="p-6 bg-[var(--gh-canvas-subtle)] border-t border-[var(--gh-border)]">
+                {validationError && (
+                  <div className="mb-4 p-3 bg-[var(--gh-danger-subtle)] border border-[var(--gh-danger-emphasis)]/20 rounded-md">
+                    <p className="text-sm text-[var(--gh-danger-fg)]" role="alert">
+                      {validationError}
+                    </p>
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-3">
+                    {currentStep === 1 ? (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setLocation('/')}
+                        className="text-[var(--gh-fg-muted)]"
+                      >
+                        Skip for now
+                      </Button>
+                    ) : (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setCurrentStep(prev => prev - 1);
+                          setValidationError(null);
+                        }}
+                        className="text-[var(--gh-fg)]"
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                      </Button>
+                    )}
+                  </div>
+
+                  {currentStep < 4 ? (
                     <Button 
-                      variant="outline" 
-                      onClick={() => setLocation('/')}
-                      className="text-[var(--gh-fg-muted)]"
+                      onClick={handleContinue}
+                      disabled={currentStep === 2 && !selectedRole || currentStep === 3 && selectedChannels.length === 0}
+                      className="bg-[var(--gh-accent-emphasis)] text-white hover:bg-blue-700 disabled:opacity-50"
                     >
-                      Skip for now
+                      Continue <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   ) : (
                     <Button 
-                      variant="outline" 
-                      onClick={() => setCurrentStep(prev => prev - 1)}
-                      className="text-[var(--gh-fg)]"
+                      onClick={handleComplete}
+                      className="bg-[var(--gh-success-emphasis)] text-white hover:bg-[var(--gh-success-hover)]"
                     >
-                      <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                      Start Your Journey <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
                   )}
                 </div>
-
-                {currentStep < 4 ? (
-                  <Button 
-                    onClick={() => setCurrentStep(prev => prev + 1)}
-                    disabled={currentStep === 2 && !selectedRole || currentStep === 3 && selectedChannels.length === 0}
-                    className="bg-[var(--gh-accent-emphasis)] text-white hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    Continue <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                ) : (
-                  <Button 
-                    onClick={handleComplete}
-                    className="bg-[var(--gh-success-emphasis)] text-white hover:bg-green-700"
-                  >
-                    Start Your Journey <ChevronRight className="w-4 h-4 ml-2" />
-                  </Button>
-                )}
               </div>
             </div>
 

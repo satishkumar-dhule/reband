@@ -197,6 +197,9 @@
   .badge {
     box-shadow: none;
     border: 1px solid #000000;
+    /* Ensure proper colors for print */
+    background-color: #f0f0f0 !important;
+    color: #000000 !important;
   }
 
   .is-new::before {

@@ -350,14 +350,14 @@ export function QuestionPanel({
           </div>
           
           {hasRated ? (
-            <span className="text-[10px] text-green-500 font-medium">✓</span>
+            <span className="text-[10px] text-[var(--gh-success-fg)] font-medium">✓</span>
           ) : showRatingButtons && srsCard ? (
             <div className="flex items-center gap-0.5">
               {[
-                { rating: 'again' as ConfidenceRating, label: '😕', color: 'bg-red-500/10 text-red-500 hover:bg-red-500/20' },
-                { rating: 'hard' as ConfidenceRating, label: '🤔', color: 'bg-orange-500/10 text-orange-500 hover:bg-orange-500/20' },
-                { rating: 'good' as ConfidenceRating, label: '👍', color: 'bg-green-500/10 text-green-500 hover:bg-green-500/20' },
-                { rating: 'easy' as ConfidenceRating, label: '🎯', color: 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20' },
+                { rating: 'again' as ConfidenceRating, label: '😕', color: 'bg-[var(--gh-danger-subtle)] text-[var(--gh-danger-fg)] hover:bg-[var(--gh-danger-fg)]/20' },
+                { rating: 'hard' as ConfidenceRating, label: '🤔', color: 'bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)] hover:bg-[var(--gh-attention-fg)]/20' },
+                { rating: 'good' as ConfidenceRating, label: '👍', color: 'bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] hover:bg-[var(--gh-success-fg)]/20' },
+                { rating: 'easy' as ConfidenceRating, label: '🎯', color: 'bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)] hover:bg-[var(--gh-accent-fg)]/20' },
               ].map((btn) => (
                 <button
                   key={btn.rating}

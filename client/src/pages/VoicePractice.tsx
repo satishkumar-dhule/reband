@@ -789,7 +789,7 @@ export default function VoicePractice() {
                           {targetWords} words
                         </span>
                       </div>
-                      <div className="max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                      <div className="max-h-[500px] overflow-y-auto momentum-scroll custom-scrollbar pr-2">
                         <p className="text-[var(--gh-fg)] text-[15px] leading-[1.7] whitespace-pre-wrap">
                           {currentQuestion.answer}
                         </p>
@@ -852,7 +852,7 @@ export default function VoicePractice() {
                           </button>
                         )}
                       </div>
-                      <div className="p-4 bg-[var(--gh-canvas)] rounded-xl max-h-[300px] overflow-y-auto custom-scrollbar border border-[var(--gh-border)]">
+                      <div className="p-4 bg-[var(--gh-canvas)] rounded-xl max-h-[300px] overflow-y-auto momentum-scroll custom-scrollbar border border-[var(--gh-border)]">
                         {transcript || interimTranscript ? (
                           <p className="text-sm text-[var(--gh-fg)] leading-relaxed whitespace-pre-wrap break-words">
                             {transcript}

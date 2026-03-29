@@ -441,11 +441,11 @@ export default function CertificationPractice() {
     if (!showTest) return null;
 
     return (
-      <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 pb-safe">
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+          className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90dvh] max-h-[90svh] overflow-hidden flex flex-col pb-safe"
         >
           {/* Header */}
           <div className="p-4 border-b border-border bg-gradient-to-r from-amber-500/10 via-primary/10 to-amber-500/10">
@@ -485,7 +485,7 @@ export default function CertificationPractice() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-5">
+          <div className="flex-1 overflow-y-auto p-5 momentum-scroll">
             {showResults ? (
               // Results - expandable review
               <div className="space-y-3">
@@ -659,14 +659,14 @@ export default function CertificationPractice() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4 pb-safe"
           onClick={() => setShowSkipConfirm(false)}
         >
           <motion.div
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.9 }}
-            className="bg-card border border-border rounded-2xl w-full max-w-sm p-5"
+            className="bg-card border border-border rounded-2xl w-full max-w-sm p-5 max-h-[90dvh] max-h-[90svh] pb-safe"
             onClick={e => e.stopPropagation()}
           >
             <div className="text-center">
@@ -819,10 +819,10 @@ export default function CertificationPractice() {
           <>
             {/* Desktop - Optimized split layout */}
             <div className="hidden lg:flex h-[calc(100vh-100px)]">
-              <div className="w-[40%] border-r border-border overflow-y-auto">
+              <div className="w-[40%] border-r border-border overflow-y-auto momentum-scroll">
                 {currentQuestion && <QuestionPanel question={currentQuestion} questionNumber={currentIndex + 1} totalQuestions={totalQuestions} isMarked={isMarked} isCompleted={isCompleted} onToggleMark={toggleMark} timerEnabled={false} timeLeft={0} />}
               </div>
-              <div className="w-[60%] overflow-y-auto">
+              <div className="w-[60%] overflow-y-auto momentum-scroll">
                 {currentQuestion && <AnswerPanel question={currentQuestion} isCompleted={isCompleted} />}
               </div>
             </div>
@@ -833,7 +833,7 @@ export default function CertificationPractice() {
                 <button onClick={() => setMobileView('question')} className={`flex-1 py-2 text-sm font-medium ${mobileView === 'question' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Question</button>
                 <button onClick={() => setMobileView('answer')} className={`flex-1 py-2 text-sm font-medium ${mobileView === 'answer' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Answer</button>
               </div>
-              <div className="flex-1 overflow-y-auto pb-14" onTouchStart={swipeHandlers.onTouchStart} onTouchMove={swipeHandlers.onTouchMove} onTouchEnd={swipeHandlers.onTouchEnd}>
+              <div className="flex-1 overflow-y-auto pb-14 momentum-scroll touch-pan-y" onTouchStart={swipeHandlers.onTouchStart} onTouchMove={swipeHandlers.onTouchMove} onTouchEnd={swipeHandlers.onTouchEnd}>
                 {mobileView === 'question' ? (
                   currentQuestion && <QuestionPanel question={currentQuestion} questionNumber={currentIndex + 1} totalQuestions={totalQuestions} isMarked={isMarked} isCompleted={isCompleted} onToggleMark={toggleMark} onTapQuestion={() => setMobileView('answer')} timerEnabled={false} timeLeft={0} />
                 ) : (

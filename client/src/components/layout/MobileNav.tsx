@@ -89,7 +89,7 @@ export function MobileNav() {
                   )}
                   
                   <div className={cn(
-                    "relative p-2.5 rounded-2xl transition-all duration-300 group-hover:scale-105",
+                    "relative p-3 rounded-2xl transition-all duration-300 group-hover:scale-105",
                     active 
                       ? "bg-gradient-to-br from-cyan-500/30 to-purple-500/20 shadow-lg shadow-cyan-500/25 border border-cyan-500/30" 
                       : isHighlight 
@@ -101,7 +101,7 @@ export function MobileNav() {
                     )}
                     
                     {isHighlight && !active ? (
-                      <div className="relative w-11 h-11 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center shadow-lg shadow-cyan-500/40 border border-white/20">
+                      <div className="relative w-12 h-12 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center shadow-lg shadow-cyan-500/40 border border-white/20">
                         <div className="absolute inset-0 rounded-xl bg-cyan-500/50 animate-ping" />
                         <Icon className="w-5 h-5 text-white" strokeWidth={2.5} />
                       </div>

@@ -407,7 +407,7 @@ export default function TrainingMode() {
           </p>
           <button
             onClick={() => setLocation('/channels')}
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-colors"
+            className="px-6 py-3 bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-hover)] text-white rounded-xl font-semibold transition-colors"
           >
             Browse Channels
           </button>
@@ -709,7 +709,7 @@ export default function TrainingMode() {
                 </button>
                 <button
                   onClick={goToNext}
-                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+                  className="flex-1 px-6 py-3 bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-hover)] text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
                 >
                   {currentIndex === questions.length - 1 ? 'Finish' : 'Next Question'}
                   <ChevronRight className="w-5 h-5" />

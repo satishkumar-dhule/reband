@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { MobileNav, mobileNavConfig } from "./MobileNav";
 import { UnifiedSearch } from "../UnifiedSearch";
@@ -26,6 +26,24 @@ export function AppLayout({
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location, setLocation] = useLocation();
+
+  // Lock body scroll when mobile menu or search is open
+  useEffect(() => {
+    if (mobileMenuOpen || searchOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    };
+  }, [mobileMenuOpen, searchOpen]);
 
   if (hideNav) {
     return <>{children}</>;
@@ -117,10 +135,10 @@ export function AppLayout({
               </div>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-7 h-7 flex items-center justify-center rounded text-muted-foreground hover-elevate"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-muted-foreground hover-elevate hover:bg-muted transition-colors -m-1.5 touch-manipulation"
                 aria-label="Close menu"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
             <ScrollArea className="flex-1 py-2">
@@ -132,7 +150,7 @@ export function AppLayout({
                     <button
                       key={item.path}
                       onClick={() => handleNavClick(item.path)}
-                      className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                      className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm transition-colors min-h-[44px] touch-manipulation ${
                         active
                           ? "bg-[var(--sidebar-active-bg)] font-semibold text-foreground"
                           : "text-muted-foreground hover:text-foreground hover:bg-[var(--sidebar-active-bg)]"

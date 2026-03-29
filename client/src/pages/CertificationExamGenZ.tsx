@@ -596,7 +596,7 @@ function ActiveExam({
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border shadow-lg shadow-[#00ff88]/5">
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border shadow-lg shadow-green-500/5 dark:shadow-green-400/5">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -801,7 +801,7 @@ function ActiveExam({
       </main>
 
       {/* Footer Navigation */}
-      <footer className="sticky bottom-0 bg-background/95 backdrop-blur-xl border-t border-border p-4 pb-safe shadow-lg shadow-[#00ff88]/5">
+      <footer className="sticky bottom-0 bg-background/95 backdrop-blur-xl border-t border-border p-4 pb-safe shadow-lg shadow-green-500/5 dark:shadow-green-400/5">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <button
             onClick={onPrev}

@@ -240,7 +240,7 @@ export default function CodingChallengeGenZ() {
           title={`${currentChallenge.title} | Coding Challenge`}
           description={currentChallenge.description}
         />
-        <div className="flex flex-col h-screen bg-[var(--gh-canvas-subtle)]">
+        <div className="flex flex-col min-h-screen min-h-dvh bg-[var(--gh-canvas-subtle)]">
           {/* Top Bar */}
           <header className="h-14 border-b bg-[var(--gh-canvas)] px-4 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-4">

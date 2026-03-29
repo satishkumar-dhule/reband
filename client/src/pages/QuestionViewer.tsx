@@ -317,7 +317,7 @@ export default function QuestionViewer() {
   // Loading state
   if (loading && !currentQuestion) {
     return (
-      <div className="h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen min-h-dvh flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-muted-foreground">Loading questions...</p>
@@ -329,7 +329,7 @@ export default function QuestionViewer() {
   // Error state
   if (error || !channel) {
     return (
-      <div className="h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen min-h-dvh flex items-center justify-center bg-background">
         <div className="text-center">
           <h2 className="text-xl font-bold mb-2">Channel not found</h2>
           <p className="text-muted-foreground mb-4">The channel "{channelId}" doesn't exist.</p>
@@ -352,7 +352,7 @@ export default function QuestionViewer() {
     if (!hasFilters || shouldRedirect) {
       // No questions at all for this channel - show coming soon
       return (
-        <div className="h-screen flex flex-col bg-background">
+        <div className="min-h-screen min-h-dvh flex flex-col bg-background">
           <Header
             channel={channel}
             onBack={() => setLocation('/')}
@@ -370,7 +370,7 @@ export default function QuestionViewer() {
     
     // Has filters - show reset option
     return (
-      <div className="h-screen flex flex-col bg-background">
+      <div className="min-h-screen min-h-dvh flex flex-col bg-background">
         <Header
           channel={channel}
           onBack={() => setLocation('/')}
@@ -412,7 +412,7 @@ export default function QuestionViewer() {
         canonical={`https://open-interview.github.io/channel/${channelId}/${currentIndex}`}
       />
 
-      <div className="h-screen flex flex-col bg-background overflow-hidden">
+      <div className="min-h-screen min-h-dvh flex flex-col bg-background overflow-hidden">
         {/* Header with integrated filters */}
         <Header
           channel={channel}
@@ -480,7 +480,7 @@ export default function QuestionViewer() {
             </div>
             {/* Mobile Content - Swipeable */}
             <div 
-              className="flex-1 overflow-y-auto overflow-x-hidden bg-background relative z-0 pb-20"
+              className="flex-1 overflow-y-auto overflow-x-hidden bg-background relative z-0 pb-20 touch-pan-y"
               onTouchStart={swipeHandlers.onTouchStart}
               onTouchMove={swipeHandlers.onTouchMove}
               onTouchEnd={swipeHandlers.onTouchEnd}
@@ -665,7 +665,7 @@ function FilterDropdown({ label, options, selected, onSelect }: FilterDropdownPr
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button 
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all whitespace-nowrap outline-none focus:outline-none ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
             isActive 
               ? 'bg-primary/15 text-primary border border-primary/30' 
               : 'bg-muted/50 hover:bg-muted border border-transparent'

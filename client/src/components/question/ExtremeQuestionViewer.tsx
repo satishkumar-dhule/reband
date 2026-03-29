@@ -550,7 +550,7 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
   // Error state
   if (error || !channel) {
     return (
-      <div className="h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen min-h-dvh flex items-center justify-center bg-background">
         <div className="text-center">
           <h2 className="text-xl font-bold mb-2">Channel not found</h2>
           <p className="text-muted-foreground mb-4">The channel "{channelId}" doesn't exist.</p>
@@ -573,7 +573,7 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
     if (!hasFilters || shouldRedirect) {
       // No questions at all for this channel - show coming soon
       return (
-        <div className="h-screen flex flex-col bg-background">
+        <div className="min-h-screen min-h-dvh flex flex-col bg-background">
           <Header
             channel={channel}
             onBack={() => setLocation('/')}
@@ -601,7 +601,7 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
     
     // Has filters - show reset option
     return (
-      <div className="h-screen flex flex-col bg-background">
+      <div className="min-h-screen min-h-dvh flex flex-col bg-background">
         <Header
           channel={channel}
           onBack={() => setLocation('/')}
@@ -646,7 +646,7 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
 
   return (
     <>
-      <div className={`h-screen flex flex-col bg-background text-foreground overflow-hidden ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
+      <div className={`min-h-screen min-h-dvh flex flex-col bg-background text-foreground overflow-hidden ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
         {/* Header with integrated filters */}
         <Header
           channel={channel}
@@ -971,7 +971,7 @@ function FilterDropdown({ label, options, selected, onSelect }: FilterDropdownPr
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button 
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap outline-none focus:outline-none ${
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
             isActive 
               ? 'bg-primary/10 text-primary border border-primary/30' 
               : 'bg-card hover:bg-muted border border-border text-foreground'

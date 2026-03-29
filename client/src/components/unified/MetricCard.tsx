@@ -38,24 +38,24 @@ const variantClasses: Record<MetricCardVariant, { bg: string; text: string; icon
     iconBg: 'bg-primary/10'
   },
   success: {
-    bg: 'bg-emerald-500/5 border-emerald-500/20',
-    text: 'text-emerald-500',
-    iconBg: 'bg-emerald-500/10'
+    bg: 'bg-[var(--gh-success-fg)]/5 border-[var(--gh-success-fg)]/20',
+    text: 'text-[var(--gh-success-fg)]',
+    iconBg: 'bg-[var(--gh-success-fg)]/10'
   },
   warning: {
-    bg: 'bg-amber-500/5 border-amber-500/20',
-    text: 'text-amber-500',
-    iconBg: 'bg-amber-500/10'
+    bg: 'bg-[var(--gh-attention-fg)]/5 border-[var(--gh-attention-fg)]/20',
+    text: 'text-[var(--gh-attention-fg)]',
+    iconBg: 'bg-[var(--gh-attention-fg)]/10'
   },
   danger: {
-    bg: 'bg-red-500/5 border-red-500/20',
-    text: 'text-red-500',
-    iconBg: 'bg-red-500/10'
+    bg: 'bg-[var(--gh-danger-fg)]/5 border-[var(--gh-danger-fg)]/20',
+    text: 'text-[var(--gh-danger-fg)]',
+    iconBg: 'bg-[var(--gh-danger-fg)]/10'
   },
   info: {
-    bg: 'bg-blue-500/5 border-blue-500/20',
-    text: 'text-blue-500',
-    iconBg: 'bg-blue-500/10'
+    bg: 'bg-[var(--gh-accent-fg)]/5 border-[var(--gh-accent-fg)]/20',
+    text: 'text-[var(--gh-accent-fg)]',
+    iconBg: 'bg-[var(--gh-accent-fg)]/10'
   }
 };
 
@@ -176,7 +176,7 @@ export function MetricCard({
       {/* Trend */}
       {trend !== undefined && (
         <div className={`flex items-center gap-1 mt-2 text-xs ${
-          trend >= 0 ? 'text-emerald-500' : 'text-red-500'
+          trend >= 0 ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'
         }`}>
           {trend >= 0 ? (
             <TrendingUp className="w-3 h-3" />

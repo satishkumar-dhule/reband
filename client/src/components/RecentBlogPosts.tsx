@@ -63,8 +63,8 @@ export function RecentBlogPosts({ limit = 3, className = '' }: RecentBlogPostsPr
         <div className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden backdrop-blur-sm">
           <div className="px-4 py-3 border-b border-white/10">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#00ff88]" />
-              <span className="text-xs font-bold text-[#a0a0a0] uppercase tracking-wider">From the Blog</span>
+              <Sparkles className="w-4 h-4 text-green-500 dark:text-green-400" />
+              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">From the Blog</span>
             </div>
           </div>
           <div className="p-3 space-y-2">
@@ -96,8 +96,8 @@ export function RecentBlogPosts({ limit = 3, className = '' }: RecentBlogPostsPr
         {/* Header */}
         <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#00ff88]" />
-            <span className="text-xs font-bold text-[#a0a0a0] uppercase tracking-wider">
+            <Sparkles className="w-4 h-4 text-green-500 dark:text-green-400" />
+            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               From the Blog
             </span>
           </div>
@@ -105,7 +105,7 @@ export function RecentBlogPosts({ limit = 3, className = '' }: RecentBlogPostsPr
             href={blogBaseUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[10px] text-[#00d4ff] hover:text-[#00ff88] flex items-center gap-1 transition-colors font-semibold"
+            className="text-[10px] text-cyan-500 dark:text-cyan-400 hover:text-green-500 dark:hover:text-green-400 flex items-center gap-1 transition-colors font-semibold"
           >
             View all <ChevronRight className="w-3 h-3" />
           </a>
@@ -124,17 +124,17 @@ export function RecentBlogPosts({ limit = 3, className = '' }: RecentBlogPostsPr
               transition={{ delay: idx * 0.1 }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="block p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#00ff88]/30 transition-all group"
+              className="block p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-green-500/30 dark:hover:border-green-400/30 transition-all group"
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00ff88]/20 to-[#00d4ff]/20 border border-[#00ff88]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <FileText className="w-5 h-5 text-[#00ff88]" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-cyan-500/20 dark:from-green-400/20 dark:to-cyan-400/20 border border-green-500/30 dark:border-green-400/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <FileText className="w-5 h-5 text-green-500 dark:text-green-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-bold leading-snug line-clamp-2 group-hover:text-[#00ff88] transition-colors mb-1">
+                  <h4 className="text-sm font-bold leading-snug line-clamp-2 group-hover:text-green-500 dark:group-hover:text-green-400 transition-colors mb-1">
                     {post.title}
                   </h4>
-                  <div className="flex items-center gap-1 text-[10px] text-[#a0a0a0] group-hover:text-[#00d4ff] transition-colors">
+                  <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400 group-hover:text-cyan-500 dark:group-hover:text-cyan-400 transition-colors">
                     <span className="font-semibold">Read article</span>
                     <ExternalLink className="w-3 h-3" />
                   </div>
@@ -145,12 +145,12 @@ export function RecentBlogPosts({ limit = 3, className = '' }: RecentBlogPostsPr
         </div>
 
         {/* Footer CTA */}
-        <div className="px-4 py-3 border-t border-white/10 bg-gradient-to-r from-[#00ff88]/5 to-[#00d4ff]/5">
+        <div className="px-4 py-3 border-t border-white/10 bg-gradient-to-r from-green-500/5 to-cyan-500/5 dark:from-green-400/5 dark:to-cyan-400/5">
           <a
             href={blogBaseUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 text-xs font-bold text-[#00ff88] hover:text-[#00d4ff] transition-colors"
+            className="flex items-center justify-center gap-2 text-xs font-bold text-green-600 dark:text-green-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
           >
             <Zap className="w-3 h-3" />
             <span>Explore More Articles</span>

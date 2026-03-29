@@ -35,10 +35,10 @@ const sizeClasses: Record<ProgressBarSize, string> = {
 
 const variantClasses: Record<ProgressBarVariant, string> = {
   default: 'bg-primary',
-  success: 'bg-emerald-500',
-  warning: 'bg-amber-500',
-  danger: 'bg-red-500',
-  info: 'bg-blue-500'
+  success: 'bg-[var(--gh-success-fg)]',
+  warning: 'bg-[var(--gh-attention-fg)]',
+  danger: 'bg-[var(--gh-danger-fg)]',
+  info: 'bg-[var(--gh-accent-fg)]'
 };
 
 export function ProgressBar({

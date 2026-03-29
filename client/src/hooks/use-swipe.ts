@@ -3,7 +3,7 @@
  * Reusable across mobile components
  */
 
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { LIMITS } from '../lib/constants';
 
 interface SwipeHandlers {
@@ -21,11 +21,13 @@ interface SwipeCallbacks {
 
 interface SwipeOptions {
   minDistance?: number;
-  preventScroll?: boolean;
+  /** Only detect horizontal swipes, never prevent vertical scroll (default: true) */
+  horizontalOnly?: boolean;
 }
 
 /**
  * Hook for detecting swipe gestures on touch devices
+ * Smart scroll handling: only intercepts horizontal swipes, allows natural vertical scroll
  * 
  * @param callbacks - Object containing callback functions for each swipe direction
  * @param options - Configuration options
@@ -55,35 +57,45 @@ export function useSwipe(
 ): SwipeHandlers {
   const {
     minDistance = LIMITS.MIN_SWIPE_DISTANCE,
-    preventScroll = false,
+    horizontalOnly = true,
   } = options;
 
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
   const touchEndY = useRef<number | null>(null);
+  // Track if we've determined swipe direction to prevent conflicting preventDefault calls
+  const [swipeDirectionLocked, setSwipeDirectionLocked] = useState<'horizontal' | 'vertical' | null>(null);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     touchEndX.current = null;
     touchEndY.current = null;
     touchStartX.current = e.targetTouches[0].clientX;
     touchStartY.current = e.targetTouches[0].clientY;
+    setSwipeDirectionLocked(null);
   }, []);
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     touchEndX.current = e.targetTouches[0].clientX;
     touchEndY.current = e.targetTouches[0].clientY;
 
-    // Prevent scroll if horizontal swipe is detected
-    if (preventScroll && touchStartX.current !== null && touchEndX.current !== null) {
+    // Smart scroll handling: only prevent default for horizontal swipes
+    // This allows natural vertical scrolling while enabling horizontal swipe detection
+    if (horizontalOnly && touchStartX.current !== null && touchEndX.current !== null && touchStartY.current !== null) {
       const distanceX = Math.abs(touchStartX.current - touchEndX.current);
-      const distanceY = Math.abs((touchStartY.current ?? 0) - (touchEndY.current ?? 0));
+      const distanceY = Math.abs(touchStartY.current - touchEndY.current);
       
-      if (distanceX > distanceY) {
+      // Lock direction once we have a clear direction (prevents flickering)
+      if (swipeDirectionLocked === null && Math.max(distanceX, distanceY) > 20) {
+        setSwipeDirectionLocked(distanceX > distanceY ? 'horizontal' : 'vertical');
+      }
+      
+      // Only prevent default for horizontal swipes
+      if (swipeDirectionLocked === 'horizontal' || (swipeDirectionLocked === null && distanceX > distanceY)) {
         e.preventDefault();
       }
     }
-  }, [preventScroll]);
+  }, [horizontalOnly, swipeDirectionLocked]);
 
   const onTouchEnd = useCallback(() => {
     if (
@@ -92,6 +104,7 @@ export function useSwipe(
       touchEndX.current === null ||
       touchEndY.current === null
     ) {
+      setSwipeDirectionLocked(null);
       return;
     }
 
@@ -122,6 +135,7 @@ export function useSwipe(
     touchStartY.current = null;
     touchEndX.current = null;
     touchEndY.current = null;
+    setSwipeDirectionLocked(null);
   }, [callbacks, minDistance]);
 
   return { onTouchStart, onTouchMove, onTouchEnd };

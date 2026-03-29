@@ -35,7 +35,7 @@ export default defineConfig({
   },
   
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: process.env.BASE_URL || 'http://localhost:5000',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -44,6 +44,7 @@ export default defineConfig({
     
     // Performance optimizations
     launchOptions: {
+      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
       args: [
         '--disable-gpu',
         '--no-sandbox',
@@ -182,7 +183,7 @@ export default defineConfig({
   
   webServer: {
     command: 'npm run dev:server',
-    url: 'http://localhost:5173',
+    url: process.env.BASE_URL || 'http://localhost:5000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
     stdout: 'pipe',

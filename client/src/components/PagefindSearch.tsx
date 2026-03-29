@@ -404,7 +404,7 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+          className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90dvh] max-h-[90svh] pb-safe"
           onClick={e => e.stopPropagation()}
         >
           {/* Desktop Search Input */}

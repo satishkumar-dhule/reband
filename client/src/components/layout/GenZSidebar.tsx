@@ -32,12 +32,21 @@ export function GenZSidebar() {
 
   const level = Math.floor(balance / 100);
 
+  const handleNavKeyDown = (e: React.KeyboardEvent, path: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setLocation(path);
+    }
+  };
+
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-background border-r border-border flex flex-col z-50 hidden lg:flex">
       {/* Logo - Clickable to go home */}
       <button 
         onClick={() => setLocation('/')}
-        className="p-6 border-b border-border transition-colors cursor-pointer"
+        onKeyDown={(e) => handleNavKeyDown(e, '/')}
+        aria-label="Go to home"
+        className="p-6 border-b border-border transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-primary to-cyan-500 rounded-[12px] flex items-center justify-center">
@@ -88,7 +97,10 @@ export function GenZSidebar() {
               whileHover={prefersReducedMotion ? undefined : { x: 4 }}
               whileTap={prefersReducedMotion ? undefined : {}}
               onClick={() => setLocation(item.path)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all ${
+              onKeyDown={(e) => handleNavKeyDown(e, item.path)}
+              tabIndex={0}
+              aria-current={isActive ? 'page' : undefined}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                 isActive
                   ? 'bg-gradient-to-r from-primary/20 to-cyan-500/20 border border-primary/30 text-foreground'
                   : 'text-muted-foreground hover:text-foreground'
@@ -114,7 +126,10 @@ export function GenZSidebar() {
                   whileHover={prefersReducedMotion ? undefined : { x: 4 }}
                   whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                   onClick={() => setLocation(item.path)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all ${
+                  onKeyDown={(e) => handleNavKeyDown(e, item.path)}
+                  tabIndex={0}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                     isActive
                       ? 'bg-gradient-to-r from-primary/20 to-cyan-500/20 border border-primary/30 text-foreground'
                       : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
@@ -147,7 +162,10 @@ export function GenZSidebar() {
                   whileHover={prefersReducedMotion ? undefined : { x: 4 }}
                   whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                   onClick={() => setLocation(item.path)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all ${
+                  onKeyDown={(e) => handleNavKeyDown(e, item.path)}
+                  tabIndex={0}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                     isActive
                       ? 'bg-gradient-to-r from-primary/20 to-cyan-500/20 border border-primary/30 text-foreground'
                       : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
@@ -180,7 +198,10 @@ export function GenZSidebar() {
                   whileHover={prefersReducedMotion ? undefined : { x: 4 }}
                   whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                   onClick={() => setLocation(item.path)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all ${
+                  onKeyDown={(e) => handleNavKeyDown(e, item.path)}
+                  tabIndex={0}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                     isActive
                       ? 'bg-gradient-to-r from-primary/20 to-cyan-500/20 border border-primary/30 text-foreground'
                       : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
@@ -200,7 +221,10 @@ export function GenZSidebar() {
         whileHover={prefersReducedMotion ? undefined : {}}
         whileTap={prefersReducedMotion ? undefined : {}}
         onClick={() => setLocation('/profile')}
-        className="m-4 p-4 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-[16px] flex items-center gap-3"
+        onKeyDown={(e) => handleNavKeyDown(e, '/profile')}
+        tabIndex={0}
+        aria-label="View profile and credits"
+        className="m-4 p-4 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-[16px] flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
       >
         <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-yellow-500 rounded-full flex items-center justify-center">
           <Coins className="w-5 h-5 text-primary-foreground" strokeWidth={2.5} />

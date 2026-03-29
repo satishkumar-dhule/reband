@@ -203,7 +203,7 @@
   --sidebar-bg: var(--gh-canvas-subtle);
   --sidebar-foreground: var(--gh-fg);
   --sidebar-border: var(--gh-border);
-  --sidebar-accent: var(--gh-canvas-muted);
+  --sidebar-accent: var(--gh-canvas-subtle);
   --sidebar-accent-foreground: var(--gh-fg);
   --sidebar-ring: var(--gh-accent-fg);
   --sidebar-active-bg: var(--gh-neutral-subtle);

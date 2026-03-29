@@ -177,15 +177,17 @@ export default function Notifications() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-card rounded-2xl border border-border p-8 text-center"
+                  className="flex items-center justify-center min-h-[40vh] bg-card rounded-2xl border border-border"
                 >
-                  <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
-                    <Bell className="w-8 h-8 text-muted-foreground" />
+                  <div className="text-center px-4">
+                    <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                      <Bell className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-semibold mb-1">No notifications</h3>
+                    <p className="text-sm text-muted-foreground">
+                      You're all caught up! Notifications will appear here.
+                    </p>
                   </div>
-                  <h3 className="font-semibold mb-1">No notifications</h3>
-                  <p className="text-sm text-muted-foreground">
-                    You're all caught up! Notifications will appear here.
-                  </p>
                 </motion.div>
               ) : (
                 notifications.map((notification, index) => (

@@ -38,11 +38,16 @@ export function PullToRefresh({
   const opacity = useTransform(pullDistance, [0, threshold], [0, 1]);
   const scale = useTransform(pullDistance, [0, threshold], [0.5, 1]);
 
+  const isAtTop = () => {
+    // Check both window scroll and container scroll
+    return window.scrollY === 0 || (containerRef.current?.scrollTop ?? 0) === 0;
+  };
+
   const handleTouchStart = (e: TouchEvent) => {
     if (disabled || isRefreshing) return;
     
-    // Only start if at top of scroll
-    if (window.scrollY === 0 || containerRef.current?.scrollTop === 0) {
+    // Only start if at top of scroll - allow natural scroll at other positions
+    if (isAtTop()) {
       startY.current = e.touches[0].clientY;
       setIsPulling(true);
       setHasTriggered(false);
@@ -55,6 +60,12 @@ export function PullToRefresh({
     const currentY = e.touches[0].clientY;
     const distance = Math.max(0, currentY - startY.current);
     
+    // Only process if pulling DOWN (not up - allow natural scroll up)
+    if (currentY <= startY.current) {
+      // User is scrolling up - let natural scroll happen
+      return;
+    }
+    
     // Apply resistance curve (feels more natural)
     const resistedDistance = Math.pow(distance, 0.7);
     pullDistance.set(Math.min(resistedDistance, threshold * 1.5));
@@ -66,8 +77,9 @@ export function PullToRefresh({
       setHasTriggered(true);
     }
     
-    // Prevent default scroll if pulling
-    if (distance > 10) {
+    // Only prevent default when actively pulling down at top of page
+    // This preserves native momentum scroll while enabling pull-to-refresh
+    if (distance > 10 && isAtTop()) {
       e.preventDefault();
     }
   };

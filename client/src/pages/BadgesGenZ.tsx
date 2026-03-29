@@ -151,7 +151,7 @@ export default function BadgesGenZ() {
                   <div
                     key={badge.id}
                     className={`bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 flex flex-col items-center text-center transition-all ${
-                      isUnlocked ? 'hover:shadow-md hover:border-[var(--gh-border-strong)]' : 'opacity-60 grayscale-[0.5]'
+                      isUnlocked ? 'hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-border-strong)]' : 'opacity-60 grayscale-[0.5] hover:opacity-80'
                     }`}
                   >
                     <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 ${
@@ -206,7 +206,7 @@ export default function BadgesGenZ() {
                 <p className="text-[var(--gh-fg-muted)] mb-6">Start learning to unlock your first achievement!</p>
                 <Button 
                   onClick={() => setLocation('/channels')}
-                  className="bg-[var(--gh-success-emphasis)] text-white hover:bg-green-700"
+                  className="bg-[var(--gh-success-emphasis)] text-white hover:bg-[var(--gh-success-hover)]"
                 >
                   Browse Channels
                 </Button>

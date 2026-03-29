@@ -26,10 +26,10 @@ export function GenZProgress({
   const percentage = Math.min((value / max) * 100, 100);
 
   const colors = {
-    green: 'from-[#00ff88] to-[#00d4ff]',
-    blue: 'from-[#00d4ff] to-[#0080ff]',
-    pink: 'from-[#ff0080] to-[#ff00ff]',
-    gold: 'from-[#ffd700] to-[#ff8c00]',
+    green: 'from-green-500 to-cyan-500 dark:from-green-400 dark:to-cyan-400',
+    blue: 'from-cyan-500 to-blue-500 dark:from-cyan-400 dark:to-blue-500',
+    pink: 'from-pink-500 to-fuchsia-500 dark:from-pink-400 dark:to-fuchsia-400',
+    gold: 'from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-500',
   };
 
   return (
@@ -46,7 +46,7 @@ export function GenZProgress({
         />
       </div>
       {showLabel && (
-        <div className="mt-2 text-sm text-[#a0a0a0] text-right">
+        <div className="mt-2 text-sm text-[var(--muted-foreground,#6b7280)] text-right">
           {value} / {max}
         </div>
       )}

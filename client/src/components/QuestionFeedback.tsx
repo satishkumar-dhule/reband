@@ -18,9 +18,9 @@ interface FeedbackOption {
 }
 
 const FEEDBACK_OPTIONS: FeedbackOption[] = [
-  { type: 'improve', icon: <Sparkles className="w-3 h-3" />, label: 'Improve', color: 'text-blue-400 hover:bg-blue-500/20', issueLabel: 'improve' },
-  { type: 'rewrite', icon: <RefreshCw className="w-3 h-3" />, label: 'Rewrite', color: 'text-amber-400 hover:bg-amber-500/20', issueLabel: 'rewrite' },
-  { type: 'disable', icon: <Ban className="w-3 h-3" />, label: 'Remove', color: 'text-red-400 hover:bg-red-500/20', issueLabel: 'disable' },
+  { type: 'improve', icon: <Sparkles className="w-3 h-3" />, label: 'Improve', color: 'text-[var(--gh-accent-fg)] hover:bg-[var(--gh-accent-fg)]/20', issueLabel: 'improve' },
+  { type: 'rewrite', icon: <RefreshCw className="w-3 h-3" />, label: 'Rewrite', color: 'text-[var(--gh-attention-fg)] hover:bg-[var(--gh-attention-fg)]/20', issueLabel: 'rewrite' },
+  { type: 'disable', icon: <Ban className="w-3 h-3" />, label: 'Remove', color: 'text-[var(--gh-danger-fg)] hover:bg-[var(--gh-danger-fg)]/20', issueLabel: 'disable' },
 ];
 
 // GitHub repo for issues

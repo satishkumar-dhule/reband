@@ -418,13 +418,15 @@
 .badge-warning {
   background: hsla(38, 92%, 60%, 0.1);
   border-color: hsla(38, 92%, 60%, 0.3);
-  color: var(--color-warning-light);
+  /* Fixed: Use darker warning color for WCAG AA compliance */
+  color: hsl(38, 92%, 50%);
 }
 
 .badge-error {
   background: hsla(0, 84%, 60%, 0.1);
   border-color: hsla(0, 84%, 60%, 0.3);
-  color: var(--color-error-light);
+  /* Fixed: Use darker error color for WCAG AA compliance */
+  color: hsl(0, 84%, 55%);
 }
 
 

@@ -201,7 +201,7 @@ export default function ProfileGenZ() {
                       {achievements.map((achievement) => (
                         <div 
                           key={achievement.id}
-                          className={`p-3 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-center transition-all ${achievement.achieved ? 'opacity-100 hover:shadow-sm' : 'opacity-40 grayscale'}`}
+                          className={`p-3 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-center transition-all ${achievement.achieved ? 'opacity-100 hover:scale-[1.02] hover:shadow-md' : 'opacity-40 grayscale'}`}
                         >
                           <div className="text-2xl mb-1">{achievement.icon}</div>
                           <div className="text-xs font-semibold text-[var(--gh-fg)] truncate">{achievement.name}</div>

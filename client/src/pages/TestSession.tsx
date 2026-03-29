@@ -387,11 +387,11 @@ export default function TestSession() {
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-4 p-3 bg-amber-500/20 border border-amber-500/30 rounded-lg flex items-center gap-2"
+                    className="mb-4 p-3 bg-[var(--gh-attention-fg)]/20 border border-[var(--gh-attention-fg)]/30 rounded-lg flex items-center gap-2"
                   >
-                    <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                    <AlertTriangle className="w-5 h-5 text-[var(--gh-attention-fg)] flex-shrink-0" />
                     <div>
-                      <p className="text-sm font-medium text-amber-500">Pass Expired!</p>
+                      <p className="text-sm font-medium text-[var(--gh-attention-fg)]">Pass Expired!</p>
                       <p className="text-xs text-muted-foreground">New questions added - retake to recertify</p>
                     </div>
                   </motion.div>
@@ -439,15 +439,15 @@ export default function TestSession() {
                     <span className="font-bold">Single & Multiple Choice</span>
                   </div>
                   {progress && !isExpired && (
-                    <div className="flex justify-between p-2 bg-green-500/10 rounded border border-green-500/30">
+                    <div className="flex justify-between p-2 bg-[var(--gh-success-fg)]/10 rounded border border-[var(--gh-success-fg)]/30">
                       <span className="text-muted-foreground">Your Best</span>
-                      <span className="font-bold text-green-500">{progress.bestScore}%</span>
+                      <span className="font-bold text-[var(--gh-success-fg)]">{progress.bestScore}%</span>
                     </div>
                   )}
                   {progress && isExpired && (
-                    <div className="flex justify-between p-2 bg-amber-500/10 rounded border border-amber-500/30">
+                    <div className="flex justify-between p-2 bg-[var(--gh-attention-fg)]/10 rounded border border-[var(--gh-attention-fg)]/30">
                       <span className="text-muted-foreground">Previous Best</span>
-                      <span className="font-bold text-amber-500">{progress.bestScore}% (expired)</span>
+                      <span className="font-bold text-[var(--gh-attention-fg)]">{progress.bestScore}% (expired)</span>
                     </div>
                   )}
                 </div>
@@ -543,7 +543,7 @@ export default function TestSession() {
             </header>
 
             {/* Question */}
-            <div className="flex-1 p-4 overflow-y-auto w-full overflow-x-hidden">
+            <div className="flex-1 p-4 overflow-y-auto w-full overflow-x-hidden momentum-scroll">
               <div className="max-w-2xl mx-auto w-full">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -556,8 +556,8 @@ export default function TestSession() {
                     <div className="flex items-center gap-2 mb-3">
                       <span className={`px-2 py-0.5 text-[10px] uppercase rounded ${
                         currentQuestion.type === 'multiple' 
-                          ? 'bg-purple-500/20 text-purple-400' 
-                          : 'bg-blue-500/20 text-blue-400'
+                          ? 'bg-[var(--gh-done-fg)]/20 text-[var(--gh-done-fg)]' 
+                          : 'bg-[var(--gh-accent-fg)]/20 text-[var(--gh-accent-fg)]'
                       }`}>
                         {currentQuestion.type === 'multiple' ? 'Select all that apply' : 'Single choice'}
                       </span>
@@ -567,9 +567,9 @@ export default function TestSession() {
                         </span>
                       )}
                       <span className={`px-2 py-0.5 text-[10px] uppercase rounded ${
-                        currentQuestion.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
-                        currentQuestion.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
-                        'bg-red-500/20 text-red-400'
+                        currentQuestion.difficulty === 'beginner' ? 'bg-[var(--gh-success-fg)]/20 text-[var(--gh-success-fg)]' :
+                        currentQuestion.difficulty === 'intermediate' ? 'bg-[var(--gh-attention-fg)]/20 text-[var(--gh-attention-fg)]' :
+                        'bg-[var(--gh-danger-fg)]/20 text-[var(--gh-danger-fg)]'
                       }`}>
                         {currentQuestion.difficulty}
                       </span>
@@ -605,24 +605,24 @@ export default function TestSession() {
                             disabled={showFeedback !== null}
                             className={`w-full p-4 text-left border rounded-lg transition-all ${
                               showCorrect
-                                ? 'border-green-500 bg-green-500/20'
+                                ? 'border-[var(--gh-success-fg)] bg-[var(--gh-success-fg)]/20'
                                 : showWrong
-                                ? 'border-red-500 bg-red-500/20'
+                                ? 'border-[var(--gh-danger-fg)] bg-[var(--gh-danger-fg)]/20'
                                 : isSelected
                                 ? 'border-primary bg-primary/10'
                                 : 'border-border hover:border-primary/50'
                             } ${showFeedback ? 'cursor-default' : ''}`}
                           >
                             <div className="flex items-start gap-3">
-                              <div className={`w-6 h-6 ${isMultiple ? 'rounded-md' : 'rounded-full'} border-2 flex items-center justify-center flex-shrink-0 ${
-                                showCorrect
-                                  ? 'border-green-500 bg-green-500'
-                                  : showWrong
-                                  ? 'border-red-500 bg-red-500'
-                                  : isSelected 
-                                  ? 'border-primary bg-primary' 
-                                  : 'border-muted-foreground/30'
-                              }`}>
+                            <div className={`w-6 h-6 ${isMultiple ? 'rounded-md' : 'rounded-full'} border-2 flex items-center justify-center flex-shrink-0 ${
+                              showCorrect
+                                ? 'border-[var(--gh-success-fg)] bg-[var(--gh-success-fg)]'
+                                : showWrong
+                                ? 'border-[var(--gh-danger-fg)] bg-[var(--gh-danger-fg)]'
+                                : isSelected 
+                                ? 'border-primary bg-primary' 
+                                : 'border-muted-foreground/30'
+                            }`}>
                                 {showCorrect && <Check className="w-4 h-4 text-white" />}
                                 {showWrong && <X className="w-4 h-4 text-white" />}
                                 {!showFeedback && isSelected && <Check className="w-4 h-4 text-primary-foreground" />}
@@ -728,13 +728,13 @@ export default function TestSession() {
           <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-muted/20 w-full overflow-x-hidden">
             {/* Vibrant Header with Score Summary */}
             <header className={`border-b p-4 relative overflow-hidden ${
-              result.passed ? 'border-green-500/30' : 'border-orange-500/30'
+              result.passed ? 'border-[var(--gh-success-fg)]/30' : 'border-[var(--gh-attention-fg)]/30'
             }`}>
               {/* Animated gradient background */}
               <div className={`absolute inset-0 bg-gradient-to-r ${
                 result.passed 
-                  ? 'from-green-500/10 via-emerald-500/5 to-teal-500/10' 
-                  : 'from-orange-500/10 via-amber-500/5 to-yellow-500/10'
+                  ? 'from-[var(--gh-success-fg)]/10 via-[var(--gh-success-fg)]/5 to-teal-500/10' 
+                  : 'from-[var(--gh-attention-fg)]/10 via-[var(--gh-attention-fg)]/5 to-yellow-500/10'
               }`} />
               
               <div className="relative z-10 max-w-3xl mx-auto">
@@ -745,8 +745,8 @@ export default function TestSession() {
                       animate={{ scale: 1 }}
                       className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${
                         result.passed 
-                          ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-green-500/30' 
-                          : 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-orange-500/30'
+                          ? 'bg-gradient-to-br from-[var(--gh-success-fg)] to-emerald-600 shadow-[var(--gh-success-fg)]/30' 
+                          : 'bg-gradient-to-br from-[var(--gh-attention-fg)] to-amber-600 shadow-[var(--gh-attention-fg)]/30'
                       }`}
                     >
                       <Eye className="w-6 h-6 text-white" />
@@ -760,17 +760,17 @@ export default function TestSession() {
                   </div>
                   
                   {/* Score Badge */}
-                  <motion.div 
+                    <motion.div 
                     initial={{ x: 20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     className={`flex items-center gap-3 px-4 py-2 rounded-xl ${
                       result.passed 
-                        ? 'bg-green-500/20 border border-green-500/30' 
-                        : 'bg-orange-500/20 border border-orange-500/30'
+                        ? 'bg-[var(--gh-success-fg)]/20 border border-[var(--gh-success-fg)]/30' 
+                        : 'bg-[var(--gh-attention-fg)]/20 border border-[var(--gh-attention-fg)]/30'
                     }`}
                   >
                     <div className="text-right">
-                      <div className={`text-2xl font-bold ${result.passed ? 'text-green-500' : 'text-orange-500'}`}>
+                      <div className={`text-2xl font-bold ${result.passed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-attention-fg)]'}`}>
                         {result.score}%
                       </div>
                       <div className="text-[10px] text-muted-foreground">
@@ -790,9 +790,9 @@ export default function TestSession() {
                         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                           reviewFilter === filter
                             ? filter === 'correct' 
-                              ? 'bg-green-500 text-white shadow-sm'
+                              ? 'bg-[var(--gh-success-fg)] text-white shadow-sm'
                               : filter === 'incorrect'
-                              ? 'bg-red-500 text-white shadow-sm'
+                              ? 'bg-[var(--gh-danger-fg)] text-white shadow-sm'
                               : 'bg-background text-foreground shadow-sm'
                             : 'text-muted-foreground hover:text-foreground'
                         }`}
@@ -832,7 +832,7 @@ export default function TestSession() {
             </header>
 
             {/* Questions Review - Collapsible Cards */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto momentum-scroll p-4">
               <div className="max-w-3xl mx-auto space-y-2">
                 {getQuestionResults()
                   .map((item, idx) => ({ item, idx }))
@@ -852,8 +852,8 @@ export default function TestSession() {
                         transition={{ delay: idx * 0.02 }}
                         className={`rounded-xl overflow-hidden border transition-all duration-300 ${
                           item.isCorrect 
-                            ? 'border-green-500/30 hover:border-green-500/50' 
-                            : 'border-red-500/30 hover:border-red-500/50'
+                            ? 'border-[var(--gh-success-fg)]/30 hover:border-[var(--gh-success-fg)]/50' 
+                            : 'border-[var(--gh-danger-fg)]/30 hover:border-[var(--gh-danger-fg)]/50'
                         } ${isExpanded ? 'shadow-lg' : 'shadow-sm hover:shadow-md'}`}
                       >
                         {/* Collapsed Header - Always Visible */}
@@ -871,8 +871,8 @@ export default function TestSession() {
                           }}
                           className={`w-full px-4 py-3 flex items-center gap-3 transition-all ${
                             item.isCorrect 
-                              ? 'bg-gradient-to-r from-green-500/10 to-transparent hover:from-green-500/20' 
-                              : 'bg-gradient-to-r from-red-500/10 to-transparent hover:from-red-500/20'
+                              ? 'bg-gradient-to-r from-[var(--gh-success-fg)]/10 to-transparent hover:from-[var(--gh-success-fg)]/20' 
+                              : 'bg-gradient-to-r from-[var(--gh-danger-fg)]/10 to-transparent hover:from-[var(--gh-danger-fg)]/20'
                           }`}
                         >
                           {/* Status Icon */}
@@ -884,8 +884,8 @@ export default function TestSession() {
                             transition={{ type: 'spring', stiffness: 200 }}
                             className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                               item.isCorrect 
-                                ? 'bg-green-500 shadow-lg shadow-green-500/30' 
-                                : 'bg-red-500 shadow-lg shadow-red-500/30'
+                                ? 'bg-[var(--gh-success-fg)] shadow-lg shadow-[var(--gh-success-fg)]/30' 
+                                : 'bg-[var(--gh-danger-fg)] shadow-lg shadow-[var(--gh-danger-fg)]/30'
                             }`}
                           >
                             {item.isCorrect ? (
@@ -898,16 +898,16 @@ export default function TestSession() {
                           {/* Question Preview */}
                           <div className="flex-1 text-left min-w-0">
                             <div className="flex items-center gap-2 mb-0.5">
-                              <span className={`text-sm font-bold ${item.isCorrect ? 'text-green-500' : 'text-red-500'}`}>
-                                Q{idx + 1}
-                              </span>
-                              <span className={`px-1.5 py-0.5 text-[9px] uppercase rounded-full font-medium ${
-                                item.question.difficulty === 'beginner' 
-                                  ? 'bg-green-500/20 text-green-400' 
-                                  : item.question.difficulty === 'intermediate' 
-                                  ? 'bg-yellow-500/20 text-yellow-400' 
-                                  : 'bg-red-500/20 text-red-400'
-                              }`}>
+                            <span className={`text-sm font-bold ${item.isCorrect ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
+                              Q{idx + 1}
+                            </span>
+                            <span className={`px-1.5 py-0.5 text-[9px] uppercase rounded-full font-medium ${
+                              item.question.difficulty === 'beginner' 
+                                ? 'bg-[var(--gh-success-fg)]/20 text-[var(--gh-success-fg)]' 
+                                : item.question.difficulty === 'intermediate' 
+                                ? 'bg-[var(--gh-attention-fg)]/20 text-[var(--gh-attention-fg)]' 
+                                : 'bg-[var(--gh-danger-fg)]/20 text-[var(--gh-danger-fg)]'
+                            }`}>
                                 {item.question.difficulty}
                               </span>
                             </div>
@@ -956,18 +956,18 @@ export default function TestSession() {
                                         transition={{ delay: optIdx * 0.05 }}
                                         className={`flex items-start gap-3 p-3 rounded-lg border transition-all ${
                                           isCorrectOption
-                                            ? 'bg-green-500/10 border-green-500/40'
+                                            ? 'bg-[var(--gh-success-fg)]/10 border-[var(--gh-success-fg)]/40'
                                             : wasSelected
-                                            ? 'bg-red-500/10 border-red-500/40'
+                                            ? 'bg-[var(--gh-danger-fg)]/10 border-[var(--gh-danger-fg)]/40'
                                             : 'bg-muted/10 border-border/50'
                                         }`}
                                       >
                                         {/* Option indicator */}
                                         <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
                                           isCorrectOption
-                                            ? 'bg-green-500 text-white'
+                                            ? 'bg-[var(--gh-success-fg)] text-white'
                                             : wasSelected
-                                            ? 'bg-red-500 text-white'
+                                            ? 'bg-[var(--gh-danger-fg)] text-white'
                                             : 'bg-muted/50 text-muted-foreground'
                                         }`}>
                                           {isCorrectOption ? (
@@ -982,9 +982,9 @@ export default function TestSession() {
                                         <div className="flex-1 min-w-0">
                                           <span className={`text-sm ${
                                             isCorrectOption 
-                                              ? 'text-green-400 font-medium' 
+                                              ? 'text-[var(--gh-success-fg)] font-medium' 
                                               : wasSelected 
-                                              ? 'text-red-400' 
+                                              ? 'text-[var(--gh-danger-fg)]' 
                                               : 'text-muted-foreground'
                                           }`}>
                                             {renderWithInlineCode(opt.text)}
@@ -994,12 +994,12 @@ export default function TestSession() {
                                         {/* Labels */}
                                         <div className="flex gap-1 flex-shrink-0">
                                           {isCorrectOption && (
-                                            <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] uppercase rounded-full font-medium">
+                                            <span className="px-2 py-0.5 bg-[var(--gh-success-fg)]/20 text-[var(--gh-success-fg)] text-[9px] uppercase rounded-full font-medium">
                                               ✓ Correct
                                             </span>
                                           )}
                                           {wasSelected && !isCorrectOption && (
-                                            <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-[9px] uppercase rounded-full font-medium">
+                                            <span className="px-2 py-0.5 bg-[var(--gh-danger-fg)]/20 text-[var(--gh-danger-fg)] text-[9px] uppercase rounded-full font-medium">
                                               Your Pick
                                             </span>
                                           )}
@@ -1017,17 +1017,17 @@ export default function TestSession() {
                                     transition={{ delay: 0.2 }}
                                     className={`mt-4 p-3 rounded-lg border ${
                                       item.isCorrect 
-                                        ? 'bg-blue-500/10 border-blue-500/30' 
-                                        : 'bg-amber-500/10 border-amber-500/30'
+                                        ? 'bg-[var(--gh-accent-fg)]/10 border-[var(--gh-accent-fg)]/30' 
+                                        : 'bg-[var(--gh-attention-fg)]/10 border-[var(--gh-attention-fg)]/30'
                                     }`}
                                   >
                                     <div className="flex items-start gap-2">
                                       <Sparkles className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
-                                        item.isCorrect ? 'text-blue-400' : 'text-amber-400'
+                                        item.isCorrect ? 'text-[var(--gh-accent-fg)]' : 'text-[var(--gh-attention-fg)]'
                                       }`} />
                                       <div>
                                         <span className={`text-xs font-bold uppercase ${
-                                          item.isCorrect ? 'text-blue-400' : 'text-amber-400'
+                                          item.isCorrect ? 'text-[var(--gh-accent-fg)]' : 'text-[var(--gh-attention-fg)]'
                                         }`}>
                                           {item.isCorrect ? '💡 Why this is correct' : '📚 Learn from this'}
                                         </span>
@@ -1068,12 +1068,12 @@ export default function TestSession() {
                 }).length === 0 && (
                   <div className="text-center py-12">
                     <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${
-                      reviewFilter === 'correct' ? 'bg-green-500/20' : 'bg-red-500/20'
+                      reviewFilter === 'correct' ? 'bg-[var(--gh-success-fg)]/20' : 'bg-[var(--gh-danger-fg)]/20'
                     }`}>
                       {reviewFilter === 'correct' ? (
-                        <Trophy className="w-8 h-8 text-green-500" />
+                        <Trophy className="w-8 h-8 text-[var(--gh-success-fg)]" />
                       ) : (
-                        <AlertCircle className="w-8 h-8 text-red-500" />
+                        <AlertCircle className="w-8 h-8 text-[var(--gh-danger-fg)]" />
                       )}
                     </div>
                     <p className="text-muted-foreground">
@@ -1088,7 +1088,7 @@ export default function TestSession() {
 
             {/* Sticky Footer */}
             <footer className={`border-t p-4 bg-background/95 backdrop-blur ${
-              result.passed ? 'border-green-500/30' : 'border-orange-500/30'
+              result.passed ? 'border-[var(--gh-success-fg)]/30' : 'border-[var(--gh-attention-fg)]/30'
             }`}>
               <div className="max-w-3xl mx-auto flex gap-3">
                 <button
@@ -1101,8 +1101,8 @@ export default function TestSession() {
                   onClick={() => setSessionState('completed')}
                   className={`flex-1 py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg ${
                     result.passed 
-                      ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-green-500/30 hover:shadow-green-500/50' 
-                      : 'bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-orange-500/30 hover:shadow-orange-500/50'
+                      ? 'bg-gradient-to-r from-[var(--gh-success-fg)] to-emerald-600 text-white shadow-[var(--gh-success-fg)]/30 hover:shadow-[var(--gh-success-fg)]/50' 
+                      : 'bg-gradient-to-r from-[var(--gh-attention-fg)] to-amber-600 text-white shadow-[var(--gh-attention-fg)]/30 hover:shadow-[var(--gh-attention-fg)]/50'
                   }`}
                 >
                   <Trophy className="w-4 h-4" /> View Results
@@ -1123,8 +1123,8 @@ export default function TestSession() {
               {/* Vibrant gradient background */}
               <div className={`absolute inset-0 bg-gradient-to-br ${
                 result.passed 
-                  ? 'from-green-500/20 via-emerald-500/10 to-teal-500/20' 
-                  : 'from-orange-500/20 via-amber-500/10 to-yellow-500/20'
+                  ? 'from-[var(--gh-success-fg)]/20 via-emerald-500/10 to-teal-500/20' 
+                  : 'from-[var(--gh-attention-fg)]/20 via-amber-500/10 to-yellow-500/20'
               } opacity-50`} />
               
               <div className="relative z-10">
@@ -1135,8 +1135,8 @@ export default function TestSession() {
                     transition={{ type: 'spring', delay: 0.2 }}
                     className={`w-20 h-20 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg ${
                       result.passed 
-                        ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-green-500/30' 
-                        : 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-orange-500/30'
+                        ? 'bg-gradient-to-br from-[var(--gh-success-fg)] to-emerald-600 shadow-[var(--gh-success-fg)]/30' 
+                        : 'bg-gradient-to-br from-[var(--gh-attention-fg)] to-amber-600 shadow-[var(--gh-attention-fg)]/30'
                     }`}
                   >
                     {result.passed ? (
@@ -1229,7 +1229,7 @@ export default function TestSession() {
                     onClick={() => setSessionState('review')}
                     className={`w-full py-2 font-bold rounded transition-all flex items-center justify-center gap-2 ${
                       result.passed 
-                        ? 'bg-green-500 text-white hover:bg-green-600' 
+                        ? 'bg-[var(--gh-success-emphasis)] text-white hover:bg-[var(--gh-success-hover)]' 
                         : 'bg-primary text-primary-foreground hover:bg-primary/90'
                     }`}
                   >
@@ -1239,7 +1239,7 @@ export default function TestSession() {
                     onClick={() => startTest(false)}
                     className={`w-full py-2 border font-bold rounded transition-all flex items-center justify-center gap-2 ${
                       result.passed 
-                        ? 'border-green-500 text-green-500 hover:bg-green-500/10' 
+                        ? 'border-[var(--gh-success-fg)] text-[var(--gh-success-fg)] hover:bg-[var(--gh-success-subtle)]' 
                         : 'border-primary text-primary hover:bg-primary/10'
                     }`}
                   >

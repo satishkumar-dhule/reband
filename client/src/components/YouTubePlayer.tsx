@@ -59,36 +59,36 @@ export function YouTubePlayer({ shortVideo, longVideo }: YouTubePlayerProps) {
           {shortVideoId && (
             <button
               onClick={() => setActiveVideo('short')}
-              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-lg transition-all group"
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2.5 bg-[var(--gh-danger-subtle)] hover:bg-[var(--gh-danger-fg)]/20 border border-[var(--gh-danger-fg)]/30 rounded-lg transition-all group"
             >
-              <Youtube className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-red-500" />
+              <Youtube className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-[var(--gh-danger-fg)]" />
               <div className="text-left">
-                <div className="text-[10px] sm:text-sm font-bold text-foreground group-hover:text-red-500 transition-colors">
+                <div className="text-[10px] sm:text-sm font-bold text-foreground group-hover:text-[var(--gh-danger-fg)] transition-colors">
                   Quick
                 </div>
                 <div className="text-[8px] sm:text-xs text-muted-foreground hidden sm:flex items-center gap-1">
                   <Clock className="w-3 h-3" /> Under 60s
                 </div>
               </div>
-              <Play className="w-3 h-3 sm:w-4 sm:h-4 text-red-500 ml-1 sm:ml-2" />
+              <Play className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--gh-danger-fg)] ml-1 sm:ml-2" />
             </button>
           )}
           
           {longVideoId && (
             <button
               onClick={() => setActiveVideo('long')}
-              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-lg transition-all group"
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2.5 bg-[var(--gh-danger-subtle)] hover:bg-[var(--gh-danger-fg)]/20 border border-[var(--gh-danger-fg)]/30 rounded-lg transition-all group"
             >
-              <Youtube className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-red-500" />
+              <Youtube className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-[var(--gh-danger-fg)]" />
               <div className="text-left">
-                <div className="text-[10px] sm:text-sm font-bold text-foreground group-hover:text-red-500 transition-colors">
+                <div className="text-[10px] sm:text-sm font-bold text-foreground group-hover:text-[var(--gh-danger-fg)] transition-colors">
                   Deep Dive
                 </div>
                 <div className="text-[8px] sm:text-xs text-muted-foreground hidden sm:flex items-center gap-1">
                   <Clock className="w-3 h-3" /> 5-20 min
                 </div>
               </div>
-              <Play className="w-3 h-3 sm:w-4 sm:h-4 text-red-500 ml-1 sm:ml-2" />
+              <Play className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--gh-danger-fg)] ml-1 sm:ml-2" />
             </button>
           )}
         </div>

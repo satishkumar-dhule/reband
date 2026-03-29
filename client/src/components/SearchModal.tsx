@@ -288,8 +288,8 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="lg:hidden fixed inset-0 z-[200] bg-background/95 backdrop-blur-xl flex flex-col"
-            style={{ top: 0, left: 0, right: 0, bottom: 0, position: 'fixed' }}
+            className="lg:hidden fixed inset-0 z-[200] bg-background/95 backdrop-blur-xl flex flex-col pb-safe"
+            style={{ top: 0, left: 0, right: 0, bottom: 0, position: 'fixed', height: '100dvh' }}
             data-testid="search-modal-mobile"
             role="dialog"
             aria-modal="true"

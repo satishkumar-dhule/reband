@@ -286,7 +286,7 @@ export default function LearningPathsGenZ() {
                 return (
                   <div 
                     key={path.id}
-                    className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-5 flex flex-col hover:border-[var(--gh-accent-fg)] transition-colors group"
+                    className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-5 flex flex-col hover:border-[var(--gh-accent-fg)] hover:scale-[1.02] transition-all duration-200 group"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
@@ -349,8 +349,8 @@ export default function LearningPathsGenZ() {
 
             {/* Custom Path Modal (Simplified implementation for GitHub style) */}
             {showCustom && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm pb-safe">
+                <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-xl max-w-2xl w-full max-h-[90dvh] max-h-[90svh] flex flex-col pb-safe">
                   <div className="p-4 border-b border-[var(--gh-border)] flex items-center justify-between">
                     <h2 className="font-semibold">Create Custom Path</h2>
                     <button onClick={resetCustomPath} className="text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]">
@@ -358,7 +358,7 @@ export default function LearningPathsGenZ() {
                     </button>
                   </div>
                   
-                  <div className="p-6 overflow-y-auto space-y-6">
+                  <div className="p-6 overflow-y-auto momentum-scroll space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-[var(--gh-fg)] mb-2">Path Name</label>
                       <input 

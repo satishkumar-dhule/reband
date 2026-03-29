@@ -290,6 +290,14 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
+/* Light mode - glass */
+[data-theme='light'] .glass,
+.light .glass {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
 /* Glassmorphism medium */
 .glass-md {
   background: rgba(255, 255, 255, 0.05);
@@ -299,6 +307,14 @@ body {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
 
+/* Light mode - glass-md */
+[data-theme='light'] .glass-md,
+.light .glass-md {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
 /* Glassmorphism heavy/dark */
 .glass-heavy {
   background: rgba(0, 0, 0, 0.4);
@@ -306,6 +322,14 @@ body {
   -webkit-backdrop-filter: blur(30px) saturate(220%);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
+/* Light mode - glass-heavy */
+[data-theme='light'] .glass-heavy,
+.light .glass-heavy {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
 }
 
 /* Glassmorphism with color tint */
@@ -318,6 +342,17 @@ body {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Light mode - glass-tint */
+[data-theme='light'] .glass-tint,
+.light .glass-tint {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.7) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /* Glassmorphism for cards */
@@ -336,6 +371,20 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+/* Light mode - glass-card */
+[data-theme='light'] .glass-card,
+.light .glass-card {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
 /* Glassmorphism navigation */
 .glass-nav {
   background: rgba(0, 0, 0, 0.6);
@@ -344,12 +393,26 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Light mode - glass-nav */
+[data-theme='light'] .glass-nav,
+.light .glass-nav {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
 /* Glassmorphism modal */
 .glass-modal {
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(40px) saturate(250%);
   -webkit-backdrop-filter: blur(40px) saturate(250%);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Light mode - glass-modal */
+[data-theme='light'] .glass-modal,
+.light .glass-modal {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 /* ===== FLOATING BLOB ANIMATIONS ===== */
@@ -635,10 +698,41 @@ body {
   );
 }
 
-/* Firefox scrollbar */
+/* Firefox scrollbar - dark mode default */
 * {
   scrollbar-width: thin;
   scrollbar-color: hsl(0, 0%, 25%) hsl(0, 0%, 5%);
+}
+
+/* Light mode scrollbar */
+[data-theme='light'] ::-webkit-scrollbar-track,
+.light ::-webkit-scrollbar-track {
+  background: hsl(210, 20%, 96%);
+}
+
+[data-theme='light'] ::-webkit-scrollbar-thumb,
+.light ::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    hsl(210, 16%, 82%) 0%,
+    hsl(210, 14%, 74%) 100%
+  );
+  border: 2px solid hsl(210, 20%, 96%);
+}
+
+[data-theme='light'] ::-webkit-scrollbar-thumb:hover,
+.light ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    hsl(210, 14%, 74%) 0%,
+    hsl(210, 12%, 66%) 100%
+  );
+}
+
+/* Firefox scrollbar - light mode */
+[data-theme='light'] *,
+.light * {
+  scrollbar-color: hsl(210, 14%, 74%) hsl(210, 20%, 96%);
 }
 
 /* Custom thin scrollbar */
@@ -658,6 +752,17 @@ body {
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: hsl(0, 0%, 30%);
+}
+
+/* Light mode - thin scrollbar */
+[data-theme='light'] .scrollbar-thin::-webkit-scrollbar-thumb,
+.light .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: hsl(210, 14%, 74%);
+}
+
+[data-theme='light'] .scrollbar-thin::-webkit-scrollbar-thumb:hover,
+.light .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: hsl(210, 12%, 60%);
 }
 
 /* Scrollbar with colored thumb */
@@ -1283,12 +1388,20 @@ body {
   background: linear-gradient(135deg, hsl(45, 100%, 60%) 0%, hsl(30, 100%, 50%) 100%);
   color: hsl(0, 0%, 0%);
   font-weight: 700;
-  font-size: 10px;
+  font-size: 11px;
   padding: 2px 8px;
   border-radius: 9999px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+/* Mobile: Ensure badge text is at least 11px for readability */
+@media (max-width: 640px) {
+  .badge-pro-max {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
 }
 
 /* Premium ===== ENHANCEMENTS ===== */
@@ -1380,31 +1493,48 @@ a.bg-secondary:hover {
   background: hsl(0 0% 30%);
 }
 
+/* Light mode scrollbar */
+[data-theme='light'] ::-webkit-scrollbar-track,
+.light ::-webkit-scrollbar-track {
+  background: hsl(210, 20%, 96%);
+}
+[data-theme='light'] ::-webkit-scrollbar-thumb,
+.light ::-webkit-scrollbar-thumb {
+  background: hsl(210, 14%, 74%);
+}
+[data-theme='light'] ::-webkit-scrollbar-thumb:hover,
+.light ::-webkit-scrollbar-thumb:hover {
+  background: hsl(210, 12%, 60%);
+}
+
 /* Custom selection */
 ::selection {
   background: hsla(190, 100%, 50%, 0.3);
   color: hsl(0 0% 98%);
 }
 
-/* Focus styles - subtle for better UX */
+/* Focus styles - use theme-aware ring variable for visibility in all themes */
 *:focus-visible {
   outline: none;
 }
 
 /* Only show focus ring on keyboard navigation for accessibility */
+/* Use var(--ring) which is defined in all themes for proper visibility */
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--accent-cyan);
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 
-/* Remove focus ring from dropdown triggers */
+/* Provide visible focus indicator for radix dropdown components */
+/* Use box-shadow instead of outline for better appearance */
 [data-radix-collection-item]:focus-visible,
 [role="menuitem"]:focus-visible {
   outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
 }
 
 /* ===== MERMAID DIAGRAMS ===== */
@@ -1438,8 +1568,9 @@ svg:has(.error-text) {
 }
 
 /* ===== PROSE/CONTENT STYLING ===== */
+/* Fixed: Use muted-foreground for proper contrast in both light/dark modes */
 .prose {
-  color: hsl(0 0% 70%);
+  color: var(--muted-foreground, hsl(215 10% 35%));
 }
 .prose h1, .prose h2, .prose h3, .prose h4 {
   color: hsl(0 0% 98%);
@@ -1480,7 +1611,8 @@ svg:has(.error-text) {
   background: hsl(0 0% 6%);
   padding: 1rem 1.5rem;
   border-radius: 0 8px 8px 0;
-  color: hsl(0 0% 70%);
+  /* Fixed: Use muted-foreground for proper contrast */
+  color: var(--muted-foreground, hsl(215 10% 60%));
 }
 .prose ul > li::marker {
   color: var(--accent-cyan);
@@ -1565,16 +1697,24 @@ svg:has(.error-text) {
     min-width: 100%;
   }
   
-  /* Prose mobile */
+  /* Prose mobile - ensure minimum 14px body text for readability */
   .prose pre {
-    font-size: 0.75rem;
-    padding: 0.75rem;
+    font-size: 0.875rem;
+    padding: 0.875rem;
     overflow-x: auto;
+    line-height: 1.6;
   }
   
-  .prose h1 { font-size: 1.25rem; }
-  .prose h2 { font-size: 1.125rem; }
-  .prose h3 { font-size: 1rem; }
+  .prose h1 { font-size: 1.5rem; line-height: 1.3; }
+  .prose h2 { font-size: 1.25rem; line-height: 1.35; }
+  .prose h3 { font-size: 1.125rem; line-height: 1.4; }
+  
+  /* Ensure body text is minimum 14px on mobile */
+  .prose p,
+  .prose li {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
   
   /* Fix text wrapping */
   .prose {
@@ -1597,10 +1737,20 @@ svg:has(.error-text) {
     padding-left: 0 !important;
   }
   
-  /* Prevent horizontal overflow */
-  body, #root, main {
+  /* Prevent horizontal overflow - but preserve scroll containers */
+  /* Using specific selectors instead of blanket !important on main */
+  body, #root {
     overflow-x: hidden !important;
     max-width: 100vw !important;
+  }
+  
+  /* Allow scroll containers to work properly on mobile */
+  /* This fixes momentum scroll issues while preventing page-level horizontal scroll */
+  .overflow-y-auto,
+  .overflow-y-scroll,
+  .overflow-auto,
+  .overflow-x-auto {
+    overflow-x: hidden; /* Prevent horizontal bleed */
   }
   
   /* Hide scrollbars on mobile */
@@ -1677,6 +1827,16 @@ main {
 .custom-scrollbar::-webkit-scrollbar-thumb { background: hsl(0 0% 20%); border-radius: 2px; }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: hsl(0 0% 30%); }
 
+/* Light mode - custom-scrollbar */
+[data-theme='light'] .custom-scrollbar::-webkit-scrollbar-thumb,
+.light .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(210, 14%, 74%);
+}
+[data-theme='light'] .custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.light .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(210, 12%, 60%);
+}
+
 /* Force scrollbar visibility for specific containers */
 .force-scrollbar::-webkit-scrollbar { 
   width: 6px !important; 
@@ -1696,6 +1856,24 @@ main {
 .force-scrollbar { 
   scrollbar-width: thin !important; 
   scrollbar-color: hsl(0 0% 25%) hsl(0 0% 5%) !important; 
+}
+
+/* Light mode - force-scrollbar */
+[data-theme='light'] .force-scrollbar::-webkit-scrollbar-track,
+.light .force-scrollbar::-webkit-scrollbar-track {
+  background: hsl(210, 20%, 96%) !important;
+}
+[data-theme='light'] .force-scrollbar::-webkit-scrollbar-thumb,
+.light .force-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(210, 14%, 74%) !important;
+}
+[data-theme='light'] .force-scrollbar::-webkit-scrollbar-thumb:hover,
+.light .force-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(210, 12%, 60%) !important;
+}
+[data-theme='light'] .force-scrollbar,
+.light .force-scrollbar {
+  scrollbar-color: hsl(210, 14%, 74%) hsl(210, 20%, 96%) !important;
 }
 
 /* Dynamic height classes for optimal UX */
@@ -1830,9 +2008,9 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Enhanced focus states for accessibility */
+/* Enhanced focus states for accessibility - use theme ring variable */
 .focus-ring:focus-visible {
-  outline: 2px solid hsl(var(--primary));
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 
@@ -2820,6 +2998,13 @@ body, #root {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Light mode - glass-morphism */
+[data-theme='light'] .glass-morphism,
+.light .glass-morphism {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
 /* Neon glow effect */
 @keyframes neon-glow {
   0%, 100% {
@@ -2913,8 +3098,12 @@ body, #root {
     min-width: 44px;
   }
   
-  /* Smooth scrolling */
-  * {
+  /* Smooth scrolling - ONLY for explicit scroll containers, not all elements */
+  /* This prevents scroll conflicts while maintaining native momentum in proper containers */
+  .overflow-y-auto,
+  .overflow-y-scroll,
+  .overflow-auto,
+  .scroll-container {
     -webkit-overflow-scrolling: touch;
   }
   

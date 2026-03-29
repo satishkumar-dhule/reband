@@ -24,6 +24,7 @@ import { evaluateVoiceAnswer, type EvaluationResult } from '../lib/voice-evaluat
 import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrapper';
 import { QuestionHistoryIcon } from '../components/unified/QuestionHistory';
 import type { Question } from '../types';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
 interface InterviewerComments {
   skip: string[];
@@ -65,7 +66,6 @@ export default function VoiceInterview() {
   const [earnedCredits, setEarnedCredits] = useState<{ total: number; bonus: number } | null>(null);
   const [interviewerComment, setInterviewerComment] = useState<string | null>(null);
   const [comments, setComments] = useState<InterviewerComments | null>(null);
-  const [showActions, setShowActions] = useState(false);
   const [sessionId, setSessionId] = useState<string>('voice-session-state');
   const [showAnswer, setShowAnswer] = useState(false); // Hide answer until after recording
   
@@ -304,7 +304,6 @@ export default function VoiceInterview() {
       setEarnedCredits(null);
       setShowAnswer(false); // Hide answer for previous question
       setState('ready');
-      setShowActions(false);
       saveSessionProgress();
     }
   }, [currentIndex]);
@@ -320,7 +319,6 @@ export default function VoiceInterview() {
       setEarnedCredits(null);
       setShowAnswer(false);
       setState('ready');
-      setShowActions(false);
       saveSessionProgress();
     }
   }, [currentIndex, questions.length, showComment]);
@@ -357,7 +355,6 @@ export default function VoiceInterview() {
     setEvaluation(null);
     setEarnedCredits(null);
     setState('ready');
-    setShowActions(false);
   }, [questions, showComment]);
 
   const retryQuestion = useCallback(() => {
@@ -562,58 +559,55 @@ export default function VoiceInterview() {
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-[var(--muted-foreground)] font-mono">Q{currentIndex + 1}/{questions.length}</span>
                   
-                  {/* Actions Dropdown */}
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowActions(!showActions)}
-                      className="p-1.5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] rounded-lg transition-colors"
-                    >
-                      <MoreHorizontal className="w-4 h-4" />
-                    </button>
-                    
-                    <AnimatePresence>
-                      {showActions && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -5 }}
-                          className="absolute left-0 top-full mt-1 bg-[var(--popover)] border border-[var(--border)] rounded-xl shadow-xl py-1 z-10 min-w-[160px]"
+                  {/* Actions Dropdown - Radix DropdownMenu for keyboard accessibility */}
+                  <DropdownMenu.Root>
+                    <DropdownMenu.Trigger asChild>
+                      <button
+                        aria-label="Actions menu"
+                        className="p-1.5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] rounded-lg transition-colors"
+                      >
+                        <MoreHorizontal className="w-4 h-4" />
+                      </button>
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Portal>
+                      <DropdownMenu.Content
+                        className="min-w-[160px] bg-popover border border-border rounded-xl shadow-xl p-1 z-50"
+                        sideOffset={4}
+                      >
+                        <DropdownMenu.Item
+                          onClick={previousQuestion}
+                          disabled={currentIndex === 0}
+                          className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg cursor-pointer transition-colors outline-none disabled:opacity-30 disabled:cursor-not-allowed"
                         >
-                          <button
-                            onClick={previousQuestion}
-                            disabled={currentIndex === 0}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors disabled:opacity-30"
-                          >
-                            <ChevronLeft className="w-4 h-4" />
-                            Previous
-                          </button>
-                          <button
-                            onClick={skipQuestion}
-                            disabled={currentIndex >= questions.length - 1}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors disabled:opacity-30"
-                          >
-                            <SkipForward className="w-4 h-4" />
-                            Skip Question
-                          </button>
-                          <button
-                            onClick={shuffleQuestions}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors"
-                          >
-                            <Shuffle className="w-4 h-4" />
-                            Shuffle All
-                          </button>
-                          <div className="border-t border-[var(--gh-border)] my-1" />
-                          <button
-                            onClick={goToOriginalQuestion}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                            View Full Question
-                          </button>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+                          <ChevronLeft className="w-4 h-4" />
+                          Previous
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          onClick={skipQuestion}
+                          disabled={currentIndex >= questions.length - 1}
+                          className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg cursor-pointer transition-colors outline-none disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          <SkipForward className="w-4 h-4" />
+                          Skip Question
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          onClick={shuffleQuestions}
+                          className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg cursor-pointer transition-colors outline-none"
+                        >
+                          <Shuffle className="w-4 h-4" />
+                          Shuffle All
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Separator className="h-px bg-border my-1" />
+                        <DropdownMenu.Item
+                          onClick={goToOriginalQuestion}
+                          className="flex items-center gap-2.5 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg cursor-pointer transition-colors outline-none"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          View Full Question
+                        </DropdownMenu.Item>
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Portal>
+                  </DropdownMenu.Root>
                 </div>
                 
                 <div className="flex items-center gap-3">
@@ -694,7 +688,7 @@ export default function VoiceInterview() {
                     placeholder="Edit your transcribed answer here..."
                   />
                 ) : (
-                  <div className="p-4 bg-[var(--gh-canvas)] rounded-xl min-h-[120px] max-h-[200px] overflow-y-auto border border-[var(--gh-border)]">
+                  <div className="p-4 bg-[var(--gh-canvas)] rounded-xl min-h-[120px] max-h-[200px] overflow-y-auto momentum-scroll border border-[var(--gh-border)]">
                     {transcript || interimTranscript ? (
                       <p className="text-sm text-[var(--gh-fg)] whitespace-pre-wrap leading-relaxed">
                         {transcript}
@@ -1035,7 +1029,7 @@ function getVerdictStyle(verdict: EvaluationResult['verdict']): string {
     case 'strong-hire': return 'bg-[var(--gh-success-emphasis)]/20 border-[var(--gh-success-emphasis)]/50';
     case 'hire': return 'bg-[var(--gh-success-fg)]/20 border-[var(--gh-success-fg)]/50';
     case 'lean-hire': return 'bg-[var(--gh-attention-fg)]/20 border-[var(--gh-attention-fg)]/50';
-    case 'lean-no-hire': return 'bg-[var(--gh-attention-fg)]/20 border-[#f0883e]/50';
+    case 'lean-no-hire': return 'bg-[var(--gh-attention-fg)]/20 border-[var(--gh-attention-fg)]/50';
     case 'no-hire': return 'bg-[var(--gh-danger-fg)]/20 border-[var(--gh-danger-fg)]/50';
   }
 }

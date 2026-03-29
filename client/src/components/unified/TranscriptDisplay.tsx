@@ -42,8 +42,8 @@ export function TranscriptDisplay({
           <Volume2 className="w-4 h-4 text-primary" />
           <span className="text-sm font-semibold">{title}</span>
           {isRecording && (
-            <span className="flex items-center gap-1 text-xs text-red-500">
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            <span className="flex items-center gap-1 text-xs text-[var(--gh-danger-fg)]">
+              <span className="w-2 h-2 bg-[var(--gh-danger-fg)] rounded-full animate-pulse" />
               Recording...
             </span>
           )}

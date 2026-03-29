@@ -79,12 +79,12 @@ export default function QuestionEditorDemo() {
 
   if (isEditing) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen min-h-dvh bg-background">
         <QuestionEditor
           question={currentQuestion || undefined}
           onSave={handleSaveQuestion}
           onCancel={handleCancelEdit}
-          className="h-screen"
+          className="min-h-screen min-h-dvh"
         />
       </div>
     );

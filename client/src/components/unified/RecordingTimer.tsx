@@ -25,7 +25,7 @@ export function RecordingTimer({
   return (
     <div className={`flex items-center gap-2 text-sm ${className}`}>
       {isRecording && (
-        <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+        <span className="w-3 h-3 bg-[var(--gh-danger-fg)] rounded-full animate-pulse" />
       )}
       <Clock className="w-4 h-4 text-muted-foreground" />
       <span className="font-mono">{formattedTime}</span>

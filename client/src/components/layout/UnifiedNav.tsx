@@ -37,6 +37,7 @@ import { useSidebar } from '../../context/SidebarContext';
 import { useUserPreferences } from '../../context/UserPreferencesContext';
 import { cn } from '../../lib/utils';
 import { useState } from 'react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 interface NavItem {
   id: string;
@@ -153,7 +154,7 @@ export function MobileBottomNav() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-background/80 backdrop-blur-md lg:hidden"
+            className="fixed inset-0 z-[60] bg-background/80 backdrop-blur-md lg:hidden"
             onClick={() => setShowMenu(null)}
           />
         )}
@@ -199,7 +200,7 @@ export function MobileBottomNav() {
             </div>
             
             {/* Menu Items - Single Column for Better Touch Targets */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-2 pb-24">
+            <div className="flex-1 overflow-y-auto p-4 space-y-2 pb-28 pb-safe">
               {currentSubNav.map((item, index) => {
                 const Icon = item.icon;
                 const isActive = location === item.path || location.startsWith(item.path + '/');
@@ -216,7 +217,7 @@ export function MobileBottomNav() {
                       setShowMenu(null);
                     }}
                     className={cn(
-                      "w-full flex items-center gap-4 p-4 rounded-[20px] transition-all relative overflow-hidden",
+                      "w-full flex items-center gap-4 p-4 rounded-[20px] transition-all relative overflow-hidden min-h-[56px] touch-manipulation",
                       isActive 
                         ? "bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30" 
                         : "bg-muted/50 hover:bg-muted border-2 border-transparent",
@@ -377,100 +378,109 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
     const Icon = item.icon;
     const active = isActive(item.path);
     const isVoice = item.id === 'voice';
-    const showTooltip = isCollapsed && hoveredItem === item.id;
     
-    return (
-      <div className="relative">
-        <button
-          onClick={() => setLocation(item.path)}
-          onMouseEnter={() => setHoveredItem(item.id)}
-          onMouseLeave={() => setHoveredItem(null)}
-          className={cn(
-            "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 group overflow-hidden",
-            isCollapsed && "justify-center px-2",
-            active 
-              ? "text-primary" 
-              : "text-muted-foreground hover:text-foreground"
-          )}
-          style={active ? {
-            background: 'hsl(150 100% 50% / 0.1)',
-            border: '1px solid hsl(150 100% 50% / 0.15)'
-          } : {
-            background: 'transparent'
-          }}
-        >
-          <div className={cn(
-            "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-colors",
-            active 
-              ? "text-primary-foreground" 
-              : isVoice
-                ? "text-primary"
-                : "text-muted-foreground group-hover:text-foreground"
-          )}
-          style={active ? {
-            background: 'hsl(150 100% 50%)',
-            boxShadow: '0 0 12px hsl(150 100% 50% / 0.3)'
-          } : isVoice ? {
-            background: 'hsl(150 100% 50% / 0.15)'
-          } : {
-            background: 'transparent'
-          }}>
-            <Icon className="w-4 h-4" />
-          </div>
-          
-          {showLabel && !isCollapsed && (
-            <span className="text-sm font-medium flex-1 text-left">
-              {item.label}
-            </span>
-          )}
-          
-          {showLabel && !isCollapsed && item.badge && (
-            <span className={cn(
-              "text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0",
-              item.badge === 'NEW' 
-                ? "bg-emerald-500/20 text-emerald-400"
-                : "bg-amber-500/20 text-amber-400"
-            )}>
-              {item.badge}
-            </span>
-          )}
-        </button>
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setLocation(item.path);
+      }
+    };
+    
+    const button = (
+      <button
+        onClick={() => setLocation(item.path)}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        aria-current={active ? 'page' : undefined}
+        className={cn(
+          "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-out group overflow-hidden",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
+          isCollapsed && "justify-center px-2",
+          active 
+            ? "text-primary" 
+            : "text-muted-foreground hover:text-foreground"
+        )}
+        style={active ? {
+          background: 'hsl(150 100% 50% / 0.1)',
+          border: '1px solid hsl(150 100% 50% / 0.15)'
+        } : {
+          background: 'transparent'
+        }}
+      >
+        <div className={cn(
+          "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-all duration-200 ease-out",
+          active 
+            ? "text-primary-foreground" 
+            : isVoice
+              ? "text-primary"
+              : "text-muted-foreground group-hover:text-foreground",
+          !active && !isVoice && "group-hover:bg-muted/50"
+        )}
+        style={active ? {
+          background: 'hsl(150 100% 50%)',
+          boxShadow: '0 0 12px hsl(150 100% 50% / 0.3)'
+        } : isVoice ? {
+          background: 'hsl(150 100% 50% / 0.15)'
+        } : {
+          background: 'transparent'
+        }}>
+          <Icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
+        </div>
         
-        {/* Tooltip - Glassmorphism */}
-        <AnimatePresence>
-          {showTooltip && (
-            <motion.div
-              initial={{ opacity: 0, x: -4 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -4 }}
-              className="absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50"
-            >
-              <div 
-                className="rounded-lg shadow-xl px-3 py-1.5 whitespace-nowrap flex items-center gap-2"
-                style={{ 
-                  background: 'hsl(0 0% 8% / 0.95)',
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  border: '1px solid hsl(0 0% 15%)'
-                }}
-              >
-                <span className="text-sm font-medium">{item.label}</span>
-                {item.badge && (
-                  <span className={cn(
-                    "text-[10px] px-1.5 py-0.5 rounded font-medium",
-                    item.badge === 'NEW' 
-                      ? "bg-emerald-500/20 text-emerald-400"
-                      : "bg-amber-500/20 text-amber-400"
-                  )}>
-                    {item.badge}
-                  </span>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+        {showLabel && !isCollapsed && (
+          <span className="text-sm font-medium flex-1 text-left">
+            {item.label}
+          </span>
+        )}
+        
+        {showLabel && !isCollapsed && item.badge && (
+          <span className={cn(
+            "text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0",
+            item.badge === 'NEW' 
+              ? "bg-emerald-500/20 text-emerald-400"
+              : "bg-amber-500/20 text-amber-400"
+          )}>
+            {item.badge}
+          </span>
+        )}
+      </button>
     );
+    
+    // Use Radix Tooltip when collapsed for keyboard accessibility and collision detection
+    if (isCollapsed) {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {button}
+          </TooltipTrigger>
+          <TooltipContent 
+            side="right" 
+            align="center"
+            className="gap-1.5 flex items-center"
+            style={{ 
+              background: 'hsl(0 0% 8% / 0.95)',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              border: '1px solid hsl(0 0% 15%)'
+            }}
+          >
+            <span className="text-sm font-medium">{item.label}</span>
+            {item.badge && (
+              <span className={cn(
+                "text-[10px] px-1.5 py-0.5 rounded font-medium",
+                item.badge === 'NEW' 
+                  ? "bg-emerald-500/20 text-emerald-400"
+                  : "bg-amber-500/20 text-amber-400"
+              )}>
+                {item.badge}
+              </span>
+            )}
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+    
+    return <div className="relative">{button}</div>;
   };
 
   const SectionHeader = ({ icon: Icon, label }: { icon: React.ElementType; label: string }) => {
@@ -489,7 +499,7 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
 
   return (
     <aside className={cn(
-      "fixed left-0 top-0 bottom-0 z-40 flex flex-col transition-all duration-200 overflow-hidden",
+      "fixed left-0 top-0 bottom-0 z-40 flex flex-col transition-[width] duration-300 ease-out overflow-hidden",
       isCollapsed ? "w-16" : "w-64"
     )}
     style={{ 
@@ -502,8 +512,18 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
       <div className="h-14 flex items-center justify-between px-3 border-b border-border">
         <button
           onClick={() => setLocation('/')}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setLocation('/');
+            }
+          }}
           aria-label="Go to home"
-          className={cn("flex items-center gap-2.5", isCollapsed && "justify-center w-full")}
+          className={cn(
+            "flex items-center gap-2.5",
+            isCollapsed && "justify-center w-full",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar rounded-lg"
+          )}
         >
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shrink-0 shadow-lg" style={{ boxShadow: '0 0 20px hsl(150 100% 50% / 0.3)' }}>
             <Mic className="w-4 h-4 text-primary-foreground" />
@@ -520,7 +540,7 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
           <button
             onClick={toggleSidebar}
             aria-label="Collapse sidebar"
-            className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar"
             title="Collapse sidebar"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -534,7 +554,7 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
           <button
             onClick={toggleSidebar}
             aria-label="Expand sidebar"
-            className="w-full p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center"
+            className="w-full p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar flex items-center justify-center"
             title="Expand sidebar"
           >
             <ChevronRight className="w-4 h-4" />
@@ -549,6 +569,7 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
           aria-label="Search"
           className={cn(
             "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors overflow-hidden",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
             isCollapsed && "justify-center px-2"
           )}
           style={{
@@ -597,6 +618,7 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
           aria-label="View credits"
           className={cn(
             "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors overflow-hidden",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
             isCollapsed && "justify-center px-1.5"
           )}
           style={{

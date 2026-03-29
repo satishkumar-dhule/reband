@@ -507,7 +507,7 @@ export default function UnifiedLearningPathsGenZ() {
                         key={path.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-4 md:p-6 bg-card backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-border hover:border-primary/30 transition-all"
+                        className="p-4 md:p-6 bg-card backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-border hover:border-primary/30 hover:scale-[1.02] transition-all duration-200"
                       >
                         <div className="flex items-start justify-between mb-3 md:mb-4">
                           <h3 className="text-lg md:text-xl font-bold flex-1 min-w-0 truncate">{path.name}</h3>
@@ -641,7 +641,7 @@ export default function UnifiedLearningPathsGenZ() {
                         key={path.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-4 md:p-6 bg-card backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-border hover:border-primary/30 transition-all group cursor-pointer"
+                        className="p-4 md:p-6 bg-card backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-border hover:border-primary/30 hover:scale-[1.02] transition-all duration-200 group cursor-pointer"
                         onClick={() => openPathModal(path, 'view')}
                       >
                         <div className="flex items-start gap-3 md:gap-4 mb-3 md:mb-4">
@@ -725,7 +725,7 @@ export default function UnifiedLearningPathsGenZ() {
                 exit={{ y: "100%" }}
                 transition={{ type: "spring", damping: 30, stiffness: 300 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-card border-t md:border border-border rounded-t-[24px] md:rounded-[32px] max-w-4xl w-full h-[90vh] md:h-auto md:max-h-[85vh] overflow-hidden flex flex-col mb-16 md:mb-0"
+                className="bg-card border-t md:border border-border rounded-t-[24px] md:rounded-[32px] max-w-4xl w-full h-[90dvh] h-[90svh] md:h-auto md:max-h-[85vh] overflow-hidden flex flex-col mb-16 md:mb-0 pb-safe"
               >
                 {/* MOBILE-FIRST: Drag handle on mobile */}
                 <div className="flex justify-center pt-3 pb-2 md:hidden">
@@ -882,7 +882,7 @@ export default function UnifiedLearningPathsGenZ() {
                 )}
 
                 {/* Content - MOBILE-FIRST: Scrollable with proper flex and padding */}
-                <div className="flex-1 overflow-y-auto p-3 md:p-8 overscroll-contain pb-safe">
+                <div className="flex-1 overflow-y-auto momentum-scroll p-3 md:p-8 overscroll-contain pb-safe">
                   {modalTab === 'channels' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 pb-4">
                       {(isReadonly ? 

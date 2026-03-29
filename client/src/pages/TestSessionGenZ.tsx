@@ -279,7 +279,7 @@ export default function TestSessionGenZ() {
               </span>
             </header>
 
-            <div className="flex-1 p-4 overflow-y-auto">
+            <div className="flex-1 p-4 overflow-y-auto momentum-scroll">
               <div className="max-w-2xl mx-auto">
                 <AnimatePresence mode="wait">
                   <motion.div

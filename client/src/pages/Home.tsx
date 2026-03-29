@@ -50,7 +50,7 @@ const quickActions = [
 const recentActivity = [
   { icon: CheckCircle2, text: "Completed React Hooks quiz", time: "2h ago", color: "text-[var(--gh-success-fg)]" },
   { icon: BookMarked, text: "Reviewed 8 JavaScript flashcards", time: "4h ago", color: "text-[var(--gh-accent-fg)]" },
-  { icon: Mic, text: "Finished voice interview session", time: "Yesterday", color: "text-[var(--gh-danger-fg)]" },
+  { icon: Mic, text: "Finished voice interview session", time: "Yesterday", color: "text-[var(--gh-success-fg)]" },
   { icon: Award, text: "Earned 'First Steps' badge", time: "2 days ago", color: "text-[var(--gh-attention-fg)]" },
   { icon: Code, text: "Solved Binary Search challenge", time: "3 days ago", color: "text-[var(--gh-done-fg)]" },
 ];

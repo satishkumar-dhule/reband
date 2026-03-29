@@ -65,7 +65,7 @@ export function UnifiedNotificationManager({ children }: { children: ReactNode }
   }, []);
 
   return (
-    <UnifiedNotificationsContext.Provider value={{ notifications, addNotification, removeNotification, clearAll }}>
+    <UnifiedNotificationsContext.Provider value={{ notifications, showToast, addNotification, removeNotification, clearAll }}>
       {children}
     </UnifiedNotificationsContext.Provider>
   );

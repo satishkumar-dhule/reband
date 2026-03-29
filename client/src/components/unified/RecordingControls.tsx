@@ -39,7 +39,7 @@ export function RecordingControls({
         <button
           onClick={onStart}
           disabled={disabled}
-          className="flex items-center gap-2 px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] min-w-[44px] bg-[var(--gh-danger-fg)] hover:bg-[var(--gh-danger-hover)] active:bg-[var(--gh-danger-fg)] text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Mic className="w-5 h-5" />
           Start Recording
@@ -50,7 +50,7 @@ export function RecordingControls({
       {state === 'recording' && (
         <button
           onClick={onStop}
-          className="flex items-center gap-2 px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors animate-pulse motion-reduce:animate-none"
+          className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] min-w-[44px] bg-[var(--gh-danger-fg)] hover:bg-[var(--gh-danger-hover)] active:bg-[var(--gh-danger-fg)] text-white rounded-lg font-semibold transition-colors animate-pulse motion-reduce:animate-none"
         >
           <Square className="w-5 h-5" />
           Stop Recording
@@ -63,18 +63,18 @@ export function RecordingControls({
           {onPlay && (
             <button
               onClick={onPlay}
-              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] min-w-[44px] bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground rounded-lg font-semibold transition-colors"
             >
-              <Play className="w-4 h-4" />
+              <Play className="w-5 h-5" />
               Play
             </button>
           )}
           {onReset && (
             <button
               onClick={onReset}
-              className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg font-semibold transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] min-w-[44px] bg-muted hover:bg-muted/80 active:bg-muted/70 rounded-lg font-semibold transition-colors"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-5 h-5" />
               Re-record
             </button>
           )}
@@ -82,7 +82,7 @@ export function RecordingControls({
             <button
               onClick={onSubmit}
               disabled={disabled}
-              className="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] min-w-[44px] bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <CheckCircle className="w-5 h-5" />
               {submitLabel}
@@ -95,9 +95,9 @@ export function RecordingControls({
       {state === 'playing' && onStopPlayback && (
         <button
           onClick={onStopPlayback}
-          className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold transition-colors"
+          className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] min-w-[44px] bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground rounded-lg font-semibold transition-colors"
         >
-          <Pause className="w-4 h-4" />
+          <Pause className="w-5 h-5" />
           Stop Playback
         </button>
       )}

@@ -41,7 +41,7 @@ export function BottomSheet({
     >
       <Drawer.Portal>
         {/* Backdrop */}
-        <Drawer.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50" />
+        <Drawer.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 pb-safe" />
         
         {/* Sheet */}
         <Drawer.Content 
@@ -50,7 +50,9 @@ export function BottomSheet({
           className={cn(
             "fixed bottom-0 left-0 right-0 z-50 flex flex-col",
             "bg-white dark:bg-gray-900 rounded-t-[24px]",
-            "max-h-[95vh] md:max-h-[85vh]",
+            // Use dynamic viewport height for mobile keyboard handling
+            "max-h-[95dvh] max-h-[95svh] md:max-h-[85vh]",
+            "pb-safe",
             "border-t border-gray-200 dark:border-gray-800",
             className
           )}

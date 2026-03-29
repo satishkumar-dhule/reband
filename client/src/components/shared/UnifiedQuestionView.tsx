@@ -140,46 +140,47 @@ export function UnifiedQuestionView({
   }, [onBookmark, triggerHaptic]);
 
   // Mode-specific styling with optimized gradients
+  // Uses CSS variables for brand consistency - dark/light mode support
   const modeConfig = useMemo(() => ({
     browse: {
       bg: 'bg-gradient-to-br from-background via-background to-primary/5',
       accent: 'cyan',
-      accentClass: 'from-cyan-500 to-cyan-600',
-      accentBg: 'bg-cyan-500/20',
-      accentText: 'text-cyan-400',
-      glow: 'shadow-cyan-500/20'
+      accentClass: 'from-[var(--gh-accent-fg)] to-[var(--gh-accent-hover)]',
+      accentBg: 'bg-[var(--gh-accent-fg)]/20',
+      accentText: 'text-[var(--gh-accent-fg)]',
+      glow: 'shadow-[var(--gh-accent-fg)]/20'
     },
     test: {
-      bg: 'bg-gradient-to-br from-background via-background to-amber-500/5',
+      bg: 'bg-gradient-to-br from-background via-background to-[var(--gh-attention-fg)]/5',
       accent: 'amber',
-      accentClass: 'from-amber-500 to-amber-600',
-      accentBg: 'bg-amber-500/20',
-      accentText: 'text-amber-400',
-      glow: 'shadow-amber-500/20'
+      accentClass: 'from-[var(--gh-attention-fg)] to-[var(--gh-attention-hover)]',
+      accentBg: 'bg-[var(--gh-attention-fg)]/20',
+      accentText: 'text-[var(--gh-attention-fg)]',
+      glow: 'shadow-[var(--gh-attention-fg)]/20'
     },
     interview: {
-      bg: 'bg-gradient-to-br from-background via-background to-purple-500/5',
+      bg: 'bg-gradient-to-br from-background via-background to-[var(--gh-done-fg)]/5',
       accent: 'purple',
-      accentClass: 'from-purple-500 to-purple-600',
-      accentBg: 'bg-purple-500/20',
-      accentText: 'text-purple-400',
-      glow: 'shadow-purple-500/20'
+      accentClass: 'from-[var(--gh-done-fg)] to-[var(--gh-done-hover)]',
+      accentBg: 'bg-[var(--gh-done-fg)]/20',
+      accentText: 'text-[var(--gh-done-fg)]',
+      glow: 'shadow-[var(--gh-done-fg)]/20'
     },
     certification: {
-      bg: 'bg-gradient-to-br from-background via-background to-blue-500/5',
+      bg: 'bg-gradient-to-br from-background via-background to-[var(--gh-accent-fg)]/5',
       accent: 'blue',
-      accentClass: 'from-blue-500 to-blue-600',
-      accentBg: 'bg-blue-500/20',
-      accentText: 'text-blue-400',
-      glow: 'shadow-blue-500/20'
+      accentClass: 'from-[var(--gh-accent-fg)] to-[var(--gh-accent-hover)]',
+      accentBg: 'bg-[var(--gh-accent-fg)]/20',
+      accentText: 'text-[var(--gh-accent-fg)]',
+      glow: 'shadow-[var(--gh-accent-fg)]/20'
     },
     review: {
-      bg: 'bg-gradient-to-br from-background via-background to-green-500/5',
+      bg: 'bg-gradient-to-br from-background via-background to-[var(--gh-success-fg)]/5',
       accent: 'green',
-      accentClass: 'from-green-500 to-green-600',
-      accentBg: 'bg-green-500/20',
-      accentText: 'text-green-400',
-      glow: 'shadow-green-500/20'
+      accentClass: 'from-[var(--gh-success-fg)] to-[var(--gh-success-hover)]',
+      accentBg: 'bg-[var(--gh-success-fg)]/20',
+      accentText: 'text-[var(--gh-success-fg)]',
+      glow: 'shadow-[var(--gh-success-fg)]/20'
     }
   }), []);
 
@@ -224,7 +225,7 @@ export function UnifiedQuestionView({
       )}
 
       {/* Main content container */}
-      <div className="relative z-10 flex flex-col h-screen h-dvh w-full">
+      <div className="relative z-10 flex flex-col min-h-screen min-h-dvh w-full">
         {/* Top metadata bar - iPhone 13 safe area */}
         <motion.div 
           className="flex-shrink-0 pt-safe"

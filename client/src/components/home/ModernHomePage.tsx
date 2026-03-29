@@ -1547,7 +1547,7 @@ function ConfirmationDialog({
               }}
               className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors ${
                 type === "danger"
-                  ? "bg-red-500 hover:bg-red-600 text-white"
+                  ? "bg-[var(--gh-danger-emphasis)] hover:bg-[var(--gh-danger-hover)] text-white"
                   : "bg-primary hover:bg-primary/90 text-primary-foreground"
               }`}
             >

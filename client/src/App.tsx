@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
 import { CreditsProvider } from "@/context/CreditsContext";
 import { LiveRegionProvider } from "@/components/LiveRegion";
+import { UnifiedNotificationManager } from "@/components/UnifiedNotificationManager";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import NotFound from "@/pages/not-found";
 import { SkeletonLoader } from "@/components/mobile/SkeletonLoader";
@@ -130,6 +131,7 @@ export default function App() {
           <CreditsProvider>
             <QueryClientProvider client={queryClient}>
             <TooltipProvider>
+              <UnifiedNotificationManager>
               <div className="min-h-screen">
                 {/* Skip Navigation Link - P0 Accessibility Fix */}
                 <a
@@ -140,6 +142,7 @@ export default function App() {
                 </a>
                 <FullApp />
               </div>
+              </UnifiedNotificationManager>
             </TooltipProvider>
             </QueryClientProvider>
           </CreditsProvider>

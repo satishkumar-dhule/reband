@@ -150,8 +150,8 @@ export function Recommendations({
     return (
       <div className={`${className}`}>
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-[#f0883e]" />
-          <span className="text-sm font-medium text-[#e6edf3]">For You</span>
+          <Sparkles className="w-4 h-4 text-orange-500 dark:text-orange-400" />
+          <span className="text-sm font-medium text-gray-200 dark:text-gray-200">For You</span>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {visibleRecommendations.slice(0, 4).map((rec, index) => {
@@ -175,7 +175,7 @@ export function Recommendations({
                   `}
                 >
                   <Icon className={`w-3.5 h-3.5 ${config.text}`} />
-                  <span className="text-xs text-[#e6edf3]">
+                  <span className="text-xs text-gray-700 dark:text-gray-200">
                     {getChannelName(rec.channelId)}
                   </span>
                   {rec.newCount && (
@@ -197,18 +197,18 @@ export function Recommendations({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#f0883e] to-[#db6d28] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-700 dark:from-orange-400 dark:to-orange-600 flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-[#e6edf3]">Recommended for You</h3>
-            <p className="text-xs text-[#8b949e]">Based on your activity</p>
+            <h3 className="font-semibold text-gray-200 dark:text-gray-200">Recommended for You</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Based on your activity</p>
           </div>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-200 dark:hover:text-gray-200 transition-colors"
             aria-label="Close recommendations"
           >
             <X className="w-4 h-4" />
@@ -261,16 +261,16 @@ export function Recommendations({
                         </span>
                       )}
                     </div>
-                    <h4 className="font-medium text-[#e6edf3] truncate">
+                    <h4 className="font-medium text-gray-200 dark:text-gray-200 truncate">
                       {getChannelName(rec.channelId)}
                     </h4>
-                    <p className="text-xs text-[#8b949e] truncate">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       {rec.reason}
                     </p>
                   </div>
 
                   {/* Arrow */}
-                  <ChevronRight className="w-5 h-5 text-[#6e7681] group-hover:text-[#8b949e] transition-colors flex-shrink-0" />
+                  <ChevronRight className="w-5 h-5 text-gray-500 dark:text-gray-500 group-hover:text-gray-400 dark:group-hover:text-gray-400 transition-colors flex-shrink-0" />
                 </Link>
 
                 {/* Dismiss button */}
@@ -281,7 +281,7 @@ export function Recommendations({
                     handleDismiss(rec);
                   }}
                   className="absolute top-2 right-2 p-1 rounded-md opacity-0 group-hover:opacity-100 
-                             hover:bg-[#21262d] text-[#6e7681] hover:text-[#8b949e] transition-all"
+                             hover:bg-gray-800 dark:hover:bg-[#21262d] text-gray-500 dark:text-gray-500 hover:text-gray-400 dark:hover:text-gray-400 transition-all"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -305,18 +305,18 @@ function EngagementSummary({ className = '' }: { className?: string }) {
   }
 
   return (
-    <div className={`flex items-center gap-4 p-3 rounded-lg bg-[#161b22] border border-[#30363d] ${className}`}>
-      <TrendingUp className="w-4 h-4 text-[#3fb950]" />
-      <div className="flex items-center gap-4 text-xs text-[#8b949e]">
+    <div className={`flex items-center gap-4 p-3 rounded-lg bg-gray-100 dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] ${className}`}>
+      <TrendingUp className="w-4 h-4 text-green-600 dark:text-[#3fb950]" />
+      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
         <span>
-          <span className="text-[#e6edf3] font-medium">{summary.totalChannelsVisited}</span> channels explored
+          <span className="text-gray-700 dark:text-gray-200 font-medium">{summary.totalChannelsVisited}</span> channels explored
         </span>
         <span>
-          <span className="text-[#e6edf3] font-medium">{summary.totalQuestionsCompleted}</span> completed
+          <span className="text-gray-700 dark:text-gray-200 font-medium">{summary.totalQuestionsCompleted}</span> completed
         </span>
         {summary.currentStreak > 0 && (
           <span>
-            <span className="text-[#f0883e] font-medium">{summary.currentStreak}</span> day streak 🔥
+            <span className="text-orange-600 dark:text-[#f0883e] font-medium">{summary.currentStreak}</span> day streak 🔥
           </span>
         )}
       </div>
