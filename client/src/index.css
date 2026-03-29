@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "./styles/github-tokens.css";
+@import "./styles/design-system.css";
+@import "./styles/genz-design-system.css";
 
 /* ===== TYPOGRAPHY SYSTEM - Single Source of Truth ===== */
 /* 
@@ -84,13 +88,6 @@
   font-display: swap;
   src: local('Baloo 2'), local('Baloo2-Regular');
 }
-@import "tw-animate-css";
-/* ===== GITHUB DESIGN SYSTEM TOKENS ===== */
-/* Single source of truth for GitHub-themed colors - must be first */
-@import "./styles/github-tokens.css";
-
-@import "./styles/design-system.css";
-@import "./styles/genz-design-system.css";
 
 @custom-variant dark (&:is(.dark *));
 

@@ -265,6 +265,7 @@
   }
 }
 
+/* Enhanced shimmer animation with gradient overlay */
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
@@ -272,6 +273,38 @@
   100% {
     transform: translateX(100%);
   }
+}
+
+/* Smooth shimmer for skeleton loaders - uses gradient for polished effect */
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Shimmer gradient overlay - light mode */
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Shimmer gradient overlay - dark mode */
+.dark .animate-shimmer::after,
+[data-theme="dark"] .animate-shimmer::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
 }
 
 @keyframes pulse-glow {
