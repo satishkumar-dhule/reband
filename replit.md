@@ -1,156 +1,145 @@
-# Code Reels (Open-Interview / DevPrep)
+# DevPrep / Open-Interview
 
-A technical interview prep platform with 1000+ questions, swipe-based learning, voice practice, and spaced repetition.
+Free, GitHub-native technical interview prep — swipe learning, voice practice, spaced repetition, coding challenges.
 
-## Architecture
+**URL**: https://open-interview.github.io/
 
-- **Frontend**: React 19 + Vite 7, TypeScript, Tailwind CSS 4, shadcn/ui components
-- **Backend**: Express.js server with Vite dev middleware — **development only, NOT used in production**
-- **Database**: libSQL/Turso — `file:local.db` in dev, Turso cloud via `TURSO_DATABASE_URL` in prod
-- **ORM**: Drizzle ORM, SQLite schema in `shared/schema.ts`
-- **Dev Port**: 5173 (mapped to external port 80 via Replit)
-- **Production**: **GitHub Pages — pure static SPA, zero backend servers**
+---
 
-## Running the App (Development)
+## Project Type: Static Website (GitHub Pages)
 
-The "Start application" workflow runs:
-```
-npm run dev:server
-```
-This starts Express (port 5173) which serves both the API and Vite frontend in development mode.
+**No backend API server.** This is a pure static SPA deployed to GitHub Pages.
+
+- SQLite runs directly in the browser (sql.js / WASM)
+- DB syncs from remote Turso/SQLite source and stores locally
+- Full offline support after initial sync
+- GitHub design system for look & feel, colors, typography
+
+---
+
+## Stack
+
+| Layer | Tech |
+|-------|------|
+| Frontend | React 19 + Vite 7, TypeScript, Tailwind CSS 4, shadcn/ui |
+| Database | SQLite in browser (sql.js WASM) + Turso sync |
+| Sync | Background sync from Turso remote DB |
+| ORM | Drizzle ORM |
+| Deployment | GitHub Pages (static) |
+| Search | Pagefind (static search index) |
+
+---
 
 ## Agent Orchestration System
 
-This project uses **opencode agents** for all implementation work. The main Replit agent acts as **supervisor** — it plans, delegates to specialists, monitors outputs, and corrects mistakes.
+**Replit acts as Supervisor/Coordinator** — it plans work, delegates to opencode agents, monitors outputs, and synthesizes results.
 
-### How to Delegate
-```bash
-# Delegate a task to a specific agent
-./script/delegate.sh devprep-frontend-designer "Add a GitHub-themed settings page"
-
-# Or directly via opencode
-opencode run --agent devprep-coordinator "Generate 5 questions for the algorithms channel"
+### Supervisor Pattern
+```
+REPLIT (Supervisor)
+├── ANALYZE     — Which agent(s) own this work?
+├── PLAN        — Write task breakdown with agent assignments
+├── DELEGATE    — opencode run --agent <name> "task"
+├── MONITOR     — Review outputs; send corrections if needed
+├── SYNTHESIZE  — Combine results, write summary
+└── UPDATE      — Update docs if architecture changed
 ```
 
-### Key Agents (`.opencode/agents/`)
+### Key Agents
+
 | Agent | Purpose |
 |-------|---------|
-| `devprep-supervisor` | Master orchestrator — plans and delegates everything |
+| `devprep-supervisor` | Master orchestrator — plans and delegates |
 | `devprep-coordinator` | Content pipeline (questions, flashcards, challenges) |
-| `devprep-static-deployment` | GitHub Pages static build architecture |
+| `devprep-static-deployment` | GitHub Pages static build |
 | `devprep-frontend-designer` | React components and pages |
-| `devprep-github-*-expert` | GitHub-themed UI components (20+ agents) |
-| `devprep-db-optimizer` | Database schema and exports |
-| `devprep-seo-audit` | SEO, Pagefind, performance |
-| `devprep-e2e-tester` | Playwright tests and accessibility |
-| `devprep-tech-writer` | Documentation (README, AGENTS.md, replit.md) |
+| `devprep-github-*-expert` | GitHub-themed UI (20+ agents) |
+| `devprep-db-optimizer` | Database schema and queries |
+| `devprep-seo-audit` | SEO, search, performance |
+| `devprep-e2e-tester` | Playwright tests |
+| `devprep-tech-writer` | Documentation |
 
-Full agent registry in `AGENTS.md`.
+Full agent list in `AGENTS.md`.
 
-## Static GitHub Pages Deployment
-
-### Deployment Target
-GitHub Pages at `https://open-interview.github.io/` — **no backend server**.
-
-### Data Strategy (DB → Static JSON → SPA)
-- DB is the **single source of truth** for all content
-- Build-time export: DB → `client/public/data/*.json`
-- SPA fetches these static JSON files in production (`/data/channels.json`, etc.)
-- In development, SPA proxies `/api/*` to the Express server
-
-### Static Data Files (`client/public/data/`)
-```
-channels.json            # all channels with question counts
-questions-index.json     # lightweight questions index
-channel-<id>.json        # questions per channel (e.g. channel-algorithms.json)
-learning-paths.json      # curated learning paths
-coding-challenges.json   # coding challenges
-stats.json               # aggregate statistics
-search-index/            # pagefind static search index
-```
-
-### Full Static Build Pipeline
+### Delegation Commands
 ```bash
-npm run build:static
-# Expands to:
-# node script/fetch-questions-for-build.js  (DB → client/public/data/)
-# node script/generate-curated-paths.js
-# node script/generate-rss.js
-# node script/generate-sitemap.js
-# vite build                                (→ dist/)
-# node script/build-pagefind.js             (→ dist/pagefind/)
-# tsx script/deploy-pages.ts                (→ gh-pages branch)
+# Delegate to specific agent
+opencode run --agent devprep-frontend-designer "Add dark mode toggle"
+
+# Or via helper script
+./script/delegate.sh devprep-coordinator "Generate 10 questions for algorithms"
 ```
 
-### GitHub Actions
-CI/CD lives in `.github/workflows/`:
-- `deploy-app.yml` — triggers on push to main, runs full static build + deploy
-- `content-generation.yml` — scheduled content generation via coordinator agent
-- `daily-maintenance.yml` — DB cleanup, duplicate detection
+---
+
+## Data Architecture
+
+1. **Browser SQLite**: sql.js runs SQLite in browser via WASM
+2. **Initial sync**: Fetch DB from Turso CDN/storage
+3. **Local storage**: SQLite in IndexedDB
+4. **Background sync**: Periodic or on-demand sync
+5. **Offline-first**: Works fully after sync
+
+---
+
+## Build Pipeline
+
+```bash
+# Full static build
+npm run build:static
+
+# Steps:
+# 1. vite build              SPA → dist/
+# 2. Copy pre-synced SQLite to public/ (optional, faster first load)
+# 3. node script/build-pagefind.js   search index
+# 4. tsx script/deploy-pages.ts     push to gh-pages branch
+```
+
+---
+
+## Architecture Rules (Iron Laws)
+
+1. **Static-first**: NO backend API. Pure static SPA on GitHub Pages
+2. **Browser SQLite**: All data in sql.js running in browser
+3. **Sync from Turso**: Remote DB synced to browser SQLite
+4. **GitHub theme**: CSS tokens, system font stack, Primer-inspired components
+5. **Offline support**: Full functionality after initial sync
+
+---
 
 ## Key Files
 
 ```
-server/index.ts              Express server entry (DEV only)
-server/routes.ts             API routes (DEV only)
-server/db.ts                 Turso/libSQL client
 shared/schema.ts             Drizzle ORM schema (DB source of truth)
 client/src/App.tsx           React app with wouter routing
-client/src/lib/              Core business logic (SRS, voice, achievements)
 client/src/pages/            All page components
-client/src/components/       All UI components
-client/public/data/          Static JSON exports (generated by build scripts)
-script/                      100+ build/data/bot scripts
-script/fetch-questions-for-build.js   Main data export script
-script/delegate.sh           Agent delegation helper
-.opencode/agents/            All opencode agent definitions (70+ agents)
-.opencode/config.json        opencode configuration (default agent: supervisor)
-.agents/skills/              Agent skills (30+ skills)
+client/src/components/       UI components
+client/src/lib/db/           Browser SQLite (sql.js, sync, queries)
+script/                      Build scripts
 .github/workflows/           GitHub Actions CI/CD
-AGENTS.md                    Full agent system documentation + iron laws
-CONTENT_STANDARDS.md         Content quality rules (all content agents must read)
-drizzle.config.ts            Drizzle config (uses Turso, DO NOT EDIT)
-vite.config.ts               Vite config (DO NOT EDIT)
+.opencode/agents/           All agent definitions
+.agents/skills/             Agent skills
 ```
 
-## Database Setup (Development)
+---
 
-For local dev, the app uses SQLite at `file:local.db`:
+## Development
+
 ```bash
-node script/init-local-db.js    # create tables
-node script/seed-db.mjs         # seed sample questions
+npm run dev          # Start Vite dev server
+npm run sync-db     # Sync from remote Turso
 ```
 
-## API Endpoints (Development Only)
-
-These are **not available in production** (static build). All production data comes from `/data/*.json`.
-
-- `GET /api/channels` — List channels with question counts
-- `GET /api/questions/:channelId` — Questions for a channel
-- `GET /api/question/random` — Random question
-- `GET /api/stats` — Channel statistics
-- `GET /api/coding/challenges` — Coding challenges
-- `GET /api/learning-paths` — Learning paths
-- `POST /api/history` — Save question history
+---
 
 ## Features
 
-- Swipe-based learning (TikTok/Reels-style)
-- 20+ topic channels (System Design, Algorithms, Frontend, Backend, DevOps, K8s, AWS, ML, etc.)
-- Voice interview practice with AI feedback
+- Swipe-based learning (TikTok-style)
+- 20+ topic channels (System Design, Algorithms, Frontend, Backend, DevOps, K8s, AWS, ML...)
+- Voice interview practice
 - Spaced repetition system (SRS)
-- Coding challenges (Python & JavaScript) with Monaco editor
-- Knowledge tests / quick quizzes
-- Gamified progress with achievements
+- Coding challenges (JS/Python) with Monaco editor
 - GitHub-themed UI (dark/light mode)
-- Static search via Pagefind
+- Full offline support
+- Static search (Pagefind)
 - SEO-optimized (sitemap, RSS, Open Graph)
-
-## Agent System Rules (Enforced by Supervisor)
-
-- No Express API calls in production code paths
-- No hardcoded content in React components — all data from DB export
-- GitHub theme colors only (CSS tokens, not raw hex)
-- `VITE_` prefix required for all frontend env vars
-- Never modify `drizzle.config.ts` or `.replit`
-- Always run `fetch-questions-for-build.js` before building for production

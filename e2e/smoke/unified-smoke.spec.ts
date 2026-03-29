@@ -16,7 +16,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { setupUser, waitForPageReady, waitForContent } from '../fixtures';
 
-const BASE_URL = 'http://localhost:5001';
+const BASE_URL = 'http://localhost:5173';
 const CRITICAL_PAGES = ['/', '/channels', '/learning-paths', '/coding-challenges', '/about'];
 
 async function verifyPageLoads(page: Page, path: string) {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { getAllQuestions } from '../lib/questions-loader';
@@ -9,8 +9,9 @@ import { STORAGE_KEYS } from '../lib/constants';
 import type { Question } from '../types';
 import {
   Bookmark, Trash2, ChevronRight, Filter,
-  CheckCircle, Building2, X, BookOpen
+  CheckCircle, Building2, X, BookOpen, Home
 } from 'lucide-react';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 
 interface BookmarkedQuestion extends Question {
   channelId: string;
@@ -84,8 +85,24 @@ export default function Bookmarks() {
         description="View and manage your bookmarked interview questions"
       />
       <AppLayout>
-        <div className="bg-[var(--gh-canvas-subtle)] min-h-screen">
+        <div className="bg-[var(--gh-canvas-subtle)] min-h-screen" id="main-content">
           <div className="max-w-5xl mx-auto px-4 py-6 lg:px-8">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb className="mb-6">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/" className="flex items-center gap-1">
+                    <Home className="w-3.5 h-3.5" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Bookmarks</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+
             {/* Header */}
             <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
               <div>

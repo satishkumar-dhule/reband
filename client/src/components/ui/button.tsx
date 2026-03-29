@@ -1,8 +1,26 @@
+/**
+ * @deprecated Use unified/Button.tsx instead
+ * 
+ * This component is kept for backward compatibility with shadcn/ui components.
+ * All new code should use the unified Button component from:
+ * 
+ *   import { Button } from '@/components/unified/Button';
+ * 
+ * The unified Button provides:
+ * - More variants (primary, secondary, outline, ghost, danger, success)
+ * - More sizes (xs, sm, md, lg, xl)
+ * - Rounded options (default, lg, full)
+ * - Loading state, icon support, fullWidth, animated options
+ * - MotionButton, IconButton, and ButtonGroup components
+ */
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+// Note: For new code, import the unified Button:
+// import { Button } from '@/components/unified/Button';
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0" +

@@ -13,7 +13,7 @@ import type { Question } from '../../types';
 import { cn } from '../../lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { Prism as SyntaxHighlighter, type SyntaxHighlighterProps } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { EnhancedMermaid } from '../EnhancedMermaid';
 import { YouTubePlayer } from '../YouTubePlayer';
@@ -149,12 +149,13 @@ export function UnifiedAnswerPanel({
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        code({ node, inline, className, children, ...props }) {
+                        code({ className, children, ...props }) {
                           const match = /language-(\w+)/.exec(className || '');
                           const codeString = String(children).replace(/\n$/, '');
                           const codeId = `code-${Math.random().toString(36).substr(2, 9)}`;
+                          const isInline = !match;
 
-                          if (!inline && match) {
+                          if (!isInline && match) {
                             return (
                               <div className="relative group my-4">
                                 <button
@@ -168,11 +169,10 @@ export function UnifiedAnswerPanel({
                                   )}
                                 </button>
                                 <SyntaxHighlighter
-                                  style={vscDarkPlus}
+                                  style={vscDarkPlus as SyntaxHighlighterProps['style']}
                                   language={match[1]}
                                   PreTag="div"
                                   className="rounded-xl !bg-black/40 !my-0"
-                                  {...props}
                                 >
                                   {codeString}
                                 </SyntaxHighlighter>
@@ -259,7 +259,7 @@ export function UnifiedAnswerPanel({
                 <div className="p-4 border-b border-border/50">
                   <h3 className="text-lg font-semibold text-foreground">Short Explanation</h3>
                 </div>
-                <YouTubePlayer url={question.videos.shortVideo} />
+                <YouTubePlayer shortVideo={question.videos.shortVideo} />
               </div>
             )}
             {question.videos?.longVideo && (
@@ -267,7 +267,7 @@ export function UnifiedAnswerPanel({
                 <div className="p-4 border-b border-border/50">
                   <h3 className="text-lg font-semibold text-foreground">Detailed Explanation</h3>
                 </div>
-                <YouTubePlayer url={question.videos.longVideo} />
+                <YouTubePlayer longVideo={question.videos.longVideo} />
               </div>
             )}
           </div>

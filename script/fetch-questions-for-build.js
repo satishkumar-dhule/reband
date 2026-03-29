@@ -54,23 +54,37 @@ function validateQuestionFormat(question) {
   };
 }
 
+function safeJsonParse(str, fallback = null) {
+  if (!str) return fallback;
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    console.warn(`   ⚠️ JSON parse error: ${e.message}`);
+    return fallback;
+  }
+}
+
 function parseQuestionRow(row) {
   return {
     id: row.id,
     question: row.question,
     answer: row.answer,
     explanation: row.explanation,
+    tldr: row.tldr,
     diagram: row.diagram,
     difficulty: row.difficulty,
-    tags: row.tags ? JSON.parse(row.tags) : [],
+    tags: safeJsonParse(row.tags, []),
     channel: row.channel,
     subChannel: row.sub_channel,
     sourceUrl: row.source_url,
-    videos: row.videos ? JSON.parse(row.videos) : null,
-    companies: row.companies ? JSON.parse(row.companies) : null,
+    videos: safeJsonParse(row.videos, null),
+    companies: safeJsonParse(row.companies, null),
     eli5: row.eli5,
     relevanceScore: row.relevance_score,
-    voiceKeywords: row.voice_keywords ? JSON.parse(row.voice_keywords) : null,
+    relevanceDetails: row.relevance_details,
+    jobTitleRelevance: row.job_title_relevance,
+    experienceLevelTags: safeJsonParse(row.experience_level_tags, []),
+    voiceKeywords: safeJsonParse(row.voice_keywords, null),
     voiceSuitable: row.voice_suitable === 1,
     isNew: row.is_new === 1, // Parse isNew flag from database
     lastUpdated: row.last_updated,
@@ -93,9 +107,9 @@ async function main() {
   // Ensure output directory exists
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-  // Fetch all questions
-  console.log('📥 Fetching all questions...');
-  const result = await client.execute('SELECT * FROM questions ORDER BY channel, sub_channel, id');
+  // Fetch all active questions
+  console.log('📥 Fetching all active questions...');
+  const result = await client.execute('SELECT * FROM questions WHERE status = "active" ORDER BY channel, sub_channel, id');
   const allQuestions = result.rows.map(parseQuestionRow);
   console.log(`   Found ${allQuestions.length} questions`);
 
@@ -417,7 +431,7 @@ async function main() {
     };
 
     const tests = testsResult.rows.map(row => {
-      const allQuestions = JSON.parse(row.questions);
+      const allQuestions = safeJsonParse(row.questions, []);
       // Filter out irrelevant questions and enrich with channel/subChannel
       const filteredQuestions = allQuestions
         .filter(q => !isIrrelevantQuestion(q))
@@ -481,14 +495,14 @@ async function main() {
       description: row.description,
       difficulty: row.difficulty,
       category: row.category,
-      tags: row.tags ? JSON.parse(row.tags) : [],
-      companies: row.companies ? JSON.parse(row.companies) : [],
+      tags: safeJsonParse(row.tags, []),
+      companies: safeJsonParse(row.companies, []),
       starterCode: {
         javascript: row.starter_code_js,
         python: row.starter_code_py
       },
-      testCases: row.test_cases ? JSON.parse(row.test_cases) : [],
-      hints: row.hints ? JSON.parse(row.hints) : [],
+      testCases: safeJsonParse(row.test_cases, []),
+      hints: safeJsonParse(row.hints, []),
       solution: {
         javascript: row.solution_js,
         python: row.solution_py
@@ -691,7 +705,7 @@ async function main() {
       try {
         // First try: Use channel_mappings if they exist
         if (row.channel_mappings) {
-          const channelMappings = JSON.parse(row.channel_mappings);
+          const channelMappings = safeJsonParse(row.channel_mappings, []);
           for (const mapping of channelMappings) {
             const countResult = await client.execute({
               sql: mapping.subChannel 
@@ -727,8 +741,8 @@ async function main() {
         estimatedHours: row.estimated_hours || 40,
         examCode: row.exam_code,
         officialUrl: row.official_url,
-        domains: row.domains ? JSON.parse(row.domains) : [],
-        prerequisites: row.prerequisites ? JSON.parse(row.prerequisites) : [],
+        domains: safeJsonParse(row.domains, []),
+        prerequisites: safeJsonParse(row.prerequisites, []),
         questionCount: questionCount,
         passingScore: row.passing_score || 70,
         examDuration: row.exam_duration || 90,

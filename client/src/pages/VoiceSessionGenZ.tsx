@@ -13,6 +13,7 @@ import { useAchievementContext } from '../context/AchievementContext';
 import { useUserPreferences } from '../hooks/use-user-preferences';
 import { CreditsDisplay } from '../components/CreditsDisplay';
 import { AppLayout } from '../components/layout/AppLayout';
+import { Button } from '../components/unified/Button';
 import {
   type VoiceSession,
   type SessionState,
@@ -312,7 +313,7 @@ export default function VoiceSessionGenZ() {
             <div className="flex flex-col items-center py-8">
               <AlertCircle className="w-12 h-12 text-[var(--gh-danger-fg)] mb-4" />
               <p className="text-[var(--gh-fg-muted)] mb-6">Voice sessions require the Web Speech API. Please use Chrome, Edge, or Safari.</p>
-              <button onClick={() => setLocation('/')} className="gh-btn gh-btn-primary">Return Home</button>
+              <Button onClick={() => setLocation('/')} variant="primary">Return Home</Button>
             </div>
           </GHCard>
         </div>
@@ -339,7 +340,7 @@ export default function VoiceSessionGenZ() {
 
     return (
       <AppLayout>
-        <SEOHead title="Voice Sessions | DevPrep" />
+        <SEOHead title="Voice Sessions | DevPrep" description="Practice interview topics with focused question sessions" />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
@@ -361,7 +362,7 @@ export default function VoiceSessionGenZ() {
                   <AlertCircle className="w-12 h-12 text-[var(--gh-fg-muted)] mx-auto mb-4" />
                   <h2 className="text-xl font-semibold mb-2">No Sessions Available</h2>
                   <p className="text-[var(--gh-fg-muted)] mb-6">Subscribe to more channels to unlock focused voice sessions.</p>
-                  <button onClick={() => setLocation('/channels')} className="gh-btn gh-btn-primary">Explore Channels</button>
+                  <Button onClick={() => setLocation('/channels')} variant="primary">Explore Channels</Button>
                 </div>
               </GHCard>
             ) : (
@@ -415,8 +416,8 @@ export default function VoiceSessionGenZ() {
                 </div>
               </div>
               <div className="flex gap-3 w-full">
-                <button onClick={exitSession} className="gh-btn gh-btn-secondary flex-1 h-12">Cancel</button>
-                <button onClick={beginQuestions} className="gh-btn gh-btn-primary flex-1 h-12">Start Interview</button>
+                <Button onClick={exitSession} variant="secondary" fullWidth>Cancel</Button>
+                <Button onClick={beginQuestions} variant="primary" fullWidth>Start Interview</Button>
               </div>
             </div>
           </GHCard>
@@ -451,12 +452,14 @@ export default function VoiceSessionGenZ() {
                     <div className="w-full bg-[var(--gh-canvas-inset)] rounded-md p-6 min-h-[150px] mb-8 border border-[var(--gh-border)] text-lg text-[var(--gh-fg)] leading-relaxed italic text-center">
                       {transcript || interimTranscript || "Start speaking your answer..."}
                     </div>
-                    <button 
+                    <Button 
                       onClick={stopRecording}
-                      className="gh-btn gh-btn-danger h-14 px-10 text-xl font-bold"
+                      variant="danger"
+                      size="lg"
+                      icon={<Zap className="w-5 h-5" />}
                     >
-                      <Zap className="w-5 h-5 mr-2" /> Stop Recording
-                    </button>
+                      Stop Recording
+                    </Button>
                   </>
                 ) : (
                   <div className="w-full">
@@ -470,12 +473,12 @@ export default function VoiceSessionGenZ() {
                       className="w-full bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 min-h-[200px] text-[var(--gh-fg)] focus:outline-none focus:border-[var(--gh-accent-fg)] focus:ring-1 focus:ring-[var(--gh-accent-fg)] mb-8"
                     />
                     <div className="flex gap-4">
-                      <button onClick={beginQuestions} className="gh-btn gh-btn-secondary flex-1 h-12">
-                        <RotateCcw className="w-4 h-4 mr-2" /> Redo Recording
-                      </button>
-                      <button onClick={submitCurrentAnswer} className="gh-btn gh-btn-primary flex-1 h-12">
-                        Submit Answer <ChevronRight className="w-4 h-4 ml-2" />
-                      </button>
+                      <Button onClick={beginQuestions} variant="secondary" fullWidth icon={<RotateCcw className="w-4 h-4" />}>
+                        Redo Recording
+                      </Button>
+                      <Button onClick={submitCurrentAnswer} variant="primary" fullWidth icon={<ChevronRight className="w-4 h-4" />} iconPosition="right">
+                        Submit Answer
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -495,8 +498,8 @@ export default function VoiceSessionGenZ() {
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-xl font-bold">Question Analysis</h1>
             <div className="flex gap-2">
-              <button onClick={() => setLocation('/')} className="gh-btn gh-btn-secondary"><Share2 className="w-4 h-4 mr-1" /> Share</button>
-              <button className="gh-btn gh-btn-secondary"><Bookmark className="w-4 h-4 mr-1" /> Save</button>
+              <Button onClick={() => setLocation('/')} variant="secondary" icon={<Share2 className="w-4 h-4" />}>Share</Button>
+              <Button variant="secondary" icon={<Bookmark className="w-4 h-4" />}>Save</Button>
             </div>
           </div>
 
@@ -510,7 +513,7 @@ export default function VoiceSessionGenZ() {
 
               <GHCard title="Ideal Technical Answer">
                 <div className="p-4 bg-[var(--gh-canvas-inset)] rounded-md border border-[var(--gh-border-muted)] text-[var(--gh-fg)] leading-relaxed whitespace-pre-wrap">
-                  {currentQuestion.answer}
+                  {currentQuestion.idealAnswer}
                 </div>
               </GHCard>
             </div>
@@ -540,12 +543,16 @@ export default function VoiceSessionGenZ() {
                 </div>
               </GHCard>
 
-              <button 
+              <Button 
                 onClick={goToNextQuestion}
-                className="gh-btn gh-btn-primary w-full h-14 text-lg font-bold"
+                variant="primary"
+                size="lg"
+                fullWidth
+                icon={<ChevronRight className="w-5 h-5" />}
+                iconPosition="right"
               >
-                Continue to Next <ChevronRight className="w-5 h-5 ml-2" />
-              </button>
+                Continue to Next
+              </Button>
             </div>
           </div>
         </div>
@@ -571,14 +578,14 @@ export default function VoiceSessionGenZ() {
                   <div className="text-xs font-bold text-[var(--gh-fg-muted)] uppercase tracking-wider mt-1">Average Score</div>
                 </div>
                 <div className="p-6 bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-md">
-                  <div className="text-4xl font-black text-[var(--gh-success-fg)]">{sessionResult.totalQuestions}</div>
+                  <div className="text-4xl font-black text-[var(--gh-success-fg)]">{sessionResult.answers.length}</div>
                   <div className="text-xs font-bold text-[var(--gh-fg-muted)] uppercase tracking-wider mt-1">Answered</div>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <button onClick={exitSession} className="gh-btn gh-btn-secondary flex-1 h-12">Done</button>
-                <button onClick={() => setLocation('/stats')} className="gh-btn gh-btn-primary flex-1 h-12">View Detailed Stats</button>
+                <Button onClick={exitSession} variant="secondary" fullWidth>Done</Button>
+                <Button onClick={() => setLocation('/stats')} variant="primary" fullWidth>View Detailed Stats</Button>
               </div>
             </div>
           </GHCard>

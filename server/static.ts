@@ -14,12 +14,11 @@ export function serveStatic(app: Express) {
     maxAge: '1d',
     etag: true,
     lastModified: true,
-    immutable: true,
   }));
 
   app.use((req, res, next) => {
     if (req.method === 'GET') {
-      res.set('Cache-Control', 'public, max-age=86400, immutable');
+      res.set('Cache-Control', 'public, max-age=86400');
     }
     next();
   });

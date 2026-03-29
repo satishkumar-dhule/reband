@@ -1,18 +1,82 @@
 @import "tailwindcss";
 
+/* ===== TYPOGRAPHY SYSTEM - Single Source of Truth ===== */
+/* 
+ * Consolidated typography system for DevPrep
+ * All fonts and type scales are defined here
+ * Use CSS variables for font families and sizes
+ */
+
 :root {
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-display: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Standardized font families with consistent fallback chain */
+  /* Using GitHub's system font stack for consistency */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  
+  /* Legacy font aliases for backward compatibility */
+  --font-family-primary: var(--font-sans);
+  --font-family-secondary: var(--font-display);
+  --font-family-mono: var(--font-mono);
+  
+  /* Decorative fonts */
+  --font-baloo: "Baloo 2", "Comic Neue", cursive;
+  --font-comic: "Comic Neue", cursive;
+
+  /* ===== STANDARDIZED TYPE SCALE ===== */
+  /* Using Tailwind-compatible scale with CSS variables for flexibility */
+  /* Base size: 16px (1rem) */
+  
+  /* Font sizes */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+  --text-5xl: 3rem;      /* 48px */
+  --text-6xl: 3.75rem;   /* 60px */
+  --text-7xl: 4.5rem;    /* 72px */
+  
+  /* Line heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+  
+  /* Letter spacing */
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  
+  /* Font weights */
+  --font-thin: 100;
+  --font-extralight: 200;
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+  --font-black: 900;
 }
 
+/* ===== FONT FACE DECLARATIONS ===== */
+/* Inter - Primary sans-serif font */
 @font-face {
   font-family: 'Inter';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 100 900;
   font-display: swap;
-  src: local('Inter'), local('Inter-Regular');
+  src: local('Inter');
 }
 
+/* Baloo 2 - Decorative cursive */
 @font-face {
   font-family: 'Baloo 2';
   font-style: normal;
@@ -21,6 +85,10 @@
   src: local('Baloo 2'), local('Baloo2-Regular');
 }
 @import "tw-animate-css";
+/* ===== GITHUB DESIGN SYSTEM TOKENS ===== */
+/* Single source of truth for GitHub-themed colors - must be first */
+@import "./styles/github-tokens.css";
+
 @import "./styles/design-system.css";
 @import "./styles/genz-design-system.css";
 
@@ -98,11 +166,43 @@
   --color-text-tertiary: var(--color-text-tertiary, hsl(215 8% 55%));
   --color-text-disabled: var(--color-text-disabled, hsl(215 8% 40%));
   
-  /* Premium fonts */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, monospace;
-  --font-baloo: 'Baloo 2', 'Comic Neue', cursive;
-  --font-comic: 'Comic Neue', cursive;
+  /* Typography - Use consolidated CSS variables */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  
+  /* Font sizes mapped to type scale */
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+  --text-4xl: var(--text-4xl);
+  --text-5xl: var(--text-5xl);
+  --text-6xl: var(--text-6xl);
+  --text-7xl: var(--text-7xl);
+  
+  /* Line heights */
+  --leading-none: var(--leading-none);
+  --leading-tight: var(--leading-tight);
+  --leading-snug: var(--leading-snug);
+  --leading-normal: var(--leading-normal);
+  --leading-relaxed: var(--leading-relaxed);
+  --leading-loose: var(--leading-loose);
+  
+  /* Letter spacing */
+  --tracking-tight: var(--tracking-tight);
+  --tracking-normal: var(--tracking-normal);
+  --tracking-wide: var(--tracking-wide);
+  --tracking-wider: var(--tracking-wider);
+}
+
+/* ===== BODY BASE STYLES ===== */
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ===== PREMIUM PRO MAX DESIGN SYSTEM ===== */
@@ -638,7 +738,7 @@ body {
     radial-gradient(ellipse at 80% 80%, rgba(100, 200, 255, 0.02) 0%, transparent 50%);
   background-size: 100% 100%;
   color: var(--foreground, hsl(213 27% 90%));
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* ===== GITHUB DARK THEME ===== */
@@ -787,7 +887,7 @@ body {
     border-color: var(--border);
   }
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--background);

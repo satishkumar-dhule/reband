@@ -11,6 +11,7 @@
 import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { Skeleton } from '../mobile/SkeletonLoader';
 
 export type MetricCardVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
 export type MetricCardSize = 'sm' | 'md' | 'lg';
@@ -25,6 +26,7 @@ interface MetricCardProps {
   size?: MetricCardSize;
   description?: string;
   animated?: boolean;
+  isLoading?: boolean;
   className?: string;
   onClick?: () => void;
 }
@@ -88,11 +90,55 @@ export function MetricCard({
   size = 'md',
   description,
   animated = true,
+  isLoading = false,
   className = '',
   onClick
 }: MetricCardProps) {
   const variantConfig = variantClasses[variant];
   const sizeConfig = sizeClasses[size];
+
+  // Loading state - render skeleton content
+  if (isLoading) {
+    const loadingContent = (
+      <div 
+        className={`
+          ${variantConfig.bg} rounded-xl border ${sizeConfig.padding}
+          ${className}
+        `}
+        role="status"
+        aria-busy="true"
+        aria-label="Loading metric"
+      >
+        {/* Icon placeholder */}
+        <Skeleton variant="rectangular" className={`${sizeConfig.icon} mb-3`} />
+        
+        {/* Value placeholder */}
+        <Skeleton className={`${sizeConfig.value} w-16 mb-1`} />
+        
+        {/* Label placeholder */}
+        <Skeleton className={`${sizeConfig.label} w-20`} />
+        
+        {/* Description placeholder */}
+        {description && (
+          <Skeleton className="text-xs w-24 mt-2" />
+        )}
+      </div>
+    );
+
+    if (animated) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.2 }}
+        >
+          {loadingContent}
+        </motion.div>
+      );
+    }
+
+    return loadingContent;
+  }
 
   const content = (
     <div 

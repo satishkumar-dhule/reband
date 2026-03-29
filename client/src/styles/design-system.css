@@ -331,6 +331,11 @@
 
 /* ===== COMPONENT PATTERNS ===== */
 
+/**
+ * @deprecated .btn-primary is deprecated
+ * Use <Button variant="primary"> from unified/Button instead
+ */
+
 /* Premium button */
 .btn-primary {
   background: var(--gradient-primary);
@@ -682,6 +687,29 @@ input + input {
 }
 
 /* ===== GITHUB UTILITY CLASSES ===== */
+
+/**
+ * @deprecated .gh-btn CSS classes are deprecated
+ * 
+ * Use the unified Button component instead:
+ *   import { Button } from '@/components/unified/Button';
+ * 
+ * Available variants:
+ *   - variant="primary" - Primary action button
+ *   - variant="secondary" - Secondary action
+ *   - variant="outline" - Outlined style
+ *   - variant="ghost" - Minimal style
+ *   - variant="danger" - Destructive action
+ *   - variant="success" - Success action
+ * 
+ * Available sizes:
+ *   - size="xs", "sm", "md", "lg", "xl"
+ * 
+ * Example usage:
+ *   <Button variant="primary" size="md">Click me</Button>
+ *   <Button variant="outline" size="sm">Cancel</Button>
+ *   <Button variant="danger" size="lg">Delete</Button>
+ */
 
 /* Buttons */
 .gh-btn {

@@ -87,12 +87,14 @@ export default function TestsGenZ() {
             >
               <div className="relative">
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <label htmlFor="tests-search" className="sr-only">Search tests</label>
                 <input
+                  id="tests-search"
                   type="text"
                   placeholder="Search tests..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-14 pr-6 py-4 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                  className="w-full pl-14 pr-6 py-4 bg-card border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
                 />
               </div>
             </motion.div>

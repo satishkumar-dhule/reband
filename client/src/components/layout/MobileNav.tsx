@@ -1,15 +1,23 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
-import { Home, BookOpen, Bookmark, BarChart2, Mic } from "lucide-react";
+import { useLocation, Link } from "wouter";
+import { Home, BookOpen, Bookmark, BarChart2, Mic, Code, RotateCcw, User, Map, Award } from "lucide-react";
 import { cn } from "../../lib/utils";
 
-const navItems = [
+// Shared navigation configuration - used by MobileNav, AppLayout mobile drawer, and Sidebar
+export const mobileNavConfig = [
   { icon: Home, label: "Home", path: "/" },
   { icon: BookOpen, label: "Channels", path: "/channels" },
   { icon: Mic, label: "Voice", path: "/voice-interview", highlight: true },
+  { icon: Code, label: "Coding", path: "/coding" },
+  { icon: RotateCcw, label: "Review", path: "/review" },
   { icon: BarChart2, label: "Stats", path: "/stats" },
   { icon: Bookmark, label: "Saved", path: "/bookmarks" },
+  { icon: Map, label: "Paths", path: "/learning-paths" },
+  { icon: Award, label: "Badges", path: "/badges" },
+  { icon: User, label: "Profile", path: "/profile" },
 ];
+
+const navItems = mobileNavConfig;
 
 export function MobileNav() {
   const [location, setLocation] = useLocation();

@@ -101,7 +101,7 @@
 
 /* Global Resets */
 * {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* Body uses theme variables */
@@ -126,6 +126,11 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
 }
+
+/**
+ * @deprecated CSS button classes are deprecated
+ * Use <Button variant="primary"> from unified/Button instead
+ */
 
 /* Premium button - aligned with design-system.css */
 .btn-primary,

@@ -17,6 +17,7 @@ import type { Question } from '../../lib/data';
 import { formatTag } from '../../lib/utils';
 import { DifficultyBadge } from './DifficultyBadge';
 import { QuestionHistoryIcon, QuestionType } from './QuestionHistory';
+import { Skeleton } from '../mobile/SkeletonLoader';
 
 export type QuestionCardVariant = 'default' | 'compact' | 'detailed' | 'minimal';
 export type QuestionCardSize = 'sm' | 'md' | 'lg';
@@ -48,6 +49,9 @@ interface QuestionCardProps {
   totalQuestions?: number;
   timerEnabled?: boolean;
   timeLeft?: number;
+  
+  // Loading state
+  isLoading?: boolean;
   
   // Actions
   onToggleMark?: () => void;
@@ -183,6 +187,7 @@ export function QuestionCard({
   totalQuestions,
   timerEnabled = false,
   timeLeft = 0,
+  isLoading = false,
   onToggleMark,
   onTapQuestion,
   footer,
@@ -200,6 +205,86 @@ export function QuestionCard({
     if (length > 100) return 'text-base sm:text-lg lg:text-xl';
     return sizeConfig.title;
   };
+
+  // Loading state - render skeleton content
+  if (isLoading) {
+    const loadingContent = (
+      <div 
+        className={`
+          w-full h-full flex flex-col ${sizeConfig.padding} overflow-y-auto relative
+          ${className}
+        `}
+        role="status"
+        aria-busy="true"
+        aria-label="Loading question"
+      >
+        {/* Top bar skeleton */}
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <div className="flex items-center gap-2">
+            {/* Difficulty badge skeleton */}
+            <Skeleton className="h-5 w-20 rounded-full" />
+            {/* Progress skeleton */}
+            {showProgress && (
+              <Skeleton className="h-5 w-12 rounded-md" />
+            )}
+          </div>
+          <div className="flex items-center gap-1.5">
+            {/* History icon skeleton */}
+            {showHistory && (
+              <Skeleton variant="circular" className="w-8 h-8" />
+            )}
+            {/* Bookmark button skeleton */}
+            {showBookmark && (
+              <Skeleton variant="rectangular" className="w-11 h-11 rounded-md" />
+            )}
+          </div>
+        </div>
+
+        {/* Main content skeleton */}
+        <div className="flex-1 flex flex-col justify-center max-w-2xl w-full">
+          {/* Question text skeleton */}
+          <Skeleton className={`${sizeConfig.title} w-full mb-3`} />
+          <Skeleton className={`${sizeConfig.title} w-4/5 mb-3`} />
+          
+          {/* Sub-channel skeleton */}
+          {showSubChannel && (
+            <Skeleton className={`${sizeConfig.meta} w-24 mt-2`} />
+          )}
+          
+          {/* Tags skeleton */}
+          {showTags && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Skeleton className="h-5 w-16 rounded" />
+              <Skeleton className="h-5 w-20 rounded" />
+              <Skeleton className="h-5 w-14 rounded" />
+            </div>
+          )}
+        </div>
+
+        {/* Footer skeleton */}
+        {footer && (
+          <div className="mt-auto pt-3">
+            <Skeleton className="h-10 w-full rounded-lg" />
+          </div>
+        )}
+      </div>
+    );
+
+    if (animated) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="w-full h-full motion-reduce:transition-none"
+        >
+          {loadingContent}
+        </motion.div>
+      );
+    }
+
+    return loadingContent;
+  }
 
   const content = (
     <div 
@@ -281,7 +366,8 @@ export function QuestionCard({
                   e.stopPropagation();
                   onToggleMark();
                 }}
-                className={`p-1.5 rounded-md transition-colors ${
+                aria-label={isMarked ? 'Remove bookmark' : 'Bookmark question'}
+                className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary ${
                   isMarked
                     ? 'bg-primary/10 text-primary border border-primary/20'
                     : 'bg-muted text-muted-foreground hover:text-primary'
@@ -365,7 +451,7 @@ export function QuestionCard({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="w-full h-full"
+        className="w-full h-full motion-reduce:transition-none"
       >
         {content}
       </motion.div>
@@ -407,6 +493,7 @@ export function CompactQuestionCard({
       className={`
         p-4 bg-card border border-border rounded-xl cursor-pointer
         hover:border-primary/30 hover:shadow-lg transition-all
+        motion-reduce:hover:scale-100 motion-reduce:active:scale-100
         ${className}
       `}
     >
@@ -442,7 +529,8 @@ export function CompactQuestionCard({
                 e.stopPropagation();
                 onToggleMark();
               }}
-              className={`p-1 rounded ${isMarked ? 'text-primary' : 'text-muted-foreground'}`}
+              aria-label={isMarked ? 'Remove bookmark' : 'Bookmark question'}
+              className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary ${isMarked ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
             >
               <Bookmark className={`w-4 h-4 ${isMarked ? 'fill-current' : ''}`} />
             </button>

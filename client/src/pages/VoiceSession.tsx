@@ -148,7 +148,7 @@ export default function VoiceSession() {
       console.error('Speech recognition error:', event.error);
       if (event.error === 'not-allowed') {
         setError('Microphone access denied.');
-        setPageState('ready');
+        setPageState('select');
       } else if (event.error === 'no-speech') {
         console.log('No speech detected, continuing...');
       } else {
@@ -592,7 +592,7 @@ export default function VoiceSession() {
                   <textarea
                     value={transcript}
                     onChange={(e) => setTranscript(e.target.value)}
-                    className="w-full p-4 bg-[var(--gh-canvas)] border border-[var(--gh-attention-fg)]/30 rounded-xl min-h-[100px] text-sm text-[var(--gh-fg)] resize-y focus:outline-none focus:ring-2 focus:ring-[var(--gh-attention-fg)]/50"
+                    className="w-full p-4 bg-[var(--gh-canvas)] border border-[var(--gh-attention-fg)]/30 rounded-md min-h-[100px] text-sm text-[var(--gh-fg)] resize-y focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--gh-attention-fg)]/50"
                     placeholder="Edit your answer..."
                   />
                 ) : (

@@ -42,9 +42,6 @@ const DialogContent = React.forwardRef<
   return (
     <DialogPortal>
       <DialogOverlay 
-        role="button"
-        tabIndex={-1}
-        aria-label="Close dialog"
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))

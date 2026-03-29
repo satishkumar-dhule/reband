@@ -134,7 +134,7 @@ export function Recommendations({
   if (loading) {
     return (
       <div className={`${className}`}>
-        <div className="flex items-center gap-2 text-[#8b949e] py-4">
+        <div className="flex items-center gap-2 text-var(--gh-fg-muted) py-4">
           <RefreshCw className="w-4 h-4 animate-spin" />
           <span className="text-sm">Loading recommendations...</span>
         </div>

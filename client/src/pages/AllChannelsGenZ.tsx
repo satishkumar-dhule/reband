@@ -69,7 +69,7 @@ export function AllChannelsGenZ() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [, setLocation] = useLocation();
-  const { stats } = useChannelStats();
+  const { stats, loading, error } = useChannelStats();
 
   const channelStatsMap = useMemo(() => {
     return (stats || []).reduce((acc, curr) => {
@@ -150,7 +150,30 @@ export function AllChannelsGenZ() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8 md:px-8">
-        {filteredChannels.length > 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm text-muted-foreground">Loading topics...</p>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-card border border-destructive/20 rounded-md">
+            <div className="p-3 bg-destructive/10 rounded-full mb-4">
+              <Zap className="w-6 h-6 text-destructive" />
+            </div>
+            <h3 className="text-lg font-medium text-foreground">Failed to load topics</h3>
+            <p className="text-muted-foreground mt-1 text-center max-w-md">
+              {error.message || 'Something went wrong while loading the topics.'}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 text-sm font-medium bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors"
+            >
+              Try again
+            </button>
+          </div>
+        ) : filteredChannels.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredChannels.map((channel) => {
               const channelStat = channelStatsMap[channel.id] || { total: 0 };

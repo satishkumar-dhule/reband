@@ -265,14 +265,14 @@ export default function TestSessionGenZ() {
                     exit={{ opacity: 0, x: -20 }}
                   >
                     <div className="flex items-center gap-2 mb-3">
-                      <span className={`px-2 py-0.5 text-[10px] uppercase rounded ${
+                      <span className={`px-2 py-0.5 text-xs uppercase rounded ${
                         currentQuestion.type === 'multiple' 
                           ? 'bg-destructive/20 text-destructive' 
                           : 'bg-cyan-500/20 text-cyan-400'
                       }`}>
                         {currentQuestion.type === 'multiple' ? 'Select all that apply' : 'Single choice'}
                       </span>
-                      <span className={`px-2 py-0.5 text-[10px] uppercase rounded ${
+                      <span className={`px-2 py-0.5 text-xs uppercase rounded ${
                         currentQuestion.difficulty === 'beginner' ? 'bg-primary/20 text-primary' :
                         currentQuestion.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
                         'bg-destructive/20 text-destructive'
@@ -295,7 +295,7 @@ export default function TestSessionGenZ() {
                             key={option.id}
                             onClick={() => handleOptionSelect(option.id)}
                             disabled={showFeedback !== null}
-                            className={`w-full p-4 text-left border rounded-lg transition-all ${
+                            className={`w-full p-3 md:p-4 text-left border rounded-lg transition-all min-h-[44px] ${
                               showCorrect
                                 ? 'border-primary bg-primary/20'
                                 : showWrong
@@ -336,7 +336,7 @@ export default function TestSessionGenZ() {
               </div>
             </div>
 
-            <footer className="border-t border-border p-2">
+            <footer className="border-t border-border p-2 pb-safe">
               <div className="max-w-2xl mx-auto flex items-center justify-between gap-2">
                 <GenZButton
                   size="sm"

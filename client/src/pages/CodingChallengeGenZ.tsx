@@ -278,10 +278,26 @@ export default function CodingChallengeGenZ() {
           </header>
 
           {/* Main Content Area */}
-          <div className="flex-1 flex overflow-hidden">
-            {/* Left Pane - Problem Description */}
-            <div className="w-1/3 border-r bg-[var(--gh-canvas)] flex flex-col min-w-[300px]">
-              <ScrollArea className="flex-1 p-6">
+          <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+            {/* Mobile Tab Switcher */}
+            <div className="lg:hidden flex border-b bg-[var(--gh-canvas)]">
+              <button
+                onClick={() => setResultsExpanded(true)}
+                className={`flex-1 py-2 px-4 text-xs font-medium ${resultsExpanded ? 'bg-[var(--gh-canvas-subtle)] border-b-2 border-[var(--gh-accent-fg)]' : ''}`}
+              >
+                Description
+              </button>
+              <button
+                onClick={() => setResultsExpanded(false)}
+                className={`flex-1 py-2 px-4 text-xs font-medium ${!resultsExpanded ? 'bg-[var(--gh-canvas-subtle)] border-b-2 border-[var(--gh-accent-fg)]' : ''}`}
+              >
+                Code Editor
+              </button>
+            </div>
+
+            {/* Left Pane - Problem Description (full-width on mobile, 1/3 on desktop) */}
+            <div className={`lg:w-1/3 lg:border-r bg-[var(--gh-canvas)] flex flex-col ${resultsExpanded ? 'flex' : 'hidden lg:flex'} min-w-0`}>
+              <ScrollArea className="flex-1 p-4 lg:p-6">
                 <div className="prose prose-sm max-w-none">
                   <h2 className="text-lg font-bold text-[var(--gh-fg)] mb-4">Description</h2>
                   <p className="text-[var(--gh-fg-muted)] mb-6 whitespace-pre-wrap leading-relaxed">
@@ -350,8 +366,8 @@ export default function CodingChallengeGenZ() {
               </ScrollArea>
             </div>
 
-            {/* Right Pane - Editor & Results */}
-            <div className="flex-1 flex flex-col min-w-0 bg-[var(--gh-canvas)]">
+            {/* Right Pane - Editor & Results (full-width on mobile, flex-1 on desktop) */}
+            <div className={`flex-1 flex flex-col min-w-0 bg-[var(--gh-canvas)] ${!resultsExpanded ? 'flex' : 'hidden lg:flex'}`}>
               {/* Editor Toolbar */}
               <div className="h-10 border-b bg-[var(--gh-canvas-subtle)] flex items-center justify-between px-4 shrink-0">
                 <div className="flex items-center gap-2">

@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import {
   ArrowLeft, Eye, EyeOff, Volume2, Trophy, RotateCcw, 
   ChevronRight, Sparkles, BookOpen, Mic, Zap,
   Target, Clock, TrendingUp, Star, Crown, Lock, Play,
-  MessageSquare, Brain, BarChart3, Flame, Waves, AlertCircle, Info
+  MessageSquare, Brain, BarChart3, Flame, Waves, AlertCircle, Info, Home
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { AppLayout } from '../components/layout/AppLayout';
 import { useUserPreferences } from '../context/UserPreferencesContext';
-import { ChannelService } from '../services/api.service';
+import { getAllQuestions } from '../lib/questions-loader';
 import type { Question } from '../types';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 
 const isSpeechSupported = typeof window !== 'undefined' && 
   ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
@@ -87,7 +88,7 @@ export default function VoicePracticeGenZ() {
     const fetchQuestions = async () => {
       try {
         setIsLoading(true);
-        const allQuestions = await ChannelService.getAllQuestions();
+        const allQuestions = getAllQuestions();
         const filtered = allQuestions.filter(q => 
           preferences.subscribedChannels.includes(q.channel)
         );
@@ -230,9 +231,25 @@ export default function VoicePracticeGenZ() {
 
   return (
     <AppLayout>
-      <SEOHead title="Voice Practice | DevPrep" />
+      <SEOHead title="Voice Practice | DevPrep" description="Practice your technical communication skills" />
       
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8" id="main-content">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/" className="flex items-center gap-1">
+                <Home className="w-3.5 h-3.5" />
+                Home
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Voice Practice</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-[var(--gh-fg)]">Voice Interview Practice</h1>

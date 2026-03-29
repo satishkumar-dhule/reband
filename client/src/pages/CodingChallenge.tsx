@@ -394,6 +394,7 @@ export default function CodingChallenge() {
 
       const allPassed = results.every((r) => r.passed);
       if (allPassed) {
+        const calculatedTimeSpent = Math.floor((Date.now() - startTime) / 1000);
         saveChallengeAttempt({
           challengeId: currentChallenge.id,
           code,
@@ -402,6 +403,7 @@ export default function CodingChallenge() {
           completedAt: new Date().toISOString(),
           passed: true,
           testResults: results,
+          timeSpent: calculatedTimeSpent,
         });
         setShowSuccessModal(true);
         mascotEvents.celebrate(); // Mascot celebrates on success!

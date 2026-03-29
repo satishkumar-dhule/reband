@@ -100,7 +100,7 @@ export function SwipeableCard({
   return (
     <div 
       ref={containerRef}
-      className="relative overflow-hidden" 
+      className="relative overflow-hidden rounded-lg hover:ring-2 hover:ring-primary/30 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none transition-shadow" 
       role="group" 
       aria-label="Swipeable card"
       data-component="SwipeableCard"

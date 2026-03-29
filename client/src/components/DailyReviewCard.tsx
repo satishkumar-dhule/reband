@@ -76,7 +76,7 @@ export function DailyReviewCard() {
           </div>
           {stats.reviewStreak > 0 && (
             <motion.div 
-              className="flex items-center gap-1 text-orange-500"
+              className="flex items-center gap-1 text-orange-500 motion-reduce:animate-none"
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
             >

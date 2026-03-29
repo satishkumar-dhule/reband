@@ -1,6 +1,6 @@
 import { test, expect, APIRequestContext } from '@playwright/test';
 
-const BASE_URL = process.env.API_URL || 'http://localhost:5000';
+const BASE_URL = process.env.API_URL || 'http://localhost:5173';
 
 interface ApiResponse<T = any> {
   status: number;

@@ -19,6 +19,30 @@ import path from 'path';
 const db = dbClient;
 const OUTPUT_DIR = 'client/public/data';
 
+// Fixed seed for deterministic question selection
+const SEED = 'devprep-curated-paths-2024';
+
+// Seeded random number generator (Mulberry32)
+function seededRandom(seed) {
+  return function() {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// Fisher-Yates shuffle with seeded random
+function shuffleWithSeed(array, seed) {
+  const random = seededRandom(seed);
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 // Get all questions with their metadata
 async function getAllQuestions() {
   const result = await db.execute(`
@@ -83,11 +107,11 @@ function selectQuestions(questions, targetCount, difficultyMix) {
     advanced: questions.filter(q => q.difficulty === 'advanced'),
   };
 
-  // Select based on difficulty mix
+  // Select based on difficulty mix (using seeded shuffle for deterministic results)
   for (const [difficulty, percentage] of Object.entries(difficultyMix)) {
     const count = Math.floor(targetCount * percentage);
     const available = byDifficulty[difficulty] || [];
-    const shuffled = available.sort(() => Math.random() - 0.5);
+    const shuffled = shuffleWithSeed(available, SEED);
     selected.push(...shuffled.slice(0, count).map(q => q.id));
   }
 

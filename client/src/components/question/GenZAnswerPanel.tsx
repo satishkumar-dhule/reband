@@ -442,8 +442,8 @@ export function GenZAnswerPanel({ question, isCompleted }: { question: Question;
   const [blogPost, setBlogPost] = useState<{ title: string; slug: string; url: string } | null>(null);
   
   // Get current theme from context
-  const { theme } = useTheme();
-  const isLightMode = theme === 'clean-light';
+  const { isDark } = useTheme();
+  const isLightMode = !isDark;
 
   useEffect(() => {
     BlogService.getByQuestionId(question.id).then(setBlogPost);

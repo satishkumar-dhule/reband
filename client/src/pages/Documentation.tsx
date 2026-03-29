@@ -36,44 +36,44 @@ export default function Documentation() {
 
   return (
     <DesktopSidebarWrapper>
-    <div className="min-h-screen bg-[#0d1117] text-[#e6edf3]">
+    <div className="min-h-screen bg-var(--gh-canvas) text-var(--gh-fg)">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-[#30363d] bg-[#0d1117]/95 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-var(--gh-border) bg-var(--gh-canvas)/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2.5 hover:bg-[#21262d] rounded-lg transition-colors"
+              className="lg:hidden p-2.5 hover:bg-var(--gh-canvas-subtle) rounded-lg transition-colors"
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <Link href="/">
               <a className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#58a6ff] to-[#a371f7] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-var(--gh-58a6ff] to-var(--gh-a371f7] flex items-center justify-center">
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
                 <div className="hidden sm:block">
                   <div className="font-semibold text-white">Documentation</div>
-                  <div className="text-xs text-[#8b949e]">Reel-LearnHub</div>
+                  <div className="text-xs text-var(--gh-fg-muted)">Reel-LearnHub</div>
                 </div>
               </a>
             </Link>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[#21262d] rounded-lg border border-[#30363d]">
-              <Search className="w-4 h-4 text-[#8b949e]" />
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-var(--gh-canvas-subtle) rounded-lg border border-var(--gh-border)">
+              <Search className="w-4 h-4 text-var(--gh-fg-muted)" />
               <input
                 type="text"
                 placeholder="Search docs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent text-sm w-40 focus:w-56 transition-all outline-none placeholder:text-[#6e7681]"
+                className="bg-transparent text-sm w-40 focus:w-56 transition-all outline-none placeholder:text-var(--gh-fg-subtle)"
               />
-              <kbd className="text-[10px] text-[#6e7681] bg-[#161b22] px-1.5 py-0.5 rounded border border-[#30363d]">⌘K</kbd>
+              <kbd className="text-[10px] text-var(--gh-fg-subtle) bg-var(--gh-canvas-overlay) px-1.5 py-0.5 rounded border border-var(--gh-border)">⌘K</kbd>
             </div>
             <Link href="/">
-              <a className="flex items-center gap-2 px-3 py-1.5 text-sm text-[#8b949e] hover:text-white hover:bg-[#21262d] rounded-lg transition-colors">
+              <a className="flex items-center gap-2 px-3 py-1.5 text-sm text-var(--gh-fg-muted) hover:text-white hover:bg-var(--gh-canvas-subtle) rounded-lg transition-colors">
                 <Home className="w-4 h-4" />
                 <span className="hidden sm:inline">Back to App</span>
               </a>
@@ -85,13 +85,13 @@ export default function Documentation() {
       <div className="max-w-7xl mx-auto flex">
         {/* Sidebar */}
         <aside className={`
-          fixed lg:sticky top-16 left-0 z-40 h-[calc(100vh-4rem)] w-72 
-          bg-[#0d1117] lg:bg-transparent border-r border-[#30363d] lg:border-0
+          fixed lg:sticky top-16 left-0 z-40 h-[calc(100vh-4rem) w-72 
+          bg-var(--gh-canvas) lg:bg-transparent border-r border-var(--gh-border) lg:border-0
           transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
           <nav className="p-4 space-y-1 overflow-y-auto h-full">
-            <div className="text-xs font-semibold text-[#8b949e] uppercase tracking-wider px-3 mb-3">
+            <div className="text-xs font-semibold text-var(--gh-fg-muted) uppercase tracking-wider px-3 mb-3">
               Documentation
             </div>
             {sections.map((section) => {
@@ -104,36 +104,36 @@ export default function Documentation() {
                   className={`
                     w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all
                     ${isActive 
-                      ? 'bg-[#21262d] text-white' 
-                      : 'text-[#8b949e] hover:text-white hover:bg-[#161b22]'
+                      ? 'bg-var(--gh-canvas-subtle) text-white' 
+                      : 'text-var(--gh-fg-muted) hover:text-white hover:bg-var(--gh-canvas-overlay)'
                     }
                   `}
                 >
                   <div 
-                    className={`p-1.5 rounded-md transition-colors ${isActive ? 'bg-[#30363d]' : ''}`}
+                    className={`p-1.5 rounded-md transition-colors ${isActive ? 'bg-[var(--gh-border)]' : ''}`}
                     style={{ color: isActive ? section.color : undefined }}
                   >
                     <Icon className="w-4 h-4" />
                   </div>
                   <span className="text-sm font-medium">{section.title}</span>
-                  {isActive && <ChevronRight className="w-4 h-4 ml-auto text-[#6e7681]" />}
+                  {isActive && <ChevronRight className="w-4 h-4 ml-auto text-var(--gh-fg-subtle)" />}
                 </button>
               );
             })}
             
             {/* Quick Links */}
-            <div className="pt-6 mt-6 border-t border-[#21262d]">
-              <div className="text-xs font-semibold text-[#8b949e] uppercase tracking-wider px-3 mb-3">
+            <div className="pt-6 mt-6 border-t border-[var(--gh-border)]">
+              <div className="text-xs font-semibold text-var(--gh-fg-muted) uppercase tracking-wider px-3 mb-3">
                 Quick Links
               </div>
               <a href="https://github.com" target="_blank" rel="noopener" 
-                className="flex items-center gap-3 px-3 py-2 text-sm text-[#8b949e] hover:text-white rounded-lg hover:bg-[#161b22] transition-colors">
+                className="flex items-center gap-3 px-3 py-2 text-sm text-var(--gh-fg-muted) hover:text-white rounded-lg hover:bg-var(--gh-canvas-overlay) transition-colors">
                 <GitBranch className="w-4 h-4" />
                 <span>GitHub Repository</span>
                 <ExternalLink className="w-3 h-3 ml-auto" />
               </a>
               <a href="/whats-new"
-                className="flex items-center gap-3 px-3 py-2 text-sm text-[#8b949e] hover:text-white rounded-lg hover:bg-[#161b22] transition-colors">
+                className="flex items-center gap-3 px-3 py-2 text-sm text-var(--gh-fg-muted) hover:text-white rounded-lg hover:bg-var(--gh-canvas-overlay) transition-colors">
                 <Sparkles className="w-4 h-4" />
                 <span>What's New</span>
               </a>
@@ -182,7 +182,7 @@ function SectionHeader({ icon: Icon, title, description, color = '#58a6ff' }: {
           <h1 className="text-2xl lg:text-3xl font-bold text-white">{title}</h1>
         </div>
       </div>
-      <p className="text-lg text-[#8b949e] leading-relaxed">{description}</p>
+      <p className="text-lg text-var(--gh-fg-muted) leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -199,26 +199,26 @@ function CodeBlock({ code, language = 'typescript', title, copyable = true }: {
   };
 
   return (
-    <div className="rounded-xl overflow-hidden border border-[#30363d] my-6 group">
+    <div className="rounded-xl overflow-hidden border border-var(--gh-border) my-6 group">
       {title && (
-        <div className="bg-[#161b22] px-4 py-2.5 border-b border-[#30363d] flex items-center justify-between">
+        <div className="bg-var(--gh-canvas-overlay) px-4 py-2.5 border-b border-var(--gh-border) flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FileCode className="w-4 h-4 text-[#8b949e]" />
-            <span className="text-sm text-[#8b949e] font-mono">{title}</span>
+            <FileCode className="w-4 h-4 text-var(--gh-fg-muted)" />
+            <span className="text-sm text-var(--gh-fg-muted) font-mono">{title}</span>
           </div>
           {copyable && (
             <button 
               onClick={handleCopy}
-              className="p-1.5 hover:bg-[#30363d] rounded transition-colors"
+              className="p-1.5 hover:bg-var(--gh-30363d] rounded transition-colors"
               title="Copy code"
             >
-              {copied ? <Check className="w-4 h-4 text-[#3fb950]" /> : <Copy className="w-4 h-4 text-[#6e7681]" />}
+              {copied ? <Check className="w-4 h-4 text-var(--gh-success-fg)" /> : <Copy className="w-4 h-4 text-var(--gh-fg-subtle)" />}
             </button>
           )}
         </div>
       )}
-      <pre className="bg-[#0d1117] p-4 overflow-x-auto">
-        <code className={`language-${language} text-sm text-[#e6edf3] font-mono leading-relaxed`}>
+      <pre className="bg-var(--gh-canvas) p-4 overflow-x-auto">
+        <code className={`language-${language} text-sm text-var(--gh-fg) font-mono leading-relaxed`}>
           {code.trim()}
         </code>
       </pre>
@@ -230,23 +230,23 @@ function DiagramCard({ title, description, diagram }: { title: string; descripti
   const [expanded, setExpanded] = useState(true);
   
   return (
-    <div className="rounded-xl border border-[#30363d] bg-[#161b22]/50 overflow-hidden my-8">
+    <div className="rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/50 overflow-hidden my-8">
       <button 
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-[#21262d]/50 transition-colors"
+        className="w-full p-4 flex items-center justify-between hover:bg-var(--gh-canvas-subtle)/50 transition-colors"
       >
         <div className="text-left">
           <h3 className="font-semibold text-white flex items-center gap-2">
-            <Box className="w-4 h-4 text-[#58a6ff]" />
+            <Box className="w-4 h-4 text-var(--gh-accent-fg)" />
             {title}
           </h3>
-          <p className="text-sm text-[#8b949e] mt-1">{description}</p>
+          <p className="text-sm text-var(--gh-fg-muted) mt-1">{description}</p>
         </div>
-        <ChevronDown className={`w-5 h-5 text-[#6e7681] transition-transform ${expanded ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-5 h-5 text-var(--gh-fg-subtle) transition-transform ${expanded ? 'rotate-180' : ''}`} />
       </button>
       {expanded && (
-        <div className="p-4 pt-0 border-t border-[#30363d]/50">
-          <div className="bg-[#0d1117] rounded-lg p-4 overflow-x-auto">
+        <div className="p-4 pt-0 border-t border-var(--gh-border)/50">
+          <div className="bg-var(--gh-canvas) rounded-lg p-4 overflow-x-auto">
             <EnhancedMermaid chart={diagram} />
           </div>
         </div>
@@ -263,22 +263,22 @@ function FeatureCard({ icon: Icon, title, description, color = '#58a6ff' }: {
   icon: any; title: string; description: string; color?: string 
 }) {
   return (
-    <div className="p-4 rounded-xl border border-[#30363d] bg-[#161b22]/30 hover:bg-[#161b22] hover:border-[#58a6ff]/30 transition-all group">
+    <div className="p-4 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30 hover:bg-var(--gh-canvas-overlay) hover:border-var(--gh-58a6ff]/30 transition-all group">
       <div className="p-2 rounded-lg w-fit mb-3" style={{ backgroundColor: `${color}15` }}>
         <Icon className="w-5 h-5" style={{ color }} />
       </div>
-      <h4 className="font-semibold text-white mb-1 group-hover:text-[#58a6ff] transition-colors">{title}</h4>
-      <p className="text-sm text-[#8b949e] leading-relaxed">{description}</p>
+      <h4 className="font-semibold text-white mb-1 group-hover:text-var(--gh-accent-fg) transition-colors">{title}</h4>
+      <p className="text-sm text-var(--gh-fg-muted) leading-relaxed">{description}</p>
     </div>
   );
 }
 
 function InfoBox({ type = 'info', title, children }: { type?: 'info' | 'warning' | 'success' | 'tip'; title: string; children: React.ReactNode }) {
   const styles = {
-    info: { bg: 'bg-[#58a6ff]/10', border: 'border-[#58a6ff]/30', icon: '💡', color: 'text-[#58a6ff]' },
-    warning: { bg: 'bg-[#d29922]/10', border: 'border-[#d29922]/30', icon: '⚠️', color: 'text-[#d29922]' },
-    success: { bg: 'bg-[#3fb950]/10', border: 'border-[#3fb950]/30', icon: '✅', color: 'text-[#3fb950]' },
-    tip: { bg: 'bg-[#a371f7]/10', border: 'border-[#a371f7]/30', icon: '🎯', color: 'text-[#a371f7]' },
+    info: { bg: 'bg-[#58a6ff]/10', border: 'border-[var(--gh-accent-fg)]/30', icon: '💡', color: 'text-var(--gh-accent-fg)' },
+    warning: { bg: 'bg-var(--gh-attention-fg)/10', border: 'border-[var(--gh-attention-fg)]/30', icon: '⚠️', color: 'text-var(--gh-attention-fg)' },
+    success: { bg: 'bg-[#3fb950]/10', border: 'border-[var(--gh-success-fg)]/30', icon: '✅', color: 'text-var(--gh-success-fg)' },
+    tip: { bg: 'bg-[#a371f7]/10', border: 'border-[var(--gh-done-fg)]/30', icon: '🎯', color: 'text-var(--gh-done-fg)' },
   };
   const s = styles[type];
   
@@ -287,13 +287,13 @@ function InfoBox({ type = 'info', title, children }: { type?: 'info' | 'warning'
       <div className={`font-semibold ${s.color} mb-2 flex items-center gap-2`}>
         <span>{s.icon}</span> {title}
       </div>
-      <div className="text-sm text-[#8b949e] leading-relaxed">{children}</div>
+      <div className="text-sm text-var(--gh-fg-muted) leading-relaxed">{children}</div>
     </div>
   );
 }
 
 function SectionDivider() {
-  return <hr className="border-[#21262d] my-10" />;
+  return <hr className="border-[var(--gh-border)] my-10" />;
 }
 
 // ============== OVERVIEW SECTION ==============
@@ -314,8 +314,8 @@ graph TB
     end
     
     subgraph DB["Databases"]
-        Turso[(Turso SQLite)]
-        Qdrant[(Qdrant Vectors)]
+        Turso[(Turso SQLite)
+        Qdrant[(Qdrant Vectors)
     end
     
     subgraph AI["AI Pipeline - LangGraph"]
@@ -366,7 +366,7 @@ graph TB
       <SectionDivider />
       
       <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-        <Shield className="w-5 h-5 text-[#3fb950]" />
+        <Shield className="w-5 h-5 text-var(--gh-success-fg)" />
         Design Principles
       </h2>
       
@@ -497,28 +497,28 @@ graph TB
       <h2 className="text-xl font-semibold text-white mt-10 mb-4">Pipeline Nodes</h2>
       
       <div className="space-y-4">
-        <div className="p-4 rounded-xl border border-[#30363d] bg-[#161b22]/30">
+        <div className="p-4 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-[#1f6feb]/20 flex items-center justify-center text-[#58a6ff] font-mono text-sm">1</div>
+            <div className="w-8 h-8 rounded-lg bg-var(--gh-accent-emphasis)/20 flex items-center justify-center text-var(--gh-accent-fg) font-mono text-sm">1</div>
             <h4 className="font-semibold text-white">Find Real-World Case</h4>
           </div>
-          <p className="text-sm text-[#8b949e] ml-11">Searches for compelling case studies from major tech companies. Validates source URLs and scores relevance (minimum 6/10 to proceed).</p>
+          <p className="text-sm text-var(--gh-fg-muted) ml-11">Searches for compelling case studies from major tech companies. Validates source URLs and scores relevance (minimum 6/10 to proceed).</p>
         </div>
         
-        <div className="p-4 rounded-xl border border-[#30363d] bg-[#161b22]/30">
+        <div className="p-4 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-[#238636]/20 flex items-center justify-center text-[#3fb950] font-mono text-sm">2</div>
+            <div className="w-8 h-8 rounded-lg bg-var(--gh-success-emphasis)/20 flex items-center justify-center text-var(--gh-success-fg) font-mono text-sm">2</div>
             <h4 className="font-semibold text-white">Generate Blog Content</h4>
           </div>
-          <p className="text-sm text-[#8b949e] ml-11">Creates structured blog with introduction, sections, code examples, and conclusion. Uses RAG to find related questions for enrichment.</p>
+          <p className="text-sm text-var(--gh-fg-muted) ml-11">Creates structured blog with introduction, sections, code examples, and conclusion. Uses RAG to find related questions for enrichment.</p>
         </div>
         
-        <div className="p-4 rounded-xl border border-[#30363d] bg-[#161b22]/30">
+        <div className="p-4 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-[#a371f7]/20 flex items-center justify-center text-[#a371f7] font-mono text-sm">3</div>
+            <div className="w-8 h-8 rounded-lg bg-[#a371f7]/20 flex items-center justify-center text-var(--gh-done-fg) font-mono text-sm">3</div>
             <h4 className="font-semibold text-white">Generate Pixel Art</h4>
           </div>
-          <p className="text-sm text-[#8b949e] ml-11">Auto-detects scene type from content and generates 16-bit pixel art SVG illustrations with CSS animations.</p>
+          <p className="text-sm text-var(--gh-fg-muted) ml-11">Auto-detects scene type from content and generates 16-bit pixel art SVG illustrations with CSS animations.</p>
         </div>
       </div>
       
@@ -541,11 +541,11 @@ graph TB
           { name: 'improvement-graph.js', desc: 'Content improvement suggestions' },
           { name: 'linkedin-graph.js', desc: 'LinkedIn post generation' },
         ].map(g => (
-          <div key={g.name} className="flex items-center gap-3 p-3 rounded-lg border border-[#30363d] bg-[#161b22]/30">
-            <FileCode className="w-4 h-4 text-[#8b949e] shrink-0" />
+          <div key={g.name} className="flex items-center gap-3 p-3 rounded-lg border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
+            <FileCode className="w-4 h-4 text-var(--gh-fg-muted) shrink-0" />
             <div className="min-w-0">
-              <div className="font-mono text-sm text-[#58a6ff] truncate">{g.name}</div>
-              <div className="text-xs text-[#6e7681] truncate">{g.desc}</div>
+              <div className="font-mono text-sm text-var(--gh-accent-fg) truncate">{g.name}</div>
+              <div className="text-xs text-var(--gh-fg-subtle) truncate">{g.desc}</div>
             </div>
           </div>
         ))}
@@ -631,7 +631,7 @@ graph LR
     end
     
     subgraph Store["Qdrant"]
-        D[(Collection)]
+        D[(Collection)
         E[HNSW Index]
     end
     
@@ -657,29 +657,29 @@ graph LR
       />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="p-5 rounded-xl border border-[#30363d] bg-[#161b22]/30">
+        <div className="p-5 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
           <div className="flex items-center gap-3 mb-3">
             <Database className="w-6 h-6 text-[#00e5ff]" />
             <h3 className="font-semibold text-white">Turso (LibSQL)</h3>
           </div>
-          <ul className="text-sm text-[#8b949e] space-y-2">
-            <li className="flex items-start gap-2"><span className="text-[#3fb950]">•</span> Edge-ready SQLite with global replication</li>
-            <li className="flex items-start gap-2"><span className="text-[#3fb950]">•</span> Drizzle ORM for type-safe queries</li>
-            <li className="flex items-start gap-2"><span className="text-[#3fb950]">•</span> Automatic schema migrations</li>
-            <li className="flex items-start gap-2"><span className="text-[#3fb950]">•</span> Read replicas for performance</li>
+          <ul className="text-sm text-var(--gh-fg-muted) space-y-2">
+            <li className="flex items-start gap-2"><span className="text-var(--gh-success-fg)">•</span> Edge-ready SQLite with global replication</li>
+            <li className="flex items-start gap-2"><span className="text-var(--gh-success-fg)">•</span> Drizzle ORM for type-safe queries</li>
+            <li className="flex items-start gap-2"><span className="text-var(--gh-success-fg)">•</span> Automatic schema migrations</li>
+            <li className="flex items-start gap-2"><span className="text-var(--gh-success-fg)">•</span> Read replicas for performance</li>
           </ul>
         </div>
         
-        <div className="p-5 rounded-xl border border-[#30363d] bg-[#161b22]/30">
+        <div className="p-5 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
           <div className="flex items-center gap-3 mb-3">
-            <Cpu className="w-6 h-6 text-[#a371f7]" />
+            <Cpu className="w-6 h-6 text-var(--gh-done-fg)" />
             <h3 className="font-semibold text-white">Qdrant Vector DB</h3>
           </div>
-          <ul className="text-sm text-[#8b949e] space-y-2">
-            <li className="flex items-start gap-2"><span className="text-[#a371f7]">•</span> Semantic similarity search</li>
-            <li className="flex items-start gap-2"><span className="text-[#a371f7]">•</span> Duplicate detection (85% threshold)</li>
-            <li className="flex items-start gap-2"><span className="text-[#a371f7]">•</span> Related content discovery</li>
-            <li className="flex items-start gap-2"><span className="text-[#a371f7]">•</span> HNSW indexing for fast queries</li>
+          <ul className="text-sm text-var(--gh-fg-muted) space-y-2">
+            <li className="flex items-start gap-2"><span className="text-var(--gh-done-fg)">•</span> Semantic similarity search</li>
+            <li className="flex items-start gap-2"><span className="text-var(--gh-done-fg)">•</span> Duplicate detection (85% threshold)</li>
+            <li className="flex items-start gap-2"><span className="text-var(--gh-done-fg)">•</span> Related content discovery</li>
+            <li className="flex items-start gap-2"><span className="text-var(--gh-done-fg)">•</span> HNSW indexing for fast queries</li>
           </ul>
         </div>
       </div>
@@ -995,16 +995,16 @@ graph LR
       
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-8">
         {sceneTypes.map((scene) => (
-          <div key={scene.name} className="p-3 rounded-lg bg-[#161b22]/50 border border-[#30363d] hover:border-[#58a6ff]/50 transition-colors">
+          <div key={scene.name} className="p-3 rounded-lg bg-var(--gh-canvas-overlay)/50 border border-var(--gh-border) hover:border-var(--gh-58a6ff]/50 transition-colors">
             <div className="flex items-center gap-2 mb-1">
               <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: scene.color }} />
               <span className="font-medium text-white text-sm">{scene.name}</span>
             </div>
-            <p className="text-xs text-[#6e7681]">{scene.keywords}</p>
+            <p className="text-xs text-var(--gh-fg-subtle)">{scene.keywords}</p>
           </div>
         ))}
-        <div className="p-3 rounded-lg bg-[#21262d]/50 border border-dashed border-[#30363d] flex items-center justify-center">
-          <span className="text-xs text-[#6e7681]">+15 more scenes</span>
+        <div className="p-3 rounded-lg bg-var(--gh-canvas-subtle)/50 border border-dashed border-var(--gh-border) flex items-center justify-center">
+          <span className="text-xs text-var(--gh-fg-subtle)">+15 more scenes</span>
         </div>
       </div>
       
@@ -1013,22 +1013,22 @@ graph LR
       <h2 className="text-xl font-semibold text-white mb-4">Character System</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="p-4 rounded-xl border border-[#30363d] bg-[#161b22]/30">
+        <div className="p-4 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
           <h4 className="font-semibold text-white mb-2">Character Dimensions</h4>
-          <ul className="text-sm text-[#8b949e] space-y-1">
+          <ul className="text-sm text-var(--gh-fg-muted) space-y-1">
             <li>• Grid: 200×125 units (4px per unit)</li>
             <li>• Character: 12 units wide × 20 units tall</li>
             <li>• Minimum spacing: 30-40 units between characters</li>
             <li>• Floor position: y=100 (standing/sitting)</li>
           </ul>
         </div>
-        <div className="p-4 rounded-xl border border-[#30363d] bg-[#161b22]/30">
+        <div className="p-4 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
           <h4 className="font-semibold text-white mb-2">Poses Available</h4>
-          <ul className="text-sm text-[#8b949e] space-y-1">
-            <li>• <code className="text-[#58a6ff]">stand</code> - Default standing pose</li>
-            <li>• <code className="text-[#58a6ff]">sit</code> - Sitting at desk/chair</li>
-            <li>• <code className="text-[#58a6ff]">wave</code> - Waving hand</li>
-            <li>• <code className="text-[#58a6ff]">cheer</code> - Arms raised celebrating</li>
+          <ul className="text-sm text-var(--gh-fg-muted) space-y-1">
+            <li>• <code className="text-var(--gh-accent-fg)">stand</code> - Default standing pose</li>
+            <li>• <code className="text-var(--gh-accent-fg)">sit</code> - Sitting at desk/chair</li>
+            <li>• <code className="text-var(--gh-accent-fg)">wave</code> - Waving hand</li>
+            <li>• <code className="text-var(--gh-accent-fg)">cheer</code> - Arms raised celebrating</li>
           </ul>
         </div>
       </div>
@@ -1167,30 +1167,30 @@ sequenceDiagram
       
       <h2 className="text-xl font-semibold text-white mt-10 mb-4">Endpoints</h2>
       
-      <div className="rounded-xl border border-[#30363d] overflow-hidden">
+      <div className="rounded-xl border border-var(--gh-border) overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-[#161b22]">
+            <thead className="bg-var(--gh-canvas-overlay)">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-[#8b949e]">Method</th>
-                <th className="px-4 py-3 text-left font-medium text-[#8b949e]">Path</th>
-                <th className="px-4 py-3 text-left font-medium text-[#8b949e] hidden md:table-cell">Description</th>
+                <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted)">Method</th>
+                <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted)">Path</th>
+                <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted) hidden md:table-cell">Description</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#21262d]">
+            <tbody className="divide-y divide-var(--gh-border-muted)">
               {endpoints.map((ep, i) => (
-                <tr key={i} className="hover:bg-[#161b22]/50">
+                <tr key={i} className="hover:bg-var(--gh-canvas-overlay)/50">
                   <td className="px-4 py-3">
                     <span className={`px-2 py-1 rounded text-xs font-mono font-medium ${
-                      ep.method === 'GET' ? 'bg-[#238636]/20 text-[#3fb950]' :
-                      ep.method === 'POST' ? 'bg-[#1f6feb]/20 text-[#58a6ff]' :
-                      'bg-[#bf8700]/20 text-[#d29922]'
+                      ep.method === 'GET' ? 'bg-var(--gh-success-emphasis)/20 text-var(--gh-success-fg)' :
+                      ep.method === 'POST' ? 'bg-var(--gh-accent-emphasis)/20 text-var(--gh-accent-fg)' :
+                      'bg-var(--gh-attention-emphasis)/20 text-var(--gh-attention-fg)'
                     }`}>
                       {ep.method}
                     </span>
                   </td>
-                  <td className="px-4 py-3 font-mono text-[#e6edf3]">{ep.path}</td>
-                  <td className="px-4 py-3 text-[#8b949e] hidden md:table-cell">{ep.desc}</td>
+                  <td className="px-4 py-3 font-mono text-var(--gh-fg)">{ep.path}</td>
+                  <td className="px-4 py-3 text-var(--gh-fg-muted) hidden md:table-cell">{ep.desc}</td>
                 </tr>
               ))}
             </tbody>
@@ -1316,26 +1316,26 @@ graph LR
       
       <h2 className="text-xl font-semibold text-white mt-10 mb-4">Environment Variables</h2>
       
-      <div className="rounded-xl border border-[#30363d] overflow-hidden">
+      <div className="rounded-xl border border-var(--gh-border) overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-[#161b22]">
+            <thead className="bg-var(--gh-canvas-overlay)">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-[#8b949e]">Variable</th>
-                <th className="px-4 py-3 text-left font-medium text-[#8b949e] hidden sm:table-cell">Description</th>
-                <th className="px-4 py-3 text-left font-medium text-[#8b949e]">Required</th>
+                <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted)">Variable</th>
+                <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted) hidden sm:table-cell">Description</th>
+                <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted)">Required</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#21262d]">
+            <tbody className="divide-y divide-var(--gh-border-muted)">
               {envVars.map((env, i) => (
-                <tr key={i} className="hover:bg-[#161b22]/50">
-                  <td className="px-4 py-3 font-mono text-[#58a6ff] text-xs">{env.name}</td>
-                  <td className="px-4 py-3 text-[#8b949e] hidden sm:table-cell">{env.desc}</td>
+                <tr key={i} className="hover:bg-var(--gh-canvas-overlay)/50">
+                  <td className="px-4 py-3 font-mono text-var(--gh-accent-fg) text-xs">{env.name}</td>
+                  <td className="px-4 py-3 text-var(--gh-fg-muted) hidden sm:table-cell">{env.desc}</td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-1 rounded text-xs ${
                       env.required 
-                        ? 'bg-[#da3633]/20 text-[#f85149]' 
-                        : 'bg-[#30363d] text-[#8b949e]'
+                        ? 'bg-var(--gh-danger-emphasis)/20 text-var(--gh-danger-fg)' 
+                        : 'bg-var(--gh-border) text-var(--gh-fg-muted)'
                     }`}>
                       {env.required ? 'Required' : 'Optional'}
                     </span>
@@ -1352,9 +1352,9 @@ graph LR
       <h2 className="text-xl font-semibold text-white mb-4">Quick Start</h2>
       
       <div className="space-y-4">
-        <div className="p-4 rounded-xl border border-[#30363d] bg-[#161b22]/30">
+        <div className="p-4 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-[#3fb950]/20 flex items-center justify-center text-[#3fb950] font-mono text-sm">1</div>
+            <div className="w-8 h-8 rounded-lg bg-var(--gh-success-fg)/20 flex items-center justify-center text-var(--gh-success-fg) font-mono text-sm">1</div>
             <h4 className="font-semibold text-white">Clone & Install</h4>
           </div>
           <CodeBlock
@@ -1366,9 +1366,9 @@ pnpm install`}
           />
         </div>
         
-        <div className="p-4 rounded-xl border border-[#30363d] bg-[#161b22]/30">
+        <div className="p-4 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-[#3fb950]/20 flex items-center justify-center text-[#3fb950] font-mono text-sm">2</div>
+            <div className="w-8 h-8 rounded-lg bg-var(--gh-success-fg)/20 flex items-center justify-center text-var(--gh-success-fg) font-mono text-sm">2</div>
             <h4 className="font-semibold text-white">Configure Environment</h4>
           </div>
           <CodeBlock
@@ -1379,9 +1379,9 @@ pnpm install`}
           />
         </div>
         
-        <div className="p-4 rounded-xl border border-[#30363d] bg-[#161b22]/30">
+        <div className="p-4 rounded-xl border border-var(--gh-border) bg-var(--gh-canvas-overlay)/30">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-[#3fb950]/20 flex items-center justify-center text-[#3fb950] font-mono text-sm">3</div>
+            <div className="w-8 h-8 rounded-lg bg-var(--gh-success-fg)/20 flex items-center justify-center text-var(--gh-success-fg) font-mono text-sm">3</div>
             <h4 className="font-semibold text-white">Start Development</h4>
           </div>
           <CodeBlock

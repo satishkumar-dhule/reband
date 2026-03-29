@@ -574,22 +574,22 @@ export default function VoiceInterview() {
                           <button
                             onClick={skipQuestion}
                             disabled={currentIndex >= questions.length - 1}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors disabled:opacity-30"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors disabled:opacity-30"
                           >
                             <SkipForward className="w-4 h-4" />
                             Skip Question
                           </button>
                           <button
                             onClick={shuffleQuestions}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors"
                           >
                             <Shuffle className="w-4 h-4" />
                             Shuffle All
                           </button>
-                          <div className="border-t border-[#30363d] my-1" />
+                          <div className="border-t border-[var(--gh-border)] my-1" />
                           <button
                             onClick={goToOriginalQuestion}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[#8b949e] hover:text-white hover:bg-[#21262d] transition-colors"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors"
                           >
                             <ExternalLink className="w-4 h-4" />
                             View Full Question
@@ -603,7 +603,7 @@ export default function VoiceInterview() {
                 <div className="flex items-center gap-3">
                   <ListenButton text={currentQuestion?.question || ''} label="Listen" size="sm" />
                   {currentQuestion?.voiceKeywords && currentQuestion.voiceKeywords.length > 0 && (
-                    <span className="text-xs text-[#6e7681]">
+                    <span className="text-xs text-[var(--gh-fg-subtle)]">
                       {currentQuestion.voiceKeywords.length} key terms
                     </span>
                   )}
@@ -612,7 +612,7 @@ export default function VoiceInterview() {
             </div>
             
             {error && (
-              <div className="mx-6 mb-6 p-4 bg-[#f85149]/10 border border-[#f85149]/30 rounded-xl text-[#f85149] text-sm">
+              <div className="mx-6 mb-6 p-4 bg-[var(--gh-danger-fg)]/10 border border-[var(--gh-danger-fg)]/30 rounded-xl text-[var(--gh-danger-fg)] text-sm">
                 {error}
               </div>
             )}
@@ -627,42 +627,42 @@ export default function VoiceInterview() {
                 exit={{ opacity: 0, x: 20 }}
                 className="mb-6 flex items-start gap-3"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#a371f7] to-[#f778ba] flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--gh-done-fg)] to-[var(--gh-pink-emphasis)] flex items-center justify-center flex-shrink-0">
                   <User className="w-5 h-5 text-white" />
                 </div>
-                <div className="flex-1 p-4 bg-[#21262d] border border-[#30363d] rounded-2xl rounded-tl-none">
-                  <p className="text-sm italic text-[#8b949e]">"{interviewerComment}"</p>
-                  <p className="text-[10px] text-[#6e7681] mt-2">— Your Interviewer</p>
+                <div className="flex-1 p-4 bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-2xl rounded-tl-none">
+                  <p className="text-sm italic text-[var(--gh-fg-muted)]">"{interviewerComment}"</p>
+                  <p className="text-[10px] text-[var(--gh-fg-subtle)] mt-2">— Your Interviewer</p>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* Recording Interface */}
-          <div className="rounded-2xl border border-[#30363d] bg-[#161b22] p-6 mb-6 w-full overflow-hidden" style={{ maxWidth: '100%' }}>
+          <div className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)] p-6 mb-6 w-full overflow-hidden" style={{ maxWidth: '100%' }}>
             {/* Recording Status */}
             <div className="flex items-center justify-center gap-4 mb-6">
               {state === 'recording' && (
-                <div className="flex items-center gap-3 px-4 py-2 bg-[#f85149]/10 border border-[#f85149]/30 rounded-full">
-                  <span className="w-3 h-3 bg-[#f85149] rounded-full animate-pulse" />
-                  <span className="text-sm text-[#f85149]">Recording</span>
+                <div className="flex items-center gap-3 px-4 py-2 bg-[var(--gh-danger-fg)]/10 border border-[var(--gh-danger-fg)]/30 rounded-full">
+                  <span className="w-3 h-3 bg-[var(--gh-danger-fg)] rounded-full animate-pulse" />
+                  <span className="text-sm text-[var(--gh-danger-fg)]">Recording</span>
                   {!transcript && !interimTranscript && (
-                    <span className="text-xs text-[#6e7681]">(Listening...)</span>
+                    <span className="text-xs text-[var(--gh-fg-subtle)]">(Listening...)</span>
                   )}
                 </div>
               )}
               
               {state === 'editing' && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-[#d29922]/10 border border-[#d29922]/30 rounded-full">
-                  <Edit3 className="w-4 h-4 text-[#d29922]" />
-                  <span className="text-sm text-[#d29922]">Edit your answer, then submit</span>
+                <div className="flex items-center gap-2 px-4 py-2 bg-[var(--gh-attention-fg)]/10 border border-[var(--gh-attention-fg)]/30 rounded-full">
+                  <Edit3 className="w-4 h-4 text-[var(--gh-attention-fg)]" />
+                  <span className="text-sm text-[var(--gh-attention-fg)]">Edit your answer, then submit</span>
                 </div>
               )}
               
               {state === 'processing' && (
-                <div className="flex items-center gap-3 px-4 py-2 bg-[#58a6ff]/10 border border-[#58a6ff]/30 rounded-full">
-                  <Loader2 className="w-4 h-4 animate-spin text-[#58a6ff]" />
-                  <span className="text-sm text-[#58a6ff]">Analyzing your answer...</span>
+                <div className="flex items-center gap-3 px-4 py-2 bg-[var(--gh-accent-fg)]/10 border border-[var(--gh-accent-fg)]/30 rounded-full">
+                  <Loader2 className="w-4 h-4 animate-spin text-[var(--gh-accent-fg)]" />
+                  <span className="text-sm text-[var(--gh-accent-fg)]">Analyzing your answer...</span>
                 </div>
               )}
             </div>
@@ -674,19 +674,19 @@ export default function VoiceInterview() {
                   <textarea
                     value={transcript}
                     onChange={(e) => setTranscript(e.target.value)}
-                    className="w-full p-4 bg-[#0d1117] border border-[#d29922]/30 rounded-xl min-h-[150px] max-h-[300px] text-sm text-[#e6edf3] resize-y focus:outline-none focus:ring-2 focus:ring-[#d29922]/50 focus:border-[#d29922]"
+                    className="w-full p-4 bg-[var(--gh-canvas)] border border-[var(--gh-attention-fg)]/30 rounded-xl min-h-[150px] max-h-[300px] text-sm text-[var(--gh-fg)] resize-y focus:outline-none focus:ring-2 focus:ring-[var(--gh-attention-fg)]/50 focus:border-[var(--gh-attention-fg)]"
                     placeholder="Edit your transcribed answer here..."
                   />
                 ) : (
-                  <div className="p-4 bg-[#0d1117] rounded-xl min-h-[120px] max-h-[200px] overflow-y-auto border border-[#30363d]">
+                  <div className="p-4 bg-[var(--gh-canvas)] rounded-xl min-h-[120px] max-h-[200px] overflow-y-auto border border-[var(--gh-border)]">
                     {transcript || interimTranscript ? (
-                      <p className="text-sm text-[#e6edf3] whitespace-pre-wrap leading-relaxed">
+                      <p className="text-sm text-[var(--gh-fg)] whitespace-pre-wrap leading-relaxed">
                         {transcript}
-                        <span className="text-[#6e7681]">{interimTranscript}</span>
-                        {state === 'recording' && <span className="animate-pulse text-[#58a6ff]">|</span>}
+                        <span className="text-[var(--gh-fg-subtle)]">{interimTranscript}</span>
+                        {state === 'recording' && <span className="animate-pulse text-[var(--gh-accent-fg)]">|</span>}
                       </p>
                     ) : (
-                      <p className="text-sm text-[#6e7681] italic">
+                      <p className="text-sm text-[var(--gh-fg-subtle)] italic">
                         {state === 'recording' 
                           ? 'Start speaking... Your words will appear here.'
                           : 'No transcript yet'}
@@ -695,8 +695,8 @@ export default function VoiceInterview() {
                   </div>
                 )}
                 {state === 'editing' && (
-                  <p className="text-xs text-[#6e7681] mt-2 flex items-center gap-1.5">
-                    <Lightbulb className="w-3.5 h-3.5 text-[#d29922]" />
+                  <p className="text-xs text-[var(--gh-fg-subtle)] mt-2 flex items-center gap-1.5">
+                    <Lightbulb className="w-3.5 h-3.5 text-[var(--gh-attention-fg)]" />
                     Fix any transcription errors before submitting
                   </p>
                 )}
@@ -708,7 +708,7 @@ export default function VoiceInterview() {
               {state === 'ready' && (
                 <button
                   onClick={startRecording}
-                  className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#f85149] to-[#ff7b72] text-white font-semibold rounded-2xl hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#f85149]/20"
+                  className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[var(--gh-danger-fg)] to-[var(--gh-danger-hover)] text-white font-semibold rounded-2xl hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[var(--gh-danger-fg)]/20"
                 >
                   <Mic className="w-5 h-5" />
                   Start Recording
@@ -718,7 +718,7 @@ export default function VoiceInterview() {
               {state === 'recording' && (
                 <button
                   onClick={stopRecording}
-                  className="flex items-center gap-3 px-8 py-4 bg-[#f85149] text-white font-semibold rounded-2xl hover:bg-[#da3633] transition-all"
+                  className="flex items-center gap-3 px-8 py-4 bg-[var(--gh-danger-fg)] text-white font-semibold rounded-2xl hover:bg-[var(--gh-danger-emphasis)] transition-all"
                 >
                   <Square className="w-5 h-5" />
                   Stop Recording
@@ -729,7 +729,7 @@ export default function VoiceInterview() {
                 <div className="flex gap-3">
                   <button
                     onClick={retryQuestion}
-                    className="flex items-center gap-2 px-5 py-3 border border-[#30363d] text-[#8b949e] hover:text-white hover:border-[#8b949e] rounded-xl transition-colors"
+                    className="flex items-center gap-2 px-5 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-white hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
                     Re-record
@@ -737,7 +737,7 @@ export default function VoiceInterview() {
                   <button
                     onClick={submitAnswer}
                     disabled={!transcript.trim()}
-                    className="flex items-center gap-3 px-8 py-3 bg-[#238636] text-white font-semibold rounded-xl hover:bg-[#2ea043] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-3 px-8 py-3 bg-[var(--gh-success-emphasis)] text-white font-semibold rounded-xl hover:bg-[var(--gh-success-hover)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <CheckCircle className="w-5 h-5" />
                     Submit Answer
@@ -749,7 +749,7 @@ export default function VoiceInterview() {
                 <div className="flex gap-3">
                   <button
                     onClick={retryQuestion}
-                    className="flex items-center gap-2 px-5 py-3 border border-[#30363d] text-[#8b949e] hover:text-white hover:border-[#8b949e] rounded-xl transition-colors"
+                    className="flex items-center gap-2 px-5 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-white hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
                     Try Again
@@ -757,7 +757,7 @@ export default function VoiceInterview() {
                   {currentIndex < questions.length - 1 && (
                     <button
                       onClick={nextQuestion}
-                      className="flex items-center gap-2 px-6 py-3 bg-[#238636] text-white font-semibold rounded-xl hover:bg-[#2ea043] transition-colors"
+                      className="flex items-center gap-2 px-6 py-3 bg-[var(--gh-success-emphasis)] text-white font-semibold rounded-xl hover:bg-[var(--gh-success-hover)] transition-colors"
                     >
                       Next Question
                       <ChevronRight className="w-4 h-4" />
@@ -782,22 +782,22 @@ export default function VoiceInterview() {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="p-4 bg-gradient-to-r from-[#d29922]/20 to-[#f1c40f]/20 border border-[#d29922]/30 rounded-2xl flex items-center justify-between"
+                    className="p-4 bg-gradient-to-r from-[var(--gh-attention-fg)]/20 to-[var(--gh-attention-fg)]/20 border border-[var(--gh-attention-fg)]/30 rounded-2xl flex items-center justify-between"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-[#d29922]/20 flex items-center justify-center">
-                        <Coins className="w-6 h-6 text-[#d29922]" />
+                      <div className="w-12 h-12 rounded-xl bg-[var(--gh-attention-fg)]/20 flex items-center justify-center">
+                        <Coins className="w-6 h-6 text-[var(--gh-attention-fg)]" />
                       </div>
                       <div>
-                        <div className="font-bold text-[#d29922] text-lg">+{earnedCredits.total} Credits Earned!</div>
-                        <div className="text-xs text-[#8b949e]">
+                        <div className="font-bold text-[var(--gh-attention-fg)] text-lg">+{earnedCredits.total} Credits Earned!</div>
+                        <div className="text-xs text-[var(--gh-fg-muted)]">
                           {earnedCredits.bonus > 0 
                             ? `${config.VOICE_ATTEMPT} base + ${earnedCredits.bonus} success bonus`
                             : 'Thanks for practicing!'}
                         </div>
                       </div>
                     </div>
-                    <Award className="w-8 h-8 text-[#d29922]/50" />
+                    <Award className="w-8 h-8 text-[var(--gh-attention-fg)]/50" />
                   </motion.div>
                 )}
 
@@ -810,17 +810,17 @@ export default function VoiceInterview() {
                       </div>
                       <div>
                         <h3 className="font-bold text-xl text-white">{getVerdictLabel(evaluation.verdict)}</h3>
-                        <p className="text-sm text-[#8b949e]">Interview Assessment</p>
+                        <p className="text-sm text-[var(--gh-fg-muted)]">Interview Assessment</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-4xl font-bold text-white">{evaluation.score}%</div>
-                      <div className="text-xs text-[#6e7681]">Overall Score</div>
+                      <div className="text-xs text-[var(--gh-fg-subtle)]">Overall Score</div>
                     </div>
                   </div>
                   
                   {/* Score Bar */}
-                  <div className="h-2 bg-[#21262d] rounded-full overflow-hidden mb-4">
+                  <div className="h-2 bg-[var(--gh-canvas-subtle)] rounded-full overflow-hidden mb-4">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${evaluation.score}%` }}
@@ -829,14 +829,14 @@ export default function VoiceInterview() {
                     />
                   </div>
                   
-                  <p className="text-sm text-[#8b949e] leading-relaxed">{evaluation.feedback}</p>
+                  <p className="text-sm text-[var(--gh-fg-muted)] leading-relaxed">{evaluation.feedback}</p>
                 </div>
 
                 {/* Multi-Dimensional Scores */}
                 {evaluation.scores && (
-                  <div className="p-6 rounded-2xl border border-[#30363d] bg-[#161b22]">
+                  <div className="p-6 rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]">
                     <h4 className="font-semibold text-white flex items-center gap-2 mb-5">
-                      <BarChart3 className="w-5 h-5 text-[#58a6ff]" />
+                      <BarChart3 className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                       Detailed Analysis
                     </h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -868,22 +868,22 @@ export default function VoiceInterview() {
                     
                     {/* Structure Analysis */}
                     {evaluation.structureAnalysis && (
-                      <div className="mt-5 pt-5 border-t border-[#30363d]">
+                      <div className="mt-5 pt-5 border-t border-[var(--gh-border)]">
                         <div className="flex flex-wrap gap-2">
                           {evaluation.structureAnalysis.hasIntroduction && (
-                            <span className="px-3 py-1.5 text-xs bg-[#238636]/20 text-[#3fb950] rounded-lg font-medium">✓ Introduction</span>
+                            <span className="px-3 py-1.5 text-xs bg-[var(--gh-success-emphasis)]/20 text-[var(--gh-success-fg)] rounded-lg font-medium">✓ Introduction</span>
                           )}
                           {evaluation.structureAnalysis.hasExamples && (
-                            <span className="px-3 py-1.5 text-xs bg-[#238636]/20 text-[#3fb950] rounded-lg font-medium">✓ Examples</span>
+                            <span className="px-3 py-1.5 text-xs bg-[var(--gh-success-emphasis)]/20 text-[var(--gh-success-fg)] rounded-lg font-medium">✓ Examples</span>
                           )}
                           {evaluation.structureAnalysis.hasConclusion && (
-                            <span className="px-3 py-1.5 text-xs bg-[#238636]/20 text-[#3fb950] rounded-lg font-medium">✓ Conclusion</span>
+                            <span className="px-3 py-1.5 text-xs bg-[var(--gh-success-emphasis)]/20 text-[var(--gh-success-fg)] rounded-lg font-medium">✓ Conclusion</span>
                           )}
                           {evaluation.structureAnalysis.usesSTAR && (
-                            <span className="px-3 py-1.5 text-xs bg-[#a371f7]/20 text-[#a371f7] rounded-lg font-medium">⭐ STAR Method</span>
+                            <span className="px-3 py-1.5 text-xs bg-[var(--gh-done-fg)]/20 text-[var(--gh-done-fg)] rounded-lg font-medium">⭐ STAR Method</span>
                           )}
                           {evaluation.fluencyMetrics && evaluation.fluencyMetrics.fillerWordCount > 3 && (
-                            <span className="px-3 py-1.5 text-xs bg-[#d29922]/20 text-[#d29922] rounded-lg font-medium">
+                            <span className="px-3 py-1.5 text-xs bg-[var(--gh-attention-fg)]/20 text-[var(--gh-attention-fg)] rounded-lg font-medium">
                               ⚠ {evaluation.fluencyMetrics.fillerWordCount} filler words
                             </span>
                           )}
@@ -896,15 +896,15 @@ export default function VoiceInterview() {
                 {/* Key Points */}
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Covered Points */}
-                  <div className="p-5 rounded-2xl bg-[#238636]/10 border border-[#238636]/30">
-                    <h4 className="font-semibold text-[#3fb950] flex items-center gap-2 mb-4">
+                  <div className="p-5 rounded-2xl bg-[var(--gh-success-emphasis)]/10 border border-[var(--gh-success-emphasis)]/30">
+                    <h4 className="font-semibold text-[var(--gh-success-fg)] flex items-center gap-2 mb-4">
                       <CheckCircle className="w-5 h-5" />
                       Concepts Covered ({evaluation.keyPointsCovered.length})
                     </h4>
                     <ul className="space-y-2">
                       {evaluation.keyPointsCovered.map((point, i) => (
-                        <li key={i} className="text-sm flex items-start gap-2 text-[#8b949e]">
-                          <span className="text-[#3fb950] mt-0.5">✓</span>
+                        <li key={i} className="text-sm flex items-start gap-2 text-[var(--gh-fg-muted)]">
+                          <span className="text-[var(--gh-success-fg)] mt-0.5">✓</span>
                           <span>
                             {typeof point === 'object' && 'concept' in point 
                               ? `${point.concept}${point.confidence !== 'exact' ? ` (as "${point.matchedAs}")` : ''}`
@@ -913,26 +913,26 @@ export default function VoiceInterview() {
                         </li>
                       ))}
                       {evaluation.keyPointsCovered.length === 0 && (
-                        <li className="text-sm text-[#6e7681]">No key concepts identified</li>
+                        <li className="text-sm text-[var(--gh-fg-subtle)]">No key concepts identified</li>
                       )}
                     </ul>
                   </div>
 
                   {/* Missed Points */}
-                  <div className="p-5 rounded-2xl bg-[#f85149]/10 border border-[#f85149]/30">
-                    <h4 className="font-semibold text-[#f85149] flex items-center gap-2 mb-4">
+                  <div className="p-5 rounded-2xl bg-[var(--gh-danger-fg)]/10 border border-[var(--gh-danger-fg)]/30">
+                    <h4 className="font-semibold text-[var(--gh-danger-fg)] flex items-center gap-2 mb-4">
                       <XCircle className="w-5 h-5" />
                       Concepts to Include ({evaluation.keyPointsMissed.length})
                     </h4>
                     <ul className="space-y-2">
                       {evaluation.keyPointsMissed.map((point, i) => (
-                        <li key={i} className="text-sm flex items-start gap-2 text-[#8b949e]">
-                          <span className="text-[#f85149] mt-0.5">✗</span>
+                        <li key={i} className="text-sm flex items-start gap-2 text-[var(--gh-fg-muted)]">
+                          <span className="text-[var(--gh-danger-fg)] mt-0.5">✗</span>
                           <span>{point}</span>
                         </li>
                       ))}
                       {evaluation.keyPointsMissed.length === 0 && (
-                        <li className="text-sm text-[#6e7681]">Great job covering all concepts!</li>
+                        <li className="text-sm text-[var(--gh-fg-subtle)]">Great job covering all concepts!</li>
                       )}
                     </ul>
                   </div>
@@ -940,30 +940,30 @@ export default function VoiceInterview() {
 
                 {/* Strengths & Improvements */}
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="p-5 rounded-2xl border border-[#30363d] bg-[#161b22]">
+                  <div className="p-5 rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]">
                     <h4 className="font-semibold text-white flex items-center gap-2 mb-4">
-                      <Sparkles className="w-5 h-5 text-[#f1c40f]" />
+                      <Sparkles className="w-5 h-5 text-[var(--gh-attention-fg)]" />
                       Strengths
                     </h4>
                     <ul className="space-y-2">
                       {evaluation.strengths.map((s, i) => (
-                        <li key={i} className="text-sm text-[#8b949e] flex items-start gap-2">
-                          <Zap className="w-4 h-4 text-[#f1c40f] flex-shrink-0 mt-0.5" />
+                        <li key={i} className="text-sm text-[var(--gh-fg-muted)] flex items-start gap-2">
+                          <Zap className="w-4 h-4 text-[var(--gh-attention-fg)] flex-shrink-0 mt-0.5" />
                           {s}
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="p-5 rounded-2xl border border-[#30363d] bg-[#161b22]">
+                  <div className="p-5 rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]">
                     <h4 className="font-semibold text-white flex items-center gap-2 mb-4">
-                      <Target className="w-5 h-5 text-[#58a6ff]" />
+                      <Target className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                       Areas to Improve
                     </h4>
                     <ul className="space-y-2">
                       {evaluation.improvements.map((s, i) => (
-                        <li key={i} className="text-sm text-[#8b949e] flex items-start gap-2">
-                          <ChevronRight className="w-4 h-4 text-[#58a6ff] flex-shrink-0 mt-0.5" />
+                        <li key={i} className="text-sm text-[var(--gh-fg-muted)] flex items-start gap-2">
+                          <ChevronRight className="w-4 h-4 text-[var(--gh-accent-fg)] flex-shrink-0 mt-0.5" />
                           {s}
                         </li>
                       ))}
@@ -973,17 +973,17 @@ export default function VoiceInterview() {
 
                 {/* Ideal Answer Reference - Only show after answer is revealed */}
                 {showAnswer && (
-                  <details className="p-5 rounded-2xl border border-[#30363d] bg-[#161b22] group">
+                  <details className="p-5 rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)] group">
                     <summary className="cursor-pointer font-semibold text-white flex items-center gap-2 list-none">
-                      <Volume2 className="w-5 h-5 text-[#a371f7]" />
+                      <Volume2 className="w-5 h-5 text-[var(--gh-done-fg)]" />
                       View Ideal Answer
-                      <ChevronRight className="w-4 h-4 text-[#6e7681] ml-auto transition-transform group-open:rotate-90" />
+                      <ChevronRight className="w-4 h-4 text-[var(--gh-fg-subtle)] ml-auto transition-transform group-open:rotate-90" />
                     </summary>
-                    <div className="mt-4 pt-4 border-t border-[#30363d] space-y-3">
+                    <div className="mt-4 pt-4 border-t border-[var(--gh-border)] space-y-3">
                       <div className="flex justify-end">
                         <ListenButton text={currentQuestion?.answer || ''} label="Listen to Answer" size="sm" />
                       </div>
-                      <div className="text-sm text-[#8b949e] whitespace-pre-wrap leading-relaxed bg-[#0d1117] p-4 rounded-xl">
+                      <div className="text-sm text-[var(--gh-fg-muted)] whitespace-pre-wrap leading-relaxed bg-[var(--gh-canvas)] p-4 rounded-xl">
                         {currentQuestion?.answer}
                       </div>
                     </div>
@@ -1004,27 +1004,27 @@ function ScoreDimension({ label, score, icon, description }: {
   label: string; score: number; icon: React.ReactNode; description: string;
 }) {
   const getColor = (s: number) => {
-    if (s >= 70) return 'text-[#3fb950]';
-    if (s >= 50) return 'text-[#d29922]';
-    if (s >= 30) return 'text-[#f0883e]';
-    return 'text-[#f85149]';
+    if (s >= 70) return 'text-[var(--gh-success-fg)]';
+    if (s >= 50) return 'text-[var(--gh-attention-fg)]';
+    if (s >= 30) return 'text-[var(--gh-attention-fg)]';
+    return 'text-[var(--gh-danger-fg)]';
   };
   
   const getBgColor = (s: number) => {
-    if (s >= 70) return 'bg-[#238636]';
-    if (s >= 50) return 'bg-[#d29922]';
-    if (s >= 30) return 'bg-[#f0883e]';
-    return 'bg-[#f85149]';
+    if (s >= 70) return 'bg-[var(--gh-success-emphasis)]';
+    if (s >= 50) return 'bg-[var(--gh-attention-fg)]';
+    if (s >= 30) return 'bg-[var(--gh-attention-fg)]';
+    return 'bg-[var(--gh-danger-fg)]';
   };
   
   return (
-    <div className="text-center p-4 rounded-xl bg-[#0d1117] border border-[#30363d]">
+    <div className="text-center p-4 rounded-xl bg-[var(--gh-canvas)] border border-[var(--gh-border)]">
       <div className={`flex items-center justify-center gap-1.5 mb-2 ${getColor(score)}`}>
         {icon}
         <span className="text-xs font-medium">{label}</span>
       </div>
       <div className="text-2xl font-bold text-white">{score}%</div>
-      <div className="h-1.5 bg-[#21262d] rounded-full overflow-hidden mt-2">
+      <div className="h-1.5 bg-[var(--gh-canvas-subtle)] rounded-full overflow-hidden mt-2">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${score}%` }}
@@ -1032,7 +1032,7 @@ function ScoreDimension({ label, score, icon, description }: {
           className={`h-full ${getBgColor(score)}`}
         />
       </div>
-      <div className="text-[10px] text-[#6e7681] mt-2">{description}</div>
+      <div className="text-[10px] text-[var(--gh-fg-subtle)] mt-2">{description}</div>
     </div>
   );
 }
@@ -1040,31 +1040,31 @@ function ScoreDimension({ label, score, icon, description }: {
 // Helper functions
 function getVerdictStyle(verdict: EvaluationResult['verdict']): string {
   switch (verdict) {
-    case 'strong-hire': return 'bg-[#238636]/20 border-[#238636]/50';
-    case 'hire': return 'bg-[#3fb950]/20 border-[#3fb950]/50';
-    case 'lean-hire': return 'bg-[#d29922]/20 border-[#d29922]/50';
-    case 'lean-no-hire': return 'bg-[#f0883e]/20 border-[#f0883e]/50';
-    case 'no-hire': return 'bg-[#f85149]/20 border-[#f85149]/50';
+    case 'strong-hire': return 'bg-[var(--gh-success-emphasis)]/20 border-[var(--gh-success-emphasis)]/50';
+    case 'hire': return 'bg-[var(--gh-success-fg)]/20 border-[var(--gh-success-fg)]/50';
+    case 'lean-hire': return 'bg-[var(--gh-attention-fg)]/20 border-[var(--gh-attention-fg)]/50';
+    case 'lean-no-hire': return 'bg-[var(--gh-attention-fg)]/20 border-[#f0883e]/50';
+    case 'no-hire': return 'bg-[var(--gh-danger-fg)]/20 border-[var(--gh-danger-fg)]/50';
   }
 }
 
 function getVerdictBgStyle(verdict: EvaluationResult['verdict']): string {
   switch (verdict) {
     case 'strong-hire':
-    case 'hire': return 'bg-[#238636]/30';
-    case 'lean-hire': return 'bg-[#d29922]/30';
+    case 'hire': return 'bg-[var(--gh-success-emphasis)]/30';
+    case 'lean-hire': return 'bg-[var(--gh-attention-fg)]/30';
     case 'lean-no-hire':
-    case 'no-hire': return 'bg-[#f85149]/30';
+    case 'no-hire': return 'bg-[var(--gh-danger-fg)]/30';
   }
 }
 
 function getVerdictIcon(verdict: EvaluationResult['verdict']) {
   switch (verdict) {
     case 'strong-hire':
-    case 'hire': return <ThumbsUp className="w-7 h-7 text-[#3fb950]" />;
-    case 'lean-hire': return <Minus className="w-7 h-7 text-[#d29922]" />;
+    case 'hire': return <ThumbsUp className="w-7 h-7 text-[var(--gh-success-fg)]" />;
+    case 'lean-hire': return <Minus className="w-7 h-7 text-[var(--gh-attention-fg)]" />;
     case 'lean-no-hire':
-    case 'no-hire': return <ThumbsDown className="w-7 h-7 text-[#f85149]" />;
+    case 'no-hire': return <ThumbsDown className="w-7 h-7 text-[var(--gh-danger-fg)]" />;
   }
 }
 
@@ -1079,9 +1079,9 @@ function getVerdictLabel(verdict: EvaluationResult['verdict']): string {
 }
 
 function getScoreBarColor(score: number): string {
-  if (score >= 70) return 'bg-gradient-to-r from-[#238636] to-[#3fb950]';
-  if (score >= 55) return 'bg-gradient-to-r from-[#3fb950] to-[#d29922]';
-  if (score >= 40) return 'bg-gradient-to-r from-[#d29922] to-[#f0883e]';
-  if (score >= 25) return 'bg-gradient-to-r from-[#f0883e] to-[#f85149]';
-  return 'bg-[#f85149]';
+  if (score >= 70) return 'bg-gradient-to-r from-[var(--gh-success-emphasis)] to-[var(--gh-success-fg)]';
+  if (score >= 55) return 'bg-gradient-to-r from-[var(--gh-success-fg)] to-[var(--gh-attention-fg)]';
+  if (score >= 40) return 'bg-gradient-to-r from-[var(--gh-attention-fg)] to-[var(--gh-attention-fg)]';
+  if (score >= 25) return 'bg-gradient-to-r from-[var(--gh-attention-fg)] to-[var(--gh-danger-fg)]';
+  return 'bg-[var(--gh-danger-fg)]';
 }

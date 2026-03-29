@@ -655,7 +655,7 @@ function ActiveExam({
                 <h3 className="font-semibold">Question Navigator</h3>
               </div>
               
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
                 {questions.map((_, i) => {
                   const answer = answers.find(a => a.questionId === questions[i].id);
                   const isCurrent = i === currentIndex;
@@ -668,7 +668,7 @@ function ActiveExam({
                         onGoToQuestion(i);
                         setShowNav(false);
                       }}
-                      className={`relative aspect-square rounded-lg font-medium text-sm transition-all ${
+                      className={`relative aspect-square rounded-lg font-medium text-sm transition-all min-h-[44px] ${
                         isCurrent
                           ? 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground'
                           : answer
@@ -745,7 +745,7 @@ function ActiveExam({
                 key={option.id}
                 onClick={() => !isAnswered && onSelectOption(option.id)}
                 disabled={isAnswered && examMode !== 'review'}
-                className={`w-full p-4 text-left border-2 rounded-xl transition-all ${
+                className={`w-full p-3 md:p-4 text-left border-2 rounded-xl transition-all min-h-[48px] ${
                   showResult
                     ? isCorrect
                       ? 'border-green-500 bg-green-500/10'
@@ -801,7 +801,7 @@ function ActiveExam({
       </main>
 
       {/* Footer Navigation */}
-      <footer className="sticky bottom-0 bg-background/95 backdrop-blur-xl border-t border-border p-4 shadow-lg shadow-[#00ff88]/5">
+      <footer className="sticky bottom-0 bg-background/95 backdrop-blur-xl border-t border-border p-4 pb-safe shadow-lg shadow-[#00ff88]/5">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <button
             onClick={onPrev}

@@ -13,12 +13,29 @@ import {
 // Disabled: AI Companion not in use
 // import * as webllm from '@mlc-ai/web-llm';
 
-// Type stub for webllm (component disabled, avoiding build error)
+// Type definitions for webllm stub (component disabled, avoiding build error)
+interface WebLLMEngine {
+  chat: {
+    completions: {
+      create: (options: any) => Promise<any>;
+    };
+  };
+}
+
+interface WebLLMMessageParam {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+// Create a proper namespace-like object with types
 const webllm = {
-  MLCEngine: class {},
-  CreateMLCEngine: async () => null,
-  ChatCompletionMessageParam: {} as any,
-};
+  MLCEngine: class {} as new () => WebLLMEngine,
+  CreateMLCEngine: async (model: string, options?: { initProgressCallback?: (progress: { text: string }) => void }): Promise<WebLLMEngine | null> => null,
+} as const;
+
+// Export types for use in the component
+type WebLLMEngineType = WebLLMEngine;
+type WebLLMMessageParamType = WebLLMMessageParam;
 
 import { useUnifiedToast } from '../hooks/use-unified-toast';
 import { SITEMAP_RAG, searchRoutes, findRoutesByKeywords, getRouteByPath } from '../data/sitemap-rag';
@@ -53,15 +70,15 @@ interface Message {
 }
 
 const LANGUAGES = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Español' },
-  { code: 'fr', name: 'Français' },
-  { code: 'de', name: 'Deutsch' },
-  { code: 'hi', name: 'हिन्दी' },
-  { code: 'zh', name: '中文' },
-  { code: 'ja', name: '日本語' },
-  { code: 'pt', name: 'Português' },
-  { code: 'ar', name: 'العربية' },
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'pt', name: 'Português', flag: '🇧🇷' },
+  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
 ];
 
 export function AICompanion({ pageContent, onNavigate, onAction, availableActions = [] }: AICompanionProps) {
@@ -77,7 +94,7 @@ export function AICompanion({ pageContent, onNavigate, onAction, availableAction
   const [agentMode, setAgentMode] = useState(true); // Enable agent capabilities
   const [currentModel, setCurrentModel] = useState<string>(''); // Track which model is being used
   const [currentTTSModel, setCurrentTTSModel] = useState<string>('Browser TTS'); // Track TTS model
-  const [webLLMEngine, setWebLLMEngine] = useState<webllm.MLCEngine | null>(null);
+  const [webLLMEngine, setWebLLMEngine] = useState<WebLLMEngineType | null>(null);
   const [isLoadingModel, setIsLoadingModel] = useState(false);
   const [modelLoadProgress, setModelLoadProgress] = useState<string>('');
   
@@ -1099,7 +1116,7 @@ Assistant (in ${languageName}):`;
         // Simplified system prompt
         const systemPrompt = `You are a helpful AI assistant. Answer questions clearly and concisely in 2-3 sentences. Be direct and helpful.`;
         
-        const messages: webllm.ChatCompletionMessageParam[] = [
+        const messages: WebLLMMessageParamType[] = [
           {
             role: 'system',
             content: systemPrompt,

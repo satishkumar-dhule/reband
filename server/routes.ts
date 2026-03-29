@@ -2,15 +2,26 @@ import type { Express } from "express";
 import { type Server } from "http";
 import { client } from "./db";
 
-const channelCache = new Map<string, { data: any; timestamp: number }>();
+const MAX_CACHE_SIZE = 100;
 const CACHE_TTL = 60_000;
+
+// LRU cache with max size to prevent memory leaks
+const channelCache = new Map<string, { data: any; timestamp: number }>();
 
 function getCached<T>(key: string, fetchFn: () => Promise<T>): Promise<T> {
   const cached = channelCache.get(key);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    // Move to end (most recently used)
+    channelCache.delete(key);
+    channelCache.set(key, cached);
     return Promise.resolve(cached.data as T);
   }
   return fetchFn().then(data => {
+    // Evict oldest entries if cache is full (LRU eviction)
+    if (channelCache.size >= MAX_CACHE_SIZE) {
+      const firstKey = channelCache.keys().next().value;
+      if (firstKey) channelCache.delete(firstKey);
+    }
     channelCache.set(key, { data, timestamp: Date.now() });
     return data;
   });
@@ -329,7 +340,7 @@ export async function registerRoutes(
       res.json(data);
     } catch (error) {
       console.error("Error fetching coding challenges:", error);
-      res.json([]);
+      res.status(500).json({ error: "Failed to fetch coding challenges" });
     }
   });
 
@@ -411,7 +422,7 @@ export async function registerRoutes(
       res.json(stats);
     } catch (error) {
       console.error("Error fetching coding stats:", error);
-      res.json({ total: 0, byDifficulty: { easy: 0, medium: 0 }, byCategory: {} });
+      res.status(500).json({ error: "Failed to fetch coding stats" });
     }
   });
 
@@ -455,8 +466,7 @@ export async function registerRoutes(
       res.json(result.rows.map(parseHistoryRecord));
     } catch (error) {
       console.error("Error fetching question history:", error);
-      // Return empty array if table doesn't exist yet
-      res.json([]);
+      res.status(500).json({ error: "Failed to fetch question history" });
     }
   });
 
@@ -497,7 +507,7 @@ export async function registerRoutes(
       res.json({ total, byType: summary, latest });
     } catch (error) {
       console.error("Error fetching history summary:", error);
-      res.json({ total: 0, byType: {}, latest: null });
+      res.status(500).json({ error: "Failed to fetch history summary" });
     }
   });
 
@@ -581,7 +591,7 @@ export async function registerRoutes(
       res.json(result.rows.map(parseHistoryRecord));
     } catch (error) {
       console.error("Error fetching history:", error);
-      res.json([]);
+      res.status(500).json({ error: "Failed to fetch history" });
     }
   });
 
@@ -648,7 +658,7 @@ export async function registerRoutes(
       res.json(data);
     } catch (error) {
       console.error("Error fetching certifications:", error);
-      res.json([]);
+      res.status(500).json({ error: "Failed to fetch certifications" });
     }
   });
 
@@ -703,7 +713,7 @@ export async function registerRoutes(
       res.json(stats);
     } catch (error) {
       console.error("Error fetching certification stats:", error);
-      res.json({ total: 0, totalQuestions: 0, byCategory: {}, byDifficulty: {} });
+      res.status(500).json({ error: "Failed to fetch certification stats" });
     }
   });
 
@@ -732,7 +742,7 @@ export async function registerRoutes(
       res.json(result.rows.map(parseQuestion));
     } catch (error) {
       console.error("Error fetching certification questions:", error);
-      res.json([]);
+      res.status(500).json({ error: "Failed to fetch certification questions" });
     }
   });
 
@@ -843,7 +853,7 @@ export async function registerRoutes(
       res.json(data);
     } catch (error) {
       console.error("Error fetching learning paths:", error);
-      res.json([]);
+      res.status(500).json({ error: "Failed to fetch learning paths" });
     }
   });
 
@@ -877,7 +887,7 @@ export async function registerRoutes(
       res.json(result.rows.map(r => r.target_company));
     } catch (error) {
       console.error("Error fetching companies:", error);
-      res.json([]);
+      res.status(500).json({ error: "Failed to fetch companies" });
     }
   });
 
@@ -890,7 +900,7 @@ export async function registerRoutes(
       res.json(result.rows.map(r => r.target_job_title));
     } catch (error) {
       console.error("Error fetching job titles:", error);
-      res.json([]);
+      res.status(500).json({ error: "Failed to fetch job titles" });
     }
   });
 
@@ -921,7 +931,7 @@ export async function registerRoutes(
       res.json(stats);
     } catch (error) {
       console.error("Error fetching learning path stats:", error);
-      res.json({ total: 0, byType: {}, byDifficulty: {} });
+      res.status(500).json({ error: "Failed to fetch learning path stats" });
     }
   });
 

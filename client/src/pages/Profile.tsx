@@ -364,17 +364,19 @@ export default function Profile() {
                 <Gift className="w-3 h-3" /> Redeem Coupon
               </h4>
               <div className="flex gap-2">
+                <label htmlFor="coupon-code" className="sr-only">Coupon code</label>
                 <input
+                  id="coupon-code"
                   type="text"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                   placeholder="Enter code"
-                  className="flex-1 px-3 py-2 bg-black/20 border border-border rounded-lg text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="flex-1 px-3 py-2 bg-black/20 border border-border rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-amber-500 text-white text-sm font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-2 bg-amber-500 text-white text-sm font-bold rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
@@ -630,13 +632,14 @@ function VoiceSettings() {
     <div className="p-4 space-y-4">
       {/* Voice Selection */}
       <div>
-        <label className="text-xs font-medium text-muted-foreground mb-2 block">
+        <label htmlFor="voice-select" className="text-xs font-medium text-muted-foreground mb-2 block">
           Voice
         </label>
         <select
+          id="voice-select"
           value={selectedVoice}
           onChange={(e) => handleVoiceChange(e.target.value)}
-          className="w-full px-3 py-2.5 bg-muted/50 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="w-full px-3 py-2.5 bg-muted/50 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           {sortedLangs.map(lang => (
             <optgroup key={lang} label={lang}>

@@ -1,24 +1,14 @@
 import { useLocation } from "wouter";
-import {
-  Home, BookOpen, Bookmark, BarChart2,
-  Mic, Code, RotateCcw, User, Map, Award,
-  Brain,
-} from "lucide-react";
+import { Brain } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { ThemeToggle } from "../ThemeToggle";
+import { mobileNavConfig } from "./MobileNav";
 
-const navItems = [
-  { icon: Home, label: "Dashboard", path: "/" },
-  { icon: BookOpen, label: "Channels", path: "/channels" },
-  { icon: Mic, label: "Voice Practice", path: "/voice-interview" },
-  { icon: Code, label: "Coding", path: "/coding" },
-  { icon: RotateCcw, label: "SRS Review", path: "/review" },
-  { icon: BarChart2, label: "Stats", path: "/stats" },
-  { icon: Bookmark, label: "Bookmarks", path: "/bookmarks" },
-  { icon: Map, label: "Learning Paths", path: "/learning-paths" },
-  { icon: Award, label: "Badges", path: "/badges" },
-  { icon: User, label: "Profile", path: "/profile" },
-];
+// Use shared navigation config from MobileNav - ensures consistency across all navigation elements
+const navItems = mobileNavConfig.map(item => ({
+  ...item,
+  label: item.label === "Home" ? "Dashboard" : item.label,
+}));
 
 function NavItem({
   item,
@@ -63,7 +53,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className="hidden lg:flex fixed left-0 top-0 h-screen w-[260px] flex-col z-50"
+      className="hidden lg:flex fixed left-0 top-0 h-screen w-64 flex-col z-50"
       style={{
         backgroundColor: "var(--sidebar-bg)",
         borderRight: "1px solid var(--sidebar-border)",

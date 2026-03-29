@@ -17,7 +17,7 @@
 import { test, expect, request, Page } from '@playwright/test';
 import { setupUser, waitForPageReady } from '../fixtures';
 
-const BASE_URL = 'http://localhost:5001';
+const BASE_URL = 'http://localhost:5173';
 
 interface SecurityHeaders {
   'content-security-policy'?: string;

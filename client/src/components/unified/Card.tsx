@@ -10,6 +10,7 @@
 
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { ReactNode } from 'react';
+import { Skeleton, SkeletonText } from '../mobile/SkeletonLoader';
 
 export type CardVariant = 'default' | 'elevated' | 'outline' | 'ghost';
 export type CardSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -23,6 +24,7 @@ interface CardProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
   hoverable?: boolean;
   clickable?: boolean;
   gradient?: boolean;
+  isLoading?: boolean;
   className?: string;
 }
 
@@ -31,6 +33,13 @@ const variantClasses: Record<CardVariant, string> = {
   elevated: 'bg-card border border-border shadow-lg',
   outline: 'bg-transparent border border-border',
   ghost: 'bg-transparent'
+};
+
+const hoverVariantClasses: Record<CardVariant, string> = {
+  default: 'hover:border-primary/40 hover:shadow-md',
+  elevated: 'hover:border-primary/40 hover:shadow-lg',
+  outline: 'hover:border-primary/40',
+  ghost: ''
 };
 
 const sizeClasses: Record<CardSize, string> = {
@@ -56,6 +65,7 @@ export function Card({
   hoverable = false,
   clickable = false,
   gradient = false,
+  isLoading = false,
   className = '',
   ...motionProps
 }: CardProps) {
@@ -64,7 +74,7 @@ export function Card({
   const roundedClass = roundedClasses[rounded];
   
   const hoverClass = hoverable 
-    ? 'hover:border-primary/40 hover:shadow-md transition-all duration-200' 
+    ? `${hoverVariantClasses[variant]} transition-all duration-200` 
     : '';
   
   const clickableClass = clickable 
@@ -74,6 +84,30 @@ export function Card({
   const gradientClass = gradient
     ? 'bg-gradient-to-br from-card to-card/50'
     : '';
+
+  // Loading state - render skeleton content
+  if (isLoading) {
+    return (
+      <div
+        className={`
+          ${baseClasses} ${paddingClass} ${roundedClass}
+          ${className}
+        `}
+        role="status"
+        aria-busy="true"
+        aria-label="Loading content"
+      >
+        <div className="space-y-3">
+          {/* Title skeleton */}
+          <Skeleton className="h-5 w-3/4" />
+          {/* Content lines */}
+          <SkeletonText lines={3} />
+          {/* Action line */}
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div

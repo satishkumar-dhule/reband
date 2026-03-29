@@ -10,6 +10,7 @@ import {
 import { AppLayout } from "../components/layout/AppLayout";
 import { allChannelsConfig } from "../lib/channels-config";
 import { cn } from "../lib/utils";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "../components/ui/breadcrumb";
 
 interface ApiChannel {
   id: string;
@@ -107,15 +108,24 @@ function ChannelCard({ channelId, questionCount }: { channelId: string; question
   if (!config) return null;
   const { completed, pct } = getProgress(channelId, questionCount);
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setLocation(`/channel/${channelId}`);
+    }
+  };
+
   return (
-    <div
+    <button
       onClick={() => setLocation(`/channel/${channelId}`)}
-      className="flex flex-col gap-3 p-4 rounded-md border border-[var(--gh-border)] hover:border-[var(--gh-accent-fg)] cursor-pointer bg-[var(--gh-canvas)] transition-colors group"
+      onKeyDown={handleKeyDown}
+      className="flex flex-col gap-3 p-4 rounded-md border border-[var(--gh-border)] hover:border-[var(--gh-accent-fg)] cursor-pointer bg-[var(--gh-canvas)] transition-colors group text-left w-full"
       data-testid={`card-channel-${channelId}`}
+      aria-label={`${config.name}: ${completed} of ${questionCount} questions completed, ${pct}% progress`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <BookOpen className="w-4 h-4 text-[var(--gh-accent-fg)] shrink-0" />
+          <BookOpen className="w-4 h-4 text-[var(--gh-accent-fg)] shrink-0" aria-hidden="true" />
           <span className="font-semibold text-sm text-[var(--gh-accent-fg)] truncate group-hover:underline">{config.name}</span>
         </div>
       </div>
@@ -129,7 +139,7 @@ function ChannelCard({ channelId, questionCount }: { channelId: string; question
           <span>{completed}/{questionCount} done</span>
           <span>{pct}%</span>
         </div>
-        <div className="gh-progress">
+        <div className="gh-progress" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Progress">
           <div
             className="gh-progress-bar"
             style={{ width: `${pct}%` }}
@@ -139,19 +149,19 @@ function ChannelCard({ channelId, questionCount }: { channelId: string; question
 
       <div className="flex items-center gap-3 text-xs text-[var(--gh-fg-muted)]">
         <span className="flex items-center gap-1 capitalize">
-          <Circle className="w-2.5 h-2.5 fill-current" />
+          <Circle className="w-2.5 h-2.5 fill-current" aria-hidden="true" />
           {config.category}
         </span>
         <span className="flex items-center gap-1">
-          <Star className="w-3 h-3" />
+          <Star className="w-3 h-3" aria-hidden="true" />
           {questionCount}
         </span>
         <span className="flex items-center gap-1">
-          <GitFork className="w-3 h-3" />
+          <GitFork className="w-3 h-3" aria-hidden="true" />
           {pct}%
         </span>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -212,8 +222,17 @@ export default function Home() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[var(--gh-canvas-subtle)]">
+      <div className="min-h-screen bg-[var(--gh-canvas-subtle)]" id="main-content">
         <div className="max-w-6xl mx-auto px-4 py-8 lg:px-8">
+          {/* Breadcrumb */}
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-[var(--gh-fg-muted)]">Home</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+
           {/* Dashboard Header */}
           <div className="mb-8">
             <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">Dashboard</h1>

@@ -13,12 +13,13 @@ import { useLocation } from "wouter";
 import { 
   Bot, Sparkles, CheckCircle, RefreshCw,
   Activity, Clock, Trash2, FileText, ListTodo, History, Zap, Eye, Wrench,
-  ExternalLink, Code, HelpCircle, Mic
+  ExternalLink, Code, HelpCircle, Mic, Home
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SEOHead } from "../components/SEOHead";
 import { AppLayout } from "../components/layout/AppLayout";
 import { MetricCard } from "../components/unified";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "../components/ui/breadcrumb";
 import { cn } from "../lib/utils";
 
 // Types
@@ -271,6 +272,22 @@ export default function BotActivity() {
       />
       <AppLayout title="Bot Monitor" showBackOnMobile>
         <div className="max-w-6xl mx-auto">
+          {/* Breadcrumb Navigation */}
+          <Breadcrumb className="mb-4 lg:mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/" className="flex items-center gap-1">
+                  <Home className="w-3.5 h-3.5" />
+                  Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Bot Monitor</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+
           {/* Header - Desktop only since AppLayout handles mobile */}
           <header className="hidden lg:flex items-center justify-between gap-4 mb-6">
             <h1 className="text-xl font-bold flex items-center gap-2">

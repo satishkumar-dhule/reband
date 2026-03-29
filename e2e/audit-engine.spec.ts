@@ -118,7 +118,7 @@ test.describe('Accessibility Audit Engine', () => {
     
     // Each result should be a valid AuditResult
     for (const [url, result] of results) {
-      // URL in result will be full URL (http://localhost:5001/), not relative
+      // URL in result will be full URL (http://localhost:5173/), not relative
       expect(result).toHaveProperty('violations');
       expect(result).toHaveProperty('passes');
       expect(result).toHaveProperty('timestamp');

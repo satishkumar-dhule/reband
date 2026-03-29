@@ -25,6 +25,14 @@ export interface Question {
   eli5?: string;
   relevanceScore?: number;
   lastUpdated?: string;
+  // Additional fields from database
+  tldr?: string;
+  voiceKeywords?: string[];
+  voiceSuitable?: boolean;
+  isNew?: boolean;
+  relevanceDetails?: string;
+  jobTitleRelevance?: string[];
+  experienceLevelTags?: string[];
 }
 
 export interface QuestionListItem {
@@ -79,8 +87,8 @@ async function fetchJson<T>(url: string): Promise<T> {
 const BUILD_VERSION = '20260113';
 
 // Sanitize answer field if it contains MCQ JSON format
-function sanitizeAnswer(answer: string | undefined): string | undefined {
-  if (!answer || typeof answer !== 'string') return answer;
+function sanitizeAnswer(answer: string | undefined): string {
+  if (!answer || typeof answer !== 'string') return answer ?? '';
   
   const trimmed = answer.trim();
   if (trimmed.startsWith('[{')) {

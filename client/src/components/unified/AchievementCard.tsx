@@ -64,7 +64,7 @@ export function AchievementCard({
   
   return (
     <div
-      className={`flex flex-col items-center ${onClick ? 'cursor-pointer active:scale-95 transition-transform' : ''}`}
+      className={`flex flex-col items-center ${onClick ? 'cursor-pointer active:scale-95 hover:scale-105 transition-transform' : ''}`}
       onClick={onClick}
       style={{ width: s.ring + (showDetails ? 32 : 0) }}
     >

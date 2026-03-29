@@ -262,28 +262,28 @@ export function QuestionHistoryIcon({
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className="relative w-full max-w-md max-h-[80vh] overflow-hidden
-                         bg-[#161b22] border border-[#30363d] rounded-2xl shadow-2xl"
+                         bg-var(--gh-canvas-overlay) border border-var(--gh-border) rounded-2xl shadow-2xl"
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal="true"
               aria-label="Question History"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#30363d] bg-[#0d1117]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-var(--gh-border) bg-var(--gh-canvas)">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#238636] to-[#3fb950] flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-var(--gh-success-emphasis) to-var(--gh-success-fg) flex items-center justify-center">
                     <History className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="font-semibold text-[#e6edf3]">Question History</h2>
-                    <p className="text-xs text-[#8b949e]">
+                    <h2 className="font-semibold text-var(--gh-fg)">Question History</h2>
+                    <p className="text-xs text-var(--gh-fg-muted)">
                       {historyCount} change{historyCount !== 1 ? 's' : ''} recorded
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 rounded-lg hover:bg-[#21262d] text-[#8b949e] hover:text-[#e6edf3] transition-colors"
+                  className="p-2 rounded-lg hover:bg-var(--gh-bg-muted) text-var(--gh-fg-muted) hover:text-var(--gh-fg) transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -293,8 +293,8 @@ export function QuestionHistoryIcon({
               <div className="overflow-y-auto max-h-[calc(80vh-80px)] p-4">
                 {loading ? (
                   <div className="flex flex-col items-center justify-center py-12 gap-3">
-                    <RefreshCw className="w-6 h-6 animate-spin text-[#58a6ff]" />
-                    <span className="text-sm text-[#8b949e]">Loading history...</span>
+                    <RefreshCw className="w-6 h-6 animate-spin text-var(--gh-accent-fg)" />
+                    <span className="text-sm text-var(--gh-fg-muted)">Loading history...</span>
                   </div>
                 ) : historyData?.history && historyData.history.length > 0 ? (
                   <div className="space-y-2">
@@ -308,12 +308,12 @@ export function QuestionHistoryIcon({
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-[#21262d] flex items-center justify-center">
-                      <History className="w-8 h-8 text-[#8b949e]" />
+                    <div className="w-16 h-16 rounded-2xl bg-var(--gh-bg-muted) flex items-center justify-center">
+                      <History className="w-8 h-8 text-var(--gh-fg-muted)" />
                     </div>
                     <div className="text-center">
-                      <p className="text-[#e6edf3] font-medium mb-1">No History Available</p>
-                      <p className="text-sm text-[#8b949e] max-w-xs">
+                      <p className="text-var(--gh-fg) font-medium mb-1">No History Available</p>
+                      <p className="text-sm text-var(--gh-fg-muted) max-w-xs">
                         History tracking shows when questions are created, updated, improved, or verified by our content bots.
                       </p>
                     </div>
@@ -345,7 +345,7 @@ function HistoryItem({ record, isFirst }: HistoryItemProps) {
       animate={{ opacity: 1, x: 0 }}
       className={`
         rounded-xl border ${config.border} ${config.bg} overflow-hidden
-        ${isFirst ? 'ring-2 ring-offset-2 ring-offset-[#161b22] ring-[#30363d]' : ''}
+        ${isFirst ? 'ring-2 ring-offset-2 ring-offset-var(--gh-canvas-overlay) ring-var(--gh-border)' : ''}
       `}
     >
       {/* Header - Always visible */}
@@ -364,20 +364,20 @@ function HistoryItem({ record, isFirst }: HistoryItemProps) {
             <span className={`text-sm font-semibold ${config.text}`}>
               {config.label}
             </span>
-            <div className="flex items-center gap-1 text-[#8b949e]">
+            <div className="flex items-center gap-1 text-var(--gh-fg-muted)">
               <SourceIcon className="w-3 h-3" />
               <span className="text-[10px]">
                 {record.sourceName || record.eventSource}
               </span>
             </div>
             {isFirst && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#238636]/20 text-[#3fb950] font-medium">
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-var(--gh-success-emphasis)/20 text-var(--gh-success-fg) font-medium">
                 Latest
               </span>
             )}
           </div>
           {record.changesSummary && (
-            <p className="text-xs text-[#8b949e] line-clamp-1">
+            <p className="text-xs text-var(--gh-fg-muted) line-clamp-1">
               {record.changesSummary}
             </p>
           )}
@@ -385,11 +385,11 @@ function HistoryItem({ record, isFirst }: HistoryItemProps) {
 
         {/* Time & Expand */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1 text-[#6e7681]">
+          <div className="flex items-center gap-1 text-var(--gh-fg-subtle)">
             <Clock className="w-3 h-3" />
             <span className="text-[10px]">{formatRelativeTime(record.createdAt)}</span>
           </div>
-          <ChevronDown className={`w-4 h-4 text-[#6e7681] transition-transform ${expanded ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-4 h-4 text-var(--gh-fg-subtle) transition-transform ${expanded ? 'rotate-180' : ''}`} />
         </div>
       </button>
 
@@ -403,12 +403,12 @@ function HistoryItem({ record, isFirst }: HistoryItemProps) {
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-3 pb-3 pt-0 space-y-3 border-t border-[#30363d]/50">
+            <div className="px-3 pb-3 pt-0 space-y-3 border-t border-var(--gh-border)/50">
               {/* Reason */}
               {record.reason && (
-                <div className="flex items-start gap-2 p-2 rounded-lg bg-[#0d1117] border border-[#30363d] mt-3">
-                  <Info className="w-3.5 h-3.5 text-[#58a6ff] mt-0.5 flex-shrink-0" />
-                  <p className="text-[11px] text-[#8b949e]">
+                <div className="flex items-start gap-2 p-2 rounded-lg bg-var(--gh-canvas) border border-var(--gh-border) mt-3">
+                  <Info className="w-3.5 h-3.5 text-var(--gh-accent-fg) mt-0.5 flex-shrink-0" />
+                  <p className="text-[11px] text-var(--gh-fg-muted)">
                     {record.reason}
                   </p>
                 </div>
@@ -417,14 +417,14 @@ function HistoryItem({ record, isFirst }: HistoryItemProps) {
               {/* Changed fields */}
               {record.changedFields && record.changedFields.length > 0 && (
                 <div>
-                  <span className="text-[10px] font-medium text-[#8b949e] uppercase tracking-wider">
+                  <span className="text-[10px] font-medium text-var(--gh-fg-muted) uppercase tracking-wider">
                     Changed Fields
                   </span>
                   <div className="flex flex-wrap gap-1.5 mt-1.5">
                     {record.changedFields.map((field) => (
                       <span 
                         key={field}
-                        className="px-2 py-0.5 bg-[#58a6ff]/10 text-[#58a6ff] text-[10px] rounded-md border border-[#58a6ff]/30"
+                        className="px-2 py-0.5 bg-var(--gh-accent-fg)/10 text-var(--gh-accent-fg) text-[10px] rounded-md border border-var(--gh-accent-fg)/30"
                       >
                         {field}
                       </span>
@@ -434,8 +434,8 @@ function HistoryItem({ record, isFirst }: HistoryItemProps) {
               )}
 
               {/* Timestamp */}
-              <div className="flex items-center justify-between pt-2 border-t border-[#30363d]/50">
-                <span className="text-[10px] text-[#6e7681]">
+              <div className="flex items-center justify-between pt-2 border-t border-var(--gh-border)/50">
+                <span className="text-[10px] text-var(--gh-fg-subtle)">
                   {new Date(record.createdAt).toLocaleString()}
                 </span>
               </div>

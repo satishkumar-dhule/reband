@@ -94,6 +94,65 @@ export const BREAKPOINTS = {
 } as const;
 
 // ============================================
+// LAYOUT CONSTANTS
+// Standardized layout values for consistent spacing and sizing
+// ============================================
+export const LAYOUT = {
+  // Sidebar width (standardized across all sidebar implementations)
+  SIDEBAR_WIDTH: 256, // w-64 = 256px
+  
+  // Header height
+  HEADER_HEIGHT: 44,
+  
+  // Mobile navigation height
+  MOBILE_NAV_HEIGHT: 64, // h-16 = 64px
+  
+  // Container padding
+  CONTAINER_PADDING: {
+    MOBILE: 16, // px-4 = 16px
+    TABLET: 24,  // px-6 = 24px
+    DESKTOP: 32, // px-8 = 32px
+  },
+  
+  // Content max widths
+  CONTENT_MAX_WIDTH: {
+    DEFAULT: 1200,
+    WIDE: 1400,
+    NARROW: 800,
+  },
+  
+  // Grid gutter spacing (standardized)
+  GRID_GUTTER: {
+    NONE: 0,
+    SM: 8,   // gap-2
+    MD: 16,  // gap-4
+    LG: 24,  // gap-6
+    XL: 32,  // gap-8
+  },
+  
+  // Card and component border radius
+  BORDER_RADIUS: {
+    SM: 4,
+    MD: 8,
+    LG: 12,
+    XL: 16,
+    FULL: 9999,
+  },
+  
+  // Overflow strategy
+  OVERFLOW: {
+    // Content areas - prevent overflow
+    CONTENT_HIDDEN: 'overflow-hidden',
+    // Scrollable lists and containers
+    SCROLL_Y: 'overflow-y-auto',
+    SCROLL_X: 'overflow-x-auto',
+    SCROLL_BOTH: 'overflow-auto',
+    // Visible (no overflow handling)
+    VISIBLE: 'overflow-visible',
+  },
+} as const;
+
+// ============================================
 // DIFFICULTY LEVELS
 // ============================================
 export const DIFFICULTY = {

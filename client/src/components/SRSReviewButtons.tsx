@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { RotateCcw, Brain, Check, Zap } from 'lucide-react';
 import type { ReviewCard, ConfidenceRating } from '../lib/spaced-repetition';
 import { getNextReviewPreview, getMasteryLabel, getMasteryColor } from '../lib/spaced-repetition';
+import { Button } from './unified/Button';
 
 interface SRSReviewButtonsProps {
   card: ReviewCard;
@@ -57,14 +58,16 @@ export function SRSReviewButtons({ card, onRate, compact = false }: SRSReviewBut
       <div className="flex items-center gap-2">
         <span className="text-xs text-muted-foreground mr-1">Rate:</span>
         {buttons.map((btn) => (
-          <button
+          <Button
             key={btn.rating}
             onClick={() => onRate(btn.rating)}
-            className={`px-2 py-1 rounded text-xs font-medium border transition-colors ${btn.bg} ${btn.color}`}
+            variant="secondary"
+            size="sm"
+            className={`px-2 py-1 ${btn.bg} ${btn.color}`}
             title={`${btn.label} - Next review in ${btn.preview}`}
           >
             {btn.label}
-          </button>
+          </Button>
         ))}
       </div>
     );
@@ -92,18 +95,22 @@ export function SRSReviewButtons({ card, onRate, compact = false }: SRSReviewBut
       {/* Rating buttons */}
       <div className="flex items-center justify-center gap-2 sm:gap-3">
         {buttons.map((btn, idx) => (
-          <motion.button
+          <motion.div
             key={btn.rating}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: idx * 0.05 }}
-            onClick={() => onRate(btn.rating)}
-            className={`flex flex-col items-center gap-1 px-3 sm:px-4 py-2 sm:py-3 rounded-xl border transition-all ${btn.bg}`}
           >
-            <div className={`${btn.color}`}>{btn.icon}</div>
-            <span className={`text-xs sm:text-sm font-medium ${btn.color}`}>{btn.label}</span>
-            <span className="text-[10px] sm:text-xs text-muted-foreground">{btn.preview}</span>
-          </motion.button>
+            <Button
+              onClick={() => onRate(btn.rating)}
+              variant="secondary"
+              className={`flex flex-col items-center gap-1 px-3 sm:px-4 py-2 sm:py-3 rounded-xl border transition-all ${btn.bg}`}
+            >
+              <div className={`${btn.color}`}>{btn.icon}</div>
+              <span className={`text-xs sm:text-sm font-medium ${btn.color}`}>{btn.label}</span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground">{btn.preview}</span>
+            </Button>
+          </motion.div>
         ))}
       </div>
 

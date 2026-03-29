@@ -1,15 +1,12 @@
 import { ReactNode, useState } from "react";
 import { Sidebar } from "./Sidebar";
-import { MobileNav } from "./MobileNav";
+import { MobileNav, mobileNavConfig } from "./MobileNav";
 import { UnifiedSearch } from "../UnifiedSearch";
 import { Sheet, SheetContent } from "../ui/sheet";
 import { ScrollArea } from "../ui/scroll-area";
 import { useLocation } from "wouter";
 import { ThemeToggle } from "../ThemeToggle";
-import { Search, Menu, X, Brain,
-  Home, BookOpen, Bookmark, BarChart2,
-  Mic, Code, RotateCcw, User, Map, Award,
-} from "lucide-react";
+import { Search, Menu, X, Brain } from "lucide-react";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -19,18 +16,8 @@ interface AppLayoutProps {
   showBackOnMobile?: boolean;
 }
 
-const mobileNavItems = [
-  { icon: Home, label: "Dashboard", path: "/" },
-  { icon: BookOpen, label: "Channels", path: "/channels" },
-  { icon: Mic, label: "Voice Practice", path: "/voice-interview" },
-  { icon: Code, label: "Coding", path: "/coding" },
-  { icon: RotateCcw, label: "SRS Review", path: "/review" },
-  { icon: BarChart2, label: "Stats", path: "/stats" },
-  { icon: Bookmark, label: "Bookmarks", path: "/bookmarks" },
-  { icon: Map, label: "Learning Paths", path: "/learning-paths" },
-  { icon: Award, label: "Badges", path: "/badges" },
-  { icon: User, label: "Profile", path: "/profile" },
-];
+// Use shared navigation config from MobileNav - ensures consistency across all navigation elements
+const mobileNavItems = mobileNavConfig;
 
 export function AppLayout({
   children,
@@ -56,7 +43,7 @@ export function AppLayout({
     <div className="min-h-screen flex bg-background">
       <Sidebar />
 
-      <div className="flex-1 lg:ml-[260px] flex flex-col min-w-0">
+      <div className="flex-1 lg:ml-64 flex flex-col min-w-0">
         {/* Top header */}
         <header
           className="sticky top-0 z-30 flex items-center gap-3 h-[44px] px-4 border-b"
@@ -108,7 +95,7 @@ export function AppLayout({
           <ThemeToggle />
         </header>
 
-        <main className="flex-1 pb-24 lg:pb-0">
+        <main id="main-content" className="flex-1 pb-24 lg:pb-0 max-w-full" tabIndex={-1}>
           {children}
         </main>
       </div>
@@ -131,6 +118,7 @@ export function AppLayout({
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-7 h-7 flex items-center justify-center rounded text-muted-foreground hover-elevate"
+                aria-label="Close menu"
               >
                 <X className="w-4 h-4" />
               </button>

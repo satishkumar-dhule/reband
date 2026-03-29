@@ -92,7 +92,10 @@ export function getQuestions(
   }
 
   if (company && company !== 'all') {
-    questions = questions.filter(q => q.companies?.includes(company));
+    const normalizedCompany = normalizeCompanyName(company);
+    questions = questions.filter(q => 
+      q.companies?.some(c => normalizeCompanyName(c) === normalizedCompany)
+    );
   }
 
   return questions;

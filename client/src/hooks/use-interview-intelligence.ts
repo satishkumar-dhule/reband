@@ -116,7 +116,12 @@ async function fetchIntelligenceData(): Promise<IntelligenceData | null> {
     ]);
     
     if (!cognitiveRes.ok || !weightsRes.ok || !profilesRes.ok) {
-      console.warn('Intelligence data not available yet');
+      const errorDetails = [
+        !cognitiveRes.ok && `cognitive-map: ${cognitiveRes.status}`,
+        !weightsRes.ok && `company-weights: ${weightsRes.status}`,
+        !profilesRes.ok && `company-profiles: ${profilesRes.status}`
+      ].filter(Boolean).join(', ');
+      console.error(`Intelligence data fetch failed: ${errorDetails}`);
       return null;
     }
     
@@ -138,8 +143,9 @@ async function fetchIntelligenceData(): Promise<IntelligenceData | null> {
     cacheTimestamp = Date.now();
     
     return intelligenceCache;
-  } catch {
-    console.warn('Failed to fetch intelligence data');
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error fetching intelligence data';
+    console.error('Failed to fetch intelligence data:', message);
     return null;
   }
 }
@@ -152,14 +158,21 @@ async function fetchIntelligenceData(): Promise<IntelligenceData | null> {
 export function useInterviewIntelligence() {
   const [intelligenceData, setIntelligenceData] = useState<IntelligenceData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { answerHistory, topicMastery, stats } = useAdaptiveLearning();
   
   // Load intelligence data on mount
   useEffect(() => {
-    fetchIntelligenceData().then(data => {
-      setIntelligenceData(data);
-      setLoading(false);
-    });
+    fetchIntelligenceData()
+      .then(data => {
+        setIntelligenceData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch intelligence data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load intelligence data');
+        setLoading(false);
+      });
   }, []);
   
   // Calculate user's cognitive profile based on answered questions
@@ -411,6 +424,7 @@ export function useInterviewIntelligence() {
 
   return {
     loading,
+    error,
     cognitiveProfile,
     companyReadiness,
     knowledgeDNA,

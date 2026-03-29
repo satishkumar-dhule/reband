@@ -95,7 +95,7 @@ export function useQuestions(
         setQuestions([]);
       })
       .finally(() => setLoading(false));
-  }, [channelId, subChannel, difficulty, company, shuffle, prioritizeUnvisited, sessionSeed]);
+  }, [channelId, subChannel, difficulty, company, shuffle, prioritizeUnvisited]);
 
   const questionIds = useMemo(() => questions.map(q => q.id), [questions]);
 

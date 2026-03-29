@@ -11,7 +11,7 @@
  * - Reduced layout shifts
  */
 
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { 
   Sparkles, Target, Brain, Zap, Building2, Hash, Award
 } from 'lucide-react';
@@ -77,7 +77,7 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
   const DiffIcon = diffConfig.icon;
 
   // Stagger animation for children
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -88,13 +88,13 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 10 },
     show: { 
       opacity: 1, 
       y: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 300,
         damping: 24
       }
@@ -148,7 +148,7 @@ export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+              transition={{ type: 'spring' as const, stiffness: 260, damping: 20 }}
               className="flex items-center gap-1 px-2 py-1 rounded-md bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30"
             >
               <Sparkles className="w-3 h-3 text-amber-400" />

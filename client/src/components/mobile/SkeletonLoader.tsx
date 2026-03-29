@@ -47,7 +47,7 @@ export function Skeleton({
 export function SkeletonCard() {
   return (
     <div 
-      className="p-4 bg-white dark:bg-gray-900 rounded-[20px] border border-gray-200 dark:border-gray-800"
+      className="p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
       role="status"
       aria-busy="true"
       aria-label="Loading card"

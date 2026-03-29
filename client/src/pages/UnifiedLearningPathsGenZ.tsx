@@ -746,7 +746,11 @@ export default function UnifiedLearningPathsGenZ() {
                   </div>
 
                   {!isReadonly && (
+                    <label htmlFor="path-name-input" className="sr-only">Path name</label>
+                  )}
+                  {!isReadonly && (
                     <input
+                      id="path-name-input"
                       type="text"
                       placeholder="Path name (e.g., 'My Frontend Journey')"
                       value={modalMode === 'create' ? customForm.name : editForm.name}
@@ -757,7 +761,7 @@ export default function UnifiedLearningPathsGenZ() {
                           setEditForm(prev => ({ ...prev, name: e.target.value }));
                         }
                       }}
-                      className="w-full px-4 py-3 md:px-6 md:py-4 bg-muted border border-border rounded-[12px] md:rounded-[16px] text-base md:text-xl focus:outline-none focus:border-primary transition-all"
+                      className="w-full px-4 py-3 md:px-6 md:py-4 bg-muted border border-border rounded-md text-base md:text-xl focus:outline-none focus:border-primary transition-all"
                     />
                   )}
 
@@ -863,12 +867,14 @@ export default function UnifiedLearningPathsGenZ() {
                   <div className="p-3 md:p-4 border-b border-border flex-shrink-0">
                     <div className="relative">
                       <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
+                      <label htmlFor="learning-paths-search" className="sr-only">Search {modalTab}</label>
                       <input
+                        id="learning-paths-search"
                         type="text"
                         placeholder={`Search ${modalTab}...`}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 md:pl-12 pr-3 md:pr-4 py-2.5 md:py-3 text-sm md:text-base bg-muted border border-border rounded-[10px] md:rounded-[12px] focus:outline-none focus:border-primary transition-all"
+                        className="w-full pl-10 md:pl-12 pr-3 md:pr-4 py-2.5 md:py-3 text-sm md:text-base bg-muted border border-border rounded-md focus:outline-none focus:border-primary transition-all"
                       />
                     </div>
                   </div>

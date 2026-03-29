@@ -94,7 +94,7 @@ export default function AgentsUltra() {
   const [agentStatus, setAgentStatus] = useState<Record<string, string>>({});
   
   // Group agents by category
-  const categories = [...new Set(agents.map(a => a.category))];
+  const categories = Array.from(new Set(agents.map(a => a.category)));
   
   const handleAgentSelect = (agent: typeof agents[0]) => {
     setSelectedAgent(agent);

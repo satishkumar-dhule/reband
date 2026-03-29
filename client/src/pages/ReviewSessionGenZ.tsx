@@ -9,6 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Button } from '../components/unified/Button';
 import {
   Brain, ChevronLeft, Eye, Flame, Sparkles, Zap, Check, RotateCcw
 } from 'lucide-react';
@@ -278,12 +279,12 @@ export default function ReviewSessionGenZ() {
           <p className="text-[var(--gh-fg-muted)] mb-6 text-center">
             You've reviewed all cards for today. Your memory is leveling up!
           </p>
-          <button
+          <Button
             onClick={() => setLocation('/')}
-            className="gh-btn gh-btn-primary"
+            variant="primary"
           >
             Back to Dashboard
-          </button>
+          </Button>
         </div>
       </AppLayout>
     );
@@ -359,12 +360,13 @@ export default function ReviewSessionGenZ() {
               {/* Action Area */}
               {!showAnswer ? (
                 <div className="flex justify-center">
-                  <button
+                  <Button
                     onClick={handleRevealAnswer}
-                    className="gh-btn gh-btn-primary px-8 py-2.5 text-base"
+                    variant="primary"
+                    size="lg"
                   >
                     Reveal Answer
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -458,10 +460,11 @@ export default function ReviewSessionGenZ() {
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-2">
                       {confidenceLevels.map((level) => (
-                        <button
+                        <Button
                           key={level.id}
                           onClick={() => handleConfidence(level.id)}
-                          className="gh-btn gh-btn-outline group relative"
+                          variant="outline"
+                          className="relative"
                         >
                           <span className={`w-2 h-2 rounded-full mr-2 ${
                             level.id === 'again' ? 'bg-[var(--gh-danger-emphasis)]' :
@@ -473,7 +476,7 @@ export default function ReviewSessionGenZ() {
                           <span className="ml-2 text-[10px] text-[var(--gh-fg-subtle)] opacity-0 group-hover:opacity-100 transition-opacity">
                             {level.interval}d
                           </span>
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>

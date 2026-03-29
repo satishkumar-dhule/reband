@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { useUserPreferences } from '../context/UserPreferencesContext';
@@ -8,8 +8,10 @@ import { getAllQuestions } from '../lib/data';
 import {
   User, Settings, Target, 
   Award, BookOpen,
-  Mail, Link as LinkIcon, MapPin, Twitter
+  Mail, Link as LinkIcon, MapPin, Twitter,
+  ChevronLeft, Home
 } from 'lucide-react';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 
 const achievements = [
   { id: 1, name: 'First Steps', desc: 'Complete your first question', icon: '🌟', achieved: true },
@@ -32,6 +34,7 @@ export default function ProfileGenZ() {
   const { preferences, toggleShuffleQuestions, togglePrioritizeUnvisited, toggleHideCertifications } = useUserPreferences();
   const { balance } = useCredits();
   const [totalCompleted, setTotalCompleted] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const allQuestions = getAllQuestions();
@@ -48,10 +51,45 @@ export default function ProfileGenZ() {
     });
     
     setTotalCompleted(allCompletedIds.size);
+    setIsLoading(false);
   }, []);
 
   const level = Math.floor(balance / 100);
   const achievedCount = achievements.filter(a => a.achieved).length;
+
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <>
+        <SEOHead
+          title="Profile - DevPrep"
+          description="Your learning profile and achievements"
+          canonical="https://open-interview.github.io/profile"
+        />
+        <AppLayout>
+          <div className="bg-[var(--gh-canvas-subtle)] min-h-screen">
+            <div className="max-w-[1280px] mx-auto px-4 py-8">
+              <div className="animate-pulse space-y-6">
+                <div className="flex gap-8">
+                  {/* Sidebar skeleton */}
+                  <div className="w-72 space-y-4">
+                    <div className="aspect-square rounded-full bg-[var(--gh-canvas)] border border-[var(--gh-border)]" />
+                    <div className="h-8 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded w-3/4" />
+                    <div className="h-6 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded w-1/2" />
+                  </div>
+                  {/* Main content skeleton */}
+                  <div className="flex-1 space-y-6">
+                    <div className="h-48 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md" />
+                    <div className="h-64 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </AppLayout>
+      </>
+    );
+  }
 
   return (
     <>
@@ -62,8 +100,24 @@ export default function ProfileGenZ() {
       />
 
       <AppLayout>
-        <div className="bg-[var(--gh-canvas-subtle)] min-h-screen">
+        <div className="bg-[var(--gh-canvas-subtle)] min-h-screen" id="main-content">
           <div className="max-w-[1280px] mx-auto px-4 py-8">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb className="mb-6">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/" className="flex items-center gap-1">
+                    <Home className="w-3.5 h-3.5" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Profile</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+
             <div className="flex flex-col md:flex-row gap-8">
               
               {/* Left Sidebar */}

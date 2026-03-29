@@ -1094,7 +1094,7 @@ export default function TestSession() {
             }`}>
               <div className="max-w-3xl mx-auto flex gap-3">
                 <button
-                  onClick={startTest}
+                  onClick={() => startTest(false)}
                   className="flex-1 py-3 border border-border rounded-xl font-medium hover:bg-muted/50 transition-all flex items-center justify-center gap-2"
                 >
                   <RotateCcw className="w-4 h-4" /> Try Again
@@ -1238,7 +1238,7 @@ export default function TestSession() {
                     <Eye className="w-4 h-4" /> Review Answers
                   </button>
                   <button
-                    onClick={startTest}
+                    onClick={() => startTest(false)}
                     className={`w-full py-2 border font-bold rounded transition-all flex items-center justify-center gap-2 ${
                       result.passed 
                         ? 'border-green-500 text-green-500 hover:bg-green-500/10' 

@@ -15,6 +15,7 @@ import { Haptics } from '../lib/haptics';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
 import { AppLayout } from '../components/layout/AppLayout';
+import { Button } from '../components/unified/Button';
 import {
   getCard, recordReview, addToSRS,
   getMasteryLabel, getMasteryColor,
@@ -274,8 +275,8 @@ export default function QuestionViewerGenZ() {
             <h2 className="text-lg font-semibold mb-2">Error loading channel</h2>
             <p>{error?.message || "Channel not found"}</p>
           </div>
-          <Link href="/channels" className="gh-btn gh-btn-secondary">
-            Back to Topics
+          <Link href="/channels">
+            <Button variant="secondary" size="sm">Back to Topics</Button>
           </Link>
         </div>
       </AppLayout>
@@ -318,22 +319,22 @@ export default function QuestionViewerGenZ() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button 
+              <Button 
                 onClick={prevQuestion}
                 disabled={currentIndex === 0}
-                className="gh-btn gh-btn-secondary px-2 disabled:opacity-50"
+                variant="secondary"
+                size="sm"
                 aria-label="Previous question"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button 
+                icon={<ChevronLeft className="w-4 h-4" />}
+              />
+              <Button 
                 onClick={nextQuestion}
                 disabled={currentIndex === totalQuestions - 1}
-                className="gh-btn gh-btn-secondary px-2 disabled:opacity-50"
+                variant="secondary"
+                size="sm"
                 aria-label="Next question"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+                icon={<ChevronRight className="w-4 h-4" />}
+              />
             </div>
           </div>
         </div>
@@ -395,16 +396,17 @@ export default function QuestionViewerGenZ() {
             {/* Answer Section */}
             {!isAnswerRevealed ? (
               <div className="flex flex-col items-center py-8">
-                <button 
+                <Button 
                   onClick={() => {
                     setIsAnswerRevealed(true);
                     Haptics.light();
                   }}
-                  className="gh-btn gh-btn-primary h-12 px-10 text-base"
+                  variant="primary"
+                  size="md"
+                  icon={<Brain className="w-5 h-5" />}
                 >
-                  <Brain className="w-5 h-5 mr-2" />
                   Show Answer
-                </button>
+                </Button>
                 <p className="mt-4 text-sm text-[var(--gh-fg-muted)]">
                   Take a moment to think about your answer.
                 </p>
@@ -437,39 +439,43 @@ export default function QuestionViewerGenZ() {
                   
                   {showRatingButtons || srsCard ? (
                     <div className="flex flex-wrap gap-2">
-                      <button 
+                      <Button 
                         onClick={() => handleSRSRating('again')}
-                        className="gh-btn gh-btn-secondary border-red-300 hover:bg-red-50 hover:text-red-700"
+                        variant="secondary"
+                        size="sm"
                       >
                         Again
-                      </button>
-                      <button 
+                      </Button>
+                      <Button 
                         onClick={() => handleSRSRating('hard')}
-                        className="gh-btn gh-btn-secondary border-orange-300 hover:bg-orange-50 hover:text-orange-700"
+                        variant="secondary"
+                        size="sm"
                       >
                         Hard
-                      </button>
-                      <button 
+                      </Button>
+                      <Button 
                         onClick={() => handleSRSRating('good')}
-                        className="gh-btn gh-btn-secondary border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                        variant="secondary"
+                        size="sm"
                       >
                         Good
-                      </button>
-                      <button 
+                      </Button>
+                      <Button 
                         onClick={() => handleSRSRating('easy')}
-                        className="gh-btn gh-btn-secondary border-green-300 hover:bg-green-50 hover:text-green-700"
+                        variant="secondary"
+                        size="sm"
                       >
                         Easy
-                      </button>
+                      </Button>
                     </div>
                   ) : (
-                    <button 
+                    <Button 
                       onClick={handleAddToSRS}
-                      className="gh-btn gh-btn-secondary"
+                      variant="secondary"
+                      icon={<RotateCcw className="w-4 h-4" />}
                     >
-                      <RotateCcw className="w-4 h-4 mr-2" />
                       Add to SRS Review
-                    </button>
+                    </Button>
                   )}
                   
                   {srsCard && (
@@ -489,21 +495,22 @@ export default function QuestionViewerGenZ() {
                 </div>
 
                 <div className="flex justify-between items-center pt-4">
-                  <button 
+                  <Button 
                     onClick={prevQuestion}
                     disabled={currentIndex === 0}
-                    className="gh-btn gh-btn-secondary"
+                    variant="secondary"
+                    icon={<ChevronLeft className="w-4 h-4" />}
                   >
-                    <ChevronLeft className="w-4 h-4 mr-1" />
                     Previous
-                  </button>
-                  <button 
+                  </Button>
+                  <Button 
                     onClick={nextQuestion}
-                    className="gh-btn gh-btn-primary"
+                    variant="primary"
+                    icon={<ChevronRight className="w-4 h-4" />}
+                    iconPosition="right"
                   >
                     Next Question
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
@@ -551,11 +558,12 @@ export default function QuestionViewerGenZ() {
               </div>
               <div className="p-4 space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-[var(--gh-fg-muted)] flex items-center gap-1.5">
+                  <label htmlFor="sub-topic-select" className="text-xs font-medium text-[var(--gh-fg-muted)] flex items-center gap-1.5">
                     <Filter className="w-3.5 h-3.5" />
                     Sub-topic
                   </label>
                   <select 
+                    id="sub-topic-select"
                     value={selectedSubChannel}
                     onChange={(e) => setSelectedSubChannel(e.target.value)}
                     className="w-full bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md px-2 py-1.5 text-sm focus:ring-2 focus:ring-[var(--gh-accent-emphasis)] outline-none"
@@ -567,11 +575,12 @@ export default function QuestionViewerGenZ() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-[var(--gh-fg-muted)] flex items-center gap-1.5">
+                  <label htmlFor="difficulty-select" className="text-xs font-medium text-[var(--gh-fg-muted)] flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5" />
                     Difficulty
                   </label>
                   <select 
+                    id="difficulty-select"
                     value={selectedDifficulty}
                     onChange={(e) => setSelectedDifficulty(e.target.value)}
                     className="w-full bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md px-2 py-1.5 text-sm focus:ring-2 focus:ring-[var(--gh-accent-emphasis)] outline-none"
@@ -585,11 +594,12 @@ export default function QuestionViewerGenZ() {
 
                 {companiesWithCounts && companiesWithCounts.length > 0 && (
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-[var(--gh-fg-muted)] flex items-center gap-1.5">
+                    <label htmlFor="company-select" className="text-xs font-medium text-[var(--gh-fg-muted)] flex items-center gap-1.5">
                       <Building2 className="w-3.5 h-3.5" />
                       Company
                     </label>
                     <select 
+                      id="company-select"
                       value={selectedCompany}
                       onChange={(e) => setSelectedCompany(e.target.value)}
                       className="w-full bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md px-2 py-1.5 text-sm focus:ring-2 focus:ring-[var(--gh-accent-emphasis)] outline-none"
