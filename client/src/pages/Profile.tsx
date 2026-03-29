@@ -43,6 +43,7 @@ export default function Profile() {
   const [couponCode, setCouponCode] = useState('');
   const [couponMessage, setCouponMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const couponFormRef = useRef<HTMLFormElement>(null);
 
   const handleToggleShuffle = () => {
     toggleShuffleQuestions();
@@ -335,7 +336,30 @@ export default function Profile() {
             </div>
 
             {/* Coupon Redemption */}
-            <div>
+            <form
+              ref={couponFormRef}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!couponCode.trim()) return;
+                setIsSubmitting(true);
+                const result = onRedeemCoupon(couponCode);
+                setCouponMessage({
+                  type: result.success ? 'success' : 'error',
+                  text: result.message
+                });
+                toast({
+                  title: result.success ? 'Coupon Applied!' : 'Error',
+                  description: result.message,
+                  variant: result.success ? 'default' : 'destructive'
+                });
+                if (result.success) {
+                  couponFormRef.current?.reset();
+                  setCouponCode('');
+                }
+                setIsSubmitting(false);
+                setTimeout(() => setCouponMessage(null), 3000);
+              }}
+            >
               <h4 className="text-xs font-semibold mb-2 flex items-center gap-1">
                 <Gift className="w-3 h-3" /> Redeem Coupon
               </h4>
@@ -348,27 +372,8 @@ export default function Profile() {
                   className="flex-1 px-3 py-2 bg-black/20 border border-border rounded-lg text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
                 <button
+                  type="submit"
                   disabled={isSubmitting}
-                  onClick={async () => {
-                    if (!couponCode.trim()) return;
-                    setIsSubmitting(true);
-                    try {
-                      const result = onRedeemCoupon(couponCode);
-                      setCouponMessage({
-                        type: result.success ? 'success' : 'error',
-                        text: result.message
-                      });
-                      toast({
-                        title: result.success ? 'Coupon Applied!' : 'Error',
-                        description: result.message,
-                        variant: result.success ? 'default' : 'destructive'
-                      });
-                      if (result.success) setCouponCode('');
-                    } finally {
-                      setIsSubmitting(false);
-                    }
-                    setTimeout(() => setCouponMessage(null), 3000);
-                  }}
                   className="px-4 py-2 bg-amber-500 text-white text-sm font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {isSubmitting ? (
@@ -386,7 +391,7 @@ export default function Profile() {
                   {couponMessage.text}
                 </p>
               )}
-            </div>
+            </form>
 
             {/* Recent Transactions */}
             {history.length > 0 && (

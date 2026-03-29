@@ -85,7 +85,7 @@ export default function BadgesGenZ() {
 
             {/* Summary Card */}
             <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-6 mb-8">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between gap-4 mb-2">
                 <span className="text-sm font-medium text-[var(--gh-fg)]">Overall Progress</span>
                 <span className="text-sm font-bold text-[var(--gh-fg)]">{stats.percentage}%</span>
               </div>
@@ -176,7 +176,7 @@ export default function BadgesGenZ() {
                       
                       {!isUnlocked && badgeProgress.progress !== undefined && badgeProgress.target !== undefined && (
                         <div className="w-full">
-                          <div className="flex justify-between text-[9px] text-[var(--gh-fg-subtle)] mb-1">
+                          <div className="flex justify-between gap-2 text-[9px] text-[var(--gh-fg-subtle)] mb-1">
                             <span>{Math.round((badgeProgress.progress / badgeProgress.target) * 100)}%</span>
                           </div>
                           <div className="gh-progress h-1">

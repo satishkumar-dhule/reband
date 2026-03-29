@@ -562,7 +562,7 @@ function ActiveExam({
       {/* Header */}
       <header className="sticky top-0 z-40 bg-card/95 backdrop-blur border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={onExit}
@@ -929,7 +929,7 @@ function ResultsScreen({
                 
                 return (
                   <div key={domain.id}>
-                    <div className="flex justify-between text-sm mb-1">
+                    <div className="flex justify-between gap-4 text-sm mb-1">
                       <span className="text-muted-foreground">{domain.name}</span>
                       <span className={`font-medium ${
                         domainResult.percentage >= 70 ? 'text-green-500' : 'text-red-500'

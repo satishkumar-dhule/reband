@@ -59,7 +59,7 @@ export function AppLayout({
       <div className="flex-1 lg:ml-[260px] flex flex-col min-w-0">
         {/* Top header */}
         <header
-          className="sticky top-0 z-30 flex items-center gap-3 h-12 px-4 border-b"
+          className="sticky top-0 z-30 flex items-center gap-3 h-[44px] px-4 border-b"
           style={{
             backgroundColor: "var(--header-bg)",
             borderColor: "var(--sidebar-border)",
@@ -68,7 +68,7 @@ export function AppLayout({
           {/* Mobile menu trigger */}
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-md text-[var(--sidebar-foreground)] hover:text-[var(--primary)] transition-colors"
+            className="lg:hidden flex items-center justify-center w-[44px] h-[44px] rounded-md text-[var(--sidebar-foreground)] hover:text-[var(--primary)] transition-colors"
             aria-label="Open menu"
             data-testid="button-mobile-menu"
           >
@@ -89,7 +89,7 @@ export function AppLayout({
           {/* Search */}
           <button
             onClick={() => setSearchOpen(true)}
-            className="hidden sm:flex flex-1 max-w-xs items-center gap-2 h-7 px-3 rounded-md border text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--primary)] transition-colors"
+            className="hidden sm:flex flex-1 max-w-xs items-center gap-2 h-[44px] px-3 rounded-md border text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--primary)] transition-colors"
             style={{
               backgroundColor: "var(--popover)",
               borderColor: "var(--border)",

@@ -57,6 +57,7 @@ import {
   getCodingStats,
   getSolvedChallengeIds,
   ComplexityAnalysis,
+  getLoadError,
 } from '../lib/coding-challenges';
 import { GiscusComments } from '../components/GiscusComments';
 import { mascotEvents } from '../components/PixelMascot';
@@ -113,6 +114,7 @@ export default function CodingChallenge() {
   const [viewState, setViewState] = useState<ViewState>(id ? 'challenge' : 'list');
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [currentChallenge, setCurrentChallenge] = useState<Challenge | null>(null);
   const [language, setLanguage] = useState<Language>(getStoredLanguage);
   const [code, setCode] = useState('');
@@ -134,11 +136,17 @@ export default function CodingChallenge() {
   useEffect(() => {
     async function loadChallenges() {
       try {
-        const { getAllChallengesAsync } = await import('../lib/coding-challenges');
+        const { getAllChallengesAsync, getLoadError } = await import('../lib/coding-challenges');
         const loaded = await getAllChallengesAsync();
         setChallenges(loaded);
+        
+        const error = getLoadError();
+        if (error) {
+          setLoadError(error);
+        }
       } catch (error) {
         console.error('Failed to load challenges:', error);
+        setLoadError('Failed to load challenges data');
         // Fallback to sync version
         setChallenges(getAllChallenges());
       } finally {

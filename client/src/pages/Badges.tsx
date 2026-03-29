@@ -220,7 +220,7 @@ export default function Badges() {
             animate={{ opacity: 1, y: 0 }}
             className="border border-border p-4 bg-card rounded-lg mb-6"
           >
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between gap-4 mb-3">
               <div className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-primary" />
                 <span className="font-bold">Your Collection</span>
@@ -235,7 +235,7 @@ export default function Badges() {
                 transition={{ duration: 1, ease: 'easeOut' }}
               />
             </div>
-            <div className="flex justify-between text-[10px] text-muted-foreground">
+            <div className="flex justify-between gap-2 text-[10px] text-muted-foreground">
               <span>{overallProgress}% Complete</span>
               <span>{totalBadges - unlockedCount} badges remaining</span>
             </div>
@@ -454,7 +454,7 @@ export default function Badges() {
                       className="w-full mt-6 p-4 bg-muted/20 rounded-xl"
                       style={{ transform: 'translateZ(5px)' }}
                     >
-                      <div className="flex justify-between text-sm mb-2">
+                      <div className="flex justify-between gap-4 text-sm mb-2">
                         <span className="text-muted-foreground">Progress</span>
                         <span className="font-bold">
                           {selectedBadge.current}/{selectedBadge.badge.requirement} {selectedBadge.badge.unit}

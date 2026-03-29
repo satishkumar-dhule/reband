@@ -95,8 +95,8 @@ export function BadgeUnlockCelebration({ badge, onClose }: BadgeUnlockCelebratio
             
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] uppercase tracking-wider text-primary font-semibold">
-                🎉 Badge Unlocked!
+              <p className="text-[10px] uppercase tracking-wider text-primary font-semibold flex items-center gap-1">
+                <Trophy className="w-3 h-3" /> Badge Unlocked!
               </p>
               <p className="font-semibold text-sm truncate">{badge.name}</p>
               <p className="text-xs text-muted-foreground truncate">{badge.description}</p>

@@ -17,7 +17,6 @@ const Channels = lazy(() => import("@/pages/AllChannelsGenZ"));
 const QuestionViewer = lazy(() => import("@/pages/QuestionViewerGenZ"));
 const VoicePractice = lazy(() => import("@/pages/VoicePracticeGenZ"));
 const VoiceSession = lazy(() => import("@/pages/VoiceSessionGenZ"));
-const VoiceSessionQuestion = lazy(() => import("@/pages/VoiceSessionGenZ"));
 const Stats = lazy(() => import("@/pages/StatsGenZ"));
 const Bookmarks = lazy(() => import("@/pages/Bookmarks"));
 const Profile = lazy(() => import("@/pages/ProfileGenZ"));
@@ -43,7 +42,6 @@ function MinimalApp() {
         <Route path="/channel/:id/:questionId" component={QuestionViewer} />
         <Route path="/voice-interview" component={VoicePractice} />
         <Route path="/voice-session" component={VoiceSession} />
-        <Route path="/voice-session/:questionId" component={VoiceSessionQuestion} />
         <Route path="/review" component={ReviewSession} />
         <Route path="/coding" component={CodingChallenge} />
         <Route path="/coding/:id" component={CodingChallenge} />

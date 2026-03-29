@@ -213,7 +213,7 @@ export const OverrideManager: React.FC<OverrideManagerProps> = ({
 
           {/* Add New Override */}
           {!existingOverride && (
-            <div className="space-y-4">
+            <form ref={formRef} className="space-y-4">
               <Label className="text-sm font-medium">Add Manual Override</Label>
               
               <Alert>
@@ -283,7 +283,7 @@ export const OverrideManager: React.FC<OverrideManagerProps> = ({
                   </Button>
                 )}
               </div>
-            </div>
+            </form>
           )}
         </CardContent>
       </Card>

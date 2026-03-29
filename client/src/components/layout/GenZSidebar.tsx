@@ -37,7 +37,7 @@ export function GenZSidebar() {
       {/* Logo - Clickable to go home */}
       <button 
         onClick={() => setLocation('/')}
-        className="p-6 border-b border-border hover:bg-muted/50 transition-colors cursor-pointer"
+        className="p-6 border-b border-border transition-colors cursor-pointer"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-primary to-cyan-500 rounded-[12px] flex items-center justify-center">
@@ -86,12 +86,12 @@ export function GenZSidebar() {
             <motion.button
               key={item.path}
               whileHover={prefersReducedMotion ? undefined : { x: 4 }}
-              whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+              whileTap={prefersReducedMotion ? undefined : {}}
               onClick={() => setLocation(item.path)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] transition-all ${
                 isActive
                   ? 'bg-gradient-to-r from-primary/20 to-cyan-500/20 border border-primary/30 text-foreground'
-                  : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Icon className="w-5 h-5" strokeWidth={2} />
@@ -197,8 +197,8 @@ export function GenZSidebar() {
 
       {/* Credits Footer */}
       <motion.button
-        whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
-        whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+        whileHover={prefersReducedMotion ? undefined : {}}
+        whileTap={prefersReducedMotion ? undefined : {}}
         onClick={() => setLocation('/profile')}
         className="m-4 p-4 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-[16px] flex items-center gap-3"
       >
