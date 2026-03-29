@@ -6,10 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ThemeProvider } from "@/context/ThemeContext";
-import { CreditsProvider } from "@/context/CreditsContext";
-import { AchievementProvider } from "@/context/AchievementContext";
 import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
-import { UnifiedNotificationProvider } from "@/components/UnifiedNotificationManager";
 import { LiveRegionProvider } from "@/components/LiveRegion";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import NotFound from "@/pages/not-found";
@@ -117,15 +114,9 @@ function MinimalApp() {
 function FullApp() {
   return (
     <LiveRegionProvider>
-      <CreditsProvider>
-        <AchievementProvider>
-          <UnifiedNotificationProvider>
-            <OnboardingGuard>
-              <MinimalApp />
-            </OnboardingGuard>
-          </UnifiedNotificationProvider>
-        </AchievementProvider>
-      </CreditsProvider>
+      <OnboardingGuard>
+        <MinimalApp />
+      </OnboardingGuard>
     </LiveRegionProvider>
   );
 }

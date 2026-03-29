@@ -1,170 +1,172 @@
-/**
- * Achievement Context
- * Global state management for achievements with credit system integration
- * Now integrated with the unified reward system
- */
+import { createContext, useContext, useCallback, useState, useRef, useEffect } from 'react';
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import {
-  Achievement,
-  AchievementProgress,
-  UserEvent,
-  processUserEvent,
-  calculateAchievementProgress,
-  getMetrics,
-  UserMetrics,
-} from '../lib/achievements';
-import { earnCredits as earnCreditsLib } from '../lib/credits';
-import { rewardEngine, rewardStorage } from '../lib/rewards';
-
-interface AchievementContextType {
-  progress: AchievementProgress[];
-  metrics: UserMetrics;
-  newlyUnlocked: Achievement[];
-  trackEvent: (event: UserEvent) => void;
-  refreshProgress: () => void;
-  dismissNotification: (achievementId: string) => void;
-  // New: queue achievements for unified notification system
-  pendingAchievements: Achievement[];
-  consumePendingAchievement: () => Achievement | undefined;
-  // Unified reward system access
-  level: number;
-  totalXP: number;
-  credits: number;
-  streak: number;
+interface Achievement {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  icon?: string;
+  unlockedAt?: Date;
+  metadata?: Record<string, unknown>;
 }
 
-const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
+interface AchievementContextType {
+  achievements: Achievement[];
+  pendingAchievements: Achievement[];
+  trackEvent: (event: string, metadata?: Record<string, unknown>) => void;
+  unlockAchievement: (achievement: Achievement) => void;
+  consumePendingAchievement: () => Achievement | null;
+}
 
-export function AchievementProvider({ children }: { children: ReactNode }) {
-  const [progress, setProgress] = useState<AchievementProgress[]>([]);
-  const [metrics, setMetrics] = useState<UserMetrics>(() => getMetrics());
-  const [newlyUnlocked, setNewlyUnlocked] = useState<Achievement[]>([]);
+const AchievementContext = createContext<AchievementContextType | null>(null);
+
+export function AchievementProvider({ children }: { children: React.ReactNode }) {
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [pendingAchievements, setPendingAchievements] = useState<Achievement[]>([]);
-  
-  // Unified reward state
-  const [rewardState, setRewardState] = useState(() => rewardStorage.getProgress());
 
-  // Load initial progress
+  const achievementsRef = useRef(achievements);
+  achievementsRef.current = achievements;
+
   useEffect(() => {
-    refreshProgress();
+    const saved = localStorage.getItem('devprep_achievements');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setAchievements(parsed.map((a: Achievement) => ({
+          ...a,
+          unlockedAt: a.unlockedAt ? new Date(a.unlockedAt) : undefined
+        })));
+      } catch {
+        // Invalid data, ignore
+      }
+    }
   }, []);
-  
-  // Subscribe to reward engine updates
+
   useEffect(() => {
-    const unsubscribe = rewardEngine.addListener(() => {
-      setRewardState(rewardStorage.getProgress());
-    });
-    return unsubscribe;
-  }, []);
+    if (achievements.length > 0) {
+      localStorage.setItem('devprep_achievements', JSON.stringify(achievements));
+    }
+  }, [achievements]);
 
-  // Refresh progress
-  const refreshProgress = useCallback(() => {
-    const allProgress = calculateAchievementProgress();
-    setProgress(allProgress);
-    setMetrics(getMetrics());
-    setRewardState(rewardStorage.getProgress());
-  }, []);
-
-  // Track user event - now also triggers unified reward system
-  const trackEvent = useCallback((event: UserEvent) => {
-    // Process through legacy achievement system
-    const unlocked = processUserEvent(event);
-    
-    // Also process through unified reward system
-    const activityTypeMap: Record<string, string> = {
-      'question_completed': 'question_completed',
-      'quiz_answered': 'quiz_answered',
-      'voice_interview_completed': 'voice_interview_completed',
-      'srs_review': 'srs_card_rated',
-      'session_started': 'session_started',
-      'session_ended': 'session_ended',
-      'daily_login': 'daily_login',
-      'streak_updated': 'streak_updated',
+  const trackEvent = useCallback((event: string, metadata?: Record<string, unknown>) => {
+    // Handle different achievement events
+    const eventHandlers: Record<string, () => void> = {
+      'question_answered': () => {
+        const count = achievementsRef.current.filter(a => a.type === 'question_answered').length;
+        if (count === 0) {
+          unlockAchievement({
+            id: 'first_question',
+            type: 'question_answered',
+            title: 'First Steps',
+            description: 'Answered your first question'
+          });
+        }
+      },
+      'test_completed': () => {
+        const count = achievementsRef.current.filter(a => a.type === 'test_completed').length;
+        if (count === 0) {
+          unlockAchievement({
+            id: 'first_test',
+            type: 'test_completed',
+            title: 'Test Taker',
+            description: 'Completed your first practice test'
+          });
+        }
+      },
+      'voice_session': () => {
+        const count = achievementsRef.current.filter(a => a.type === 'voice_session').length;
+        if (count === 0) {
+          unlockAchievement({
+            id: 'first_voice',
+            type: 'voice_session',
+            title: 'Voice Ready',
+            description: 'Completed your first voice practice session'
+          });
+        }
+      },
+      'streak_3': () => {
+        unlockAchievement({
+          id: 'streak_3',
+          type: 'streak_3',
+          title: 'On Fire',
+          description: '3-day learning streak'
+        });
+      },
+      'streak_7': () => {
+        unlockAchievement({
+          id: 'streak_7',
+          type: 'streak_7',
+          title: 'Week Warrior',
+          description: '7-day learning streak'
+        });
+      },
+      'questions_10': () => {
+        unlockAchievement({
+          id: 'questions_10',
+          type: 'questions_10',
+          title: 'Getting Started',
+          description: 'Answered 10 questions'
+        });
+      },
+      'questions_50': () => {
+        unlockAchievement({
+          id: 'questions_50',
+          type: 'questions_50',
+          title: 'Dedicated Learner',
+          description: 'Answered 50 questions'
+        });
+      },
+      'questions_100': () => {
+        unlockAchievement({
+          id: 'questions_100',
+          type: 'questions_100',
+          title: 'Century Club',
+          description: 'Answered 100 questions'
+        });
+      },
     };
-    
-    const mappedType = activityTypeMap[event.type];
-    if (mappedType) {
-      rewardEngine.processActivity({
-        type: mappedType as any,
-        timestamp: event.timestamp,
-        data: event.data,
-      });
-    }
-    
-    if (unlocked.length > 0) {
-      // Queue achievements for unified notification system
-      setPendingAchievements(prev => [...prev, ...unlocked]);
-      
-      // Also keep legacy newlyUnlocked for backward compatibility
-      setNewlyUnlocked(prev => [...prev, ...unlocked]);
-      
-      // Award credits for achievements (through unified system)
-      unlocked.forEach(achievement => {
-        const creditRewards = achievement.rewards.filter(r => r.type === 'credits');
-        creditRewards.forEach(reward => {
-          // Use both systems for now during transition
-          earnCreditsLib(reward.amount, `Achievement: ${achievement.name}`);
-          rewardStorage.addCredits(reward.amount);
-        });
-        
-        // Award XP for achievements
-        const xpRewards = achievement.rewards.filter(r => r.type === 'xp');
-        xpRewards.forEach(reward => {
-          rewardStorage.addXP(reward.amount);
-        });
-      });
-      
-      // Auto-dismiss legacy notifications after 5 seconds
-      setTimeout(() => {
-        setNewlyUnlocked(prev => prev.filter(a => !unlocked.includes(a)));
-      }, 5000);
-    }
-    
-    // Refresh progress
-    refreshProgress();
-  }, [refreshProgress]);
 
-  // Dismiss notification (legacy)
-  const dismissNotification = useCallback((achievementId: string) => {
-    setNewlyUnlocked(prev => prev.filter(a => a.id !== achievementId));
+    if (eventHandlers[event]) {
+      eventHandlers[event]();
+    }
   }, []);
 
-  // Consume pending achievement for unified system
+  const unlockAchievement = useCallback((achievement: Achievement) => {
+    setAchievements(prev => {
+      if (prev.some(a => a.id === achievement.id)) {
+        return prev;
+      }
+      return [...prev, { ...achievement, unlockedAt: new Date() }];
+    });
+    setPendingAchievements(prev => [...prev, achievement]);
+  }, []);
+
   const consumePendingAchievement = useCallback(() => {
-    if (pendingAchievements.length === 0) return undefined;
-    const [first, ...rest] = pendingAchievements;
+    if (pendingAchievements.length === 0) return null;
+    const [next, ...rest] = pendingAchievements;
     setPendingAchievements(rest);
-    return first;
+    return next;
   }, [pendingAchievements]);
 
   return (
-    <AchievementContext.Provider
-      value={{
-        progress,
-        metrics,
-        newlyUnlocked,
-        trackEvent,
-        refreshProgress,
-        dismissNotification,
-        pendingAchievements,
-        consumePendingAchievement,
-        // Unified reward system values
-        level: rewardState.level,
-        totalXP: rewardState.totalXP,
-        credits: rewardState.creditBalance,
-        streak: rewardState.currentStreak,
-      }}
-    >
+    <AchievementContext.Provider value={{
+      achievements,
+      pendingAchievements,
+      trackEvent,
+      unlockAchievement,
+      consumePendingAchievement
+    }}>
       {children}
     </AchievementContext.Provider>
   );
 }
 
-export function useAchievementContext() {
+export function useAchievementContext(): AchievementContextType {
   const context = useContext(AchievementContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAchievementContext must be used within AchievementProvider');
   }
   return context;
 }
+
+export { AchievementContext };
