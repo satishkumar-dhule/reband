@@ -99,7 +99,7 @@ export default function OnboardingPage() {
       setRole(selectedRole);
     }
     skipOnboarding();
-    setLocation('/');
+    setLocation('/channels');
   };
 
   return (
@@ -293,7 +293,12 @@ export default function OnboardingPage() {
                   ) : (
                     <Button 
                       variant="outline" 
-                      onClick={() => setCurrentStep(prev => prev - 1)}
+                      onClick={() => {
+                        if (currentStep === 3 && selectedRole) {
+                          setSelectedRole(selectedRole);
+                        }
+                        setCurrentStep(prev => prev - 1);
+                      }}
                       className="text-[var(--gh-fg)]"
                     >
                       <ArrowLeft className="w-4 h-4 mr-2" /> Back

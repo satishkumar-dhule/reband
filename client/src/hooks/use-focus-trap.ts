@@ -41,7 +41,7 @@ export interface UseFocusTrapOptions {
  * Validates: Requirements 2.2, 2.3, 5.2, 5.3, 11.1
  */
 export function useFocusTrap(
-  containerRef: RefObject<HTMLElement>,
+  containerRef: RefObject<HTMLElement | null>,
   options: UseFocusTrapOptions = { enabled: true, returnFocus: true }
 ): void {
   const previousActiveElement = useRef<HTMLElement | null>(null);

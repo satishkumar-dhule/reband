@@ -5,7 +5,7 @@
  * of formatting patterns, including adding justifications and tracking usage.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';
@@ -41,6 +41,7 @@ export const OverrideManager: React.FC<OverrideManagerProps> = ({
   const [selectedPattern, setSelectedPattern] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const existingOverride = configurationManager.getOverrideForQuestion(questionId);
   const availablePatterns = patternLibrary.getAllPatterns();
@@ -75,7 +76,8 @@ export const OverrideManager: React.FC<OverrideManagerProps> = ({
         onOverrideAdded?.(savedOverride);
       }
 
-      // Reset form
+      // Reset form using ref
+      formRef.current?.reset();
       setJustification('');
       setSelectedPattern('');
     } catch (err) {

@@ -3,7 +3,7 @@
  * User stats, achievements, and settings
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
@@ -29,6 +29,7 @@ import {
   speak,
   stop
 } from '../lib/text-to-speech';
+import { toast } from '@/hooks/use-toast';
 
 export default function Profile() {
   const [, setLocation] = useLocation();
@@ -41,6 +42,31 @@ export default function Profile() {
   
   const [couponCode, setCouponCode] = useState('');
   const [couponMessage, setCouponMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleToggleShuffle = () => {
+    toggleShuffleQuestions();
+    toast({
+      title: "Settings saved",
+      description: "Your preference has been updated",
+    });
+  };
+
+  const handleToggleUnvisited = () => {
+    togglePrioritizeUnvisited();
+    toast({
+      title: "Settings saved",
+      description: "Your preference has been updated",
+    });
+  };
+
+  const handleToggleCertifications = () => {
+    toggleHideCertifications();
+    toast({
+      title: "Settings saved",
+      description: "Your preference has been updated",
+    });
+  };
 
   // Calculate stats
   const totalQuestions = channelStats.reduce((sum, s) => sum + s.total, 0);
@@ -232,21 +258,21 @@ export default function Profile() {
                 label="Shuffle Questions"
                 sublabel="Randomize question order"
                 enabled={preferences.shuffleQuestions !== false}
-                onToggle={toggleShuffleQuestions}
+                onToggle={handleToggleShuffle}
               />
               <ToggleItem
                 icon={<Eye className="w-5 h-5" />}
                 label="Unvisited First"
                 sublabel="Show new questions first"
                 enabled={preferences.prioritizeUnvisited !== false}
-                onToggle={togglePrioritizeUnvisited}
+                onToggle={handleToggleUnvisited}
               />
               <ToggleItem
                 icon={<Award className="w-5 h-5" />}
                 label="Hide Certifications"
                 sublabel="Remove certifications from navigation"
                 enabled={preferences.hideCertifications === true}
-                onToggle={toggleHideCertifications}
+                onToggle={handleToggleCertifications}
               />
               <MenuItem
                 icon={<Bell className="w-5 h-5" />}
@@ -322,19 +348,37 @@ export default function Profile() {
                   className="flex-1 px-3 py-2 bg-black/20 border border-border rounded-lg text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
                 <button
-                  onClick={() => {
+                  disabled={isSubmitting}
+                  onClick={async () => {
                     if (!couponCode.trim()) return;
-                    const result = onRedeemCoupon(couponCode);
-                    setCouponMessage({
-                      type: result.success ? 'success' : 'error',
-                      text: result.message
-                    });
-                    if (result.success) setCouponCode('');
+                    setIsSubmitting(true);
+                    try {
+                      const result = onRedeemCoupon(couponCode);
+                      setCouponMessage({
+                        type: result.success ? 'success' : 'error',
+                        text: result.message
+                      });
+                      toast({
+                        title: result.success ? 'Coupon Applied!' : 'Error',
+                        description: result.message,
+                        variant: result.success ? 'default' : 'destructive'
+                      });
+                      if (result.success) setCouponCode('');
+                    } finally {
+                      setIsSubmitting(false);
+                    }
                     setTimeout(() => setCouponMessage(null), 3000);
                   }}
-                  className="px-4 py-2 bg-amber-500 text-white text-sm font-bold rounded-lg hover:bg-amber-600 transition-colors"
+                  className="px-4 py-2 bg-amber-500 text-white text-sm font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  Apply
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Applying...
+                    </>
+                  ) : (
+                    'Apply'
+                  )}
                 </button>
               </div>
               {couponMessage && (

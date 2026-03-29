@@ -11,6 +11,7 @@ import {
   getCertificationById, 
   getPrerequisiteCertifications,
 } from '../lib/certifications-config';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useCredits } from '../context/CreditsContext';
 import { SEOHead } from '../components/SEOHead';
 import { QuestionPanel } from '../components/QuestionPanel';
@@ -709,6 +710,25 @@ export default function CertificationPractice() {
       <SkipConfirmModal />
 
       <div className="min-h-screen bg-background">
+        {/* Breadcrumb */}
+        <div className="max-w-7xl mx-auto px-3 pt-3">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/certifications">Certifications</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{certification.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
         {/* Compact Header - Single row with integrated progress */}
         <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
           <div className="max-w-7xl mx-auto px-3 py-2">

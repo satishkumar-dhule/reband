@@ -406,8 +406,8 @@ export function EnhancedMermaid({ chart, compact = false, onRenderResult }: Enha
               )}
             </div>
             <div className="w-px h-4 bg-white/20 mx-1" />
-            <button onClick={handleZoomOut} className="p-2 hover:bg-white/10 rounded transition-colors" title="Zoom out"><ZoomOut className="w-4 h-4 text-white/70" /></button>
-            <button onClick={handleZoomIn} className="p-2 hover:bg-white/10 rounded transition-colors" title="Zoom in"><ZoomIn className="w-4 h-4 text-white/70" /></button>
+            <button onClick={handleZoomOut} aria-label="Zoom out" className="p-2 hover:bg-white/10 rounded transition-colors"><ZoomOut className="w-4 h-4 text-white/70" /></button>
+            <button onClick={handleZoomIn} aria-label="Zoom in" className="p-2 hover:bg-white/10 rounded transition-colors"><ZoomIn className="w-4 h-4 text-white/70" /></button>
             <button onClick={resetView} className="px-3 py-1 text-[10px] text-white/50 hover:text-white hover:bg-white/10 rounded uppercase" title="Reset">Reset</button>
             <div className="w-px h-4 bg-white/20 mx-1" />
             <button onClick={() => { setIsExpanded(false); resetView(); }} className="p-2 hover:bg-white/10 rounded transition-colors" title="Close"><X className="w-4 h-4 text-white/70" /></button>
@@ -467,7 +467,7 @@ export function EnhancedMermaid({ chart, compact = false, onRenderResult }: Enha
           <button 
             onClick={(e) => { e.stopPropagation(); setInlineZoom(z => Math.max(0.5, z - 0.25)); }}
             className="p-1.5 bg-black/80 rounded border border-white/20 text-white/70 hover:text-white"
-            title="Zoom out"
+            aria-label="Zoom out"
           >
             <ZoomOut className="w-3 h-3" />
           </button>
@@ -477,7 +477,7 @@ export function EnhancedMermaid({ chart, compact = false, onRenderResult }: Enha
           <button 
             onClick={(e) => { e.stopPropagation(); setInlineZoom(z => Math.min(3, z + 0.25)); }}
             className="p-1.5 bg-black/80 rounded border border-white/20 text-white/70 hover:text-white"
-            title="Zoom in"
+            aria-label="Zoom in"
           >
             <ZoomIn className="w-3 h-3" />
           </button>

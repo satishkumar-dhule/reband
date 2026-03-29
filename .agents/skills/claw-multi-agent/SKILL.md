@@ -1,6 +1,6 @@
 ---
 name: claw-multi-agent
-description: "Multi-agent parallel orchestration for OpenClaw. Spawn AI agents as a team — parallel research, multi-model comparison, code pipelines. Proven 50-65% time savings. Trigger words: multi-agent, parallel agents, swarm, spawn multiple agents, parallel research, compare models, deep research, comprehensive research, detailed investigation, thorough analysis, research multiple topics, 多智能体, 多个Agent, 并行调研, 并行搜索, 同时搜索, 同时调研, 深度调研, 详细调研, 全面调研, 深度研究, 详细检索, 多角度分析, 全面分析, 多个模型, 让多个AI, 分别搜索, 同时搜索, 组建团队, Agent小队, 多Agent."
+description: "Multi-agent parallel orchestration for OpenClaw. Spawn AI agents as a team — parallel research, multi-model comparison, code pipelines. Proven 50-65% time savings. Trigger words: multi-agent, parallel agents, swarm, spawn multiple agents, parallel research, compare models, deep research, comprehensive research, detailed investigation, thorough analysis, research multiple topics."
 ---
 
 # claw-multi-agent 🐝
@@ -46,8 +46,8 @@ This is the recommended pattern. Every multi-agent run must follow this interact
 The very first thing to say when this skill is triggered — before any planning or spawning:
 
 ```
-🐝 **claw-multi-agent 已唤醒**
-多智能体并行模式启动，我来组建 Agent 小队处理这个任务。
+🐝 **claw-multi-agent activated**
+Multi-agent parallel mode initiated. I'll assemble an Agent team to handle this task.
 ```
 
 This tells the user the skill is active and sets expectations for what's about to happen.
@@ -57,16 +57,16 @@ This tells the user the skill is active and sets expectations for what's about t
 Right after the activation announcement, present the plan BEFORE calling sessions_spawn:
 
 ```
-🚀 [N]个方向同时开搞，全面覆盖你的问题。
+🚀 [N] directions simultaneously, comprehensive coverage of your question.
 
-📋 任务规划：
-🔍 研究员A（GLM）— [一句话任务描述]
-🔍 研究员B（GLM）— [一句话任务描述]
-📊 分析师（Kimi）— 先等前[N]个结果，单独召唤（note when sequential）
+📋 Task Plan:
+🔍 Researcher A (GLM) — [one-sentence task description]
+🔍 Researcher B (GLM) — [one-sentence task description]
+📊 Analyst (Kimi) — Waiting for first [N] results, summoned separately (note when sequential)
 
-模式：🎯 指挥官模式（联网搜索）
-预计耗时：~[X]s（[N] Agent 并行[，分析师串行跟进]）
-正在派出 Agent 小队...
+Mode: 🎯 Orchestrator Mode (web search)
+Estimated time: ~[X]s ([N] Agents parallel[, analyst follows sequentially])
+Deploying Agent team...
 ```
 
 **Role emoji reference:**
@@ -75,7 +75,7 @@ Right after the activation announcement, present the plan BEFORE calling session
 | Researcher | 🔍 | 🔍 Researcher A (GLM) — Research XX |
 | Analyst | 📊 | 📊 Analyst (Kimi) — Deep comparison |
 | Writer | ✍️ | ✍️ Writer (Gemini) — Draft the report |
-| Coder | 💻 | 💻 Programmer (Kimi) — Implement the logic |
+| Coder | 💻 | 💻 Coder (Kimi) — Implement the logic |
 | Reviewer | 🔎 | 🔎 Reviewer (GLM) — Quality check |
 | Planner | 📋 | 📋 Planner (Sonnet) — Break down tasks |
 
@@ -83,14 +83,14 @@ Right after the activation announcement, present the plan BEFORE calling session
 - ✅ Always list each agent with: emoji + role + **model name** + one-line task
 - ✅ State the mode (Orchestrator/Pipeline/Hybrid) and estimated time
 - ✅ End announcement with: `Deploying Agent team...`
-- ✅ Note sequential agents as: "Wait for first N results, spawn separately"
+- ✅ Note sequential agents as: "Waiting for first N results, summoned separately"
 - ❌ Never silently call sessions_spawn without announcing
 
 ### While waiting — brief note
 
 After spawning, say one line:
 ```
-⏳ 子 Agent 已全部出发，等结果回来...
+⏳ All sub-agents deployed, waiting for results...
 ```
 
 ### After results — structured output (not raw dump)
@@ -100,44 +100,44 @@ After spawning, say one line:
 **Recommended output order:**
 
 ```
-1. 执行统计卡 ← 先让用户知道跑了什么
-2. 核心结论（3-5条最重要发现）← 最有价值的放最前面
-3. 分主题展开细节（按内容逻辑组织，不按子Agent顺序）← 读起来是一篇完整文章
-4. 下一步行动建议 ← 落地结尾
+1. Execution Stats Card ← Let user know what ran first
+2. Core Conclusions (3-5 key findings) ← Most valuable first
+3. Detailed breakdown by topic (organized by content logic, not sub-agent order) ← Reads like a complete article
+4. Next Steps Recommendations ← Actionable ending
 ```
 
-**统计卡格式：**
+**Stats Card Format:**
 ```
-## 📊 执行统计
-| Agent | 模型 | 耗时 | 状态 |
+## 📊 Execution Stats
+| Agent | Model | Duration | Status |
 |-------|------|------|------|
-| 🔍 研究员A | GLM | 58s | ✅ |
-| 🔍 研究员B | GLM | 62s | ✅ |
-| 📊 分析师  | Kimi | 45s | ✅ |
-串行需要约 165s → 并行实际 62s，节省 **62%** ⚡
+| 🔍 Researcher A | GLM | 58s | ✅ |
+| 🔍 Researcher B | GLM | 62s | ✅ |
+| 📊 Analyst  | Kimi | 45s | ✅ |
+Serial would take ~165s → Parallel actual 62s, saved **62%** ⚡
 ```
 
 **❌ Wrong — agent order:**
 ```
-子Agent1的结果...
-子Agent2的结果...
-子Agent3的结果...  ← 读者要自己拼图，体验差
+Sub-agent 1 results...
+Sub-agent 2 results...
+Sub-agent 3 results...  ← Readers have to piece it together themselves, poor experience
 ```
 
 **✅ Right — content logic:**
 ```
-## 核心结论
-1. 最重要发现A（来自多个Agent综合）
-2. 最重要发现B
+## Key Conclusions
+1. Most important finding A (synthesized from multiple agents)
+2. Most important finding B
 ...
 
-## 详细分析：[主题1]
-...（整合所有相关Agent的内容）
+## Detailed Analysis: [Topic 1]
+...(integrating content from all relevant agents)
 
-## 详细分析：[主题2]
+## Detailed Analysis: [Topic 2]
 ...
 
-## 下一步建议
+## Next Steps Recommendations
 ...
 ```
 
@@ -173,15 +173,15 @@ message(action="send", message=report_content)
 
 **End with one line:**
 ```
-需要调整某个方向，或推送到飞书文档吗？
+Need to adjust any direction, or push to a document?
 ```
 
 **Rules:**
 - ✅ Always save `.md` file first — regardless of channel
 - ✅ Check current channel before deciding how to send
 - ❌ Never paste >300 words of Markdown text on Feishu — it won't render
-- ❌ Never just say "报告已保存至 /path/xxx" — user can't open server paths
-- ❌ Never ask "要不要我帮你整理成文档？" — just do it
+- ❌ Never just say "Report saved to /path/xxx" — user can't open server paths
+- ❌ Never ask "Do you want me to organize this into a document?" — just do it
 
 ### Sequential vs parallel — analyst must wait for researchers
 
@@ -207,41 +207,41 @@ message(action="send", message=report_content)
 
 Always pick the right model for each agent. State the model explicitly in the announcement.
 
-### Model roster
+### Model Roster
 
 | Model | Alias | Characteristics | Best for |
-|-------|-------|----------------|----------|
-| `glm` | GLM | Cheap, fast, good Chinese | Search, simple research, status check |
-| `kimi` | Kimi | Long context (128k), strong code | Deep analysis, code, long text integration |
-| `gemini` | Gemini | Good creativity, multimodal | Writing, copy, image understanding |
+|-------|-------|-----------------|----------|
+| `glm` | GLM | Cheap, fast, good Chinese | Search, simple research, status checks |
+| `kimi` | Kimi | Long context (128k), strong code | Deep analysis, code, long-form integration |
+| `gemini` | Gemini | Great creativity, multimodal | Writing, copy, image understanding |
 | `sonnet` | Claude Sonnet | Balanced, stable tool calling | Complex reasoning, planning, review |
-| `opus` | Claude Opus | Strongest reasoning | Extremely complex analysis, architecture design |
+| `opus` | Claude Opus | Strongest reasoning | Very complex analysis, architecture design |
 
 ### Role → Model mapping (default)
 
-| Role | Default model | Reason |
-|------|--------------|--------|
+| Role | Default Model | Reason |
+|------|---------------|--------|
 | 🔍 Researcher | **GLM** | Lightweight search, sufficient and cheap |
-| 📊 Analyst | **Kimi** | Long context, processing large amounts of data |
-| ✍️ Writer | **Gemini** | Best for creative writing |
-| 💻 Coder | **Kimi** | Long context code understanding |
-| 🔎 Reviewer | **GLM** | Simple judgment, no heavy artillery needed |
+| 📊 Analyst | **Kimi** | Long context, handles large amounts of data |
+| ✍️ Writer | **Gemini** | Best results for creative writing |
+| 💻 Coder | **Kimi** | Long context for code understanding |
+| 🔎 Reviewer | **GLM** | Simple judgment, doesn't need heavy artillery |
 | 📋 Planner | **Sonnet** | Strong structured planning ability |
-| 🧐 Critic | **Sonnet** | Rigorous logic, challenging assumptions |
+| 🧐 Critic | **Sonnet** | Rigorous logic, challenges assumptions |
 
 ### When to override defaults
 
-- Task is very simple → downgrade to GLM (save cost)
-- Need highest quality → upgrade to Opus
-- User explicitly specifies a model → follow the user's instructions
-- Multi-model comparison scenario → each agent uses a different model, explain in the announcement
+- Task is very simple → Downgrade to GLM (save cost)
+- Need highest quality → Upgrade to Opus
+- User explicitly specifies a model → Follow user's preference
+- Multi-model comparison → Each agent uses different model, specify in announcement
 
 ### Always announce the model
 
 In the pre-spawn announcement, every agent line must include the model:
 ```
-✅ Do this: 🔍 Researcher A (GLM) — Research LangChain
-❌ Not this: 🔍 Researcher A — Research LangChain
+✅ Correct: 🔍 Researcher A (GLM) — Research LangChain
+❌ Wrong: 🔍 Researcher A — Research LangChain
 ```
 
 ---
@@ -294,7 +294,7 @@ User says anything
 | Signal | Examples | Mode triggered |
 |--------|---------|---------------|
 | Multi-draft intent | "several versions", "multiple angles", "let me pick", "each write", "different styles" | Pipeline or Hybrid |
-| Search intent | "search", "latest", "research", "web lookup", "search", "latest" | Orchestrator or Hybrid |
+| Search intent | "search", "latest", "research", "web lookup", "lookup" | Orchestrator or Hybrid |
 | Both | "search and give me several versions", "research then write multiple drafts" | **Hybrid** |
 | Neither | "translate", "analyze", "write", plain text tasks | Pipeline |
 
@@ -474,7 +474,7 @@ python scripts/router.py spawn --json --multi "research X and write a report"
 ```
 
 | Tier | Model | Used for |
-|------|-------|---------|
+|------|-------|----------|
 | `FAST` | default (light) | Simple queries, status, translation, search |
 | `CODE` | default (smart) | Programming, debugging, implementation |
 | `RESEARCH` | default (light) | Research, search, compare, survey |
@@ -552,7 +552,7 @@ Agents spawned: 4  |  Parallel time: ~24s  |  Serial equivalent: ~86s  |  Saved:
 ## Preset roles
 
 | Role | Emoji | Best for |
-|------|-------|---------|
+|------|-------|----------|
 | `researcher` | 🔍 | Web search, info gathering |
 | `writer` | ✍️ | Reports, documentation, articles |
 | `coder` | 💻 | Code writing, debugging, implementation |
@@ -616,3 +616,7 @@ python run.py
 | `compare` | Side-by-side of each agent's output |
 | `concatenate` | Outputs joined in order |
 | `last` | Final agent's output only (sequential) |
+
+Base directory for this skill: file:///home/runner/workspace/.agents/skills/claw-multi-agent
+Relative paths in this skill (e.g., scripts/, reference/) are relative to this base directory.
+Note: file list is sampled.
