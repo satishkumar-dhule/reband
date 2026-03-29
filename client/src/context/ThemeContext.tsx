@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState, useMemo, useCallback, useRef, startTransition } from "react";
 
 export const themes = [
-  { id: "clean-dark", name: "Clean Dark", description: "Pure black with crisp white text" },
-  { id: "clean-light", name: "Clean Light", description: "Pure white with dark text" },
+  { id: "dark", name: "Dark", description: "Pure black with crisp white text" },
+  { id: "light", name: "Light", description: "Pure white with dark text" },
 ] as const;
 
 export type Theme = typeof themes[number]["id"];
@@ -18,8 +18,8 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const VALID_THEMES = ["clean-dark", "clean-light"] as const;
-const DEFAULT_THEME: Theme = "clean-dark";
+const VALID_THEMES = ["dark", "light"] as const;
+const DEFAULT_THEME: Theme = "dark";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
@@ -41,18 +41,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setThemeState((current) => (current === "clean-dark" ? "clean-light" : "clean-dark"));
+    setThemeState((current) => (current === "dark" ? "light" : "dark"));
   }, []);
 
   const cycleTheme = useCallback(() => {
-    setThemeState((current) => (current === "clean-dark" ? "clean-light" : "clean-dark"));
+    setThemeState((current) => (current === "dark" ? "light" : "dark"));
   }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const root = document.documentElement;
       root.setAttribute("data-theme", theme);
-      root.classList.remove("clean-dark", "clean-light");
+      root.classList.remove("dark", "light");
       root.classList.add(theme);
       localStorage.setItem("theme", theme);
       if (!isInitialMount.current) {
@@ -72,7 +72,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  const isDark = theme === "clean-dark";
+  const isDark = theme === "dark";
 
   const contextValue = useMemo(
     () => ({

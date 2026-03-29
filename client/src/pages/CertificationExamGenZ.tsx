@@ -19,6 +19,7 @@ import {
   CertificationDomain,
   CertificationExamConfig,
 } from '../lib/certification-questions';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { useCredits } from '../context/CreditsContext';
 import { SEOHead } from '../components/SEOHead';
 import {
@@ -385,7 +386,22 @@ function SetupScreen({
         className="w-full max-w-lg"
       >
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
+          <Breadcrumb className="justify-center mb-4">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/certifications">Certifications</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{certification.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
           <button
             onClick={onBack}
             aria-label="Go back"
@@ -560,6 +576,25 @@ function ActiveExam({
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Breadcrumb */}
+      <div className="max-w-4xl mx-auto px-4 pt-3">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/certifications">Certifications</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{certification.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border shadow-lg shadow-[#00ff88]/5">
         <div className="max-w-4xl mx-auto px-4 py-3">

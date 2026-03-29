@@ -7,7 +7,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
-import { X } from 'lucide-react';
+import { X, CheckCircle, XCircle, MessageSquare, AlertTriangle, Bell, Lightbulb, MessageCircle, Hand } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MascotMessage {
@@ -62,17 +62,17 @@ export function useMascotToast() {
   return { toast: mascotToast };
 }
 
-// Get emoji based on variant for mascot personality
-function getMascotEmoji(variant?: string) {
+// Get icon based on variant for mascot personality
+function getMascotIcon(variant?: string) {
   switch (variant) {
     case 'success':
-      return ['🎉', '✨', '🌟', '💫', '🎊'][Math.floor(Math.random() * 5)];
+      return CheckCircle;
     case 'destructive':
-      return ['😅', '🙈', '💔', '😬', '🫣'][Math.floor(Math.random() * 5)];
+      return XCircle;
     case 'warning':
-      return ['⚠️', '👀', '🤔', '💭', '📢'][Math.floor(Math.random() * 5)];
+      return AlertTriangle;
     default:
-      return ['💬', '📣', '💡', '✨', '👋'][Math.floor(Math.random() * 5)];
+      return MessageSquare;
   }
 }
 
@@ -87,7 +87,7 @@ function MascotBubble({
   onDismiss: () => void;
   mascotPosition: number;
 }) {
-  const [emoji] = useState(() => getMascotEmoji(message.variant));
+  const Icon = getMascotIcon(message.variant);
   
   // Auto dismiss after duration
   useEffect(() => {
@@ -127,7 +127,13 @@ function MascotBubble({
         
         {/* Content */}
         <div className="flex items-start gap-2 pr-4">
-          <span className="text-lg flex-shrink-0">{emoji}</span>
+          <Icon className={cn(
+            "w-5 h-5 flex-shrink-0",
+            message.variant === 'destructive' ? "text-red-400" :
+            message.variant === 'success' ? "text-green-400" :
+            message.variant === 'warning' ? "text-amber-400" :
+            "text-blue-400"
+          )} />
           <div className="min-w-0">
             {message.title && (
               <p className={cn(

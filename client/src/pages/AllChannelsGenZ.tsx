@@ -166,7 +166,7 @@ export function AllChannelsGenZ() {
                   onClick={() => setLocation(`/channel/${channel.id}`)}
                   className="group bg-card border border-border rounded-md p-4 hover:border-primary hover:shadow-sm transition-all cursor-pointer flex flex-col h-full"
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="p-2 bg-muted rounded-md border border-border-muted group-hover:border-primary transition-colors">
                       <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
                     </div>
@@ -183,7 +183,7 @@ export function AllChannelsGenZ() {
                   </p>
 
                   <div className="mt-auto pt-4 border-t border-border-muted">
-                    <div className="flex justify-between items-center text-xs mb-1.5">
+                    <div className="flex justify-between items-center gap-2 text-xs mb-1.5">
                       <span className="text-muted-foreground">
                         {channelStat.total} questions
                       </span>

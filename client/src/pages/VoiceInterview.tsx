@@ -379,14 +379,40 @@ export default function VoiceInterview() {
   }
 
   // Loading
-  if (state === 'loading' || questions.length === 0) {
+  if (state === 'loading') {
     return (
-      <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center">
+      <div 
+        className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
         <div className="text-center">
           <div className="w-16 h-16 rounded-2xl bg-[var(--gh-accent-fg)]/20 flex items-center justify-center mx-auto mb-4">
             <Loader2 className="w-8 h-8 animate-spin text-[var(--gh-accent-fg)]" />
           </div>
           <p className="text-[var(--gh-fg-muted)]">Loading interview questions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-[var(--gh-canvas)] flex items-center justify-center p-4">
+        <div className="max-w-md text-center">
+          <div className="w-20 h-20 rounded-2xl bg-[var(--gh-fg-muted)]/20 flex items-center justify-center mx-auto mb-6">
+            <MicOff className="w-10 h-10 text-[var(--gh-fg-muted)]" />
+          </div>
+          <h1 className="text-2xl font-bold text-[var(--gh-fg)] mb-3">No questions available</h1>
+          <p className="text-[var(--gh-fg-muted)] mb-6">We don't have any voice interview questions for this channel yet.</p>
+          <button
+            onClick={() => setLocation('/')}
+            className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-medium rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors"
+          >
+            Go Home
+          </button>
         </div>
       </div>
     );

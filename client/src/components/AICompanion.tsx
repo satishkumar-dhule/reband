@@ -53,15 +53,15 @@ interface Message {
 }
 
 const LANGUAGES = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-  { code: 'zh', name: '中文', flag: '🇨🇳' },
-  { code: 'ja', name: '日本語', flag: '🇯🇵' },
-  { code: 'pt', name: 'Português', flag: '🇧🇷' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Español' },
+  { code: 'fr', name: 'Français' },
+  { code: 'de', name: 'Deutsch' },
+  { code: 'hi', name: 'हिन्दी' },
+  { code: 'zh', name: '中文' },
+  { code: 'ja', name: '日本語' },
+  { code: 'pt', name: 'Português' },
+  { code: 'ar', name: 'العربية' },
 ];
 
 export function AICompanion({ pageContent, onNavigate, onAction, availableActions = [] }: AICompanionProps) {
@@ -137,7 +137,7 @@ export function AICompanion({ pageContent, onNavigate, onAction, availableAction
       setIsLoadingModel(false);
       
       toast({
-        title: "🤖 Browser AI Ready",
+        title: "Browser AI Ready",
         description: "Phi-3 model loaded! Running locally in your browser.",
       });
     } catch (error) {
@@ -313,7 +313,7 @@ export function AICompanion({ pageContent, onNavigate, onAction, availableAction
       setAutoSpeak(true);
       
       toast({
-        title: "Push-to-Talk Mode Active 🎙️",
+        title: "Push-to-Talk Mode Active",
         description: "Hold SPACEBAR to speak, release to send. I'll respond with voice automatically!",
       });
     } else {

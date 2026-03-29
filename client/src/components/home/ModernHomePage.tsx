@@ -161,6 +161,15 @@ export function ModernHomePage() {
   );
 }
 
+/**
+ * @deprecated This inline onboarding is deprecated.
+ * 
+ * For new users without channels, redirect to `/onboarding` instead of showing
+ * this inline version. Use the canonical `/client/src/pages/Onboarding.tsx`.
+ * 
+ * Last updated: 2026-03-29
+ */
+
 // Onboarding Experience for New Users
 function OnboardingExperience({ onGetStarted }: { onGetStarted: () => void }) {
   return (

@@ -30,7 +30,7 @@ export function MobileHeader({
           <button
             onClick={() => window.history.back()}
             aria-label="Go back"
-            className="p-2.5 -ml-2 hover:bg-primary/10 rounded-xl transition-all duration-200 group"
+            className="p-3 -ml-2 hover:bg-primary/10 rounded-xl transition-all duration-200 group"
           >
             <ArrowLeft className="w-5 h-5 text-foreground group-hover:text-primary transition-colors group-hover:scale-110" />
           </button>
@@ -39,7 +39,7 @@ export function MobileHeader({
             <h1 className="text-base font-semibold text-foreground truncate flex-1">{title}</h1>
           )}
           
-          <button aria-label="Notifications" className="p-2 hover:bg-primary/10 rounded-xl transition-colors relative">
+          <button aria-label="Notifications" className="p-2.5 hover:bg-primary/10 rounded-xl transition-colors relative">
             <Bell className="w-4.5 h-4.5 text-muted-foreground" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
           </button>
@@ -83,7 +83,7 @@ export function MobileHeader({
           <button 
             aria-label="Search" 
             onClick={onSearchClick}
-            className="p-2.5 hover:bg-primary/10 rounded-xl transition-all duration-200 group"
+            className="p-3 hover:bg-primary/10 rounded-xl transition-all duration-200 group"
           >
             <Search className="w-4.5 h-4.5 text-muted-foreground group-hover:text-primary transition-colors" />
           </button>
@@ -91,7 +91,7 @@ export function MobileHeader({
           <button 
             aria-label="Menu" 
             onClick={onMenuClick}
-            className="p-2.5 hover:bg-primary/10 rounded-xl transition-colors"
+            className="p-3 hover:bg-primary/10 rounded-xl transition-colors"
           >
             <Menu className="w-4.5 h-4.5 text-muted-foreground" />
           </button>

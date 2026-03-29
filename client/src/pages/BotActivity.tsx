@@ -272,7 +272,7 @@ export default function BotActivity() {
       <AppLayout title="Bot Monitor" showBackOnMobile>
         <div className="max-w-6xl mx-auto">
           {/* Header - Desktop only since AppLayout handles mobile */}
-          <header className="hidden lg:flex items-center justify-between mb-6">
+          <header className="hidden lg:flex items-center justify-between gap-4 mb-6">
             <h1 className="text-xl font-bold flex items-center gap-2">
               <Bot className="w-5 h-5 text-primary" />
               Bot Monitor
@@ -486,7 +486,7 @@ export default function BotActivity() {
                 exit={{ opacity: 0, y: -10 }}
                 className="bg-card border border-border rounded-xl overflow-hidden"
               >
-                <div className="p-4 border-b border-border flex items-center justify-between">
+                <div className="p-4 border-b border-border flex items-center justify-between gap-4">
                   <h3 className="font-semibold flex items-center gap-2">
                     <ListTodo className="w-4 h-4 text-primary" />
                     Work Queue

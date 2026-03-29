@@ -99,7 +99,7 @@ export async function registerRoutes(
       const cacheKey = `questions-${channelId}-${subChannel}-${difficulty}`;
       
       const data = await getCached(cacheKey, async () => {
-        let sql = "SELECT id, question, difficulty, sub_channel, tags, channel FROM questions WHERE channel = ? AND status != 'deleted'";
+        let sql = "SELECT id, question, answer, explanation, difficulty, sub_channel, tags, channel, diagram, eli5, videos, companies, source_url FROM questions WHERE channel = ? AND status != 'deleted'";
         const args: any[] = [channelId];
 
         if (subChannel && subChannel !== "all") {
@@ -115,14 +115,7 @@ export async function registerRoutes(
         sql += " ORDER BY created_at ASC";
 
         const result = await client.execute({ sql, args });
-        return result.rows.map((r: any) => ({ 
-          id: r.id, 
-          question: r.question, 
-          difficulty: r.difficulty,
-          channel: r.channel,
-          subChannel: r.sub_channel,
-          tags: r.tags ? JSON.parse(r.tags) : []
-        }));
+        return result.rows.map((r: any) => parseQuestion(r));
       });
       
       res.json(data);

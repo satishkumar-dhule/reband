@@ -17,6 +17,7 @@ import { SEOHead } from '../components/SEOHead';
 import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrapper';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { ChannelService } from '../services/api.service';
+import { useToast } from '@/hooks/use-toast';
 import type { Question } from '../types';
 
 // Speech recognition support check
@@ -60,6 +61,7 @@ function calculateFeedback(transcript: string, targetAnswer: string, duration: n
 export default function VoicePractice() {
   const [, setLocation] = useLocation();
   const { getSubscribedChannels } = useUserPreferences();
+  const { toast } = useToast();
   
   // Core state
   const [mode, setMode] = useState<PracticeMode>('interview');
@@ -151,7 +153,11 @@ export default function VoicePractice() {
     if (!isSpeechSupported) {
       console.error('❌ Speech recognition not supported in this browser');
       console.error('Browser:', navigator.userAgent);
-      alert('❌ Speech Recognition Not Supported\n\nYour browser does not support the Web Speech API.\n\nSupported browsers:\n• Chrome (recommended)\n• Edge\n• Safari\n\nNOT supported:\n• Firefox\n• Opera\n• Other browsers');
+      toast({
+        title: "Speech Recognition Not Supported",
+        description: "Your browser does not support the Web Speech API. Please use Chrome, Edge, or Safari.",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -160,7 +166,11 @@ export default function VoicePractice() {
     
     if (!SpeechRecognition) {
       console.error('❌ SpeechRecognition constructor not found');
-      alert('❌ Speech Recognition Not Available\n\nThe Web Speech API is not available in your browser.\n\nPlease use Chrome, Edge, or Safari.');
+      toast({
+        title: "Speech Recognition Not Available",
+        description: "The Web Speech API is not available in your browser. Please use Chrome, Edge, or Safari.",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -227,16 +237,27 @@ export default function VoicePractice() {
         });
         
         if (event.error === 'not-allowed' || event.error === 'permission-denied') {
-          alert('🎤 Microphone Access Denied!\n\nPlease:\n1. Click the microphone icon (🎤) in your browser\'s address bar\n2. Select "Allow" for microphone access\n3. Refresh the page and try again\n\nNote: Some browsers require HTTPS for microphone access.');
+          toast({
+            title: "Microphone Access Denied",
+            description: "Please allow microphone access in your browser settings and refresh the page.",
+            variant: "destructive",
+          });
         } else if (event.error === 'no-speech') {
           console.log('⚠️ No speech detected, will retry...');
-          // Don't alert for no-speech, it's normal
         } else if (event.error === 'network') {
-          alert('❌ Network Error\n\nSpeech recognition requires an active internet connection.\n\nPlease check your connection and try again.');
+          toast({
+            title: "Network Error",
+            description: "Speech recognition requires an active internet connection.",
+            variant: "destructive",
+          });
         } else if (event.error === 'aborted') {
           console.log('ℹ️ Speech recognition aborted (normal when stopping)');
         } else {
-          alert(`❌ Speech Recognition Error: ${event.error}\n\nPlease check the browser console (F12) for more details.\n\nTry:\n• Refreshing the page\n• Checking microphone permissions\n• Using Chrome or Edge browser`);
+          toast({
+            title: "Speech Recognition Error",
+            description: `Error: ${event.error}. Please refresh the page and try again.`,
+            variant: "destructive",
+          });
         }
       };
       
@@ -276,7 +297,11 @@ export default function VoicePractice() {
       };
     } catch (error) {
       console.error('❌ Failed to create SpeechRecognition instance:', error);
-      alert(`❌ Failed to Initialize Speech Recognition\n\nError: ${error}\n\nPlease:\n• Use Chrome, Edge, or Safari browser\n• Check browser console (F12) for details\n• Ensure you're on HTTPS or localhost`);
+      toast({
+        title: "Failed to Initialize Speech Recognition",
+        description: "Please use Chrome, Edge, or Safari browser and ensure you're on HTTPS or localhost.",
+        variant: "destructive",
+      });
     }
   }, []); // Only initialize once
 
@@ -307,7 +332,11 @@ export default function VoicePractice() {
     
     if (!recognitionRef.current) {
       console.error('❌ Recognition not initialized!');
-      alert('Speech recognition not initialized. Please refresh the page and check console.');
+      toast({
+        title: "Speech Recognition Not Initialized",
+        description: "Please refresh the page and try again.",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -372,24 +401,40 @@ export default function VoicePractice() {
                     console.log('✅ Recognition restarted successfully');
                   } catch (e) {
                     console.error('❌ Failed to restart:', e);
-                    alert('Failed to start recording. Please refresh the page.');
+                    toast({
+                      title: "Failed to Start Recording",
+                      description: "Please refresh the page and try again.",
+                      variant: "destructive",
+                    });
                   }
                 }, 100);
               } catch (e) {
                 console.error('❌ Failed to stop/restart:', e);
               }
             } else {
-              alert(`Failed to start recording: ${err.message || err}`);
+              toast({
+                title: "Failed to Start Recording",
+                description: err.message || "Unknown error",
+                variant: "destructive",
+              });
             }
           }
         })
         .catch(err => {
           console.error('❌ Microphone access denied:', err);
-          alert('🎤 Microphone access required!\n\nPlease:\n1. Click the microphone icon in your browser\'s address bar\n2. Select "Allow"\n3. Try again\n\nError: ' + err.message);
+          toast({
+            title: "Microphone Access Required",
+            description: "Please allow microphone access in your browser settings.",
+            variant: "destructive",
+          });
         });
     } else {
       console.error('❌ getUserMedia not supported');
-      alert('Your browser does not support microphone access. Please use Chrome, Edge, or Safari.');
+      toast({
+        title: "Microphone Access Not Supported",
+        description: "Your browser does not support microphone access. Please use Chrome, Edge, or Safari.",
+        variant: "destructive",
+      });
     }
   }, []);
 
@@ -466,13 +511,21 @@ export default function VoicePractice() {
       audio.onerror = (e) => {
         setIsPlayingAudio(false);
         console.error('❌ Audio playback error:', e);
-        alert('Failed to play recording');
+        toast({
+          title: "Playback Error",
+          description: "Failed to play recording",
+          variant: "destructive",
+        });
       };
       
       audio.play();
     } catch (err) {
       console.error('❌ Failed to play audio:', err);
-      alert('Failed to play recording');
+      toast({
+        title: "Playback Error",
+        description: "Failed to play recording",
+        variant: "destructive",
+      });
     }
   }, [audioBlob]);
 

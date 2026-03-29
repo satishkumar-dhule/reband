@@ -123,7 +123,7 @@ export default function AllChannelsRedesigned() {
         <div className="space-y-6">
           {/* Header with Search */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold">Browse Channels</h1>
                 <p className="text-muted-foreground">
@@ -297,7 +297,7 @@ function ChannelCard({
         </div>
       )} */}
 
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between gap-2 mb-4">
         <div className={`p-3 rounded-lg transition-colors ${
           isSubscribed 
             ? 'bg-primary text-primary-foreground' 
@@ -331,7 +331,7 @@ function ChannelCard({
 
       <div className="space-y-2">
         {/* Interview Questions */}
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center justify-between gap-2 text-xs">
           <span className="text-muted-foreground flex items-center gap-1">
             <Eye className="w-3 h-3" />
             Interview
@@ -341,7 +341,7 @@ function ChannelCard({
 
         {/* Test Questions */}
         {testCount > 0 && (
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between gap-2 text-xs">
             <span className="text-muted-foreground flex items-center gap-1">
               <Target className="w-3 h-3" />
               Micro Quiz
@@ -352,7 +352,7 @@ function ChannelCard({
 
         {/* Progress */}
         {isSubscribed && progress > 0 && (
-          <div className="flex items-center justify-between text-xs pt-1 border-t border-border/50">
+          <div className="flex items-center justify-between gap-2 text-xs pt-1 border-t border-border/50">
             <span className="text-muted-foreground">Progress</span>
             <span className="text-primary font-semibold">{progress}%</span>
           </div>

@@ -328,13 +328,13 @@ export default function About() {
             <MatrixRain />
             
             <div className="relative z-10 p-6 sm:p-10">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-500" />
                   <div className="w-3 h-3 rounded-full bg-yellow-500" />
                   <div className="w-3 h-3 rounded-full bg-green-500" />
                 </div>
-                <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 hover:bg-muted rounded transition-colors" aria-label={soundEnabled ? "Mute sound effects" : "Enable sound effects"}>
+                <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 hover-elevate rounded transition-colors" aria-label={soundEnabled ? "Mute sound effects" : "Enable sound effects"}>
                   {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                 </button>
               </div>
@@ -450,7 +450,7 @@ export default function About() {
                     "px-4 py-3 text-xs uppercase tracking-widest font-bold border-b-2 transition-all whitespace-nowrap",
                     activeTab === tab 
                       ? 'border-primary text-primary' 
-                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                      : 'border-transparent text-muted-foreground hover-elevate'
                   )}
                 >
                   {tab}

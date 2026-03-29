@@ -1,340 +1,268 @@
-# DevPrep Ultra Pro Max - 30+ Autonomous Agents System
+# DevPrep / Open-Interview — Agent System
 
-## Overview
+## Supervisor System Prompt
 
-DevPrep has been completely redesigned with **30+ specialized autonomous agents** that coordinate through **asynchronous message passing** to handle all operations. The system integrates Google services and features a comprehensive redesign with full skill integration.
+This project uses a **supervisor-delegate pattern**. The main Replit agent acts as **supervisor** — it plans work, delegates to specialized opencode agents via `opencode run --agent <name> "<task>"`, monitors outputs, sends corrections if needed, and synthesizes results.
 
-## Architecture
-
-### Core Message Passing System
-
-The Agent Message Bus (`src/agents/core/AgentMessageBus.ts`) provides:
-- **Async message passing** between all agents
-- **Pub/Sub pattern** for agent communication  
-- **Message queues** for reliable delivery
-- **Request/Response** pattern for queries
-- **Broadcast** for system-wide notifications
+**The supervisor never writes code directly.** It only orchestrates, reviews, and corrects.
 
 ---
 
-## GitHub Theme Migration (20+ Specialized Agents)
+## Project Context (All Agents Must Follow)
 
-The DevPrep GitHub-like theme migration has been completed with **20+ specialized agents** working in parallel.
-
-### GitHub Theme Migration Skills (`.agents/skills/`)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| github-theme-migration | All theme agents | GitHub design language and migration |
-| github-theme-components | All theme agents | GitHub-style component library |
-
-### GitHub Theme Migration Agents (`.opencode/agents/`)
-
-#### UI/UX Expert Agents (10)
-| Agent | Skills | Description |
-|-------|--------|-------------|
-| `devprep-github-colors-expert` | github-theme-migration, ui-ux-pro-max | GitHub color palette migration |
-| `devprep-github-typography-expert` | github-theme-migration, ui-ux-pro-max | GitHub typography system |
-| `devprep-github-layout-expert` | github-theme-migration, ui-ux-pro-max | GitHub layout patterns |
-| `devprep-github-nav-expert` | github-theme-migration, ui-ux-pro-max | GitHub navigation components |
-| `devprep-github-cards-expert` | github-theme-migration, ui-ux-pro-max | GitHub card components |
-| `devprep-github-darkmode-expert` | github-theme-migration, ui-ux-pro-max | Dark mode implementation |
-| `devprep-github-badges-expert` | github-theme-migration, ui-ux-pro-max | GitHub labels/badges |
-| `devprep-github-modals-expert` | github-theme-migration, ui-ux-pro-max | GitHub dialogs/modals |
-| `devprep-github-tables-expert` | github-theme-migration, ui-ux-pro-max | GitHub table components |
-| `devprep-github-forms-expert` | github-theme-migration, ui-ux-pro-max | GitHub form components |
-
-#### Frontend Designer Agents (10)
-| Agent | Skills | Description |
-|-------|--------|-------------|
-| `devprep-github-buttons-expert` | github-theme-migration, frontend-design | GitHub button styles |
-| `devprep-github-inputs-expert` | github-theme-migration, frontend-design | GitHub input components |
-| `devprep-github-icons-expert` | github-theme-migration, frontend-design | GitHub iconography |
-| `devprep-github-alerts-expert` | github-theme-migration, frontend-design | GitHub alert notices |
-| `devprep-github-avatar-expert` | github-theme-migration, frontend-design | GitHub avatar components |
-| `devprep-github-progress-expert` | github-theme-migration, frontend-design | GitHub progress indicators |
-| `devprep-github-tooltip-expert` | github-theme-migration, frontend-design | GitHub tooltips |
-| `devprep-github-dropdown-expert` | github-theme-migration, frontend-design | GitHub dropdown menus |
-| `devprep-github-tabs-expert` | github-theme-migration, frontend-design | GitHub tab navigation |
-| `devprep-github-utilities-expert` | github-theme-migration, frontend-design | GitHub utility classes |
+**Name**: DevPrep / Open-Interview (Code-Reels v2.2)
+**Mission**: Free, GitHub-native technical interview prep — swipe learning, voice practice, SRS, coding challenges
+**Theme**: GitHub design system (Primer-inspired, GitHub color tokens, system font stack)
+**Stack**: React 19 + Vite 7 + TypeScript 5 + Tailwind CSS 4 + shadcn/ui
+**Database**: libSQL/Turso — `file:local.db` in dev, Turso cloud URL in prod via `TURSO_DATABASE_URL`
+**Deployment**: **GitHub Pages (static SPA, zero backend servers in production)**
+**Data strategy**: DB is source of truth → build-time export to `public/data/*.json` → SPA fetches static JSON
 
 ---
 
-## OpenCode Agents (`.opencode/agents/`)
+## Architecture Principles (Iron Laws)
 
-### Coordinator Agents (1)
-| Agent | Skill Reference | Description |
-|-------|-----------------|-------------|
-| `devprep-coordinator` | pipeline-generator, pipeline-verifier, pipeline-processor | Orchestrates parallel content generation across all channels |
+### 1. Static-First (GitHub Pages)
+- Production runs with **NO backend server** — pure static files served by GitHub Pages
+- All dynamic data (questions, channels, paths) is **exported from DB at build time** to `public/data/*.json`
+- Frontend fetches static JSON in production (`/data/channels.json`, `/data/channel-<id>.json`, etc.)
+- In development, frontend proxies `/api/*` to Express server (port 5173)
+- Use `IS_STATIC` env flag (`VITE_STATIC_MODE=true`) to switch data fetching strategy
 
-### Content Expert Agents (5)
-| Agent | Skill Reference | Description |
-|-------|-----------------|-------------|
-| `devprep-question-expert` | content-question-expert | Technical interview Q&A questions |
-| `devprep-flashcard-expert` | content-flashcard-expert | Spaced-repetition flashcards |
-| `devprep-exam-expert` | content-certification-expert | Certification exam questions |
-| `devprep-voice-expert` | content-voice-expert | Verbal practice prompts |
-| `devprep-coding-expert` | content-challenge-expert | Coding challenges |
+### 2. DB as Single Source of Truth
+- All content lives in SQLite/Turso — **never hardcode question/answer data in React**
+- Content changes: Update DB → re-run export → rebuild
+- Schema defined in `shared/schema.ts` (Drizzle ORM)
 
-### Content Generator Agents (3)
-| Agent | Skill Reference | Description |
-|-------|-----------------|-------------|
-| `devprep-blog-generator` | content-blog-expert | Educational blog posts with SEO |
-| `devprep-study-guide-generator` | pdf | PDF study materials |
-| `devprep-presentation-generator` | pptx | PowerPoint slides |
+### 3. GitHub-Themed UI
+- Colors: CSS variables matching GitHub design tokens (`--color-canvas-default`, `--color-fg-default`, etc.)
+- Font: `-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial` (GitHub system stack)
+- Components: shadcn/ui + Primer-inspired styles from `.agents/skills/github-theme-migration/`
+- No random Tailwind colors that aren't mapped to GitHub tokens
+- Dark/light mode follows GitHub's theme system
 
-### Quality & Testing Agents (3)
-| Agent | Skill Reference | Description |
-|-------|-----------------|-------------|
-| `devprep-testing-agent` | browser-use | Automated UI testing |
-| `devprep-seo-audit` | seo-audit, audit-website | SEO and website audits |
-| `devprep-site-auditor` | audit-website | Comprehensive site auditing |
+---
 
-### Specialist Agents (8)
-| Agent | Skill Reference | Description |
-|-------|-----------------|-------------|
-| `devprep-frontend-designer` | frontend-design, ui-ux-pro-max | UI/UX design |
-| `devprep-react-optimizer` | vercel-react-best-practices | React performance |
-| `devprep-ui-ux-expert` | ui-ux-pro-max | UI/UX review |
-| `devprep-web-reviewer` | web-design-guidelines | Web interface guidelines |
-| `devprep-db-optimizer` | supabase-postgres-best-practices | Database optimization |
-| `devprep-auth-specialist` | better-auth-best-practices | Authentication |
-| `devprep-copywriter` | copywriting | Marketing copy |
-| `devprep-brainstormer` | brainstorming | Feature design |
-| `devprep-ai-tools` | agent-tools | AI/ML tools integration |
+## Supervisor Delegation Protocol
+
+When the main agent receives a task:
+
+```
+1. ANALYZE   — Which agent(s) own this work?
+2. PLAN      — Write a task breakdown with agent assignments
+3. DELEGATE  — opencode run --agent <name> "<task>" (parallel where possible)
+4. MONITOR   — Review outputs; if wrong, send a correction request
+5. SYNTHESIZE — Combine results, write summary
+6. UPDATE    — Update replit.md + AGENTS.md if architecture changed
+```
+
+### Correction Request Format (when an agent makes a mistake)
+```
+CORRECTION REQUEST → <agent-name>
+Issue: <what is wrong>
+Expected: <what should have been done>
+Context: <relevant files or code snippets>
+Action: <specific redo instruction>
+```
+
+---
+
+## Build Pipeline (Static GitHub Pages)
+
+```bash
+# Full static build (run before deploying)
+node script/fetch-questions-for-build.js    # DB → public/data/*.json
+node script/generate-curated-paths.js       # learning paths JSON
+node script/generate-rss.js                 # RSS feed
+node script/generate-sitemap.js             # sitemap.xml
+vite build                                  # SPA → dist/
+node script/build-pagefind.js               # static search index
+tsx script/deploy-pages.ts                  # push dist/ to gh-pages branch
+```
+
+npm script: `npm run build:static`
+
+---
+
+## Agent Team (`.opencode/agents/`)
+
+### Orchestrators
+| Agent | File | Description |
+|-------|------|-------------|
+| `devprep-supervisor` | `supervisor.agent.md` | **Main supervisor** — plans, delegates, reviews all work |
+| `devprep-coordinator` | `coordinator.agent.md` | Content pipeline orchestration (questions, flashcards, etc.) |
+
+### Deployment & Infrastructure
+| Agent | File | Description |
+|-------|------|-------------|
+| `devprep-static-deployment` | `static-deployment.agent.md` | GitHub Pages static SPA deployment |
+| `devprep-deployment-strategy-evaluator` | `deployment-strategy-evaluator.agent.md` | Deployment strategy analysis |
+| `devprep-devops-engineer` | `devops-engineer.agent.md` | DevOps, CI/CD, GH Actions |
+| `devprep-cicd-security-reviewer` | `cicd-security-reviewer.agent.md` | CI/CD security |
+| `devprep-github-actions-workflow-auditor` | `github-actions-workflow-auditor.agent.md` | GH Actions review |
+
+### Frontend & UI
+| Agent | File | Description |
+|-------|------|-------------|
+| `devprep-frontend-designer` | `frontend-designer.agent.md` | React components, pages, layout |
+| `devprep-ui-ux-expert` | `ui-ux-expert.agent.md` | UI/UX review and guidance |
+| `devprep-react-optimizer` | `react-optimizer.agent.md` | React performance optimization |
+| `devprep-web-reviewer` | `web-reviewer.agent.md` | Web interface guidelines |
+
+### GitHub Theme Agents (20+)
+| Agent Group | Description |
+|-------------|-------------|
+| `devprep-github-colors-expert` | GitHub color palette migration |
+| `devprep-github-typography-expert` | GitHub typography system |
+| `devprep-github-layout-expert` | GitHub layout patterns |
+| `devprep-github-nav-expert` | GitHub navigation components |
+| `devprep-github-cards-expert` | GitHub card components |
+| `devprep-github-darkmode-expert` | Dark mode implementation |
+| `devprep-github-badges-expert` | GitHub labels/badges |
+| `devprep-github-modals-expert` | GitHub dialogs/modals |
+| `devprep-github-tables-expert` | GitHub table components |
+| `devprep-github-forms-expert` | GitHub form components |
+| `devprep-github-buttons-expert` | GitHub button styles |
+| `devprep-github-inputs-expert` | GitHub input components |
+| `devprep-github-icons-expert` | GitHub iconography |
+| `devprep-github-alerts-expert` | GitHub alert notices |
+| `devprep-theme-*` (10+) | Full theme component agents |
+
+### Content Generation
+| Agent | Description |
+|-------|-------------|
+| `devprep-question-expert` | Technical interview Q&A questions |
+| `devprep-flashcard-expert` | Spaced-repetition flashcards |
+| `devprep-exam-expert` | Certification exam questions |
+| `devprep-voice-expert` | Verbal practice prompts |
+| `devprep-coding-expert` | Coding challenges with solutions |
+| `devprep-blog-generator` | SEO-optimized blog posts |
+| `devprep-study-guide-generator` | PDF study materials |
+| `devprep-presentation-generator` | PowerPoint slides |
+
+### Data & Database
+| Agent | Description |
+|-------|-------------|
+| `devprep-db-optimizer` | Database schema, queries, export |
+| `devprep-auth-specialist` | Authentication implementation |
+| `devprep-caching-strategy-specialist` | Caching strategy |
+| `devprep-error-handling-auditor` | Error handling patterns |
+
+### Quality & Testing
+| Agent | Description |
+|-------|-------------|
+| `devprep-e2e-tester` | Playwright tests, accessibility |
+| `devprep-testing-agent` | Automated UI testing with browser-use |
+| `devprep-seo-audit` | SEO and Lighthouse analysis |
+| `devprep-site-auditor` | Comprehensive site auditing |
+| `devprep-code-reviewer` | Code review |
+| `devprep-action-composite-reviewer` | GH Action composite review |
+
+### Strategy & Documentation
+| Agent | Description |
+|-------|-------------|
+| `devprep-tech-writer` | Documentation (README, AGENTS.md, replit.md) |
+| `devprep-brainstormer` | Feature design and ideation |
+| `devprep-copywriter` | Marketing copy |
+| `devprep-ai-tools` | AI/ML tools integration |
+| `devprep-workflow-architecture-advisor` | Workflow design |
+| `devprep-workflow-performance-analyzer` | Workflow performance |
 
 ---
 
 ## Skills (`.agents/skills/`)
 
-### Content Generation Skills (6)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| content-question-expert | question-expert | Interview Q&A generation |
-| content-flashcard-expert | flashcard-expert | Spaced repetition cards |
-| content-certification-expert | exam-expert | Exam questions |
-| content-voice-expert | voice-expert | Practice prompts |
-| content-challenge-expert | coding-expert | Coding challenges |
-| content-blog-expert | blog-generator | Blog posts |
+### Content Generation (6)
+`content-question-expert`, `content-flashcard-expert`, `content-certification-expert`, `content-voice-expert`, `content-challenge-expert`, `content-blog-expert`
 
-### Pipeline Skills (3)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| pipeline-generator | coordinator | Parallel orchestration |
-| pipeline-verifier | coordinator | Quality validation |
-| pipeline-processor | coordinator | Post-processing |
+### Pipeline (3)
+`pipeline-generator`, `pipeline-verifier`, `pipeline-processor`
 
-### Frontend/React Skills (5)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| frontend-design | frontend-designer | UI design |
-| ui-ux-pro-max | ui-ux-expert, frontend-designer | UI/UX patterns |
-| web-design-guidelines | web-reviewer | Web interface guidelines |
-| vercel-react-best-practices | react-optimizer | React performance |
-| next-best-practices | react-optimizer | Next.js optimization |
+### Frontend/React (5)
+`frontend-design`, `ui-ux-pro-max`, `web-design-guidelines`, `vercel-react-best-practices`, `next-best-practices`
 
-### Database Skills (1)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| supabase-postgres-best-practices | db-optimizer | Postgres optimization |
+### GitHub Theme (2)
+`github-theme-migration`, `github-theme-components`
 
-### Auth Skills (1)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| better-auth-best-practices | auth-specialist | Auth configuration |
+### Database & Auth (2)
+`supabase-postgres-best-practices`, `better-auth-best-practices`
 
-### SEO/Audit Skills (2)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| seo-audit | seo-audit | SEO analysis |
-| audit-website | site-auditor | Website auditing |
+### SEO & Auditing (2)
+`seo-audit`, `audit-website`
 
-### Media Skills (3)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| pdf | study-guide-generator | PDF generation |
-| pptx | presentation-generator | PowerPoint creation |
-| remotion-best-practices | future | Video content |
+### Media (3)
+`pdf`, `pptx`, `remotion-best-practices`
 
-### Automation Skills (2)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| browser-use | testing-agent | Browser automation |
-| agent-tools | ai-tools | AI/ML tools |
+### Automation & AI (3)
+`browser-use`, `agent-tools`, `claw-multi-agent`
 
-### Creative/Strategy Skills (3)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| copywriting | copywriter | Marketing copy |
-| brainstorming | brainstormer | Feature design |
-| find-skills | future | Skill discovery |
-
-### GitHub Theme Skills (2)
-| Skill | Used By | Description |
-|-------|---------|-------------|
-| github-theme-migration | All theme agents | GitHub design language migration |
-| github-theme-components | All theme agents | GitHub-style component library |
+### Creative & Strategy (4)
+`copywriting`, `brainstorming`, `find-skills`, `swarm-coordination`
 
 ---
 
-## Client Skill Agents (21 in `client/src/agents/skills/`)
-
-| Category | Agents |
-|----------|--------|
-| **Learning** | LearningPathAgent, SpacedRepetitionAgent, CertificationAgent, RecommendationAgent |
-| **Content** | QuestionBankAgent, SearchAgent, ChannelAgent, ContentAgent, CodingChallengeAgent |
-| **User** | UserProgressAgent, NotificationAgent, BookmarkAgent, ThemeAgent, PreferencesAgent, OnboardingAgent, ExportAgent |
-| **Practice** | VoicePracticeAgent, TimerAgent |
-| **Analytics** | AnalyticsAgent, SyncAgent, BadgeAgent, CacheAgent |
-
----
-
-## Content Pipeline
+## Static Data Files (Generated at Build Time)
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     devprep-coordinator                     │
-│  Orchestrates parallel generation using pipeline-generator   │
-└─────────────────────────────────────────────────────────────┘
-                              │
-       ┌──────────────────────┼──────────────────────┐
-       │                      │                      │
-       ▼                      ▼                      ▼
-┌──────────────┐     ┌──────────────┐     ┌──────────────────┐
-│  Questions   │     │  Flashcards  │     │  Coding Challenges│
-│   (5)        │     │   (5)        │     │    (5)            │
-└──────────────┘     └──────────────┘     └──────────────────┘
-       │                      │                      │
-       ▼                      ▼                      ▼
-┌──────────────┐     ┌──────────────┐     ┌──────────────────┐
-│  Exam Q's    │     │  Voice       │     │   Blogs          │
-│   (5)        │     │  (5)         │     │   (3)            │
-└──────────────┘     └──────────────┘     └──────────────────┘
-       │                      │                      │
-       └──────────────────────┼──────────────────────┘
-                              │
-                              ▼
-                   ┌──────────────────┐
-                   │ pipeline-verifier│
-                   │  Quality Gates  │
-                   └──────────────────┘
-                              │
-                              ▼
-                   ┌──────────────────┐
-                   │pipeline-processor│
-                   │  Save & Publish │
-                   └──────────────────┘
+public/data/
+├── channels.json            # [{id, label, questionCount, ...}]
+├── questions-index.json     # lightweight index (id, channel, difficulty, question)
+├── channel-algorithms.json  # full questions for algorithms channel
+├── channel-frontend.json    # full questions for frontend channel
+├── channel-*.json           # one file per channel
+├── learning-paths.json      # curated learning path definitions
+├── coding-challenges.json   # coding challenges with solutions
+├── stats.json               # aggregate statistics
+└── search-index/            # pagefind static search
+    ├── pagefind.js
+    └── *.idx
 ```
 
 ---
 
-## Database Schema
+## Key Project Files
 
-Complete redesign with SQLite database (`src/database/schema.ts`):
-
-### Core Tables
-- **users** - User accounts and preferences
-- **channels** - Learning channels/categories
-- **content** - Questions, flashcards, exams, voice, coding
-- **user_progress** - Progress tracking per user
-- **learning_paths** - Structured learning journeys
-- **achievements** - Gamification badges
-- **user_achievements** - Earned achievements
-- **discussions** - Community discussions
-- **comments** - Discussion replies
-- **job_applications** - Job tracking
-- **analytics_events** - User analytics tracking
-
-### Agent Coordination
-
-Each database operation coordinates with multiple agents:
-- **db-architect** - Schema design and migrations
-- **query-optimizer** - Query optimization
-- **cache** - Caching layer management
-- **backup** - Automated backups
+```
+server/index.ts           Express entry (dev only — not used in prod static build)
+server/routes.ts          API routes (dev only)
+server/db.ts              Turso/libSQL client
+shared/schema.ts          Drizzle ORM schema (source of truth for DB structure)
+client/src/App.tsx        React app with routing (wouter)
+client/src/lib/           Core business logic
+client/src/pages/         All pages
+client/src/components/    All UI components
+script/                   Build & data scripts (100+ utility scripts)
+.github/workflows/        GitHub Actions CI/CD
+.opencode/agents/         All opencode agent definitions
+.agents/skills/           All agent skills
+CONTENT_STANDARDS.md      Content quality rules (all content agents must read this)
+```
 
 ---
 
-## Google Services Integration
+## What No Agent May Do
 
-Complete integration in `src/services/google/index.ts`:
-
-- **Google Analytics 4** - User tracking and events
-- **Google Auth** - OAuth/SSO authentication
-- **Google Cloud** - Deployment and infrastructure
-- **Google Maps** - Location services
-- **Google Sheets** - Data export/import
-
----
-
-## Pages Redesigned
-
-New UI components in `src/pages/index.ts`:
-
-1. **Dashboard** - Progress overview, stats, learning paths
-2. **Learning Paths** - Guided learning journeys
-3. **Code Practice** - Coding challenges with difficulty
-4. **Interview Simulator** - Technical, system design, behavioral
-5. **Voice Practice** - AI-powered speech analysis
-6. **Flashcards** - Spaced repetition system
-7. **Analytics** - Performance metrics and insights
-8. **Community** - Discussions and social features
-9. **Job Tracker** - Application management
-10. **Settings** - Profile and preferences
+- Add Express/backend API calls in production code paths
+- Hardcode question/answer data in React components (must come from DB export)
+- Use `process.env` without `VITE_` prefix in frontend code
+- Break GitHub theme colors (use CSS tokens, not raw hex)
+- Modify `drizzle.config.ts` or `.replit`
+- Change primary key ID column types in the DB schema
+- Deploy without running `fetch-questions-for-build.js` first
 
 ---
 
-## Key Features
+## GitHub Actions Workflows (`.github/workflows/`)
 
-- ✅ **50+** autonomous specialized agents
-- ✅ **29** integrated skills (content, pipeline, frontend, SEO, GitHub theme, etc.)
-- ✅ **20+** GitHub theme migration agents
-- ✅ Async message passing coordination
-- ✅ Google services integration
-- ✅ Complete database redesign
-- ✅ **10+** fully redesigned pages
-- ✅ GitHub-style UI with dark mode
-- ✅ Material Design UI (MUI)
-- ✅ Responsive layouts
-- ✅ Real-time agent status
-- ✅ Agent category grouping
-- ✅ Content pipeline with quality gates
-- ✅ Automated testing with browser-use
-- ✅ SEO auditing capabilities
-- ✅ PDF/PPTX generation
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `deploy-app.yml` | Push to main | Deploy static SPA to GitHub Pages |
+| `content-generation.yml` | Scheduled | Generate new content via coordinator |
+| `daily-maintenance.yml` | Daily | DB cleanup, duplicate check |
+| `duplicate-check.yml` | On push | Detect duplicate questions |
+| `manual-intake.yml` | Manual | Add content manually |
 
 ---
 
-## Skill → Agent Mapping
-
-| Skill | Primary Agent(s) | Secondary Usage |
-|-------|-----------------|-----------------|
-| content-question-expert | question-expert | blog-generator |
-| content-flashcard-expert | flashcard-expert | study-guide-generator |
-| content-certification-expert | exam-expert | presentation-generator |
-| content-voice-expert | voice-expert | - |
-| content-challenge-expert | coding-expert | study-guide-generator |
-| content-blog-expert | blog-generator | presentation-generator |
-| pipeline-generator | coordinator | - |
-| pipeline-verifier | coordinator | - |
-| pipeline-processor | coordinator | - |
-| frontend-design | frontend-designer | ui-ux-expert, github theme agents |
-| ui-ux-pro-max | ui-ux-expert | frontend-designer, github theme agents |
-| web-design-guidelines | web-reviewer | - |
-| vercel-react-best-practices | react-optimizer | frontend-designer |
-| next-best-practices | react-optimizer | frontend-designer |
-| supabase-postgres-best-practices | db-optimizer | - |
-| better-auth-best-practices | auth-specialist | - |
-| seo-audit | seo-audit | coordinator |
-| audit-website | site-auditor | seo-audit |
-| pdf | study-guide-generator | - |
-| pptx | presentation-generator | - |
-| browser-use | testing-agent | - |
-| agent-tools | ai-tools | coordinator |
-| copywriting | copywriter | blog-generator |
-| brainstorming | brainstormer | coordinator |
-| github-theme-migration | github theme agents (20+) | frontend-designer |
-| github-theme-components | github theme agents (20+) | ui-ux-expert |
-
----
-
-Last Updated: 2026-03-27
+Last Updated: 2026-03-29
+Maintained by: devprep-tech-writer agent + supervisor

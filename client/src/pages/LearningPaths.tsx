@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { 
@@ -89,15 +90,22 @@ export default function LearningPaths() {
   const [companies, setCompanies] = useState<string[]>([]);
   const [jobTitles, setJobTitles] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     fetchLearningPaths();
     fetchFilterOptions();
-  }, [selectedDifficulty, selectedPathType, selectedCompany, selectedJobTitle, searchQuery]);
+  }, [selectedDifficulty, selectedPathType, selectedCompany, selectedJobTitle, searchQuery, retryKey]);
+
+  const handleRetry = () => {
+    setRetryKey(k => k + 1);
+  };
 
   const fetchLearningPaths = async () => {
     try {
       setLoading(true);
+      setError(null);
       const params = new URLSearchParams();
       
       if (selectedDifficulty !== 'all') params.append('difficulty', selectedDifficulty);
@@ -106,11 +114,21 @@ export default function LearningPaths() {
       if (selectedJobTitle !== 'all') params.append('jobTitle', selectedJobTitle);
       if (searchQuery) params.append('search', searchQuery);
       
-      const response = await fetch(`/api/learning-paths?${params.toString()}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const response = await fetch(`/api/learning-paths?${params.toString()}`, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      
       const data = await response.json();
       setPaths(data);
-    } catch (error) {
-      console.error('Failed to fetch learning paths:', error);
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        setError('Request timed out. Please try again.');
+      } else {
+        console.error('Failed to fetch learning paths:', error);
+        setError('Failed to load learning paths');
+      }
       setPaths([]);
     } finally {
       setLoading(false);
@@ -119,15 +137,23 @@ export default function LearningPaths() {
 
   const fetchFilterOptions = async () => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
       const [companiesRes, jobTitlesRes] = await Promise.all([
-        fetch('/api/learning-paths/filters/companies'),
-        fetch('/api/learning-paths/filters/job-titles')
+        fetch('/api/learning-paths/filters/companies', { signal: controller.signal }),
+        fetch('/api/learning-paths/filters/job-titles', { signal: controller.signal })
       ]);
       
+      clearTimeout(timeoutId);
       setCompanies(await companiesRes.json());
       setJobTitles(await jobTitlesRes.json());
-    } catch (error) {
-      console.error('Failed to fetch filter options:', error);
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.error('Filter options request timed out');
+      } else {
+        console.error('Failed to fetch filter options:', error);
+      }
     }
   };
 
@@ -408,8 +434,29 @@ export default function LearningPaths() {
             </div>
           )}
 
+          {/* Error State */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-12"
+            >
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/10 mb-4">
+                <AlertCircle className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">Failed to load</h3>
+              <p className="text-muted-foreground mb-4">{error}</p>
+              <button
+                onClick={handleRetry}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+              >
+                Retry
+              </button>
+            </motion.div>
+          )}
+
           {/* Empty State */}
-          {!loading && paths.length === 0 && (
+          {!loading && !error && paths.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

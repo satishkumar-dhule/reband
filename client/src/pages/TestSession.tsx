@@ -408,7 +408,7 @@ export default function TestSession() {
                   >
                     <RefreshCw className="w-5 h-5 text-primary flex-shrink-0" />
                     <div>
-                      <p className="text-sm font-medium text-primary">Continue where you left off</p>
+                      <p className="text-sm font-medium text-foreground">Continue where you left off</p>
                       <p className="text-xs text-muted-foreground">You have an in-progress test session</p>
                     </div>
                   </motion.div>

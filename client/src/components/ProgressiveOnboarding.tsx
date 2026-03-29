@@ -1,4 +1,16 @@
 /**
+ * @deprecated This component is deprecated. Use `/client/src/pages/Onboarding.tsx` instead.
+ * 
+ * This was a non-blocking progressive onboarding that appeared as a floating
+ * card after 3 seconds. The canonical onboarding is now at `/client/src/pages/Onboarding.tsx`.
+ * 
+ * If you need a non-blocking variant, consider integrating this behavior into
+ * the main onboarding or as a separate feature rather than a separate component.
+ * 
+ * Last updated: 2026-03-29
+ */
+
+/**
  * Progressive Onboarding
  * 
  * Non-blocking onboarding that collects user preferences progressively

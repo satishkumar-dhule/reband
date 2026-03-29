@@ -675,34 +675,34 @@ export default function VoiceSession() {
     return (
       <>
         <SEOHead title="Feedback | Voice Session" description="Review your answer feedback" />
-        <div className="min-h-screen bg-[#0d1117] text-[#e6edf3] flex items-center justify-center p-4">
+        <div className="min-h-screen bg-[var(--gh-canvas)] text-[var(--gh-fg)] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="max-w-lg w-full"
           >
-            <div className="rounded-2xl border border-[#30363d] bg-[#161b22] overflow-hidden">
+            <div className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] overflow-hidden">
               {/* Score Header */}
               <div className="p-8 text-center">
                 <div className={`w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-4 ${
-                  lastAnswer.isCorrect ? 'bg-[#238636]/20' : 'bg-[#f85149]/20'
+                  lastAnswer.isCorrect ? 'bg-[var(--gh-success-fg)]/20' : 'bg-[var(--gh-danger-fg)]/20'
                 }`}>
                   {lastAnswer.isCorrect 
-                    ? <CheckCircle className="w-12 h-12 text-[#3fb950]" /> 
-                    : <XCircle className="w-12 h-12 text-[#f85149]" />
+                    ? <CheckCircle className="w-12 h-12 text-[var(--gh-done-fg)]" /> 
+                    : <XCircle className="w-12 h-12 text-[var(--gh-danger-fg)]" />
                   }
                 </div>
-                <div className="text-4xl font-bold text-white mb-2">{lastAnswer.score}%</div>
-                <p className={`text-sm font-medium ${lastAnswer.isCorrect ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
+                <div className="text-4xl font-bold text-[var(--gh-fg)] mb-2">{lastAnswer.score}%</div>
+                <p className={`text-sm font-medium ${lastAnswer.isCorrect ? 'text-[var(--gh-done-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
                   {lastAnswer.isCorrect ? 'Good answer!' : 'Needs improvement'}
                 </p>
               </div>
 
               {/* Feedback Content */}
               <div className="px-6 pb-6 space-y-4">
-                <div className="bg-[#0d1117] rounded-xl p-4">
-                  <p className="text-sm text-[#8b949e]">{lastAnswer.feedback}</p>
-                  <div className="mt-2 text-xs text-[#6e7681]">
+                <div className="bg-[var(--gh-canvas)] rounded-xl p-4">
+                  <p className="text-sm text-[var(--gh-fg-muted)]">{lastAnswer.feedback}</p>
+                  <div className="mt-2 text-xs text-[var(--gh-fg-subtle)]">
                     Score: {lastAnswer.weightedScore}/{lastAnswer.maxPossibleScore} weighted points
                   </div>
                 </div>
@@ -711,12 +711,12 @@ export default function VoiceSession() {
                 <div className="space-y-3">
                   {lastAnswer.pointsCovered.length > 0 && (
                     <div>
-                      <h4 className="text-xs font-medium text-[#3fb950] mb-2 flex items-center gap-1.5">
+                      <h4 className="text-xs font-medium text-[var(--gh-done-fg)] mb-2 flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5" /> Covered
                       </h4>
                       <div className="flex flex-wrap gap-1.5">
                         {lastAnswer.pointsCovered.map((point, i) => (
-                          <span key={i} className="px-2.5 py-1 text-xs bg-[#238636]/20 text-[#3fb950] rounded-lg font-medium flex items-center gap-1">
+                          <span key={i} className="px-2.5 py-1 text-xs bg-[var(--gh-success-fg)]/20 text-[var(--gh-done-fg)] rounded-lg font-medium flex items-center gap-1">
                             {point.phrase}
                             <span className="opacity-60">×{point.weight}</span>
                           </span>
@@ -726,12 +726,12 @@ export default function VoiceSession() {
                   )}
                   {lastAnswer.pointsMissed.length > 0 && (
                     <div>
-                      <h4 className="text-xs font-medium text-[#f85149] mb-2 flex items-center gap-1.5">
+                      <h4 className="text-xs font-medium text-[var(--gh-danger-fg)] mb-2 flex items-center gap-1.5">
                         <XCircle className="w-3.5 h-3.5" /> Missed
                       </h4>
                       <div className="flex flex-wrap gap-1.5">
                         {lastAnswer.pointsMissed.map((point, i) => (
-                          <span key={i} className="px-2.5 py-1 text-xs bg-[#f85149]/20 text-[#f85149] rounded-lg font-medium flex items-center gap-1">
+                          <span key={i} className="px-2.5 py-1 text-xs bg-[var(--gh-danger-fg)]/20 text-[var(--gh-danger-fg)] rounded-lg font-medium flex items-center gap-1">
                             {point.phrase}
                             <span className="opacity-60">×{point.weight}</span>
                           </span>
@@ -743,19 +743,19 @@ export default function VoiceSession() {
 
                 {/* Practice Mode CTA */}
                 {answeredQuestion.idealAnswer && (
-                  <div className="bg-[#58a6ff]/10 border border-[#58a6ff]/30 rounded-xl p-4">
+                  <div className="bg-[var(--gh-accent-fg)]/10 border border-[var(--gh-accent-fg)]/30 rounded-xl p-4">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-lg bg-[#58a6ff]/20">
-                        <BookOpen className="w-5 h-5 text-[#58a6ff]" />
+                      <div className="p-2 rounded-lg bg-[var(--gh-accent-fg)]/20">
+                        <BookOpen className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-sm font-medium text-[#58a6ff] mb-1">Practice the Ideal Answer</h4>
-                        <p className="text-xs text-[#8b949e] mb-3">
+                        <h4 className="text-sm font-medium text-[var(--gh-accent-fg)] mb-1">Practice the Ideal Answer</h4>
+                        <p className="text-xs text-[var(--gh-fg-muted)] mb-3">
                           Read aloud to practice pronunciation and memorize key terms.
                         </p>
                         <button
                           onClick={startPracticeMode}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-[#58a6ff]/20 text-[#58a6ff] text-xs font-medium rounded-lg hover:bg-[#58a6ff]/30 transition-colors"
+                          className="flex items-center gap-2 px-3 py-1.5 bg-[var(--gh-accent-fg)]/20 text-[var(--gh-accent-fg)] text-xs font-medium rounded-lg hover:bg-[var(--gh-accent-fg)]/30 transition-colors"
                         >
                           <Mic className="w-3.5 h-3.5" />
                           Practice Reading Aloud
@@ -767,17 +767,17 @@ export default function VoiceSession() {
               </div>
 
               {/* Actions */}
-              <div className="p-4 bg-[#0d1117] border-t border-[#30363d] flex gap-3">
+              <div className="p-4 bg-[var(--gh-canvas)] border-t border-[var(--gh-border)] flex gap-3">
                 <button
                   onClick={retryQuestion}
-                  className="flex-1 px-4 py-3 border border-[#30363d] text-[#8b949e] hover:text-white hover:border-[#8b949e] rounded-xl transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
                   <RotateCcw className="w-4 h-4" />
                   Retry
                 </button>
                 <button
                   onClick={goToNextQuestion}
-                  className="flex-1 px-4 py-3 bg-[#238636] text-white font-semibold rounded-xl hover:bg-[#2ea043] transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors flex items-center justify-center gap-2"
                 >
                   {isLastQuestion ? (
                     <>
@@ -819,26 +819,26 @@ export default function VoiceSession() {
     return (
       <>
         <SEOHead title="Practice Mode | Voice Session" description="Practice reading the ideal answer" />
-        <div className="min-h-screen bg-[#0d1117] text-[#e6edf3]">
-          <header className="sticky top-0 z-50 border-b border-[#30363d] bg-[#0d1117]/95 backdrop-blur-md">
+        <div className="min-h-screen bg-[var(--gh-canvas)] text-[var(--gh-fg)]">
+          <header className="sticky top-0 z-50 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]/95 backdrop-blur-md">
             <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <button onClick={stopPractice} className="p-2 hover:bg-[#21262d] rounded-lg transition-colors">
-                  <ArrowRight className="w-5 h-5 rotate-180 text-[#8b949e]" />
+                <button onClick={stopPractice} className="p-2 hover:bg-[var(--gh-canvas-subtle)] rounded-lg transition-colors">
+                  <ArrowRight className="w-5 h-5 rotate-180 text-[var(--gh-fg-muted)]" />
                 </button>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#58a6ff]/20 flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-[#58a6ff]" />
+                  <div className="w-10 h-10 rounded-xl bg-[var(--gh-accent-fg)]/20 flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                   </div>
                   <div>
-                    <h1 className="font-semibold text-white text-sm">Practice Mode</h1>
-                    <p className="text-xs text-[#8b949e]">Read the ideal answer aloud</p>
+                    <h1 className="font-semibold text-[var(--gh-fg)] text-sm">Practice Mode</h1>
+                    <p className="text-xs text-[var(--gh-fg-muted)]">Read the ideal answer aloud</p>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 px-4 py-2 bg-[#f85149]/10 border border-[#f85149]/30 rounded-full">
-                <span className="w-3 h-3 bg-[#f85149] rounded-full animate-pulse" />
-                <span className="text-sm text-[#f85149]">Recording</span>
+              <div className="flex items-center gap-3 px-4 py-2 bg-[var(--gh-danger-fg)]/10 border border-[var(--gh-danger-fg)]/30 rounded-full">
+                <span className="w-3 h-3 bg-[var(--gh-danger-fg)] rounded-full animate-pulse" />
+                <span className="text-sm text-[var(--gh-danger-fg)]">Recording</span>
               </div>
             </div>
           </header>
@@ -848,25 +848,25 @@ export default function VoiceSession() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl bg-[#58a6ff]/10 border border-[#58a6ff]/30 p-6 mb-6"
+              className="rounded-2xl bg-[var(--gh-accent-fg)]/10 border border-[var(--gh-accent-fg)]/30 p-6 mb-6"
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-medium text-[#58a6ff] flex items-center gap-2">
+                <h2 className="text-sm font-medium text-[var(--gh-accent-fg)] flex items-center gap-2">
                   <BookOpen className="w-4 h-4" />
                   Read This Aloud
                 </h2>
                 <ListenButton text={answeredQuestion.idealAnswer} label="Listen" size="sm" />
               </div>
-              <p className="text-lg text-white leading-relaxed">{answeredQuestion.idealAnswer}</p>
+              <p className="text-lg text-[var(--gh-fg)] leading-relaxed">{answeredQuestion.idealAnswer}</p>
               
-              <div className="mt-4 pt-4 border-t border-[#58a6ff]/20">
-                <p className="text-xs text-[#8b949e] mb-2">Key points to emphasize:</p>
+              <div className="mt-4 pt-4 border-t border-[var(--gh-accent-fg)]/20">
+                <p className="text-xs text-[var(--gh-fg-muted)] mb-2">Key points to emphasize:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {answeredQuestion.criticalPoints.map((point, i) => (
                     <span key={i} className={`px-2.5 py-1 text-xs rounded-lg font-medium flex items-center gap-1 ${
-                      point.weight === 3 ? 'bg-[#58a6ff]/30 text-[#79c0ff]' :
-                      point.weight === 2 ? 'bg-[#58a6ff]/20 text-[#58a6ff]' :
-                      'bg-[#58a6ff]/10 text-[#58a6ff]/80'
+                      point.weight === 3 ? 'bg-[var(--gh-accent-fg)]/30 text-[var(--gh-accent-fg)]' :
+                      point.weight === 2 ? 'bg-[var(--gh-accent-fg)]/20 text-[var(--gh-accent-fg)]' :
+                      'bg-[var(--gh-accent-fg)]/10 text-[var(--gh-accent-fg)]/80'
                     }`}>
                       {point.phrase}
                       {point.weight > 1 && <span className="opacity-60">×{point.weight}</span>}
@@ -877,19 +877,19 @@ export default function VoiceSession() {
             </motion.div>
 
             {/* Your Recording */}
-            <div className="rounded-2xl border border-[#30363d] bg-[#161b22] p-6 mb-6">
-              <h3 className="text-sm font-medium text-white mb-4 flex items-center gap-2">
-                <Mic className="w-4 h-4 text-[#f85149]" />
+            <div className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] p-6 mb-6">
+              <h3 className="text-sm font-medium text-[var(--gh-fg)] mb-4 flex items-center gap-2">
+                <Mic className="w-4 h-4 text-[var(--gh-danger-fg)]" />
                 Your Recording
               </h3>
-              <div className="p-4 bg-[#0d1117] rounded-xl min-h-[100px] border border-[#30363d]">
-                <p className="text-sm text-[#e6edf3] whitespace-pre-wrap">
+              <div className="p-4 bg-[var(--gh-canvas)] rounded-xl min-h-[100px] border border-[var(--gh-border)]">
+                <p className="text-sm text-[var(--gh-fg)] whitespace-pre-wrap">
                   {practiceTranscript}
-                  <span className="text-[#6e7681]">{interimTranscript}</span>
-                  <span className="animate-pulse text-[#58a6ff]">|</span>
+                  <span className="text-[var(--gh-fg-subtle)]">{interimTranscript}</span>
+                  <span className="animate-pulse text-[var(--gh-accent-fg)]">|</span>
                 </p>
                 {!practiceTranscript && !interimTranscript && (
-                  <p className="text-[#6e7681] text-sm">Start reading the answer above...</p>
+                  <p className="text-[var(--gh-fg-subtle)] text-sm">Start reading the answer above...</p>
                 )}
               </div>
             </div>
@@ -898,14 +898,14 @@ export default function VoiceSession() {
             <div className="flex gap-3">
               <button
                 onClick={stopPractice}
-                className="flex-1 px-4 py-3 border border-[#30363d] text-[#8b949e] hover:text-white hover:border-[#8b949e] rounded-xl transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors flex items-center justify-center gap-2"
               >
                 <Square className="w-4 h-4" />
                 Back to Feedback
               </button>
               <button
                 onClick={finishPractice}
-                className="flex-1 px-4 py-3 bg-[#238636] text-white font-semibold rounded-xl hover:bg-[#2ea043] transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors flex items-center justify-center gap-2"
               >
                 {isLastQuestion ? (
                   <>
@@ -930,10 +930,10 @@ export default function VoiceSession() {
   if (pageState === 'results' && sessionResult) {
     const getVerdictStyle = (verdict: string) => {
       switch (verdict) {
-        case 'excellent': return { bg: 'bg-[#238636]/20', text: 'text-[#3fb950]', icon: '🌟' };
-        case 'good': return { bg: 'bg-[#58a6ff]/20', text: 'text-[#58a6ff]', icon: '👍' };
-        case 'needs-work': return { bg: 'bg-[#d29922]/20', text: 'text-[#d29922]', icon: '📚' };
-        default: return { bg: 'bg-[#f85149]/20', text: 'text-[#f85149]', icon: '🔄' };
+        case 'excellent': return { bg: 'bg-[var(--gh-success-fg)]/20', text: 'text-[var(--gh-done-fg)]', icon: '🌟' };
+        case 'good': return { bg: 'bg-[var(--gh-accent-fg)]/20', text: 'text-[var(--gh-accent-fg)]', icon: '👍' };
+        case 'needs-work': return { bg: 'bg-[var(--gh-attention-fg)]/20', text: 'text-[var(--gh-attention-fg)]', icon: '📚' };
+        default: return { bg: 'bg-[var(--gh-danger-fg)]/20', text: 'text-[var(--gh-danger-fg)]', icon: '🔄' };
       }
     };
     
@@ -942,14 +942,14 @@ export default function VoiceSession() {
     return (
       <>
         <SEOHead title="Results | Voice Session" description="Your session results and score" />
-        <div className="min-h-screen bg-[#0d1117] text-[#e6edf3]">
-          <header className="sticky top-0 z-50 border-b border-[#30363d] bg-[#0d1117]/95 backdrop-blur-md">
+        <div className="min-h-screen bg-[var(--gh-canvas)] text-[var(--gh-fg)]">
+          <header className="sticky top-0 z-50 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]/95 backdrop-blur-md">
             <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f1c40f] to-[#d29922] flex items-center justify-center">
-                  <Trophy className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-xl bg-[var(--gh-attention-fg)]/20 flex items-center justify-center">
+                  <Trophy className="w-5 h-5 text-[var(--gh-attention-fg)]" />
                 </div>
-                <h1 className="font-semibold text-white">Session Complete</h1>
+                <h1 className="font-semibold text-[var(--gh-fg)]">Session Complete</h1>
               </div>
               <CreditsDisplay compact onClick={() => setLocation('/profile')} />
             </div>
@@ -960,45 +960,45 @@ export default function VoiceSession() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl border border-[#30363d] bg-[#161b22] p-8 mb-6 text-center"
+              className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] p-8 mb-6 text-center"
             >
               <div className={`w-28 h-28 rounded-2xl ${verdictStyle.bg} flex items-center justify-center mx-auto mb-6`}>
                 <span className={`text-5xl font-bold ${verdictStyle.text}`}>{sessionResult.overallScore}%</span>
               </div>
               
-              <h2 className="text-2xl font-bold text-white mb-2">{sessionResult.topic}</h2>
+              <h2 className="text-2xl font-bold text-[var(--gh-fg)] mb-2">{sessionResult.topic}</h2>
               <p className={`text-lg font-medium ${verdictStyle.text} mb-4`}>
                 {verdictStyle.icon} {sessionResult.verdict === 'excellent' ? 'Excellent!' :
                  sessionResult.verdict === 'good' ? 'Good Job!' :
                  sessionResult.verdict === 'needs-work' ? 'Keep Practicing' : 'Review Topic'}
               </p>
-              <p className="text-sm text-[#8b949e] max-w-md mx-auto">{sessionResult.summary}</p>
+              <p className="text-sm text-[var(--gh-fg-muted)] max-w-md mx-auto">{sessionResult.summary}</p>
             </motion.div>
 
             {/* Question Breakdown */}
-            <div className="rounded-2xl border border-[#30363d] bg-[#161b22] p-6 mb-6">
-              <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-[#58a6ff]" />
+            <div className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] p-6 mb-6">
+              <h3 className="font-semibold text-[var(--gh-fg)] mb-4 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                 Question Breakdown
               </h3>
               <div className="space-y-3">
                 {sessionResult.answers.map((answer, index) => (
-                  <div key={answer.questionId} className="flex items-center justify-between p-4 bg-[#0d1117] rounded-xl border border-[#30363d]">
+                  <div key={answer.questionId} className="flex items-center justify-between p-4 bg-[var(--gh-canvas)] rounded-xl border border-[var(--gh-border)]">
                     <div className="flex items-center gap-3">
                       <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold ${
-                        answer.isCorrect ? 'bg-[#238636]/20 text-[#3fb950]' : 'bg-[#f85149]/20 text-[#f85149]'
+                        answer.isCorrect ? 'bg-[var(--gh-success-fg)]/20 text-[var(--gh-done-fg)]' : 'bg-[var(--gh-danger-fg)]/20 text-[var(--gh-danger-fg)]'
                       }`}>
                         {index + 1}
                       </span>
-                      <span className="text-sm text-[#8b949e]">Question {index + 1}</span>
+                      <span className="text-sm text-[var(--gh-fg-muted)]">Question {index + 1}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`text-lg font-bold ${answer.score >= 60 ? 'text-[#3fb950]' : 'text-[#f85149]'}`}>
+                      <span className={`text-lg font-bold ${answer.score >= 60 ? 'text-[var(--gh-done-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
                         {answer.score}%
                       </span>
                       {answer.isCorrect 
-                        ? <CheckCircle className="w-5 h-5 text-[#3fb950]" /> 
-                        : <XCircle className="w-5 h-5 text-[#f85149]" />
+                        ? <CheckCircle className="w-5 h-5 text-[var(--gh-done-fg)]" /> 
+                        : <XCircle className="w-5 h-5 text-[var(--gh-danger-fg)]" />
                       }
                     </div>
                   </div>
@@ -1009,14 +1009,14 @@ export default function VoiceSession() {
             {/* Strengths & Improvements */}
             <div className="grid md:grid-cols-2 gap-4 mb-6">
               {sessionResult.strengths.length > 0 && (
-                <div className="rounded-2xl border border-[#30363d] bg-[#161b22] p-5">
-                  <h4 className="font-semibold text-[#3fb950] mb-4 flex items-center gap-2">
+                <div className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] p-5">
+                  <h4 className="font-semibold text-[var(--gh-done-fg)] mb-4 flex items-center gap-2">
                     <Sparkles className="w-5 h-5" /> Strengths
                   </h4>
                   <ul className="space-y-2">
                     {sessionResult.strengths.map((s, i) => (
-                      <li key={i} className="text-sm text-[#8b949e] flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 text-[#3fb950] flex-shrink-0 mt-0.5" />
+                      <li key={i} className="text-sm text-[var(--gh-fg-muted)] flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-[var(--gh-done-fg)] flex-shrink-0 mt-0.5" />
                         {s}
                       </li>
                     ))}
@@ -1024,14 +1024,14 @@ export default function VoiceSession() {
                 </div>
               )}
               {sessionResult.areasToImprove.length > 0 && (
-                <div className="rounded-2xl border border-[#30363d] bg-[#161b22] p-5">
-                  <h4 className="font-semibold text-[#d29922] mb-4 flex items-center gap-2">
+                <div className="rounded-2xl border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] p-5">
+                  <h4 className="font-semibold text-[var(--gh-attention-fg)] mb-4 flex items-center gap-2">
                     <Target className="w-5 h-5" /> To Improve
                   </h4>
                   <ul className="space-y-2">
                     {sessionResult.areasToImprove.map((a, i) => (
-                      <li key={i} className="text-sm text-[#8b949e] flex items-start gap-2">
-                        <ArrowRight className="w-4 h-4 text-[#d29922] flex-shrink-0 mt-0.5" />
+                      <li key={i} className="text-sm text-[var(--gh-fg-muted)] flex items-start gap-2">
+                        <ArrowRight className="w-4 h-4 text-[var(--gh-attention-fg)] flex-shrink-0 mt-0.5" />
                         {a}
                       </li>
                     ))}
@@ -1044,14 +1044,14 @@ export default function VoiceSession() {
             <div className="flex gap-3">
               <button 
                 onClick={() => setLocation('/')} 
-                className="flex-1 px-4 py-3 border border-[#30363d] text-[#8b949e] hover:text-white hover:border-[#8b949e] rounded-xl transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors flex items-center justify-center gap-2"
               >
                 <Home className="w-4 h-4" />
                 Home
               </button>
               <button 
                 onClick={exitSession} 
-                className="flex-1 px-4 py-3 bg-[#238636] text-white font-semibold rounded-xl hover:bg-[#2ea043] transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors flex items-center justify-center gap-2"
               >
                 <Target className="w-4 h-4" />
                 New Session

@@ -778,6 +778,7 @@ const CODING_PROGRESS_KEY = 'coding-challenge-progress';
 // Cache for loaded challenges from JSON
 let loadedChallenges: CodingChallenge[] | null = null;
 let loadPromise: Promise<CodingChallenge[]> | null = null;
+let loadError: string | null = null;
 
 // Load challenges from JSON file (database source)
 async function loadChallengesFromJson(): Promise<CodingChallenge[]> {
@@ -786,17 +787,30 @@ async function loadChallengesFromJson(): Promise<CodingChallenge[]> {
   
   loadPromise = (async (): Promise<CodingChallenge[]> => {
     try {
+      loadError = null;
       const response = await fetch('/data/coding-challenges.json');
-      if (!response.ok) throw new Error('Failed to load challenges');
-      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error('Failed to load challenges data (HTTP error)');
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Failed to load challenges data (invalid content type)');
+      }
+
+      const rawData = await response.json();
+      
+      // Support both array and object formats
+      const data = Array.isArray(rawData) ? rawData : (rawData.challenges || []);
       
       // Transform database format to app format
       const challenges: CodingChallenge[] = data.map((c: any) => ({
-        id: c.id,
-        title: c.title,
-        description: c.description,
-        difficulty: c.difficulty as Difficulty,
-        category: c.category,
+        id: c.id || `challenge-${Math.random().toString(36).substr(2, 9)}`,
+        title: c.title || 'Untitled Challenge',
+        description: c.description || '',
+        difficulty: (c.difficulty as Difficulty) || 'easy',
+        category: c.category || 'General',
         tags: c.tags || [],
         starterCode: c.starterCode || { javascript: '', python: '' },
         testCases: (c.testCases || []).map((tc: any) => ({
@@ -815,7 +829,10 @@ async function loadChallengesFromJson(): Promise<CodingChallenge[]> {
       loadedChallenges = challenges;
       return challenges;
     } catch (error) {
-      console.warn('Failed to load challenges from JSON, using fallback templates:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error loading challenges';
+      console.error('Failed to load challenges data:', error);
+      loadError = errorMsg;
+      
       // Fallback to hardcoded templates if JSON fails
       const fallback: CodingChallenge[] = challengeTemplates.map((template, index) => ({
         ...template,
@@ -827,6 +844,11 @@ async function loadChallengesFromJson(): Promise<CodingChallenge[]> {
   })();
   
   return loadPromise;
+}
+
+// Export the error if any
+export function getLoadError(): string | null {
+  return loadError;
 }
 
 // Synchronous getter - returns cached challenges or fallback

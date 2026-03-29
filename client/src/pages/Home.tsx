@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
+import { useMemo } from "react";
 import {
   Mic, Code, RotateCcw, BookOpen, ChevronRight,
   Flame, CheckCircle2, Layers, TrendingUp,
@@ -52,16 +53,19 @@ function ContributionGrid() {
   const weeks = 15;
   const days = 7;
   const levels = [0, 1, 2, 3, 4];
-  const cells: number[][] = Array.from({ length: weeks }, (_, w) =>
-    Array.from({ length: days }, (_, d) => {
-      const val = Math.random();
-      if (val < 0.4) return 0;
-      if (val < 0.6) return 1;
-      if (val < 0.75) return 2;
-      if (val < 0.9) return 3;
-      return 4;
-    })
-  );
+  
+  const cells = useMemo(() => {
+    return Array.from({ length: weeks }, (_, w) =>
+      Array.from({ length: days }, (_, d) => {
+        const val = Math.random();
+        if (val < 0.4) return 0;
+        if (val < 0.6) return 1;
+        if (val < 0.75) return 2;
+        if (val < 0.9) return 3;
+        return 4;
+      })
+    );
+  }, []);
 
   const colorMap = [
     "bg-[var(--gh-canvas-inset)]",

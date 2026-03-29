@@ -1,3 +1,15 @@
+/**
+ * @deprecated This component is deprecated. Use `/client/src/pages/Onboarding.tsx` instead.
+ * 
+ * This was the legacy onboarding with dark/mono theme. The canonical onboarding
+ * is now at `/client/src/pages/Onboarding.tsx` which provides:
+ * - 4-step flow (Welcome → Choose Role → Select Channels → Ready)
+ * - GitHub theme styling
+ * - Proper UserPreferencesContext integration
+ * 
+ * Last updated: 2026-03-29
+ */
+
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { rolesConfig, getRecommendedChannels } from '../lib/channels-config';
@@ -26,8 +38,17 @@ const iconMap: Record<string, React.ReactNode> = {
 
 // Step indicator component
 function StepIndicator({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
+  const stepNames = ['Select Role', 'Preview Channels'];
+  
   return (
-    <div className="flex items-center justify-center gap-2 mb-6">
+    <div 
+      className="flex items-center justify-center gap-2 mb-6" 
+      role="progressbar" 
+      aria-valuenow={currentStep + 1} 
+      aria-valuemin={1} 
+      aria-valuemax={totalSteps}
+      aria-label={`Step ${currentStep + 1} of ${totalSteps}: ${stepNames[currentStep]}`}
+    >
       {Array.from({ length: totalSteps }).map((_, i) => (
         <div key={i} className="flex items-center">
           <motion.div

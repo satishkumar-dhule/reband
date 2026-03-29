@@ -2,60 +2,78 @@
 // Coordinates via message passing with Google services integration
 
 import { useState } from "react";
+import { 
+  Palette, Sparkles, Accessibility, Smartphone, 
+  Database, Search, RefreshCw, Save, Zap, 
+  BarChart, Lock, Cloud, Map, FileText, 
+  Layers, Box, Globe, Activity, Shield, 
+  Bot, Code, TestTube, Library, Microscope,
+  Star, Bell, DoorOpen, MessageSquare, HardDrive
+} from "lucide-react";
 import { messageBus } from "@/agents/core/AgentMessageBus";
+
+const iconsMap: Record<string, any> = {
+  Palette, Sparkles, Accessibility, Smartphone,
+  Database, Search, RefreshCw, Save, Zap,
+  BarChart, Lock, Cloud, Map, FileText,
+  Layers, Box, Globe, Activity, Shield,
+  Bot, Code, TestTube, Library, Microscope,
+  Star, Bell, DoorOpen, MessageSquare, HardDrive
+};
 
 // 30 Autonomous Agents Configuration
 // Using consistent design system colors (GitHub-style semantic palette)
 const agents = [
   // UI/UX Agents (1-5) - Purple/Pink/Teal accent colors
-  { id: 'ui-ux-architect', name: 'UI/UX Architect', icon: '🎨', color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/30', category: 'UI/UX', desc: 'Design & prototyping' },
-  { id: 'design-system', name: 'Design System', icon: '🖌️', color: 'text-violet-500', bg: 'bg-violet-500/10', border: 'border-violet-500/30', category: 'UI/UX', desc: 'Component libraries' },
-  { id: 'accessibility', name: 'Accessibility', icon: '♿', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', category: 'UI/UX', desc: 'WCAG compliance' },
-  { id: 'animation', name: 'Animation', icon: '✨', color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30', category: 'UI/UX', desc: 'Motion & transitions' },
-  { id: 'responsive', name: 'Responsive', icon: '📱', color: 'text-pink-500', bg: 'bg-pink-500/10', border: 'border-pink-500/30', category: 'UI/UX', desc: 'Multi-device layouts' },
+  { id: 'ui-ux-architect', name: 'UI/UX Architect', icon: 'Palette', color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/30', category: 'UI/UX', desc: 'Design & prototyping' },
+  { id: 'design-system', name: 'Design System', icon: 'Layers', color: 'text-violet-500', bg: 'bg-violet-500/10', border: 'border-violet-500/30', category: 'UI/UX', desc: 'Component libraries' },
+  { id: 'accessibility', name: 'Accessibility', icon: 'Accessibility', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', category: 'UI/UX', desc: 'WCAG compliance' },
+  { id: 'animation', name: 'Animation', icon: 'Sparkles', color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30', category: 'UI/UX', desc: 'Motion & transitions' },
+  { id: 'responsive', name: 'Responsive', icon: 'Smartphone', color: 'text-pink-500', bg: 'bg-pink-500/10', border: 'border-pink-500/30', category: 'UI/UX', desc: 'Multi-device layouts' },
   
   // Database Agents (6-10) - Blue/Sky/Teal colors
-  { id: 'db-architect', name: 'DB Architect', icon: '🏗️', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Database', desc: 'Schema design' },
-  { id: 'query-optimizer', name: 'Query Optimizer', icon: '🔍', color: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/30', category: 'Database', desc: 'SQL performance' },
-  { id: 'migration', name: 'Migration', icon: '🔄', color: 'text-teal-500', bg: 'bg-teal-500/10', border: 'border-teal-500/30', category: 'Database', desc: 'Data migration' },
-  { id: 'backup', name: 'Backup', icon: '💾', color: 'text-slate-500', bg: 'bg-slate-500/10', border: 'border-slate-500/30', category: 'Database', desc: 'Disaster recovery' },
-  { id: 'cache', name: 'Cache Manager', icon: '⚡', color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/30', category: 'Database', desc: 'Redis caching' },
+  { id: 'db-architect', name: 'DB Architect', icon: 'HardDrive', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Database', desc: 'Schema design' },
+  { id: 'query-optimizer', name: 'Query Optimizer', icon: 'Search', color: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/30', category: 'Database', desc: 'SQL performance' },
+  { id: 'migration', name: 'Migration', icon: 'RefreshCw', color: 'text-teal-500', bg: 'bg-teal-500/10', border: 'border-teal-500/30', category: 'Database', desc: 'Data migration' },
+  { id: 'backup', name: 'Backup', icon: 'Save', color: 'text-slate-500', bg: 'bg-slate-500/10', border: 'border-slate-500/30', category: 'Database', desc: 'Disaster recovery' },
+  { id: 'cache', name: 'Cache Manager', icon: 'Zap', color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/30', category: 'Database', desc: 'Redis caching' },
   
   // Google Agents (11-15) - Google brand colors
-  { id: 'google-analytics', name: 'Google Analytics', icon: '📊', color: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/30', category: 'Google', desc: 'User tracking' },
-  { id: 'google-auth', name: 'Google Auth', icon: '🔐', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Google', desc: 'OAuth/SSO' },
-  { id: 'google-cloud', name: 'Google Cloud', icon: '☁️', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', category: 'Google', desc: 'GCP deployment' },
-  { id: 'google-maps', name: 'Google Maps', icon: '🗺️', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30', category: 'Google', desc: 'Location services' },
-  { id: 'google-sheets', name: 'Google Sheets', icon: '📑', color: 'text-green-600', bg: 'bg-green-600/10', border: 'border-green-600/30', category: 'Google', desc: 'Data export' },
+  { id: 'google-analytics', name: 'Google Analytics', icon: 'BarChart', color: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/30', category: 'Google', desc: 'User tracking' },
+  { id: 'google-auth', name: 'Google Auth', icon: 'Lock', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Google', desc: 'OAuth/SSO' },
+  { id: 'google-cloud', name: 'Google Cloud', icon: 'Cloud', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', category: 'Google', desc: 'GCP deployment' },
+  { id: 'google-maps', name: 'Google Maps', icon: 'Map', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30', category: 'Google', desc: 'Location services' },
+  { id: 'google-sheets', name: 'Google Sheets', icon: 'FileText', color: 'text-green-600', bg: 'bg-green-600/10', border: 'border-green-600/30', category: 'Google', desc: 'Data export' },
   
   // DevOps Agents (16-20) - Cyan/Blue colors
-  { id: 'ci-cd', name: 'CI/CD Pipeline', icon: '🔄', color: 'text-cyan-500', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', category: 'DevOps', desc: 'Automation' },
-  { id: 'docker', name: 'Docker', icon: '🐳', color: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/30', category: 'DevOps', desc: 'Containers' },
-  { id: 'kubernetes', name: 'Kubernetes', icon: '☸️', color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', category: 'DevOps', desc: 'Orchestration' },
-  { id: 'monitoring', name: 'Monitoring', icon: '📈', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30', category: 'DevOps', desc: 'System health' },
-  { id: 'security', name: 'Security', icon: '🛡️', color: 'text-violet-600', bg: 'bg-violet-600/10', border: 'border-violet-600/30', category: 'DevOps', desc: 'Security scanning' },
+  { id: 'ci-cd', name: 'CI/CD Pipeline', icon: 'RefreshCw', color: 'text-cyan-500', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', category: 'DevOps', desc: 'Automation' },
+  { id: 'docker', name: 'Docker', icon: 'Box', color: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/30', category: 'DevOps', desc: 'Containers' },
+  { id: 'kubernetes', name: 'Kubernetes', icon: 'Globe', color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', category: 'DevOps', desc: 'Orchestration' },
+  { id: 'monitoring', name: 'Monitoring', icon: 'Activity', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30', category: 'DevOps', desc: 'System health' },
+  { id: 'security', name: 'Security', icon: 'Shield', color: 'text-violet-600', bg: 'bg-violet-600/10', border: 'border-violet-600/30', category: 'DevOps', desc: 'Security scanning' },
   
   // AI/ML Agents (21-25) - Purple/Lime colors
-  { id: 'ai-assistant', name: 'AI Assistant', icon: '🤖', color: 'text-fuchsia-500', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/30', category: 'AI/ML', desc: 'NLP & generative' },
-  { id: 'code-generator', name: 'Code Generator', icon: '💻', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30', category: 'AI/ML', desc: 'Code generation' },
-  { id: 'testing', name: 'Testing', icon: '🧪', color: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', category: 'AI/ML', desc: 'QA & coverage' },
-  { id: 'documentation', name: 'Documentation', icon: '📚', color: 'text-slate-500', bg: 'bg-slate-500/10', border: 'border-slate-500/30', category: 'AI/ML', desc: 'API docs' },
-  { id: 'analytics-ml', name: 'ML Analytics', icon: '🔬', color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/30', category: 'AI/ML', desc: 'Data insights' },
+  { id: 'ai-assistant', name: 'AI Assistant', icon: 'Bot', color: 'text-fuchsia-500', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/30', category: 'AI/ML', desc: 'NLP & generative' },
+  { id: 'code-generator', name: 'Code Generator', icon: 'Code', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30', category: 'AI/ML', desc: 'Code generation' },
+  { id: 'testing', name: 'Testing', icon: 'TestTube', color: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', category: 'AI/ML', desc: 'QA & coverage' },
+  { id: 'documentation', name: 'Documentation', icon: 'Library', color: 'text-slate-500', bg: 'bg-slate-500/10', border: 'border-slate-500/30', category: 'AI/ML', desc: 'API docs' },
+  { id: 'analytics-ml', name: 'ML Analytics', icon: 'Microscope', color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/30', category: 'AI/ML', desc: 'Data insights' },
   
   // Feature Agents (26-30) - Orange/Rose/Teal colors
-  { id: 'onboarding', name: 'Onboarding', icon: '🌟', color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30', category: 'Features', desc: 'User guidance' },
-  { id: 'notifications', name: 'Notifications', icon: '🔔', color: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/30', category: 'Features', desc: 'Push & email' },
-  { id: 'search', name: 'Search', icon: '🔎', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Features', desc: 'Indexing' },
-  { id: 'api-gateway', name: 'API Gateway', icon: '🚪', color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', category: 'Features', desc: 'Routes & rate limiting' },
-  { id: 'feedback', name: 'Feedback', icon: '💬', color: 'text-teal-500', bg: 'bg-teal-500/10', border: 'border-teal-500/30', category: 'Features', desc: 'Surveys' },
+  { id: 'onboarding', name: 'Onboarding', icon: 'Star', color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30', category: 'Features', desc: 'User guidance' },
+  { id: 'notifications', name: 'Notifications', icon: 'Bell', color: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/30', category: 'Features', desc: 'Push & email' },
+  { id: 'search', name: 'Search', icon: 'Search', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Features', desc: 'Indexing' },
+  { id: 'api-gateway', name: 'API Gateway', icon: 'DoorOpen', color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', category: 'Features', desc: 'Routes & rate limiting' },
+  { id: 'feedback', name: 'Feedback', icon: 'MessageSquare', color: 'text-teal-500', bg: 'bg-teal-500/10', border: 'border-teal-500/30', category: 'Features', desc: 'Surveys' },
 ];
 
 // Get agent component based on selection
 function AgentPanel({ agent }: { agent: typeof agents[0] }) {
+  const Icon = iconsMap[agent.icon] || Bot;
   return (
     <div className="bg-card rounded-lg p-6 border border-border">
       <div className="flex items-center gap-4 mb-4">
-        <span className="text-4xl">{agent.icon}</span>
+        <Icon className={`w-12 h-12 ${agent.color}`} />
         <div>
           <h2 className={`text-2xl font-bold ${agent.color}`}>{agent.name}</h2>
           <span className="text-sm text-muted-foreground">{agent.category} Agent</span>

@@ -100,3 +100,19 @@ export function SkeletonText({ lines = 3 }: { lines?: number }) {
     </div>
   );
 }
+
+export function SkeletonLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="flex flex-col items-center gap-4 w-full max-w-md p-4">
+        <Skeleton variant="circular" className="w-16 h-16" />
+        <Skeleton className="h-4 w-32" />
+        <div className="w-full space-y-3 mt-4">
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      </div>
+    </div>
+  );
+}
