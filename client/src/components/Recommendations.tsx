@@ -305,8 +305,8 @@ function EngagementSummary({ className = '' }: { className?: string }) {
   }
 
   return (
-    <div className={`flex items-center gap-4 p-3 rounded-lg bg-gray-100 dark:bg-[#161b22] border border-gray-200 dark:border-[#30363d] ${className}`}>
-      <TrendingUp className="w-4 h-4 text-green-600 dark:text-[#3fb950]" />
+    <div className={`flex items-center gap-4 p-3 rounded-lg bg-muted border-border ${className}`}>
+      <TrendingUp className="w-4 h-4 text-[var(--gh-success-fg,#1a7f37)]" />
       <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
         <span>
           <span className="text-gray-700 dark:text-gray-200 font-medium">{summary.totalChannelsVisited}</span> channels explored
@@ -316,7 +316,7 @@ function EngagementSummary({ className = '' }: { className?: string }) {
         </span>
         {summary.currentStreak > 0 && (
           <span>
-            <span className="text-orange-600 dark:text-[#f0883e] font-medium">{summary.currentStreak}</span> day streak 🔥
+            <span className="text-[var(--gh-attention-fg,#9a6700)] font-medium">{summary.currentStreak}</span> day streak 🔥
           </span>
         )}
       </div>

@@ -118,6 +118,8 @@ export default function QuestionViewerGenZ() {
       setLocation(`/channel/${channelId}/${questions[0].id}`, { replace: true });
       setIsInitialized(true);
     }
+    // Intentionally omit currentIndex, isInitialized from deps - this effect initializes state, not reacts to it
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetQuestionId, questions.length, channelId, loading, questionIdFromSearch]);
 
   useEffect(() => {
@@ -143,7 +145,7 @@ export default function QuestionViewerGenZ() {
       setLocation(`/channel/${channelId}/${currentQuestion.id}`, { replace: true });
     }
     saveLastVisitedIndex(currentIndex);
-  }, [currentIndex, isInitialized]);
+  }, [currentIndex, isInitialized, loading, channelId, currentQuestion, targetQuestionId, setLocation]);
 
   useEffect(() => {
     if (currentQuestion) {
@@ -175,13 +177,14 @@ export default function QuestionViewerGenZ() {
     }
   };
 
+  // Use refs to avoid stale closure issues with keyboard navigation
   useEffect(() => {
     nextQuestionRef.current = nextQuestion;
-  }, [nextQuestion]);
-  
+  });
+
   useEffect(() => {
     prevQuestionRef.current = prevQuestion;
-  }, [prevQuestion]);
+  });
   
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

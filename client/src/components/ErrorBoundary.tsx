@@ -44,6 +44,8 @@ export class ErrorBoundary extends Component<Props, State> {
 
   handleRetry = (): void => {
     this.setState({ hasError: false, error: null, errorInfo: null });
+    // Force a re-render to remount children
+    this.forceUpdate();
   };
 
   handleGoHome = (): void => {

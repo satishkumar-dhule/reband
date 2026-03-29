@@ -260,7 +260,8 @@ export default function ReviewSessionGenZ() {
     if (currentIndex < cards.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else {
-      setLocation('/stats');
+      // Review complete - navigate to stats
+      setLocation('/stats', { replace: true });
     }
   };
 

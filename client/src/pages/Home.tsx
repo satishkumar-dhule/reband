@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Mic, Code, RotateCcw, BookOpen, ChevronRight,
   Flame, CheckCircle2, Layers, TrendingUp,
   Clock, BookMarked, Activity, Brain, Award,
-  Circle, Star, GitFork
+  Circle, Star, GitFork, AlertCircle
 } from "lucide-react";
 import { AppLayout } from "../components/layout/AppLayout";
 import { allChannelsConfig } from "../lib/channels-config";
@@ -18,16 +18,41 @@ interface ApiChannel {
 }
 
 function useApiChannels() {
-  return useQuery<ApiChannel[]>({
-    queryKey: ["channels"],
-    queryFn: async () => {
-      const r = await fetch("/api/channels");
-      if (!r.ok) throw new Error(`Failed to fetch channels: ${r.status}`);
-      return r.json();
-    },
-    staleTime: 120_000,
-    retry: 2,
-  });
+  const [channels, setChannels] = useState<ApiChannel[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchChannels() {
+      try {
+        // Use static JSON in production, API in dev
+        const basePath = import.meta.env.BASE_URL || '/';
+        const response = await fetch(`${basePath}data/channels.json`);
+        if (!response.ok) throw new Error(`Failed to fetch channels: ${response.status}`);
+        const data = await response.json();
+        setChannels(data);
+      } catch (err) {
+        // Fallback: try API endpoint in dev mode
+        if (import.meta.env.DEV) {
+          try {
+            const r = await fetch("/api/channels");
+            if (!r.ok) throw new Error(`Failed to fetch channels: ${r.status}`);
+            const data = await r.json();
+            setChannels(data);
+            return;
+          } catch {
+            // Fall through to error
+          }
+        }
+        setError(err instanceof Error ? err.message : 'Failed to load channels');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchChannels();
+  }, []);
+
+  return { data: channels, isLoading: loading, error };
 }
 
 function getProgress(channelId: string, total: number) {
@@ -190,7 +215,7 @@ function StatBadge({ icon: Icon, label, value, color }: {
 
 export default function Home() {
   const [, setLocation] = useLocation();
-  const { data: apiChannels = [], isLoading } = useApiChannels();
+  const { data: apiChannels = [], isLoading, error } = useApiChannels();
 
   const channelMap = Object.fromEntries(
     apiChannels.map((c: ApiChannel) => [c.id, c.questionCount])

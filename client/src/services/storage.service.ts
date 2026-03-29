@@ -49,7 +49,49 @@ function getString(key: string, defaultValue: string = ''): string {
 
 function setString(key: string, value: string): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(key, value);
+  
+  try {
+    localStorage.setItem(key, value);
+  } catch (error) {
+    console.error(`Failed to write ${key} to localStorage:`, error);
+    // Handle storage quota exceeded
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded, attempting to clear old data');
+      clearOldStorageData();
+      // Retry once
+      try {
+        localStorage.setItem(key, value);
+      } catch (retryError) {
+        console.error('Failed to write after cleanup:', retryError);
+      }
+    }
+  }
+}
+
+/**
+ * Clear old storage data to free up quota
+ */
+function clearOldStorageData(): void {
+  // Clear session storage first
+  sessionStorage.clear();
+  
+  // Find and clear old activity stats (keep last 30 days)
+  try {
+    const statsKey = STORAGE_KEYS.ACTIVITY_STATS;
+    const stored = localStorage.getItem(statsKey);
+    if (stored) {
+      const stats = JSON.parse(stored);
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - 30);
+      const cutoffStr = cutoff.toISOString().split('T')[0];
+      const filtered = stats.filter((s: { date: string }) => s.date >= cutoffStr);
+      if (filtered.length < stats.length) {
+        localStorage.setItem(statsKey, JSON.stringify(filtered));
+      }
+    }
+  } catch {
+    // Ignore errors when clearing
+  }
 }
 
 function getBoolean(key: string, defaultValue: boolean = false): boolean {

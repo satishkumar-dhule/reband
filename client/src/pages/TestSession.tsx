@@ -1171,7 +1171,7 @@ export default function TestSession() {
                       initial={{ strokeDasharray: '0 352' }}
                       animate={{ strokeDasharray: `${(result.score / 100) * 352} 352` }}
                       transition={{ duration: 1, delay: 0.3 }}
-                      className={result.passed ? 'text-green-500' : 'text-orange-500'}
+                      className={result.passed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-attention-fg)]'}
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -1179,7 +1179,7 @@ export default function TestSession() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.5 }}
-                      className={`text-3xl font-bold ${result.passed ? 'text-green-500' : 'text-orange-500'}`}
+                      className={`text-3xl font-bold ${result.passed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-attention-fg)]'}`}
                     >
                       {result.score}%
                     </motion.span>
@@ -1190,13 +1190,13 @@ export default function TestSession() {
                 </div>
 
                 <div className="space-y-2 mb-6 text-sm">
-                  <div className={`flex justify-between p-2 bg-green-500/10 rounded`}>
+                  <div className={`flex justify-between p-2 bg-[var(--gh-success-fg)]/10 rounded`}>
                     <span className="text-muted-foreground">Correct Answers</span>
-                    <span className="font-bold text-green-500">{result.correct}</span>
+                    <span className="font-bold text-[var(--gh-success-fg)]">{result.correct}</span>
                   </div>
-                  <div className="flex justify-between p-2 bg-red-500/10 rounded">
+                  <div className="flex justify-between p-2 bg-[var(--gh-danger-fg)]/10 rounded">
                     <span className="text-muted-foreground">Incorrect</span>
-                    <span className="font-bold text-red-500">{result.total - result.correct}</span>
+                    <span className="font-bold text-[var(--gh-danger-fg)]">{result.total - result.correct}</span>
                   </div>
                 </div>
 
@@ -1207,7 +1207,7 @@ export default function TestSession() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`flex-1 py-2 border rounded text-center text-sm hover:opacity-80 transition-all flex items-center justify-center gap-1 ${
-                      result.passed ? 'border-green-500/30 text-green-500' : 'border-border'
+                      result.passed ? 'border-[var(--gh-success-fg)]/30 text-[var(--gh-success-fg)]' : 'border-border'
                     }`}
                   >
                     <Share2 className="w-4 h-4" /> Share on X
@@ -1217,7 +1217,7 @@ export default function TestSession() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`flex-1 py-2 border rounded text-center text-sm hover:opacity-80 transition-all flex items-center justify-center gap-1 ${
-                      result.passed ? 'border-green-500/30 text-green-500' : 'border-border'
+                      result.passed ? 'border-[var(--gh-success-fg)]/30 text-[var(--gh-success-fg)]' : 'border-border'
                     }`}
                   >
                     <Share2 className="w-4 h-4" /> Share

@@ -68,6 +68,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const [formatSuggestions, setFormatSuggestions] = useState<FormatSuggestion[]>([]);
   const [formattedAnswer, setFormattedAnswer] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Debounced validation
   const [validationTimeout, setValidationTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -249,6 +250,8 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
       return;
     }
 
+    setIsSubmitting(true);
+
     const questionToSave: Question = {
       id: formData.id || `q-${Date.now()}`,
       question: formData.question.trim(),
@@ -268,6 +271,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
     };
 
     onSave?.(questionToSave);
+    setIsSubmitting(false);
   };
 
   // Validation status
@@ -361,11 +365,20 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
 
             <button
               onClick={handleSave}
-              disabled={!formData.question?.trim() || !formData.answer?.trim()}
-              className="px-4 py-1.5 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting || !formData.question?.trim() || !formData.answer?.trim()}
+              className="px-4 py-1.5 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
             >
-              <Save className="w-4 h-4 mr-1.5" />
-              Save
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-1.5" />
+                  Save
+                </>
+              )}
             </button>
           </div>
         </div>

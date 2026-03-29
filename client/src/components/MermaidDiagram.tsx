@@ -195,7 +195,7 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
     <div className={`mermaid-diagram-wrapper ${className}`}>
       {status === 'loading' && (
         <div className="flex flex-col items-center justify-center p-8 gap-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ff88]"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 dark:border-green-400"></div>
           <p className="text-xs text-muted-foreground">Rendering diagram...</p>
         </div>
       )}
@@ -216,7 +216,7 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
           <summary className="text-sm text-red-400 cursor-pointer hover:text-red-300">
             Show diagram code
           </summary>
-          <pre className="mt-2 text-xs text-[#00d4ff] overflow-x-auto p-2 bg-background/30 rounded">
+          <pre className="mt-2 text-xs text-cyan-500 dark:text-cyan-400 overflow-x-auto p-2 bg-background/30 rounded">
             {content}
           </pre>
         </details>

@@ -15,28 +15,36 @@ import {
 import { useCredits } from '../context/CreditsContext';
 import {
   Trophy, Target, Clock, CheckCircle, Lock, ChevronRight,
-  Star, Zap, Sparkles, AlertTriangle, Search
+  Star, Zap, Sparkles, AlertTriangle, Search, RefreshCw
 } from 'lucide-react';
 
 export default function TestsGenZ() {
   const [, setLocation] = useLocation();
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [expiredChannels, setExpiredChannels] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const progress = getAllTestProgress();
   const stats = getTestStats();
   const { balance, formatCredits } = useCredits();
 
-  useEffect(() => {
-    const initTests = async () => {
+  const loadTestsData = async () => {
+    try {
+      setError(null);
       const expired = await checkAndExpireTests();
       setExpiredChannels(expired);
       const t = await loadTests();
       setTests(t);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load tests');
+    } finally {
       setLoading(false);
-    };
-    initTests();
+    }
+  };
+
+  useEffect(() => {
+    loadTestsData();
   }, []);
 
   const passedCount = Object.values(progress).filter(p => p.passed && !p.expired).length;

@@ -29,20 +29,30 @@ export function AppLayout({
 
   // Lock body scroll when mobile menu or search is open
   useEffect(() => {
+    const body = document.body;
+    
     if (mobileMenuOpen || searchOpen) {
-      document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-    } else {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
+      // Store original styles
+      const originalOverflow = body.style.overflow;
+      const originalPosition = body.style.position;
+      const originalWidth = body.style.width;
+      
+      body.style.overflow = "hidden";
+      body.style.position = "fixed";
+      body.style.width = "100%";
+      
+      return () => {
+        // Restore original styles on cleanup
+        body.style.overflow = originalOverflow;
+        body.style.position = originalPosition;
+        body.style.width = originalWidth;
+      };
     }
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-    };
+    
+    // Reset to default when closed
+    body.style.overflow = "";
+    body.style.position = "";
+    body.style.width = "";
   }, [mobileMenuOpen, searchOpen]);
 
   if (hideNav) {

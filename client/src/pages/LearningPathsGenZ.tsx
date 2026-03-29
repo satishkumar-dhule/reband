@@ -9,6 +9,7 @@ import {
   Plus, ChevronRight, Check, X, Search, Home, Clock, Trophy
 } from 'lucide-react';
 import { Button } from "../components/ui/button";
+import { toast } from '@/hooks/use-toast';
 
 // Certification type
 interface Certification {
@@ -153,7 +154,11 @@ export default function LearningPathsGenZ() {
 
   const handleCreateCustomPath = () => {
     if (!customPath.name || (customPath.channels.length === 0 && customPath.certifications.length === 0)) {
-      alert('Please add a name and select at least one channel or certification');
+      toast({
+        title: 'Missing Information',
+        description: 'Please add a name and select at least one channel or certification',
+        variant: 'destructive'
+      });
       return;
     }
 
@@ -183,10 +188,20 @@ export default function LearningPathsGenZ() {
         certifications: newPath.certifications
       }));
 
+      toast({
+        title: 'Path Created',
+        description: `"${customPath.name}" has been created successfully`,
+      });
+
       resetCustomPath();
       setLocation('/');
     } catch (e) {
       console.error('Failed to save custom path:', e);
+      toast({
+        title: 'Error',
+        description: 'Failed to save custom path. Please try again.',
+        variant: 'destructive'
+      });
     }
   };
 

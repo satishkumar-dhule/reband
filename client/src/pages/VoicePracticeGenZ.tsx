@@ -197,20 +197,18 @@ export default function VoicePracticeGenZ() {
   }, [sessionStartTime, targetWords]);
 
   const nextQuestion = useCallback(() => {
-    setCurrentIndex(prev => {
-      if (prev < questions.length - 1) {
-        setRecordingState('idle');
-        setTranscript('');
-        setInterimTranscript('');
-        setFeedback(null);
-        setShowAnswer(false);
-        return prev + 1;
-      } else {
-        setLocation('/');
-        return prev;
-      }
-    });
-  }, [questions.length]);
+    if (currentIndex < questions.length - 1) {
+      setRecordingState('idle');
+      setTranscript('');
+      setInterimTranscript('');
+      setFeedback(null);
+      setShowAnswer(false);
+      setCurrentIndex(prev => prev + 1);
+    } else {
+      // All questions completed - navigate to home
+      setLocation('/');
+    }
+  }, [currentIndex, questions.length, setLocation]);
 
   if (!isSpeechSupported) {
     return (

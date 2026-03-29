@@ -209,20 +209,26 @@ export default function VoiceSessionGenZ() {
     
     recognitionRef.current = recognition;
     return () => { try { recognition.stop(); } catch (e) { } };
-  }, [pageState, transcript, sessionDuration]);
+  }, []);
 
   useEffect(() => {
+    // Clear any existing timer first
+    if (sessionTimerRef.current) {
+      clearInterval(sessionTimerRef.current);
+      sessionTimerRef.current = null;
+    }
+    
     if (pageState === 'recording') {
       sessionTimerRef.current = setInterval(() => {
         setSessionDuration(prev => prev + 1);
       }, 1000);
-    } else {
+    }
+    
+    return () => {
       if (sessionTimerRef.current) {
         clearInterval(sessionTimerRef.current);
+        sessionTimerRef.current = null;
       }
-    }
-    return () => {
-      if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
     };
   }, [pageState]);
 

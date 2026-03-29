@@ -13,15 +13,24 @@ export default function NotFound() {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          setLocation('/');
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [setLocation]);
+    // Navigate when countdown reaches 0
+    const navigateTimer = setTimeout(() => {
+      if (countdown === 1) {
+        setLocation('/');
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+      clearTimeout(navigateTimer);
+    };
+  }, [countdown, setLocation]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-background p-4">

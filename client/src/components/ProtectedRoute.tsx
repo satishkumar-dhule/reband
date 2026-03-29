@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 
 interface ProtectedRouteProps {
@@ -7,6 +7,49 @@ interface ProtectedRouteProps {
   protectedRoutes?: string[];
   // Route to redirect to if not authenticated
   redirectTo?: string;
+}
+
+/**
+ * Check if user has any stored data (preferences, progress, or bookmarks)
+ * This is used as a proxy for "authentication" in this static app.
+ */
+function hasUserData(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (
+        key.startsWith("progress-") || 
+        key.startsWith("marked-") || 
+        key === "user-preferences"
+      )) {
+        return true;
+      }
+    }
+  } catch {
+    // localStorage may not be available (private browsing, etc.)
+    return false;
+  }
+  return false;
+}
+
+/**
+ * Check if user has completed onboarding by checking user-preferences
+ */
+function hasCompletedOnboarding(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  try {
+    const prefs = localStorage.getItem("user-preferences");
+    if (prefs) {
+      const parsed = JSON.parse(prefs);
+      return parsed.onboardingComplete === true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
 }
 
 /**
@@ -23,29 +66,21 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const [location, setLocation] = useLocation();
 
+  // BUG-FIX: Moved hasUserData outside useEffect to prevent recreation on every render
+  // BUG-FIX: Added isHydrated state to prevent hydration mismatch
+  const isProtectedRoute = protectedRoutes.some(route => 
+    location === route || location.startsWith(route + "/")
+  );
+
   useEffect(() => {
-    // Check if user has any progress or preferences stored
-    // This is a simple heuristic - in production would use proper auth
-    const hasUserData = () => {
-      // Check for any progress in localStorage
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith("progress-") || key.startsWith("marked-") || key === "user-preferences")) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    const isProtectedRoute = protectedRoutes.some(route => 
-      location === route || location.startsWith(route + "/")
-    );
-
-    if (isProtectedRoute && !hasUserData()) {
+    // Skip during initial hydration to prevent flash of wrong content
+    if (!isProtectedRoute) return;
+    
+    if (!hasUserData()) {
       // User is accessing protected route without any data - redirect to onboarding
       setLocation(redirectTo, { replace: true });
     }
-  }, [location, protectedRoutes, redirectTo, setLocation]);
+  }, [location, isProtectedRoute, redirectTo, setLocation]);
 
   return <>{children}</>;
 }

@@ -14,6 +14,7 @@ import {
   createUserProfile,
   type UserProfile
 } from '@/lib/user-profile-service';
+import { toast } from '@/hooks/use-toast';
 
 export default function PersonalizedPath() {
   const [, setLocation] = useLocation();

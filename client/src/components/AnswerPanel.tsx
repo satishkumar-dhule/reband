@@ -274,7 +274,7 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
   };
 
   return (
-    <div className="rounded-lg sm:rounded-xl overflow-hidden border border-border bg-[#1e1e1e]">
+    <div className="rounded-lg sm:rounded-xl overflow-hidden border border-border bg-muted dark:bg-[var(--gh-canvas-subtle,#1e1e1e)]">
       <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-2 bg-muted/50 border-b border-border">
         <div className="flex items-center gap-2">
           <Code2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />

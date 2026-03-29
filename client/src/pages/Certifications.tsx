@@ -15,7 +15,7 @@ import {
   Search, Award, Clock, ChevronRight, Play, BookOpen,
   Cloud, Shield, Database, Brain, Code, Users, Box,
   Terminal, Server, Cpu, Layers, Network, GitBranch,
-  Target, Zap, GraduationCap, Lock, Loader2, Check, Plus, X, AlertTriangle
+  Target, Zap, GraduationCap, Lock, Loader2, Check, Plus, X, AlertTriangle, RefreshCw
 } from 'lucide-react';
 
 // Certification type from API
@@ -154,6 +154,28 @@ export default function Certifications() {
       <AppLayout title="Certifications">
         <div className="flex items-center justify-center min-h-[400px]">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Show error state with retry option
+  if (error) {
+    return (
+      <AppLayout title="Certifications">
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-4">
+          <div className="bg-[var(--gh-danger-subtle)] border border-[var(--gh-danger-fg)]/20 p-6 rounded-lg mb-6 max-w-md">
+            <AlertTriangle className="w-12 h-12 text-[var(--gh-danger-fg)] mx-auto mb-4" />
+            <h2 className="text-lg font-semibold text-[var(--gh-fg)] mb-2">Failed to load certifications</h2>
+            <p className="text-sm text-[var(--gh-fg-muted)]">{error}</p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </button>
         </div>
       </AppLayout>
     );

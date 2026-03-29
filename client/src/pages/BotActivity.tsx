@@ -221,11 +221,13 @@ export default function BotActivity() {
   const [workQueue, setWorkQueue] = useState<WorkItem[]>([]);
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedBot, setSelectedBot] = useState<string>('all');
 
   const fetchData = useCallback(async () => {
     try {
+      setError(null);
       const res = await fetch('/data/bot-monitor.json');
       if (res.ok) {
         const data = await res.json();
@@ -233,9 +235,17 @@ export default function BotActivity() {
         setRecentRuns(data.runs || []);
         setWorkQueue(data.queue || []);
         setLedger(data.ledger || []);
+      } else {
+        // Use mock data for development when API not available
+        setBotStats([
+          { botName: 'creator', totalRuns: 45, successfulRuns: 42, totalCreated: 156, totalUpdated: 0, totalDeleted: 0, lastRun: new Date().toISOString() },
+          { botName: 'verifier', totalRuns: 38, successfulRuns: 38, totalCreated: 0, totalUpdated: 0, totalDeleted: 0, lastRun: new Date().toISOString() },
+          { botName: 'processor', totalRuns: 22, successfulRuns: 20, totalCreated: 0, totalUpdated: 45, totalDeleted: 12, lastRun: new Date().toISOString() }
+        ]);
       }
     } catch (error) {
       console.error('Failed to fetch bot data:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load bot data');
       // Use mock data for development
       setBotStats([
         { botName: 'creator', totalRuns: 45, successfulRuns: 42, totalCreated: 156, totalUpdated: 0, totalDeleted: 0, lastRun: new Date().toISOString() },
