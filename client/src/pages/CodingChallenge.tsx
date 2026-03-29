@@ -387,6 +387,8 @@ export default function CodingChallenge() {
     setIsRunning(true);
     setShowSuccessModal(false);
 
+    const challengeStartTime = startTime;
+
     try {
       // Use async version that supports both JS and Python (via Pyodide)
       const results = await runTestsAsync(code, currentChallenge, language);
@@ -394,7 +396,7 @@ export default function CodingChallenge() {
 
       const allPassed = results.every((r) => r.passed);
       if (allPassed) {
-        const calculatedTimeSpent = Math.floor((Date.now() - startTime) / 1000);
+        const calculatedTimeSpent = Math.floor((Date.now() - challengeStartTime) / 1000);
         saveChallengeAttempt({
           challengeId: currentChallenge.id,
           code,
@@ -416,7 +418,7 @@ export default function CodingChallenge() {
     } finally {
       setIsRunning(false);
     }
-  }, [code, currentChallenge, language, startTime, timeSpent]);
+  }, [code, currentChallenge, language, startTime]);
 
   const resetCode = useCallback(() => {
     if (currentChallenge) {

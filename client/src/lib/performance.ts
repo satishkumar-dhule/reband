@@ -8,14 +8,15 @@ import { trackMobilePerformance } from './analytics';
 /**
  * Debounce function calls
  * Prevents excessive function calls
+ * Returns both the debounced function and a cancel method
  */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
-): (...args: Parameters<T>) => void {
+): ((...args: Parameters<T>) => void) & { cancel: () => void } {
   let timeout: NodeJS.Timeout | null = null;
   
-  return function executedFunction(...args: Parameters<T>) {
+  const executedFunction = (...args: Parameters<T>) => {
     const later = () => {
       timeout = null;
       func(...args);
@@ -26,6 +27,15 @@ export function debounce<T extends (...args: any[]) => any>(
     }
     timeout = setTimeout(later, wait);
   };
+  
+  const cancel = () => {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+  };
+  
+  return Object.assign(executedFunction, { cancel });
 }
 
 /**
@@ -50,13 +60,14 @@ export function throttle<T extends (...args: any[]) => any>(
 /**
  * Request Animation Frame wrapper
  * Ensures smooth 60fps animations
+ * Returns both the throttled function and a cancel method
  */
 export function rafThrottle<T extends (...args: any[]) => any>(
   func: T
-): (...args: Parameters<T>) => void {
+): ((...args: Parameters<T>) => void) & { cancel: () => void } {
   let rafId: number | null = null;
   
-  return function executedFunction(...args: Parameters<T>) {
+  const executedFunction = (...args: Parameters<T>) => {
     if (rafId) {
       return;
     }
@@ -66,6 +77,15 @@ export function rafThrottle<T extends (...args: any[]) => any>(
       rafId = null;
     });
   };
+  
+  const cancel = () => {
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+  };
+  
+  return Object.assign(executedFunction, { cancel });
 }
 
 /**
@@ -119,12 +139,13 @@ export class LatencyMeter {
 /**
  * Lazy load images
  * Improves initial load time
+ * Returns cleanup function to disconnect observer
  */
 export function lazyLoadImage(
   img: HTMLImageElement,
   src: string,
   placeholder?: string
-) {
+): (() => void) | undefined {
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -140,9 +161,15 @@ export function lazyLoadImage(
     }
     
     observer.observe(img);
+    
+    // Return cleanup function
+    return () => {
+      observer.disconnect();
+    };
   } else {
     // Fallback for browsers without IntersectionObserver
     img.src = src;
+    return undefined;
   }
 }
 

@@ -247,6 +247,7 @@ export default function CertificationPractice() {
     const currentQ = testQuestions[currentTestIndex];
     const correctOption = currentQ.options.find(o => o.isCorrect);
     const isCorrect = optionId === correctOption?.id;
+    const totalQuestions = testQuestions.length;
     
     const answer: TestAnswer = {
       questionId: currentQ.id,
@@ -264,11 +265,13 @@ export default function CertificationPractice() {
       setShowingFeedback(false);
       setLastAnswer(null);
       
-      if (currentTestIndex < testQuestions.length - 1) {
-        setCurrentTestIndex(prev => prev + 1);
-      } else {
+      setCurrentTestIndex(prev => {
+        if (prev < totalQuestions - 1) {
+          return prev + 1;
+        }
         setShowResults(true);
-      }
+        return prev;
+      });
     }, FEEDBACK_DELAY);
   }, [showingFeedback, testQuestions, currentTestIndex]);
 
@@ -318,25 +321,31 @@ export default function CertificationPractice() {
 
   // Navigation
   const goToNext = useCallback(() => {
-    if (currentIndex < totalQuestions - 1) {
-      const nextIndex = currentIndex + 1;
-      if (isTestCheckpoint(nextIndex) && !isCheckpointPassed(nextIndex)) {
-        setCurrentIndex(nextIndex);
-        startTest();
-        return;
+    setCurrentIndex(prev => {
+      const nextIndex = prev + 1;
+      if (nextIndex < totalQuestions) {
+        if (isTestCheckpoint(nextIndex) && !isCheckpointPassed(nextIndex)) {
+          startTest();
+          return nextIndex;
+        }
+        setMobileView('question');
+        onQuestionSwipe?.();
+        return nextIndex;
       }
-      setCurrentIndex(nextIndex);
-      setMobileView('question');
-      onQuestionSwipe?.();
-    }
-  }, [currentIndex, totalQuestions, isTestCheckpoint, isCheckpointPassed, startTest, onQuestionSwipe]);
+      return prev;
+    });
+  }, [totalQuestions, isTestCheckpoint, isCheckpointPassed, startTest, onQuestionSwipe]);
 
-  const goToPrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      setMobileView('question');
-    }
-  };
+  const goToPrev = useCallback(() => {
+    setCurrentIndex(prev => {
+      if (prev > 0) {
+        const newIndex = prev - 1;
+        setMobileView('question');
+        return newIndex;
+      }
+      return prev;
+    });
+  }, []);
 
   const markCompleted = () => {
     if (currentQuestion) {

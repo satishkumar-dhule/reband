@@ -142,9 +142,13 @@ export default function LearningPathsGenZ() {
         console.error('Failed to save path:', e);
       }
     }
-    setTimeout(() => {
-      setLocation('/');
-    }, 200);
+    setLocation('/');
+  };
+
+  const resetCustomPath = () => {
+    setCustomPath({ name: '', channels: [], certifications: [] });
+    setSearchQuery('');
+    setShowCustom(false);
   };
 
   const handleCreateCustomPath = () => {
@@ -179,7 +183,7 @@ export default function LearningPathsGenZ() {
         certifications: newPath.certifications
       }));
 
-      setShowCustom(false);
+      resetCustomPath();
       setLocation('/');
     } catch (e) {
       console.error('Failed to save custom path:', e);
@@ -349,7 +353,7 @@ export default function LearningPathsGenZ() {
                 <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
                   <div className="p-4 border-b border-[var(--gh-border)] flex items-center justify-between">
                     <h2 className="font-semibold">Create Custom Path</h2>
-                    <button onClick={() => setShowCustom(false)} className="text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]">
+                    <button onClick={resetCustomPath} className="text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]">
                       <X className="w-5 h-5" />
                     </button>
                   </div>
@@ -399,7 +403,7 @@ export default function LearningPathsGenZ() {
                   </div>
 
                   <div className="p-4 border-t border-[var(--gh-border)] flex justify-end gap-3">
-                    <Button variant="outline" onClick={() => setShowCustom(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={resetCustomPath}>Cancel</Button>
                     <Button 
                       className="bg-[var(--gh-accent-emphasis)] text-white hover:opacity-90"
                       disabled={!customPath.name || customPath.channels.length === 0}

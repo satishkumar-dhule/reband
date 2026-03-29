@@ -3,7 +3,7 @@
  * Same aesthetic as Channels page
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
@@ -104,30 +104,32 @@ export default function CertificationsGenZ() {
     }
   }, []);
 
-  // Toggle started certification
-  const toggleStarted = (certId: string) => {
-    const newStarted = new Set(startedCerts);
-    if (newStarted.has(certId)) {
-      newStarted.delete(certId);
-    } else {
-      newStarted.add(certId);
-    }
-    setStartedCerts(newStarted);
-    try {
-      localStorage.setItem('startedCertifications', JSON.stringify(Array.from(newStarted)));
-    } catch (e) {
-      console.error('Failed to save:', e);
-    }
-  };
+  // Toggle started certification - useCallback to prevent stale closures
+  const toggleStarted = useCallback((certId: string) => {
+    setStartedCerts(prev => {
+      const newStarted = new Set(prev);
+      if (newStarted.has(certId)) {
+        newStarted.delete(certId);
+      } else {
+        newStarted.add(certId);
+      }
+      try {
+        localStorage.setItem('startedCertifications', JSON.stringify(Array.from(newStarted)));
+      } catch (e) {
+        console.error('Failed to save:', e);
+      }
+      return newStarted;
+    });
+  }, []);
 
-  // Filter certifications
-  const filteredCerts = certifications.filter(cert => {
+  // Filter certifications - memoized to avoid recalc on every render
+  const filteredCerts = useMemo(() => certifications.filter(cert => {
     const matchesSearch = cert.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          cert.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          cert.provider.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = !selectedCategory || cert.category === selectedCategory;
     return matchesSearch && matchesCategory;
-  });
+  }), [certifications, searchQuery, selectedCategory]);
 
   if (loading) {
     return (

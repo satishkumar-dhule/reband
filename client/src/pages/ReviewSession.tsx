@@ -3,7 +3,7 @@
  * Dedicated SRS review interface for spaced repetition
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -168,6 +168,8 @@ export default function ReviewSession() {
   const [creditPopup, setCreditPopup] = useState<{ amount: number; show: boolean }>({ amount: 0, show: false });
   const { onSRSReview, config } = useCredits();
   const { trackEvent } = useAchievementContext();
+  const dueCardsRef = useRef(dueCards);
+  dueCardsRef.current = dueCards;
 
   // Load due cards
   useEffect(() => {
@@ -199,6 +201,10 @@ export default function ReviewSession() {
 
   const handleRate = (rating: ConfidenceRating) => {
     if (!currentCard || !currentQuestion) return;
+
+    // Capture current values at render time to avoid stale closure
+    const cardIndex = currentIndex;
+    const cards = dueCards;
 
     // Record the review
     recordReview(
@@ -237,10 +243,10 @@ export default function ReviewSession() {
     setReviewedCount(prev => prev + 1);
 
     // Move to next card
-    const nextIndex = currentIndex + 1;
-    if (nextIndex < dueCards.length) {
+    const nextIndex = cardIndex + 1;
+    if (nextIndex < cards.length) {
       setCurrentIndex(nextIndex);
-      loadQuestion(dueCards[nextIndex]);
+      loadQuestion(cards[nextIndex]);
     } else {
       setShowConfetti(true);
       setSessionState('completed');

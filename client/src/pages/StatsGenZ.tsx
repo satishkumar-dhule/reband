@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { AppLayout } from '../components/layout/AppLayout';
 import { useGlobalStats } from '../hooks/use-progress';
 import { useCredits } from '../context/CreditsContext';
@@ -26,6 +26,13 @@ import {
 export default function StatsGenZ() {
   const { stats } = useGlobalStats();
   const { balance } = useCredits();
+  const [localStorageKey, setLocalStorageKey] = useState(0);
+
+  useEffect(() => {
+    const handleStorage = () => setLocalStorageKey(k => k + 1);
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   const { totalCompleted, totalQuestions, streak, moduleProgress, recentActivity } = useMemo(() => {
     const allQuestions = getAllQuestions();
@@ -70,7 +77,7 @@ export default function StatsGenZ() {
       moduleProgress: modProgress,
       recentActivity: recent
     };
-  }, [stats]);
+  }, [stats, localStorageKey]);
 
   const level = Math.floor(balance / 100);
 

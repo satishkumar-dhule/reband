@@ -290,7 +290,7 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
                   <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{result.channel}</span>
                 </div>
                 <p className="text-sm text-foreground line-clamp-2">{result.title}</p>
-                <p className="text-xs text-muted-foreground line-clamp-2 mt-1" dangerouslySetInnerHTML={{ __html: result.excerpt }} />
+                <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{result.excerpt.replace(/<[^>]*>/g, '')}</p>
               </div>
               <ArrowRight className={`w-4 h-4 shrink-0 mt-1 ${index === selectedIndex ? 'text-primary' : 'text-muted-foreground/30'}`} />
             </button>

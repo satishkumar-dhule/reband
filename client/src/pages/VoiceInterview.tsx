@@ -72,6 +72,8 @@ export default function VoiceInterview() {
   const recognitionRef = useRef<any>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const commentTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const stateRef = useRef(state);
+  stateRef.current = state;
   
   const { onVoiceInterview, config } = useCredits();
   const { trackEvent } = useAchievementContext();
@@ -190,16 +192,33 @@ export default function VoiceInterview() {
       console.log('Speech recognition started');
     };
     
-    recognition.onend = () => {
-      console.log('Speech recognition ended, state:', state);
-      if (state === 'recording') {
-        try { 
-          console.log('Restarting recognition...');
-          recognition.start(); 
-        } catch (e) { 
-          console.error('Failed to restart recognition:', e);
+    const checkAndRestart = () => {
+      setState(currentState => {
+        if (currentState === 'recording') {
+          try { 
+            console.log('Restarting recognition...');
+            recognition.start(); 
+          } catch (e) { 
+            console.error('Failed to restart recognition:', e);
+          }
         }
-      }
+        return currentState;
+      });
+    };
+    
+    recognition.onend = () => {
+      console.log('Speech recognition ended');
+      setState(currentState => {
+        if (currentState === 'recording') {
+          try { 
+            console.log('Restarting recognition...');
+            recognition.start(); 
+          } catch (e) { 
+            console.error('Failed to restart recognition:', e);
+          }
+        }
+        return currentState;
+      });
     };
     
     recognitionRef.current = recognition;
@@ -210,7 +229,7 @@ export default function VoiceInterview() {
         console.log('Recognition already stopped');
       }
     };
-  }, [state]);
+  }, []);
 
   useEffect(() => {
     if (timerRef.current) {
@@ -293,7 +312,7 @@ export default function VoiceInterview() {
   }, [currentIndex]);
 
   const skipQuestion = useCallback(() => {
-    if (recognitionRef.current && state === 'recording') recognitionRef.current.stop();
+    if (recognitionRef.current && stateRef.current === 'recording') recognitionRef.current.stop();
     if (currentIndex < questions.length - 1) {
       showComment('skip');
       setCurrentIndex(prev => prev + 1);
@@ -301,13 +320,12 @@ export default function VoiceInterview() {
       setInterimTranscript('');
       setEvaluation(null);
       setEarnedCredits(null);
-      setShowAnswer(false); // Hide answer for skipped question
-      setEarnedCredits(null);
+      setShowAnswer(false);
       setState('ready');
       setShowActions(false);
       saveSessionProgress();
     }
-  }, [currentIndex, questions.length, state, showComment]);
+  }, [currentIndex, questions.length, showComment]);
 
   const saveSessionProgress = useCallback(() => {
     if (questions.length === 0) return;

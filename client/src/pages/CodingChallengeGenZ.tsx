@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useParams } from 'wouter';
 import {
   ArrowLeft, Play, RotateCcw, Eye, CheckCircle, XCircle,
@@ -216,12 +216,12 @@ export default function CodingChallengeGenZ() {
     }
   };
 
-  const filteredChallenges = challenges.filter(c => {
+  const filteredChallenges = useMemo(() => challenges.filter(c => {
     const matchesSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          c.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesDifficulty = difficultyFilter === 'all' || c.difficulty === difficultyFilter;
     return matchesSearch && matchesDifficulty;
-  });
+  }), [challenges, searchQuery, difficultyFilter]);
 
   if (viewState === 'challenge' && currentChallenge) {
     return (

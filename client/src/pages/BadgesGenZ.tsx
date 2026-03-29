@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
@@ -28,10 +28,16 @@ export default function BadgesGenZ() {
   const { progress: allBadges, stats, isLoading } = useAchievements();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const categories = Array.from(new Set(allBadges.map(b => b.achievement.category)));
-  const filteredBadges = selectedCategory
-    ? allBadges.filter(b => b.achievement.category === selectedCategory)
-    : allBadges;
+  const categories = useMemo(
+    () => Array.from(new Set(allBadges.map(b => b.achievement.category))),
+    [allBadges]
+  );
+  const filteredBadges = useMemo(
+    () => selectedCategory
+      ? allBadges.filter(b => b.achievement.category === selectedCategory)
+      : allBadges,
+    [allBadges, selectedCategory]
+  );
 
   if (isLoading) {
     return (

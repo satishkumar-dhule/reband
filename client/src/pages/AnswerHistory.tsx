@@ -74,35 +74,24 @@ export default function AnswerHistory() {
 
   // Filter history
   const filteredHistory = useMemo(() => {
-    let filtered = history;
-    
-    // Filter by channel
-    if (selectedChannel !== 'all') {
-      filtered = filtered.filter(h => h.channelId === selectedChannel);
-    }
-    
-    // Filter by date range
-    if (dateRange !== 'all') {
-      const now = Date.now();
-      const cutoff = {
-        today: now - 24 * 60 * 60 * 1000,
-        week: now - 7 * 24 * 60 * 60 * 1000,
-        month: now - 30 * 24 * 60 * 60 * 1000,
-      }[dateRange];
-      
-      filtered = filtered.filter(h => h.timestamp >= cutoff);
-    }
-    
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(h => 
-        h.questionId.toLowerCase().includes(query) ||
-        h.channelName.toLowerCase().includes(query)
-      );
-    }
-    
-    return filtered;
+    return history
+      .filter(h => selectedChannel === 'all' || h.channelId === selectedChannel)
+      .filter(h => {
+        if (dateRange === 'all') return true;
+        const now = Date.now();
+        const cutoff = {
+          today: now - 24 * 60 * 60 * 1000,
+          week: now - 7 * 24 * 60 * 60 * 1000,
+          month: now - 30 * 24 * 60 * 60 * 1000,
+        }[dateRange];
+        return h.timestamp >= cutoff;
+      })
+      .filter(h => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return h.questionId.toLowerCase().includes(query) ||
+          h.channelName.toLowerCase().includes(query);
+      });
   }, [history, selectedChannel, dateRange, searchQuery]);
 
   // Calculate statistics

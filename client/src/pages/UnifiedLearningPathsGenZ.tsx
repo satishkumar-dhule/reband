@@ -166,22 +166,23 @@ export default function UnifiedLearningPathsGenZ() {
     return jobTitle ? salaryMap[jobTitle] || '$80k - $150k' : '';
   };
 
-  // Get active paths - use state to react to curated paths loading
   const [activePaths, setActivePaths] = useState<any[]>([]);
   
   useEffect(() => {
     try {
       const saved = localStorage.getItem('activeLearningPaths');
       if (saved) {
-        const pathIds = JSON.parse(saved);
-        const paths = pathIds.map((id: string) => {
-          const custom = customPaths.find(p => p.id === id);
-          if (custom) return { ...custom, type: 'custom' };
-          const curated = curatedPaths.find(p => p.id === id);
-          if (curated) return { ...curated, type: 'curated' };
-          return null;
-        }).filter(Boolean);
-        setActivePaths(paths);
+        const pathIds: string[] = JSON.parse(saved);
+        setActivePaths(current => {
+          const paths = pathIds.map((id: string) => {
+            const custom = customPaths.find(p => p.id === id);
+            if (custom) return { ...custom, type: 'custom' };
+            const curated = curatedPaths.find(p => p.id === id);
+            if (curated) return { ...curated, type: 'curated' };
+            return null;
+          }).filter(Boolean);
+          return paths;
+        });
       } else {
         setActivePaths([]);
       }

@@ -20,8 +20,13 @@ interface ApiChannel {
 function useApiChannels() {
   return useQuery<ApiChannel[]>({
     queryKey: ["channels"],
-    queryFn: () => fetch("/api/channels").then((r) => r.json()),
+    queryFn: async () => {
+      const r = await fetch("/api/channels");
+      if (!r.ok) throw new Error(`Failed to fetch channels: ${r.status}`);
+      return r.json();
+    },
     staleTime: 120_000,
+    retry: 2,
   });
 }
 

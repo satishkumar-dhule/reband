@@ -162,17 +162,26 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
     };
   }, [onTranscriptUpdate, onError]);
 
-  // Auto-start if requested
+  // Auto-start if requested - use refs to avoid stale closure issues
+  const autoStartRef = useRef(autoStart);
+  const startRecordingRef = useRef<() => Promise<void>>(async () => {});
+  autoStartRef.current = autoStart;
+
   useEffect(() => {
-    if (autoStart) {
-      startRecording();
+    startRecordingRef.current = startRecording;
+  }, [startRecording]);
+
+  useEffect(() => {
+    if (autoStartRef.current) {
+      startRecordingRef.current();
     }
   }, [autoStart]);
 
-  // Max duration check
+  // Max duration check - use refs to avoid stale closure
+  const stopRecordingRef = useRef<() => void>(() => {});
   useEffect(() => {
     if (maxDuration && state.duration >= maxDuration && state.isRecording) {
-      stopRecording();
+      stopRecordingRef.current();
     }
   }, [state.duration, maxDuration, state.isRecording]);
 

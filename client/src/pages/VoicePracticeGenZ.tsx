@@ -133,16 +133,25 @@ export default function VoicePracticeGenZ() {
     };
     
     recognition.onend = () => {
-      if (isRecording) recognition.start();
+      setIsRecording(prev => {
+        if (prev) {
+          try {
+            recognition.start();
+          } catch (e) {
+            console.error(e);
+          }
+        }
+        return prev;
+      });
     };
     
     recognitionRef.current = recognition;
     return () => {
       if (recognitionRef.current) recognitionRef.current.stop();
     };
-  }, [isRecording]);
+  }, []);
 
-  const startRecording = () => {
+  const startRecording = useCallback(() => {
     setTranscript('');
     setInterimTranscript('');
     setFeedback(null);
@@ -156,45 +165,52 @@ export default function VoicePracticeGenZ() {
         console.error(e);
       }
     }
-  };
+  }, []);
 
-  const stopRecording = () => {
+  const stopRecording = useCallback(() => {
     setIsRecording(false);
     setRecordingState('recorded');
     if (recognitionRef.current) recognitionRef.current.stop();
     
-    const duration = Math.round((Date.now() - sessionStartTime) / 1000);
-    setSessionTotalTime(prev => prev + duration);
-    
-    const words = transcript.trim().split(/\s+/).length;
-    const score = Math.min(100, Math.round((words / targetWords) * 100));
-    
-    setFeedback({
-      wordsSpoken: words,
-      targetWords,
-      duration,
-      score,
-      clarity: 85 + Math.random() * 10,
-      fluency: 80 + Math.random() * 15,
-      pace: 90 + Math.random() * 5,
-      message: score > 80 ? "Excellent job! Your answer was comprehensive and well-paced." : 
-               score > 50 ? "Good effort. Try to elaborate more on your technical points." :
-               "Keep practicing. Aim for a more detailed explanation of the concept."
+    setTranscript(prevTranscript => {
+      const duration = Math.round((Date.now() - sessionStartTime) / 1000);
+      setSessionTotalTime(prev => prev + duration);
+      
+      const words = prevTranscript.trim().split(/\s+/).length;
+      const score = Math.min(100, Math.round((words / targetWords) * 100));
+      
+      setFeedback({
+        wordsSpoken: words,
+        targetWords,
+        duration,
+        score,
+        clarity: 85 + Math.random() * 10,
+        fluency: 80 + Math.random() * 15,
+        pace: 90 + Math.random() * 5,
+        message: score > 80 ? "Excellent job! Your answer was comprehensive and well-paced." : 
+                 score > 50 ? "Good effort. Try to elaborate more on your technical points." :
+                 "Keep practicing. Aim for a more detailed explanation of the concept."
+      });
+      
+      return prevTranscript;
     });
-  };
+  }, [sessionStartTime, targetWords]);
 
-  const nextQuestion = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-      setRecordingState('idle');
-      setTranscript('');
-      setInterimTranscript('');
-      setFeedback(null);
-      setShowAnswer(false);
-    } else {
-      setLocation('/');
-    }
-  };
+  const nextQuestion = useCallback(() => {
+    setCurrentIndex(prev => {
+      if (prev < questions.length - 1) {
+        setRecordingState('idle');
+        setTranscript('');
+        setInterimTranscript('');
+        setFeedback(null);
+        setShowAnswer(false);
+        return prev + 1;
+      } else {
+        setLocation('/');
+        return prev;
+      }
+    });
+  }, [questions.length]);
 
   if (!isSpeechSupported) {
     return (

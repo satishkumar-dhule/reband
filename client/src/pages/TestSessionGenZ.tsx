@@ -68,11 +68,8 @@ export default function TestSessionGenZ() {
   const handleOptionSelect = (optionId: string) => {
     if (!currentQuestion) return;
     
-    const current = answers[currentQuestion.id] || [];
-    
     if (currentQuestion.type === 'single') {
-      const newAnswers = { ...answers, [currentQuestion.id]: [optionId] };
-      setAnswers(newAnswers);
+      setAnswers(prev => ({ ...prev, [currentQuestion.id]: [optionId] }));
       
       const correctOption = currentQuestion.options.find(o => o.isCorrect);
       const isCorrect = correctOption?.id === optionId;
@@ -80,21 +77,39 @@ export default function TestSessionGenZ() {
       
       setTimeout(() => {
         setShowFeedback(null);
-        if (currentIndex < questions.length - 1) {
-          setCurrentIndex(currentIndex + 1);
-        }
+        setCurrentIndex(prev => {
+          if (prev < questions.length - 1) {
+            return prev + 1;
+          }
+          return prev;
+        });
       }, 600);
     } else {
-      if (current.includes(optionId)) {
-        setAnswers({ ...answers, [currentQuestion.id]: current.filter(id => id !== optionId) });
-      } else {
-        setAnswers({ ...answers, [currentQuestion.id]: [...current, optionId] });
-      }
+      setAnswers(prev => {
+        const current = prev[currentQuestion.id] || [];
+        if (current.includes(optionId)) {
+          return { ...prev, [currentQuestion.id]: current.filter(id => id !== optionId) };
+        } else {
+          return { ...prev, [currentQuestion.id]: [...current, optionId] };
+        }
+      });
     }
   };
 
-  const confirmMultipleChoice = () => {
+  const confirmMultipleChoice = useCallback(() => {
     if (!currentQuestion || currentQuestion.type !== 'multiple') return;
+    
+    setAnswers(prev => {
+      const userAnswers = prev[currentQuestion.id] || [];
+      if (userAnswers.length === 0) return prev;
+      
+      const correctIds = currentQuestion.options.filter(o => o.isCorrect).map(o => o.id);
+      const allCorrectSelected = correctIds.every(id => userAnswers.includes(id));
+      const noIncorrectSelected = userAnswers.every(id => correctIds.includes(id));
+      const isCorrect = allCorrectSelected && noIncorrectSelected;
+      
+      return prev;
+    });
     
     const userAnswers = answers[currentQuestion.id] || [];
     if (userAnswers.length === 0) return;
@@ -108,22 +123,31 @@ export default function TestSessionGenZ() {
     
     setTimeout(() => {
       setShowFeedback(null);
-      if (currentIndex < questions.length - 1) {
-        setCurrentIndex(currentIndex + 1);
-      }
+      setCurrentIndex(idx => {
+        if (idx < questions.length - 1) {
+          return idx + 1;
+        }
+        return idx;
+      });
     }, 800);
-  };
+  }, [currentQuestion, answers, questions.length]);
 
   const goNext = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+    setCurrentIndex(prev => {
+      if (prev < questions.length - 1) {
+        return prev + 1;
+      }
+      return prev;
+    });
   };
 
   const goPrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
+    setCurrentIndex(prev => {
+      if (prev > 0) {
+        return prev - 1;
+      }
+      return prev;
+    });
   };
 
   const submitTest = () => {

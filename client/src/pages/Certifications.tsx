@@ -124,9 +124,9 @@ export default function Certifications() {
     }
   };
 
-  const handleConfirmUnsubscribe = () => {
-    if (confirmDialog.certId) {
-      unsubscribeCertification(confirmDialog.certId);
+  const handleConfirmUnsubscribe = (certId: string) => {
+    if (certId) {
+      unsubscribeCertification(certId);
     }
   };
 
@@ -328,7 +328,7 @@ export default function Certifications() {
       <ConfirmationDialog
         isOpen={confirmDialog.isOpen}
         onClose={() => setConfirmDialog({ isOpen: false, certId: '', certName: '' })}
-        onConfirm={handleConfirmUnsubscribe}
+        onConfirm={() => handleConfirmUnsubscribe(confirmDialog.certId)}
         title="Unsubscribe from Certification?"
         message={`Are you sure you want to unsubscribe from "${confirmDialog.certName}"? Your progress will be saved.`}
         confirmText="Unsubscribe"

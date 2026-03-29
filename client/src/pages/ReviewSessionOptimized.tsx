@@ -126,34 +126,36 @@ export default function ReviewSessionOptimized() {
 
     // Update stats
     setSessionStats(prev => ({ ...prev, [rating]: prev[rating] + 1 }));
-    const newCount = reviewedCount + 1;
-    setReviewedCount(newCount);
+    setReviewedCount(prevCount => {
+      const newCount = prevCount + 1;
+      
+      // Track this card for checkpoint
+      setRecentCards(prev => [...prev, currentCard]);
+
+      // Use functional update for currentIndex to avoid stale closure
+      setCurrentIndex(prevIndex => {
+        const nextIndex = prevIndex + 1;
+        
+        // Check for checkpoint AFTER updating count
+        if (newCount % 5 === 0 && nextIndex < dueCards.length) {
+          console.log(`[Checkpoint] Triggering at question ${newCount}`);
+          setSessionState('checkpoint');
+          return nextIndex;
+        }
+
+        // Load next card or complete
+        if (nextIndex < dueCards.length) {
+          loadQuestion(dueCards[nextIndex]);
+        } else {
+          setSessionState('completed');
+        }
+        return nextIndex;
+      });
+      
+      return newCount;
+    });
     triggerHaptic('medium');
-    
-    // Track this card for checkpoint
-    setRecentCards(prev => [...prev, currentCard]);
-
-    console.log(`[Checkpoint Debug] Reviewed: ${newCount}, Next: ${currentIndex + 1}, Total: ${dueCards.length}`);
-
-    // Move to next card first
-    const nextIndex = currentIndex + 1;
-    
-    // Check for checkpoint AFTER updating count
-    if (newCount % 5 === 0 && nextIndex < dueCards.length) {
-      console.log(`[Checkpoint] Triggering at question ${newCount}`);
-      setCurrentIndex(nextIndex);
-      setSessionState('checkpoint');
-      return;
-    }
-
-    // Load next card or complete
-    if (nextIndex < dueCards.length) {
-      setCurrentIndex(nextIndex);
-      loadQuestion(dueCards[nextIndex]);
-    } else {
-      setSessionState('completed');
-    }
-  }, [currentCard, currentQuestion, reviewedCount, currentIndex, dueCards, onSRSReview, trackEvent, triggerHaptic, loadQuestion]);
+  }, [currentCard, currentQuestion, dueCards, onSRSReview, trackEvent, triggerHaptic, loadQuestion]);
 
   const handleCheckpointComplete = useCallback((checkpointScore: number) => {
     console.log(`[Checkpoint] Completed with score: ${checkpointScore}`);

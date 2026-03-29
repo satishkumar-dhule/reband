@@ -176,10 +176,17 @@ export default function VoiceSessionGenZ() {
         }
       }
       if (final) {
-        setTranscript(prev => prev + final);
-        const words = (transcript + final).trim().split(/\s+/).length;
-        const elapsed = sessionDuration / 60;
-        if (elapsed > 0) setLiveWPM(Math.round(words / elapsed));
+        setTranscript(prev => {
+          const newTranscript = prev + final;
+          const words = newTranscript.trim().split(/\s+/).length;
+          // Calculate WPM using functional update for sessionDuration
+          setSessionDuration(prevDuration => {
+            const elapsed = prevDuration / 60;
+            if (elapsed > 0) setLiveWPM(Math.round(words / elapsed));
+            return prevDuration;
+          });
+          return newTranscript;
+        });
       }
       setInterimTranscript(interim);
     };
@@ -193,7 +200,9 @@ export default function VoiceSessionGenZ() {
     };
     
     recognition.onend = () => {
-      if (pageState === 'recording') {
+      // Use ref to track recording state without stale closure issues
+      const isRecording = recognitionRef.current && recognitionRef.current.recording;
+      if (isRecording) {
         try { recognition.start(); } catch (e) { }
       }
     };

@@ -134,7 +134,7 @@ async function initMermaid(mermaidTheme: MermaidTheme, force = false) {
     mermaid.initialize({
       startOnLoad: false,
       ...config,
-      securityLevel: 'loose',
+      securityLevel: 'safe',
       fontFamily: 'monospace, sans-serif',
       fontSize: isMobile ? 14 : 12,
       flowchart: {

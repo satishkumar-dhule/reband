@@ -267,6 +267,9 @@ class BrowserDB {
         
         if (response.ok) {
           await this.markSynced(sync.id);
+        } else {
+          const errorText = await response.text().catch(() => 'Unknown error');
+          console.warn(`Sync failed for ${sync.id}: ${response.status} - ${errorText}`);
         }
       } catch (error) {
         console.warn('Sync failed, will retry:', error);
@@ -300,11 +303,13 @@ class BrowserDB {
   }
 
   destroy(): void {
-    if (this.syncInterval) {
+    if (this.syncInterval !== null) {
       clearInterval(this.syncInterval);
+      this.syncInterval = null;
     }
     if (this.db) {
       this.db.close();
+      this.db = null;
     }
   }
 }

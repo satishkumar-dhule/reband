@@ -22,6 +22,7 @@ const DEFAULT_SYNC_CONFIG: SyncConfig = {
 class DatabaseStorageSync {
   private config: SyncConfig = DEFAULT_SYNC_CONFIG;
   private syncInProgress = false;
+  private syncInterval: ReturnType<typeof setInterval> | null = null;
   private userId = 'anonymous';
 
   constructor() {
@@ -45,9 +46,21 @@ class DatabaseStorageSync {
   }
 
   private startAutoSync(): void {
-    setInterval(() => {
-      this.syncWithDatabase();
+    if (this.syncInterval) clearInterval(this.syncInterval);
+    this.syncInterval = setInterval(async () => {
+      try {
+        await this.syncWithDatabase();
+      } catch (error) {
+        console.error('Auto-sync failed:', error);
+      }
     }, this.config.syncInterval);
+  }
+
+  private stopAutoSync(): void {
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+      this.syncInterval = null;
+    }
   }
 
   async setUserId(userId: string): Promise<void> {
@@ -113,8 +126,14 @@ class DatabaseStorageSync {
         }),
       });
       
-      return response.ok;
-    } catch {
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => 'Unknown error');
+        console.warn(`Sync record failed: ${response.status} - ${errorBody}`);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Sync record error:', error);
       return false;
     }
   }
@@ -132,6 +151,8 @@ class DatabaseStorageSync {
             lastUpdated: Date.now(),
           });
         }
+      } else {
+        console.warn(`Failed to fetch channels: ${channelsResponse.status}`);
       }
 
       const progressResponse = await fetch(`/api/progress/${this.userId}`);
@@ -149,6 +170,8 @@ class DatabaseStorageSync {
             lastUpdated: Date.now(),
           });
         }
+      } else {
+        console.warn(`Failed to fetch progress: ${progressResponse.status}`);
       }
     } catch (error) {
       console.warn('Failed to fetch latest from database:', error);
@@ -229,6 +252,9 @@ class DatabaseStorageSync {
         })));
         
         return questions;
+      } else {
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.error(`Failed to fetch questions: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error('Failed to fetch questions:', error);
@@ -273,6 +299,8 @@ class DatabaseStorageSync {
     if (config.autoSync !== undefined) {
       if (config.autoSync) {
         this.startAutoSync();
+      } else {
+        this.stopAutoSync();
       }
     }
   }
@@ -283,6 +311,10 @@ class DatabaseStorageSync {
 
   isSyncing(): boolean {
     return this.syncInProgress;
+  }
+
+  destroy(): void {
+    this.stopAutoSync();
   }
 }
 

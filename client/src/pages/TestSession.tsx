@@ -189,14 +189,11 @@ export default function TestSession() {
   const theme = test ? getChannelTheme(test.channelId) : getChannelTheme('default');
   const isExpired = test && progress ? checkTestExpiration(test, progress) : false;
 
-  const handleOptionSelect = (optionId: string) => {
+  const handleOptionSelect = useCallback((optionId: string) => {
     if (!currentQuestion) return;
     
-    const current = answers[currentQuestion.id] || [];
-    
     if (currentQuestion.type === 'single') {
-      const newAnswers = { ...answers, [currentQuestion.id]: [optionId] };
-      setAnswers(newAnswers);
+      setAnswers(prev => ({ ...prev, [currentQuestion.id]: [optionId] }));
       
       // Auto-submit for single choice if enabled
       if (autoSubmit) {
@@ -208,20 +205,21 @@ export default function TestSession() {
         // Auto-advance after brief feedback
         setTimeout(() => {
           setShowFeedback(null);
-          if (currentIndex < questions.length - 1) {
-            setCurrentIndex(currentIndex + 1);
-          }
+          setCurrentIndex(prev => prev < questions.length - 1 ? prev + 1 : prev);
         }, 600);
       }
     } else {
-      // Multiple choice - toggle
-      if (current.includes(optionId)) {
-        setAnswers({ ...answers, [currentQuestion.id]: current.filter(id => id !== optionId) });
-      } else {
-        setAnswers({ ...answers, [currentQuestion.id]: [...current, optionId] });
-      }
+      // Multiple choice - toggle with functional update
+      setAnswers(prev => {
+        const current = prev[currentQuestion.id] || [];
+        if (current.includes(optionId)) {
+          return { ...prev, [currentQuestion.id]: current.filter(id => id !== optionId) };
+        } else {
+          return { ...prev, [currentQuestion.id]: [...current, optionId] };
+        }
+      });
     }
-  };
+  }, [currentQuestion, autoSubmit, questions.length]);
 
   // Save progress whenever answers or current index changes
   useEffect(() => {

@@ -94,67 +94,80 @@ export default function LearningPaths() {
   const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
-    fetchLearningPaths();
-    fetchFilterOptions();
+    let cancelled = false;
+    
+    async function loadData() {
+      try {
+        setLoading(true);
+        setError(null);
+        const params = new URLSearchParams();
+        
+        if (selectedDifficulty !== 'all') params.append('difficulty', selectedDifficulty);
+        if (selectedPathType !== 'all') params.append('pathType', selectedPathType);
+        if (selectedCompany !== 'all') params.append('company', selectedCompany);
+        if (selectedJobTitle !== 'all') params.append('jobTitle', selectedJobTitle);
+        if (searchQuery) params.append('search', searchQuery);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        const response = await fetch(`/api/learning-paths?${params.toString()}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        if (cancelled) return;
+        
+        const data = await response.json();
+        setPaths(data);
+      } catch (error: any) {
+        if (cancelled) return;
+        if (error.name === 'AbortError') {
+          setError('Request timed out. Please try again.');
+        } else {
+          console.error('Failed to fetch learning paths:', error);
+          setError('Failed to load learning paths');
+        }
+        setPaths([]);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    async function loadFilters() {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        const [companiesRes, jobTitlesRes] = await Promise.all([
+          fetch('/api/learning-paths/filters/companies', { signal: controller.signal }),
+          fetch('/api/learning-paths/filters/job-titles', { signal: controller.signal })
+        ]);
+        
+        clearTimeout(timeoutId);
+        
+        if (cancelled) return;
+        
+        setCompanies(await companiesRes.json());
+        setJobTitles(await jobTitlesRes.json());
+      } catch (error: any) {
+        if (cancelled) return;
+        if (error.name === 'AbortError') {
+          console.error('Filter options request timed out');
+        } else {
+          console.error('Failed to fetch filter options:', error);
+        }
+      }
+    }
+
+    loadData();
+    loadFilters();
+
+    return () => { cancelled = true; };
   }, [selectedDifficulty, selectedPathType, selectedCompany, selectedJobTitle, searchQuery, retryKey]);
 
   const handleRetry = () => {
     setRetryKey(k => k + 1);
-  };
-
-  const fetchLearningPaths = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const params = new URLSearchParams();
-      
-      if (selectedDifficulty !== 'all') params.append('difficulty', selectedDifficulty);
-      if (selectedPathType !== 'all') params.append('pathType', selectedPathType);
-      if (selectedCompany !== 'all') params.append('company', selectedCompany);
-      if (selectedJobTitle !== 'all') params.append('jobTitle', selectedJobTitle);
-      if (searchQuery) params.append('search', searchQuery);
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-      const response = await fetch(`/api/learning-paths?${params.toString()}`, { signal: controller.signal });
-      clearTimeout(timeoutId);
-      
-      const data = await response.json();
-      setPaths(data);
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        setError('Request timed out. Please try again.');
-      } else {
-        console.error('Failed to fetch learning paths:', error);
-        setError('Failed to load learning paths');
-      }
-      setPaths([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchFilterOptions = async () => {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-      const [companiesRes, jobTitlesRes] = await Promise.all([
-        fetch('/api/learning-paths/filters/companies', { signal: controller.signal }),
-        fetch('/api/learning-paths/filters/job-titles', { signal: controller.signal })
-      ]);
-      
-      clearTimeout(timeoutId);
-      setCompanies(await companiesRes.json());
-      setJobTitles(await jobTitlesRes.json());
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        console.error('Filter options request timed out');
-      } else {
-        console.error('Failed to fetch filter options:', error);
-      }
-    }
   };
 
   const handleStartPath = async (path: LearningPath) => {

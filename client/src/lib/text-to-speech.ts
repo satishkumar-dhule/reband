@@ -208,11 +208,24 @@ export interface SpeakOptions {
   onError?: (error: string) => void;
 }
 
+// Track mounted state for safe callback execution
+let isMounted = true;
+
+export function setTTSMounted(mounted: boolean): void {
+  isMounted = mounted;
+}
+
+// Safe callback wrapper to prevent state updates after unmount
+function safeCallback<T>(callback: (() => T) | undefined): T | undefined {
+  if (!isMounted) return undefined;
+  return callback?.();
+}
+
 // Speak text
-export function speak(text: string, options: SpeakOptions = {}): void {
+export function speak(text: string, options: SpeakOptions = {}): () => void {
   if (!isTTSSupported()) {
     options.onError?.('Text-to-speech not supported in this browser');
-    return;
+    return () => {};
   }
   
   // Stop any current speech
@@ -222,7 +235,7 @@ export function speak(text: string, options: SpeakOptions = {}): void {
   
   if (!cleanedText) {
     options.onError?.('No text to speak');
-    return;
+    return () => {};
   }
   
   const utterance = new SpeechSynthesisUtterance(cleanedText);
@@ -238,36 +251,51 @@ export function speak(text: string, options: SpeakOptions = {}): void {
   utterance.pitch = options.pitch ?? 1.05;
   utterance.volume = options.volume ?? 1;
   
-  // Event handlers
+  let voicesChangedHandler: (() => void) | null = null;
+  
+  // Event handlers - use safe callbacks to prevent stale closures
   utterance.onstart = () => {
     isSpeaking = true;
-    options.onStart?.();
+    safeCallback(options.onStart);
   };
   
   utterance.onend = () => {
     isSpeaking = false;
     currentUtterance = null;
-    options.onEnd?.();
+    safeCallback(options.onEnd);
   };
   
   utterance.onerror = (event) => {
     isSpeaking = false;
     currentUtterance = null;
-    options.onError?.(event.error);
+    safeCallback(() => options.onError?.(event.error));
   };
   
   currentUtterance = utterance;
   
+  // Cleanup function to stop speech and remove listeners
+  const cleanup = () => {
+    stop();
+    if (voicesChangedHandler) {
+      speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+      voicesChangedHandler = null;
+    }
+  };
+  
   // Chrome bug workaround: voices may not be loaded yet
   if (getVoices().length === 0) {
-    speechSynthesis.addEventListener('voiceschanged', () => {
+    voicesChangedHandler = () => {
       const newVoice = getPreferredVoice();
       if (newVoice) utterance.voice = newVoice;
       speechSynthesis.speak(utterance);
-    }, { once: true });
+    };
+    speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
+    speechSynthesis.speak(utterance);
   } else {
     speechSynthesis.speak(utterance);
   }
+  
+  return cleanup;
 }
 
 // Stop speaking

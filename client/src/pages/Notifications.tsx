@@ -69,33 +69,43 @@ export default function Notifications() {
   };
 
   const markAsRead = (id: string) => {
-    const updated = notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    );
-    saveNotifications(updated);
+    setNotifications(prev => {
+      const updated = prev.map(n => 
+        n.id === id ? { ...n, read: true } : n
+      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const handleNotificationClick = (notification: Notification) => {
-    // Mark as read
-    const updated = notifications.map(n => 
-      n.id === notification.id ? { ...n, read: true } : n
-    );
-    saveNotifications(updated);
+    setNotifications(prev => {
+      const updated = prev.map(n => 
+        n.id === notification.id ? { ...n, read: true } : n
+      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
     
-    // Navigate if link exists
     if (notification.link) {
       setLocation(notification.link);
     }
   };
 
   const markAllAsRead = () => {
-    const updated = notifications.map(n => ({ ...n, read: true }));
-    saveNotifications(updated);
+    setNotifications(prev => {
+      const updated = prev.map(n => ({ ...n, read: true }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const clearNotification = (id: string) => {
-    const updated = notifications.filter(n => n.id !== id);
-    saveNotifications(updated);
+    setNotifications(prev => {
+      const updated = prev.filter(n => n.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const clearAll = () => {

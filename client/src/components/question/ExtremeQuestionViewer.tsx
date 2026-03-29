@@ -25,8 +25,8 @@ import { loadTests, getSessionQuestions, TestQuestion, Test } from '../../lib/te
 import { spendCredits } from '../../lib/credits';
 import {
   ChevronLeft, ChevronRight, Search, ChevronDown, Check,
-  Brain, Target, Zap, Flame, Building2,
-  X, Bookmark, Share2, Sparkles, Maximize2, Settings,
+  Target, Zap, Flame, Building2,
+  Bookmark, Share2, Maximize2, Settings,
   Lock, Unlock, CheckCircle, XCircle, RefreshCw, SkipForward,
   AlertTriangle, Coins, ChevronUp, Lightbulb
 } from 'lucide-react';
@@ -82,7 +82,6 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
   // UI states
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [aiAssistant, setAiAssistant] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [mobileView, setMobileView] = useState<'question' | 'answer'>('question');
   const [shouldRedirect, setShouldRedirect] = useState(false);
@@ -231,6 +230,7 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
     const currentQ = testQuestions[currentTestIndex];
     const correctOption = currentQ.options.find(o => o.isCorrect);
     const isCorrect = optionId === correctOption?.id;
+    const testLength = testQuestions.length;
     
     const answer: TestAnswer = {
       questionId: currentQ.id,
@@ -243,16 +243,19 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
     setLastAnswer(answer);
     setShowingFeedback(true);
     
-    // Auto-advance after brief feedback
+    // Auto-advance after brief feedback - capture values to avoid stale closure
     setTimeout(() => {
       setShowingFeedback(false);
       setLastAnswer(null);
       
-      if (currentTestIndex < testQuestions.length - 1) {
-        setCurrentTestIndex(prev => prev + 1);
-      } else {
-        setShowResults(true);
-      }
+      setCurrentTestIndex(prevIndex => {
+        if (prevIndex < testLength - 1) {
+          return prevIndex + 1;
+        } else {
+          setShowResults(true);
+          return prevIndex;
+        }
+      });
     }, FEEDBACK_DELAY);
   }, [showingFeedback, testQuestions, currentTestIndex]);
 
@@ -426,6 +429,40 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
     }
   }, [currentQuestion?.id]);
 
+  // Trigger checkpoint test when reaching checkpoint
+  useEffect(() => {
+    if (isTestCheckpoint(currentIndex) && !isCheckpointPassed(currentIndex) && !showTest && !loading) {
+      startTest();
+    }
+  }, [currentIndex, isTestCheckpoint, isCheckpointPassed, showTest, loading, startTest]);
+
+  // Navigation functions
+  const nextQuestion = useCallback(() => {
+    setCurrentIndex(prevIndex => {
+      if (prevIndex >= totalQuestions - 1) return prevIndex;
+      
+      const nextIndex = prevIndex + 1;
+      if (isTestCheckpoint(nextIndex) && !isCheckpointPassed(nextIndex)) {
+        startTest();
+        return nextIndex;
+      }
+      // Track swipe for voice reminder
+      onQuestionSwipe();
+      // Deduct credits for viewing
+      onQuestionView();
+      setMobileView('question');
+      return nextIndex;
+    });
+  }, [totalQuestions, isTestCheckpoint, isCheckpointPassed, onQuestionSwipe, onQuestionView, startTest]);
+
+  const prevQuestion = useCallback(() => {
+    setCurrentIndex(prev => {
+      if (prev <= 0) return prev;
+      setMobileView('question');
+      return prev - 1;
+    });
+  }, []);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -448,39 +485,7 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, totalQuestions, showSearchModal, showTest]);
-
-  // Trigger checkpoint test when reaching checkpoint
-  useEffect(() => {
-    if (isTestCheckpoint(currentIndex) && !isCheckpointPassed(currentIndex) && !showTest && !loading) {
-      startTest();
-    }
-  }, [currentIndex, isTestCheckpoint, isCheckpointPassed, showTest, loading, startTest]);
-
-  // Navigation functions
-  const nextQuestion = () => {
-    if (currentIndex < totalQuestions - 1) {
-      const nextIndex = currentIndex + 1;
-      if (isTestCheckpoint(nextIndex) && !isCheckpointPassed(nextIndex)) {
-        setCurrentIndex(nextIndex);
-        startTest();
-        return;
-      }
-      setCurrentIndex(nextIndex);
-      setMobileView('question');
-      // Track swipe for voice reminder
-      onQuestionSwipe();
-      // Deduct credits for viewing
-      onQuestionView();
-    }
-  };
-
-  const prevQuestion = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
-      setMobileView('question');
-    }
-  };
+  }, [showSearchModal, showTest, nextQuestion, prevQuestion]);
 
   // Filter change handler
   const handleFilterChange = (type: 'sub' | 'diff' | 'company', value: string) => {
@@ -726,15 +731,6 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
             </div>
           </div>
 
-          {/* AI Assistant Sidebar */}
-          <AnimatePresence>
-            {aiAssistant && (
-              <AIAssistantPanel
-                question={currentQuestion}
-                onClose={() => setAiAssistant(false)}
-              />
-            )}
-          </AnimatePresence>
         </div>
 
         {/* Navigation Footer */}
@@ -1005,107 +1001,6 @@ function FilterDropdown({ label, options, selected, onSelect }: FilterDropdownPr
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
-  );
-}
-
-// AI Assistant Panel - Extreme UX sidebar
-function AIAssistantPanel({ question, onClose }: { question: any; onClose: () => void }) {
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-    
-    const userMessage = input.trim();
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
-    setIsLoading(true);
-
-    // Simulate AI response (replace with actual AI integration)
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: `I can help you understand this ${question.difficulty} level question about "${question.question.substring(0, 50)}...". What specific aspect would you like me to explain?`
-      }]);
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  return (
-    <motion.div
-      initial={{ x: '100%', opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: '100%', opacity: 0 }}
-      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="w-80 h-full bg-card backdrop-blur-xl border-l border-border flex flex-col relative z-10"
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5 text-violet-500" />
-          <h3 className="font-semibold text-foreground">AI Assistant</h3>
-        </div>
-        <button
-          onClick={onClose}
-          className="p-1.5 hover:bg-muted rounded-lg transition-colors"
-        >
-          <X className="w-4 h-4 text-muted-foreground" />
-        </button>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.length === 0 && (
-          <div className="text-center text-muted-foreground text-sm">
-            <Brain className="w-8 h-8 mx-auto mb-2 text-violet-500" />
-            <p>Ask me anything about this question!</p>
-          </div>
-        )}
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] p-3 rounded-xl text-sm ${
-              msg.role === 'user' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'bg-muted text-foreground border border-border'
-            }`}>
-              {msg.content}
-            </div>
-          </div>
-        ))}
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-muted border border-border p-3 rounded-xl">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-violet-500 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                <div className="w-2 h-2 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Input */}
-      <div className="p-4 border-t border-border">
-        <div className="flex gap-2">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ask about this question..."
-            className="flex-1 px-3 py-2 bg-background border border-border rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-violet-500"
-          />
-          <button
-            onClick={handleSend}
-            disabled={!input.trim() || isLoading}
-            className="px-4 py-2 bg-violet-500 hover:bg-violet-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-colors"
-          >
-            <Sparkles className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    </motion.div>
   );
 }
 

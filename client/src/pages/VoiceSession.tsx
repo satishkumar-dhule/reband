@@ -127,19 +127,17 @@ export default function VoiceSession() {
         }
       }
       if (final) {
-        if (pageState === 'practice') {
-          setPracticeTranscript(prev => {
-            const updated = prev + final;
-            console.log('Updated practice transcript:', updated);
-            return updated;
-          });
-        } else {
-          setTranscript(prev => {
-            const updated = prev + final;
-            console.log('Updated transcript:', updated);
-            return updated;
-          });
-        }
+        // Use functional updates to avoid stale closure
+        setPracticeTranscript(prev => {
+          const updated = prev + final;
+          console.log('Updated practice transcript:', updated);
+          return updated;
+        });
+        setTranscript(prev => {
+          const updated = prev + final;
+          console.log('Updated transcript:', updated);
+          return updated;
+        });
       }
       setInterimTranscript(interim);
     };

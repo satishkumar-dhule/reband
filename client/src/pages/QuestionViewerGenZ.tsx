@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useRoute, Link } from 'wouter';
 import { getChannel } from '../lib/data';
 import { useQuestionsWithPrefetch, useSubChannels, useCompaniesWithCounts } from '../hooks/use-questions';
@@ -10,7 +10,6 @@ import { SEOHead } from '../components/SEOHead';
 import { UnifiedSearch } from '../components/UnifiedSearch';
 import { VoiceReminder } from '../components/VoiceReminder';
 import { GenZAnswerPanel } from '../components/question/GenZAnswerPanel';
-import { AICompanion } from '../components/AICompanion';
 import { Haptics } from '../lib/haptics';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
@@ -92,6 +91,9 @@ export default function QuestionViewerGenZ() {
   );
 
   const [isInitialized, setIsInitialized] = useState(false);
+
+  const nextQuestionRef = useRef<() => void>(() => {});
+  const prevQuestionRef = useRef<() => void>(() => {});
   
   useEffect(() => {
     if (!currentQuestion) return;
@@ -128,7 +130,7 @@ export default function QuestionViewerGenZ() {
         description: `${channel.name} added to your channels`,
       });
     }
-  }, [channelId, channel, loading, totalQuestions, questions.length]);
+  }, [channelId, channel, loading, totalQuestions, questions.length, isSubscribed, subscribeChannel, toast]);
 
   useEffect(() => {
     if (totalQuestions > 0 && currentIndex >= totalQuestions) {
@@ -161,30 +163,7 @@ export default function QuestionViewerGenZ() {
         },
       });
     }
-  }, [currentQuestion?.id]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setShowSearchModal(true);
-        return;
-      }
-      if (showSearchModal) return;
-
-      if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        nextQuestion();
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        prevQuestion();
-      } else if (e.key === 'Escape') {
-        setLocation('/channels');
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, totalQuestions, showSearchModal]);
+  }, [currentQuestion, trackEvent, markCompleted]);
 
   const nextQuestion = () => {
     if (currentIndex < totalQuestions - 1) {
@@ -199,6 +178,37 @@ export default function QuestionViewerGenZ() {
       setCurrentIndex(prev => prev - 1);
     }
   };
+
+  useEffect(() => {
+    nextQuestionRef.current = nextQuestion;
+  }, [nextQuestion]);
+  
+  useEffect(() => {
+    prevQuestionRef.current = prevQuestion;
+  }, [prevQuestion]);
+  
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowSearchModal(true);
+        return;
+      }
+      if (showSearchModal) return;
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextQuestionRef.current();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevQuestionRef.current();
+      } else if (e.key === 'Escape') {
+        setLocation('/channels');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showSearchModal, setLocation]);
 
   const toggleMark = () => {
     if (!currentQuestion) return;
@@ -614,24 +624,7 @@ export default function QuestionViewerGenZ() {
               </div>
             </div>
 
-            {/* AI Companion / Related */}
-            <div className="space-y-4">
-              {currentQuestion && (
-                <AICompanion 
-                  pageContent={{
-                    type: 'question',
-                    title: channel.name,
-                    question: currentQuestion.question,
-                    answer: currentQuestion.answer,
-                    explanation: currentQuestion.explanation,
-                    tags: currentQuestion.tags,
-                    difficulty: currentQuestion.difficulty,
-                  }}
-                  onNavigate={(path) => setLocation(path)}
-                />
-              )}
-              <VoiceReminder />
-            </div>
+            <VoiceReminder />
           </aside>
         </div>
       </div>

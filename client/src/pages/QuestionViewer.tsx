@@ -4,7 +4,7 @@
  * Mobile: Swipeable cards
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { getChannel } from '../lib/data';
 import { useQuestionsWithPrefetch, useSubChannels, useCompaniesWithCounts } from '../hooks/use-questions';
@@ -170,10 +170,13 @@ export default function QuestionViewer() {
     }
   }, [loading, totalQuestions, questions.length, channelId, channel, isSubscribed]);
 
-  const [markedQuestions, setMarkedQuestions] = useState<string[]>(() => {
+  // Load marked questions when channelId changes (not just on mount)
+  const [markedQuestions, setMarkedQuestions] = useState<string[]>([]);
+
+  useEffect(() => {
     const saved = localStorage.getItem(`marked-${channelId}`);
-    return saved ? JSON.parse(saved) : [];
-  });
+    setMarkedQuestions(saved ? JSON.parse(saved) : []);
+  }, [channelId]);
 
   // Mobile swipe to switch between question and answer
   const swipeHandlers = useSwipe({

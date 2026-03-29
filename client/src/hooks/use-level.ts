@@ -25,19 +25,21 @@ export function useLevel() {
   useEffect(() => {
     const interval = setInterval(() => {
       const newMetrics = getMetrics();
+      const currentLevel = newMetrics.level;
       
-      // Check for level up
-      if (newMetrics.level > metrics.level) {
-        setPreviousLevel(metrics.level);
-        setShowLevelUp(true);
-        setTimeout(() => setShowLevelUp(false), 5000);
-      }
-      
-      setMetrics(newMetrics);
+      setMetrics(prev => {
+        // Check for level up by comparing with previous state
+        if (currentLevel > prev.level) {
+          setPreviousLevel(prev.level);
+          setShowLevelUp(true);
+          setTimeout(() => setShowLevelUp(false), 5000);
+        }
+        return newMetrics;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [metrics.level]);
+  }, []);
 
   // Current level data
   const currentLevel = useMemo(() => {

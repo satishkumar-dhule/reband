@@ -36,7 +36,7 @@ async function initMermaid(mermaidTheme: MermaidTheme, force = false) {
     mermaidModule.initialize({
       startOnLoad: false,
       ...config,
-      securityLevel: 'loose',
+      securityLevel: 'safe',
       fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
       fontSize: isMobile ? 12 : 14,
       flowchart: {

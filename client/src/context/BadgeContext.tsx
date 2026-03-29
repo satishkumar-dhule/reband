@@ -232,11 +232,15 @@ export function BadgeProvider({ children }: { children: ReactNode }) {
 
   // Consume pending badge for unified notification system
   const consumePendingBadge = useCallback(() => {
-    if (pendingBadges.length === 0) return undefined;
-    const [first, ...rest] = pendingBadges;
-    setPendingBadges(rest);
-    return first;
-  }, [pendingBadges]);
+    let result: Badge | undefined;
+    setPendingBadges(prev => {
+      if (prev.length === 0) return prev;
+      const [first, ...rest] = prev;
+      result = first;
+      return rest;
+    });
+    return result;
+  }, []);
 
   // Reset shown badges (for testing)
   const resetShownBadges = useCallback(() => {

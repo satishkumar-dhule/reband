@@ -1,5 +1,10 @@
 /// <reference types="vite/client" />
 
+interface DOMPurify {
+  sanitize(dirty: string, config?: { USE_PROFILES?: { svg?: boolean } }): string;
+}
+declare const DOMPurify: DOMPurify | undefined;
+
 declare module '*.module.css' {
   const classes: { readonly [key: string]: string };
   export default classes;

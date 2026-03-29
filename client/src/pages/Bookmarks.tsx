@@ -54,7 +54,7 @@ export default function Bookmarks() {
       });
     });
     setBookmarkedQuestions(bookmarked);
-  }, []);
+  }, [getSubscribedChannels]);
 
   const channelsWithBookmarks = useMemo(() =>
     Array.from(new Set(bookmarkedQuestions.map(q => q.channelId))),

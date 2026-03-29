@@ -86,16 +86,29 @@ class ApiError extends Error {
   }
 }
 
-async function fetchJson<T>(url: string): Promise<T> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new ApiError(
-      `HTTP ${response.status}: ${response.statusText}`,
-      response.status,
-      url
-    );
+async function fetchJson<T>(url: string, timeoutMs = 10000): Promise<T> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new ApiError(
+        `HTTP ${response.status}: ${response.statusText}`,
+        response.status,
+        url
+      );
+    }
+    return response.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new ApiError(`Request timeout after ${timeoutMs}ms`, 408, url);
+    }
+    throw error;
   }
-  return response.json();
 }
 
 // ============================================

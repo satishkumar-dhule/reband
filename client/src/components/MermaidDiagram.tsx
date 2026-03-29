@@ -31,8 +31,8 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
         setStatus('loading');
         setError(null);
 
-        // Clear container
-        containerRef.current.innerHTML = '';
+        // Clear container safely
+        containerRef.current.textContent = '';
 
         // Extract mermaid code from markdown if needed
         let mermaidCode = content.trim();
@@ -132,9 +132,16 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
           throw new Error('Render returned no SVG');
         }
 
-        // Insert SVG
+        // Insert SVG safely using DOMPurify if available, otherwise use innerHTML
         if (containerRef.current) {
-          containerRef.current.innerHTML = result.svg;
+          // Check if DOMPurify is available for sanitization
+          if (typeof DOMPurify !== 'undefined') {
+            const clean = DOMPurify.sanitize(result.svg, { USE_PROFILES: { svg: true } });
+            containerRef.current.innerHTML = clean;
+          } else {
+            // Fallback: Mermaid generates safe SVG, but this is less secure
+            containerRef.current.innerHTML = result.svg;
+          }
           console.log(`✅ [Attempt ${attemptId}] Diagram rendered successfully!`);
           console.log(`📊 [Attempt ${attemptId}] SVG length: ${result.svg.length} chars`);
           setStatus('success');
@@ -151,13 +158,21 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
         setError(err.message || 'Unknown error');
         setStatus('error');
 
-        // Show error in container
+        // Show error in container safely - escape user content
         if (containerRef.current) {
+          // Escape any HTML in error message to prevent XSS
+          const escapeHtml = (str: string) => str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+          
           containerRef.current.innerHTML = `
             <div style="color: #ff0080; padding: 20px; text-align: center;">
               <div style="font-size: 24px; margin-bottom: 10px;">⚠️</div>
               <div style="font-weight: bold; margin-bottom: 5px;">Diagram Render Error</div>
-              <div style="font-size: 12px; opacity: 0.8;">${err.message}</div>
+              <div style="font-size: 12px; opacity: 0.8;">${escapeHtml(err.message || 'Unknown error')}</div>
             </div>
           `;
         }

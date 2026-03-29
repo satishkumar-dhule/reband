@@ -161,32 +161,40 @@ export default function CertificationExam() {
 
   // Navigation
   const goToNext = useCallback(() => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-      setSelectedOption(null);
-      setShowExplanation(false);
-      setQuestionStartTime(Date.now());
-      saveSessionProgress();
-    }
-  }, [currentIndex, questions.length, saveSessionProgress]);
+    setCurrentIndex(prev => {
+      if (prev < questions.length - 1) {
+        const nextIndex = prev + 1;
+        setSelectedOption(null);
+        setShowExplanation(false);
+        setQuestionStartTime(Date.now());
+        saveSessionProgress();
+        return nextIndex;
+      }
+      return prev;
+    });
+  }, [questions.length, saveSessionProgress]);
 
   const goToPrev = useCallback(() => {
-    if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
-      const prevAnswer = answers.find(a => a.questionId === questions[currentIndex - 1]?.id);
-      setSelectedOption(prevAnswer?.selectedOptionId || null);
-      setShowExplanation(false);
-      saveSessionProgress();
-    }
-  }, [currentIndex, answers, questions, saveSessionProgress]);
+    setCurrentIndex(prev => {
+      if (prev > 0) {
+        const newIndex = prev - 1;
+        const prevAnswer = answers.find(a => a.questionId === questions[newIndex]?.id);
+        setSelectedOption(prevAnswer?.selectedOptionId || null);
+        setShowExplanation(false);
+        saveSessionProgress();
+        return newIndex;
+      }
+      return prev;
+    });
+  }, [answers, questions, saveSessionProgress]);
 
   const goToQuestion = useCallback((index: number) => {
-    setCurrentIndex(index);
     const answer = answers.find(a => a.questionId === questions[index]?.id);
     setSelectedOption(answer?.selectedOptionId || null);
     setShowExplanation(false);
     setQuestionStartTime(Date.now());
     saveSessionProgress();
+    setCurrentIndex(index);
   }, [answers, questions, saveSessionProgress]);
 
   const toggleFlag = useCallback(() => {

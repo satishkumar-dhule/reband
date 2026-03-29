@@ -214,20 +214,24 @@ function TabbedMediaPanel({
   if (hasEli5) availableTabs.push('eli5');
   if (hasVideo) availableTabs.push('video');
   
-  const [activeTab, setActiveTab] = useState<MediaTab>(() => {
-    if (hasTldr) return 'tldr';
-    if (hasEli5) return 'eli5';
-    if (hasVideo) return 'video';
-    return 'diagram';
-  });
+  const [activeTab, setActiveTab] = useState<MediaTab>('tldr');
   
   useEffect(() => {
+    // Reset to first available tab when question changes or diagram fails
     if (diagramRenderSuccess === false && activeTab === 'diagram') {
       if (hasTldr) setActiveTab('tldr');
       else if (hasEli5) setActiveTab('eli5');
       else if (hasVideo) setActiveTab('video');
     }
   }, [diagramRenderSuccess, activeTab, hasTldr, hasEli5, hasVideo]);
+  
+  // Initialize active tab when question loads
+  useEffect(() => {
+    if (hasTldr) setActiveTab('tldr');
+    else if (hasEli5) setActiveTab('eli5');
+    else if (hasVideo) setActiveTab('video');
+    else if (hasDiagram) setActiveTab('diagram');
+  }, [hasTldr, hasEli5, hasVideo, hasDiagram, question.id]);
   
   const handleDiagramRenderResult = useCallback((success: boolean) => {
     setDiagramRenderSuccess(success);

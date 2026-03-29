@@ -29,16 +29,29 @@ export default function Tests() {
   const { balance, formatCredits, config } = useCredits();
 
   useEffect(() => {
+    let cancelled = false;
+    
     const initTests = async () => {
-      // Check for expired tests first
-      const expired = await checkAndExpireTests();
-      setExpiredChannels(expired);
-      
-      const t = await loadTests();
-      setTests(t);
-      setLoading(false);
+      try {
+        const expired = await checkAndExpireTests();
+        if (cancelled) return;
+        setExpiredChannels(expired);
+        
+        const t = await loadTests();
+        if (cancelled) return;
+        setTests(t);
+      } catch (error) {
+        console.error('Failed to load tests:', error);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
     };
+    
     initTests();
+    
+    return () => { cancelled = true; };
   }, []);
 
   // Calculate vibrant stats

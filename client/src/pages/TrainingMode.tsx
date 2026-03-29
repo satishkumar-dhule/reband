@@ -251,6 +251,12 @@ export default function TrainingMode() {
     }
   }, [recording]);
 
+  // Track resetRecording function for useEffect dependency
+  const resetRecordingFnRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    resetRecordingFnRef.current = recording?.resetRecording ?? null;
+  }, [recording]);
+
   // Load questions from subscribed channels - only once
   useEffect(() => {
     if (hasLoadedQuestions) return;
@@ -324,13 +330,13 @@ export default function TrainingMode() {
   // Reset recording when question changes
   useEffect(() => {
     if (!currentQuestion?.answer) return;
-    if (resetRecordingRef.current) {
-      resetRecordingRef.current();
+    if (resetRecordingFnRef.current) {
+      resetRecordingFnRef.current();
     }
     setShowFeedback(false);
     setCurrentFeedback(null);
     setShowAnswer(false); // Hide answer for new question in interview mode
-  }, [currentQuestion?.id]); // Use question ID to avoid infinite loop
+  }, [currentQuestion?.id]);
 
   const goToNext = () => {
     if (currentIndex < questions.length - 1) {

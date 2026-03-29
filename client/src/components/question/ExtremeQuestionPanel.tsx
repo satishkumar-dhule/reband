@@ -78,12 +78,7 @@ export function ExtremeQuestionPanel({
   useEffect(() => {
     if (question?.id) {
       const card = getCard(question.id, question.channel, question.difficulty);
-      setSrsCard(prev => {
-        if (prev?.questionId === card.questionId && prev?.totalReviews === card.totalReviews) {
-          return prev;
-        }
-        return card;
-      });
+      setSrsCard(card);
       setHasRated(false);
       setShowRatingButtons(card.totalReviews > 0);
     }
