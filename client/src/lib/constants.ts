@@ -12,29 +12,97 @@ export const STORAGE_KEYS = {
   THEME: 'theme',
   THEME_AUTO_ROTATE: 'theme-auto-rotate',
   THEME_USER_CHANGED: 'theme-user-changed',
-  
+
   // Notifications
   NOTIFICATIONS: 'app-notifications',
-  
+
   // Progress tracking
   PROGRESS_PREFIX: 'progress-',
   MARKED_PREFIX: 'marked-',
   LAST_VISITED_PREFIX: 'last-visited-',
-  
+
   // Onboarding
+  ONBOARDING_COMPLETE: 'onboarding-complete',  // Legacy fast-read key
+  ONBOARDING_STEP: 'onboarding-step',
+  ONBOARDING_ROLE: 'onboarding-role',
+  ONBOARDING_CHANNELS: 'onboarding-channels',
   MARVEL_INTRO_SEEN: 'marvel-intro-seen',
   SWIPE_HINT_SEEN: 'swipe-hint-seen',
   GETTING_STARTED_SEEN: 'getting-started-seen',
   COACH_MARKS_SEEN: 'coach-marks-seen',
-  
+  PROGRESSIVE_ONBOARDING_DISMISSED: 'progressive-onboarding-dismissed',
+
+  // Auth (used in ProtectedRoute.tsx)
+  AUTH_TOKEN: 'devprep-auth-token',
+  AUTH_EXPIRY: 'devprep-auth-expiry',
+
   // Timer settings
   TIMER_ENABLED: 'timer-enabled',
   TIMER_DURATION: 'timer-duration',
-  
+
   // Activity tracking
   ACTIVITY_STATS: 'activity-stats',
   LAST_ACTIVITY_DATE: 'last-activity-date',
+
+  // UI preferences
+  SIDEBAR_COLLAPSED: 'sidebar-collapsed',
+  UI_TOGGLE_SEEN: 'ui-toggle-banner-seen',
+  USE_NEW_UI: 'use-new-ui',
+  WHATS_NEW_DISMISSED: 'whats-new-banner-dismissed',
+
+  // Learning paths
+  ACTIVE_LEARNING_PATHS: 'activeLearningPaths',
+  CUSTOM_PATHS: 'customPaths',
+  CUSTOM_LEARNING_PATHS: 'customLearningPaths',
+
+  // Coding challenges
+  CODING_PROGRESS: 'coding-challenge-progress',
+
+  // Achievements
+  ACHIEVEMENTS: 'devprep_achievements',
+
+  // Confetti
+  CONFETTI_PREFERENCE: 'confetti-preference',
+
+  // Mermaid
+  MERMAID_THEME: 'mermaid-theme',
+
+  // Badges
+  SHOWN_BADGES: 'shown-badge-unlocks',
+
+  // AI Companion
+  AI_COMPANION_MESSAGES: 'ai-companion-messages',
+
+  // Test sessions
+  TEST_AUTO_SUBMIT: 'test-auto-submit',
 } as const;
+
+/**
+ * ONBOARDING STORAGE DOCUMENTATION
+ * ================================
+ * Onboarding state is stored across multiple locations:
+ *
+ * 1. UserPreferences (primary):
+ *    - role: string | null - Selected career path
+ *    - subscribedChannels: string[] - User's chosen channels
+ *    - onboardingComplete: boolean - Full onboarding completion flag
+ *    - Stored at: STORAGE_KEYS.USER_PREFERENCES
+ *
+ * 2. Onboarding-specific flags (legacy/progressive):
+ *    - STORAGE_KEYS.ONBOARDING_STEP - Current step in multi-step onboarding
+ *    - STORAGE_KEYS.ONBOARDING_ROLE - Persisted role selection
+ *    - STORAGE_KEYS.ONBOARDING_CHANNELS - Persisted channel selection
+ *
+ * 3. Tutorial/hint flags:
+ *    - MARVEL_INTRO_SEEN - Hero intro overlay shown
+ *    - SWIPE_HINT_SEEN - Swipe gesture tutorial shown
+ *    - GETTING_STARTED_SEEN - Getting started card dismissed
+ *    - COACH_MARKS_SEEN - Interface coach marks shown
+ *    - PROGRESSIVE_ONBOARDING_DISMISSED - Floating onboarding card dismissed
+ *
+ * Flow: User visits -> checks onboardingComplete in preferences -> redirects to /onboarding
+ * Completion: role + channels set + onboardingComplete = true in USER_PREFERENCES
+ */
 
 // ============================================
 // TIMING CONSTANTS

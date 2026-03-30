@@ -16,21 +16,28 @@ export function setAuthToken(token: string): void {
 }
 
 /**
- * Check if user is currently authenticated with valid (non-expired) token
+ * Get current auth token (returns null if expired or not set)
  */
-export function isAuthenticated(): boolean {
+export function getAuthToken(): string | null {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const expiry = localStorage.getItem(AUTH_EXPIRY_KEY);
   
-  if (!token || !expiry) return false;
+  if (!token || !expiry) return null;
   
-  // Check if token has expired
-  if (Date.now() > parseInt(expiry, 10)) {
+  const expiryTime = parseInt(expiry, 10);
+  if (isNaN(expiryTime) || Date.now() > expiryTime) {
     clearAuthToken();
-    return false;
+    return null;
   }
   
-  return true;
+  return token;
+}
+
+/**
+ * Check if user is currently authenticated with valid (non-expired) token
+ */
+export function isAuthenticated(): boolean {
+  return getAuthToken() !== null;
 }
 
 /**
@@ -92,7 +99,7 @@ export function PublicRoute({
     if (isPublicOnlyRoute && isAuthenticated()) {
       setLocation(redirectTo, { replace: true });
     }
-  }, [location, publicOnlyRoutes, redirectTo, setLocation]);
+  }, [location, publicOnlyRoutes, redirectTo, setLocation, isAuthenticated]);
 
   return <>{children}</>;
 }

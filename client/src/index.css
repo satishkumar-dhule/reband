@@ -1,8 +1,70 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "./styles/github-tokens.css";
-@import "./styles/design-system.css";
-@import "./styles/genz-design-system.css";
+/*
+ * DevPrep Main Stylesheet
+ * Note: Core stylesheets are now imported via Vite-native imports in main.tsx
+ * for faster rendering (replaces @import chain that blocks paint)
+ */
+
+/* ===== ANIMATION OPTIMIZATION ===== */
+/* 
+ * Reduce animations to improve performance:
+ * - Disabled by default for faster initial paint
+ * - Only enable fancy animations when user explicitly opts in via prefers-reduced-motion: no-preference
+ * - Keep essential functional animations (shimmer, pulse-glow) for loading states
+ */
+
+/* Default: Disable non-essential decorative animations */
+.blob-float,
+.aurora-shift,
+.gold-shift,
+.particle-rise,
+.blob,
+.particle-blob,
+.aurora-gradient,
+.gold-gradient {
+  animation: none !important;
+}
+
+/* Only enable fancy animations for users who have no motion preference */
+@media (prefers-reduced-motion: no-preference) {
+  .blob {
+    animation: blob-float 20s ease-in-out infinite;
+  }
+  
+  .blob-1 { animation-delay: 0s; }
+  .blob-2 { animation-delay: -2s; }
+  .blob-3 { animation-delay: -4s; }
+  
+  .particle-blob {
+    animation: particle-rise 6s ease-out infinite;
+  }
+  
+  .aurora-gradient {
+    animation: aurora-shift 12s ease infinite;
+  }
+  
+  .gold-gradient {
+    animation: gold-shift 8s ease infinite;
+  }
+}
+
+/* Keep functional loading animations (shimmer, pulse-glow) - they're essential */
+.shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 
 /* ===== TYPOGRAPHY SYSTEM - Single Source of Truth ===== */
 /* 
@@ -426,7 +488,7 @@ body {
   border-radius: 50%;
   filter: blur(60px);
   opacity: 0.4;
-  animation: blob-float 8s ease-in-out infinite;
+  /* Animation is disabled by default, enabled via prefers-reduced-motion: no-preference */
 }
 
 .blob-1 {
@@ -456,19 +518,21 @@ body {
   animation-delay: -4s;
 }
 
-/* Animated blob keyframes */
-@keyframes blob-float {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  25% {
-    transform: translate(30px, -30px) scale(1.05);
-  }
-  50% {
-    transform: translate(-20px, 20px) scale(0.95);
-  }
-  75% {
-    transform: translate(-30px, -20px) scale(1.02);
+/* Animated blob keyframes - only active when motion is allowed */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes blob-float {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(30px, -30px) scale(1.05);
+    }
+    50% {
+      transform: translate(-20px, 20px) scale(0.95);
+    }
+    75% {
+      transform: translate(-30px, -20px) scale(1.02);
+    }
   }
 }
 
@@ -478,7 +542,7 @@ body {
   border-radius: 50%;
   background: radial-gradient(circle, currentColor, transparent);
   opacity: 0;
-  animation: particle-rise 6s ease-out infinite;
+  /* Animation disabled by default, enabled via prefers-reduced-motion: no-preference */
 }
 
 .particle-blob:nth-child(1) { left: 10%; animation-delay: 0s; }
@@ -491,20 +555,22 @@ body {
 .particle-blob:nth-child(8) { left: 80%; animation-delay: 3.5s; }
 .particle-blob:nth-child(9) { left: 90%; animation-delay: 4s; }
 
-@keyframes particle-rise {
-  0% {
-    transform: translateY(100vh) scale(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.6;
-  }
-  90% {
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(-100px) scale(1);
-    opacity: 0;
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes particle-rise {
+    0% {
+      transform: translateY(100vh) scale(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.6;
+    }
+    90% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(-100px) scale(1);
+      opacity: 0;
+    }
   }
 }
 
@@ -532,12 +598,14 @@ body {
     hsl(260, 30%, 10%) 100%
   );
   background-size: 400% 400%;
-  animation: aurora-shift 12s ease infinite;
+  /* Animation disabled by default, enabled via prefers-reduced-motion: no-preference */
 }
 
-@keyframes aurora-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes aurora-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
 }
 
 /* Gold shimmer gradient */
@@ -551,12 +619,17 @@ body {
     hsl(45, 100%, 50%) 100%
   );
   background-size: 400% 400%;
-  animation: gold-shift 8s ease infinite;
 }
 
-@keyframes gold-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+@media (prefers-reduced-motion: no-preference) {
+  .gold-gradient {
+    animation: gold-shift 8s ease infinite;
+  }
+  
+  @keyframes gold-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
 }
 
 /* Midnight gradient */
@@ -1283,6 +1356,148 @@ body {
   :root[data-theme='genz-light'] .text-muted-foreground {
     color: hsl(0 0% 35%) !important;
   }
+
+  html[data-theme='genz-light'] .bg-primary,
+  html.genz-light .bg-primary,
+  :root[data-theme='genz-light'] .bg-primary {
+    background-color: hsl(212 92% 44%) !important;
+    color: hsl(0 0% 100%) !important;
+  }
+
+  html[data-theme='genz-light'] .bg-primary\/10,
+  html.genz-light .bg-primary\/10,
+  :root[data-theme='genz-light'] .bg-primary\/10 {
+    background-color: hsla(212 92% 44% 0.1) !important;
+  }
+
+  html[data-theme='genz-light'] .bg-primary\/20,
+  html.genz-light .bg-primary\/20,
+  :root[data-theme='genz-light'] .bg-primary\/20 {
+    background-color: hsla(212 92% 44% 0.2) !important;
+  }
+
+  html[data-theme='genz-light'] .text-primary,
+  html.genz-light .text-primary,
+  :root[data-theme='genz-light'] .text-primary {
+    color: hsl(212 92% 44%) !important;
+  }
+}
+
+/* ===== GENZ DARK THEME - Full CSS Variable Support ===== */
+html[data-theme='genz-dark'],
+html.genz-dark,
+:root[data-theme='genz-dark'] {
+  --background: hsl(216 28% 7%);
+  --foreground: hsl(213 27% 90%);
+  --card: hsl(216 25% 10%);
+  --card-foreground: hsl(213 27% 90%);
+  --popover: hsl(215 22% 12%);
+  --popover-foreground: hsl(213 27% 90%);
+  --primary: hsl(212 100% 68%);
+  --primary-foreground: hsl(216 28% 7%);
+  --secondary: hsl(215 22% 13%);
+  --secondary-foreground: hsl(213 27% 90%);
+  --muted: hsl(215 22% 13%);
+  --muted-foreground: hsl(215 8% 65%);
+  --accent: hsl(136 70% 33%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(3 88% 58%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(215 14% 22%);
+  --input: hsl(215 14% 22%);
+  --ring: hsl(212 100% 68%);
+  --radius: 6px;
+  --sidebar-bg: hsl(216 25% 10%);
+  --sidebar-foreground: hsl(213 27% 90%);
+  --sidebar-border: hsl(215 14% 22%);
+  --sidebar-accent: hsl(215 14% 18%);
+  --sidebar-accent-foreground: hsl(213 27% 90%);
+  --sidebar-ring: hsl(212 100% 68%);
+  --sidebar-active-bg: hsl(215 14% 18%);
+  --sidebar-active-border: hsl(212 100% 68%);
+  --header-bg: hsl(216 28% 7%);
+  --gh-green: hsl(136 79% 57%);
+  --gh-blue: hsl(212 100% 68%);
+  --button-outline: hsl(215 14% 22%);
+  --success: hsl(142 76% 36%);
+  --success-foreground: hsl(0 0% 100%);
+  color-scheme: dark;
+}
+
+/* ===== GENZ LIGHT THEME - Full CSS Variable Support ===== */
+html[data-theme='genz-light'],
+html.genz-light,
+:root[data-theme='genz-light'] {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(215 14% 14%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(215 14% 14%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(215 14% 14%);
+  --primary: hsl(212 92% 44%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(210 17% 98%);
+  --secondary-foreground: hsl(215 14% 14%);
+  --muted: hsl(210 17% 98%);
+  --muted-foreground: hsl(215 10% 35%);
+  --accent: hsl(134 61% 29%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(1 83% 40%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(213 13% 83%);
+  --input: hsl(213 13% 83%);
+  --ring: hsl(212 92% 44%);
+  --radius: 6px;
+  --sidebar-bg: hsl(210 17% 98%);
+  --sidebar-foreground: hsl(215 14% 14%);
+  --sidebar-border: hsl(213 13% 83%);
+  --sidebar-accent: hsl(213 20% 93%);
+  --sidebar-accent-foreground: hsl(215 14% 14%);
+  --sidebar-ring: hsl(212 92% 44%);
+  --sidebar-active-bg: hsl(213 20% 93%);
+  --sidebar-active-border: hsl(212 92% 44%);
+  --header-bg: hsl(210 17% 95%);
+  --gh-green: hsl(136 79% 40%);
+  --gh-blue: hsl(212 92% 44%);
+  --button-outline: hsl(213 13% 83%);
+  --success: hsl(142 76% 30%);
+  --success-foreground: hsl(0 0% 100%);
+  color-scheme: light;
+}
+
+/* Ensure proper text contrast in modals for genz themes */
+html[data-theme='genz-light'] .search-modal-backdrop,
+html.genz-light .search-modal-backdrop,
+html[data-theme='genz-dark'] .search-modal-backdrop,
+html.genz-dark .search-modal-backdrop {
+  background-color: var(--popover);
+}
+
+html[data-theme='genz-light'] .search-modal-content,
+html.genz-light .search-modal-content {
+  background-color: hsl(0 0% 100%);
+  border-color: hsl(213 13% 83%);
+}
+
+html[data-theme='genz-dark'] .search-modal-content,
+html.genz-dark .search-modal-content {
+  background-color: hsl(215 22% 12%);
+  border-color: hsl(215 14% 22%);
+}
+
+/* Search modal button text contrast fixes */
+html[data-theme='genz-light'] .search-modal-content button,
+html.genz-light .search-modal-content button,
+html[data-theme='genz-light'] .search-modal-content .text-muted-foreground,
+html.genz-light .search-modal-content .text-muted-foreground {
+  color: hsl(215 14% 14%) !important;
+}
+
+html[data-theme='genz-dark'] .search-modal-content button,
+html.genz-dark .search-modal-content button,
+html[data-theme='genz-dark'] .search-modal-content .text-muted-foreground,
+html.genz-dark .search-modal-content .text-muted-foreground {
+  color: hsl(213 27% 90%) !important;
 }
 
 /* ===== PRO MAX PREMIUM THEME ===== */

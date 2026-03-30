@@ -156,9 +156,11 @@ export const ChannelService = {
       return data;
     } else {
       // Production mode: use static client
-      const questions = await fetchChannelQuestions(channelId);
-      const subChannels = await fetchSubChannels(channelId);
-      const companies = await fetchCompanies(channelId);
+      const [questions, subChannels, companies] = await Promise.all([
+        fetchChannelQuestions(channelId),
+        fetchSubChannels(channelId),
+        fetchCompanies(channelId),
+      ]);
 
       const stats = {
         total: questions.length,
@@ -286,25 +288,32 @@ export const QuestionService = {
 
       return results.slice(0, limit);
     } else {
-      // Production mode: search through all channels
+      // Production mode: search through all channels (parallel with bounded concurrency)
       const channels = await fetchChannels();
-      const results: Question[] = [];
       const searchQuery = query.toLowerCase();
 
-      for (const ch of channels) {
-        try {
-          const questions = await fetchChannelQuestions(ch.id);
-          const matches = questions
-            .filter(question =>
-              question.question.toLowerCase().includes(searchQuery) ||
-              question.tags?.some(t => t.toLowerCase().includes(searchQuery))
-            )
-            .map(castQuestion);
-          results.push(...matches);
-          if (results.length >= limit) break;
-        } catch {
-          // Skip if channel fails
-        }
+      // Process in batches of 5 to avoid overwhelming the browser
+      const BATCH_SIZE = 5;
+      const results: Question[] = [];
+
+      for (let i = 0; i < channels.length; i += BATCH_SIZE) {
+        const batch = channels.slice(i, i + BATCH_SIZE);
+        const batchResults = await Promise.all(
+          batch.map(async (ch) => {
+            try {
+              const questions = await fetchChannelQuestions(ch.id);
+              return questions.filter(
+                (question) =>
+                  question.question.toLowerCase().includes(searchQuery) ||
+                  question.tags?.some((t) => t.toLowerCase().includes(searchQuery))
+              );
+            } catch {
+              return [];
+            }
+          })
+        );
+        results.push(...batchResults.flat().map(castQuestion));
+        if (results.length >= limit) break;
       }
 
       return results.slice(0, limit);

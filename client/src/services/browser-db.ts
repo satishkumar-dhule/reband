@@ -68,11 +68,15 @@ interface SyncDBRecord {
 class BrowserDB {
   private db: IDBDatabase | null = null;
   private dbReady: Promise<void>;
+  private isDbReady = false;
   private syncInterval: number | null = null;
 
   constructor() {
-    this.dbReady = this.initDB();
-    this.startSync();
+    // Start init but don't block - lazy init pattern
+    this.dbReady = this.initDB().then(() => {
+      this.isDbReady = true;
+    });
+    // Don't start sync in constructor - let db-storage-sync handle it
   }
 
   private async initDB(): Promise<void> {
@@ -144,8 +148,17 @@ class BrowserDB {
     }
   }
 
+  public startSyncIfEnabled(enabled: boolean): void {
+    if (enabled) {
+      this.startSync();
+    }
+  }
+
   async ready(): Promise<void> {
-    await this.dbReady;
+    // Non-blocking: resolve immediately if already ready
+    if (this.isDbReady) return;
+    // Fire-and-forget: let init continue in background, don't block
+    this.dbReady.catch(() => {});
   }
 
   private getStore(name: keyof DBSchema, mode: IDBTransactionMode = 'readonly'): IDBObjectStore {
@@ -155,7 +168,9 @@ class BrowserDB {
   }
 
   async put<T>(storeName: keyof DBSchema, data: T & { id: string }): Promise<void> {
-    await this.ready();
+    // Non-blocking: fire-and-forget init, proceed with operation
+    this.ready().catch(() => {});
+    if (!this.db) return Promise.resolve(); // Skip if DB not ready
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName, 'readwrite');
       const request = store.put(data);
@@ -165,7 +180,8 @@ class BrowserDB {
   }
 
   async get<T>(storeName: keyof DBSchema, id: string): Promise<T | undefined> {
-    await this.ready();
+    this.ready().catch(() => {});
+    if (!this.db) return undefined;
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName);
       const request = store.get(id);
@@ -175,7 +191,8 @@ class BrowserDB {
   }
 
   async getAll<T>(storeName: keyof DBSchema): Promise<T[]> {
-    await this.ready();
+    this.ready().catch(() => {});
+    if (!this.db) return [];
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName);
       const request = store.getAll();
@@ -189,7 +206,8 @@ class BrowserDB {
     indexName: string,
     value: IDBValidKey
   ): Promise<T[]> {
-    await this.ready();
+    this.ready().catch(() => {});
+    if (!this.db) return [];
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName);
       const index = store.index(indexName);
@@ -200,7 +218,8 @@ class BrowserDB {
   }
 
   async delete(storeName: keyof DBSchema, id: string): Promise<void> {
-    await this.ready();
+    this.ready().catch(() => {});
+    if (!this.db) return;
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName, 'readwrite');
       const request = store.delete(id);
@@ -210,7 +229,8 @@ class BrowserDB {
   }
 
   async clear(storeName: keyof DBSchema): Promise<void> {
-    await this.ready();
+    this.ready().catch(() => {});
+    if (!this.db) return;
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName, 'readwrite');
       const request = store.clear();
@@ -220,11 +240,10 @@ class BrowserDB {
   }
 
   async bulkPut<T extends { id: string }>(storeName: keyof DBSchema, data: T[]): Promise<void> {
-    await this.ready();
+    this.ready().catch(() => {});
+    if (!this.db) return Promise.resolve();
     return new Promise((resolve, reject) => {
-      if (!this.db) return reject(new Error('Database not initialized'));
-      
-      const transaction = this.db.transaction(storeName, 'readwrite');
+      const transaction = this.db!.transaction(storeName, 'readwrite');
       const store = transaction.objectStore(storeName);
       
       data.forEach(item => store.put(item));

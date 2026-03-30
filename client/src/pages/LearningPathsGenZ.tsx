@@ -102,6 +102,8 @@ export default function LearningPathsGenZ() {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [showCustom, setShowCustom] = useState(false);
   const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [certsLoading, setCertsLoading] = useState(true);
+  const [certsError, setCertsError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'Beginner' | 'Intermediate' | 'Advanced'>('all');
   
   // Custom path builder state
@@ -115,15 +117,22 @@ export default function LearningPathsGenZ() {
   // Load certifications
   useEffect(() => {
     async function loadCerts() {
+      setCertsLoading(true);
+      setCertsError(null);
       try {
         const basePath = import.meta.env.BASE_URL || '/';
         const response = await fetch(`${basePath}data/certifications.json`);
         if (response.ok) {
           const data = await response.json();
           setCertifications(data);
+        } else {
+          setCertsError('Failed to load certifications');
         }
       } catch (e) {
+        setCertsError('Failed to load certifications');
         console.error('Failed to load certifications:', e);
+      } finally {
+        setCertsLoading(false);
       }
     }
     loadCerts();
@@ -414,6 +423,41 @@ export default function LearningPathsGenZ() {
                           </button>
                         ))}
                       </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-semibold mb-3">Select Certifications ({customPath.certifications.length})</h3>
+                      {certsLoading ? (
+                        <div className="flex items-center justify-center py-8 text-[var(--gh-fg-muted)]">
+                          <div className="animate-spin w-5 h-5 border-2 border-[var(--gh-border)] border-t-[var(--gh-accent-fg)] rounded-full mr-2" />
+                          Loading certifications...
+                        </div>
+                      ) : certsError ? (
+                        <div className="text-[var(--gh-danger-fg)] text-sm py-4">
+                          {certsError}
+                        </div>
+                      ) : certifications.length === 0 ? (
+                        <div className="text-[var(--gh-fg-muted)] text-sm py-4">
+                          No certifications available
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-2">
+                          {filteredCerts.slice(0, 10).map(cert => (
+                            <button
+                              key={cert.id}
+                              onClick={() => toggleCertification(cert.id)}
+                              className={`flex items-center justify-between px-3 py-2 rounded-md text-sm border transition-colors ${
+                                customPath.certifications.includes(cert.id)
+                                  ? 'bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-fg)] text-[var(--gh-accent-fg)]'
+                                  : 'bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:border-[var(--gh-fg-subtle)]'
+                              }`}
+                            >
+                              {cert.name}
+                              {customPath.certifications.includes(cert.id) && <Check className="w-3.5 h-3.5" />}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 

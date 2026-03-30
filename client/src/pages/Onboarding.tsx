@@ -8,6 +8,7 @@ import { useLocation } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { useUserPreferences } from '../context/UserPreferencesContext';
+import { PreferencesStorage, OnboardingStorage } from '../services/storage.service';
 import { getRecommendedChannels } from '../lib/channels-config';
 import {
   ArrowRight, ArrowLeft, Check, Code, Server, Layout, Database,
@@ -80,7 +81,9 @@ export default function OnboardingPage() {
   const { setRole, skipOnboarding } = useUserPreferences();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
+  const [selectedChannels, setSelectedChannels] = useState<string[]>(
+    OnboardingStorage.getSubscribedChannels() // Restore from localStorage
+  );
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const recommendedChannels = selectedRole 
@@ -88,11 +91,14 @@ export default function OnboardingPage() {
     : [];
 
   const toggleChannel = (channelId: string) => {
-    setSelectedChannels(prev => 
-      prev.includes(channelId)
+    setSelectedChannels(prev => {
+      const updated = prev.includes(channelId)
         ? prev.filter(c => c !== channelId)
-        : [...prev, channelId]
-    );
+        : [...prev, channelId];
+      // Persist to OnboardingStorage for survival across browser restarts
+      OnboardingStorage.setSubscribedChannels(updated);
+      return updated;
+    });
     // Clear validation error when user selects a channel
     setValidationError(null);
   };
@@ -112,11 +118,27 @@ export default function OnboardingPage() {
   };
 
   const handleComplete = () => {
+    // Persist to dedicated OnboardingStorage keys for fast early-read
     if (selectedRole) {
+      OnboardingStorage.setRole(selectedRole);
       setRole(selectedRole);
+    } else {
+      skipOnboarding();
     }
-    skipOnboarding();
-    // Navigate to channels with replace to prevent back navigation to onboarding
+
+    // Persist selected channels to OnboardingStorage
+    if (selectedChannels.length > 0) {
+      OnboardingStorage.setSubscribedChannels(selectedChannels);
+      const current = PreferencesStorage.get();
+      const mergedChannels = [...new Set([...current.subscribedChannels, ...selectedChannels])];
+      PreferencesStorage.update({
+        subscribedChannels: mergedChannels
+      });
+    }
+
+    // Mark onboarding as complete in dedicated key
+    OnboardingStorage.completeOnboarding();
+
     setLocation('/channels', { replace: true });
   };
 

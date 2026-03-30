@@ -609,7 +609,7 @@ function QuickQuizCard({
                       disabled={showFeedback !== null}
                       aria-disabled={showFeedback !== null}
                       aria-label={option.text}
-                      className={`w-full p-2.5 sm:p-3 text-left border rounded-lg transition-all text-sm ${
+                      className={`w-full p-2.5 sm:p-3 text-left border rounded-lg transition-all text-sm min-h-[48px] touch-manipulation ${
                         showCorrect
                           ? 'border-green-500 bg-green-500/20'
                           : showWrong
@@ -618,6 +618,7 @@ function QuickQuizCard({
                           ? 'border-primary bg-primary/10'
                           : 'border-border hover:border-primary/50'
                       } ${showFeedback ? 'cursor-default opacity-75' : ''}`}
+                      type="button"
                     >
                       <div className="flex items-center gap-2.5">
                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
@@ -862,7 +863,9 @@ function ChannelCard({
     <div className="relative group">
       <button
         onClick={onClick}
-        className="w-full p-4 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors text-left border border-border/50 hover:border-primary/30"
+        className="w-full p-4 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors text-left border border-border/50 hover:border-primary/30 min-h-[120px] touch-manipulation"
+        aria-label={`Go to ${channel.name}`}
+        type="button"
       >
         <div className="flex items-start justify-between mb-3">
           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
@@ -896,9 +899,10 @@ function ChannelCard({
           e.stopPropagation();
           setConfirmingUnsubscribe(true);
         }}
-        className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 border border-border opacity-60 group-hover:opacity-100 hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all"
-        aria-label="Unsubscribe"
+        className="absolute top-2 right-2 min-w-[44px] min-h-[44px] p-1.5 rounded-full bg-background/80 border border-border opacity-60 group-hover:opacity-100 hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all flex items-center justify-center touch-manipulation"
+        aria-label={`Unsubscribe from ${channel.name}`}
         title="Unsubscribe"
+        type="button"
       >
         <X className="w-3.5 h-3.5" />
       </button>
@@ -972,7 +976,9 @@ function ChannelRow({
     <div className="flex items-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 hover:bg-muted/50 transition-colors">
       <button
         onClick={onClick}
-        className="flex-1 flex items-center gap-3 text-left"
+        className="flex-1 flex items-center gap-3 text-left min-h-[56px] touch-manipulation"
+        aria-label={`Go to ${channel.name}`}
+        type="button"
       >
         <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
           {iconMap[channel.icon] || <Code className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -1005,9 +1011,10 @@ function ChannelRow({
           e.stopPropagation();
           setConfirmingUnsubscribe(true);
         }}
-        className="p-1.5 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors flex-shrink-0"
-        aria-label="Unsubscribe"
+        className="min-w-[44px] min-h-[44px] p-1.5 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors flex-shrink-0 touch-manipulation flex items-center justify-center"
+        aria-label={`Unsubscribe from ${channel.name}`}
         title="Unsubscribe"
+        type="button"
       >
         <X className="w-4 h-4" />
       </button>
@@ -1020,8 +1027,9 @@ function CodingChallengeCardCompact({ onStart }: { onStart: () => void }) {
   return (
     <button
       onClick={onStart}
-      className="min-h-[80px] bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-xl border border-purple-500/20 p-3 flex flex-col items-center gap-2 hover:from-purple-500/15 hover:to-blue-500/15 transition-colors text-center active:scale-[0.98]"
+      className="min-h-[80px] bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-xl border border-purple-500/20 p-3 flex flex-col items-center gap-2 hover:from-purple-500/15 hover:to-blue-500/15 transition-colors text-center active:scale-[0.98] touch-manipulation"
       aria-label="Start coding practice"
+      type="button"
     >
       <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
         <Code className="w-5 h-5 text-purple-500" />
@@ -1039,8 +1047,9 @@ function CertificationCardCompact({ onStart }: { onStart: () => void }) {
   return (
     <button
       onClick={onStart}
-      className="min-h-[80px] bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-xl border border-amber-500/20 p-3 flex flex-col items-center gap-2 hover:from-amber-500/15 hover:to-orange-500/15 transition-colors text-center active:scale-[0.98]"
+      className="min-h-[80px] bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-xl border border-amber-500/20 p-3 flex flex-col items-center gap-2 hover:from-amber-500/15 hover:to-orange-500/15 transition-colors text-center active:scale-[0.98] touch-manipulation"
       aria-label="View certifications"
+      type="button"
     >
       <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
         <Award className="w-5 h-5 text-amber-500" />
@@ -1058,8 +1067,9 @@ function TrainingModeCardCompact({ onStart }: { onStart: () => void }) {
   return (
     <button
       onClick={onStart}
-      className="min-h-[80px] bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-500/20 p-3 flex flex-col items-center gap-2 hover:from-blue-500/15 hover:to-purple-500/15 transition-colors text-center active:scale-[0.98]"
+      className="min-h-[80px] bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-500/20 p-3 flex flex-col items-center gap-2 hover:from-blue-500/15 hover:to-purple-500/15 transition-colors text-center active:scale-[0.98] touch-manipulation"
       aria-label="Start training mode"
+      type="button"
     >
       <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
         <BookOpen className="w-5 h-5 text-blue-500" />
@@ -1078,33 +1088,37 @@ function QuickLinksCompact({ onNavigate }: { onNavigate: (path: string) => void 
     <div className="bg-card rounded-xl border border-border p-2 flex flex-wrap justify-center gap-1.5" role="navigation" aria-label="Quick links">
       <button
         onClick={() => onNavigate('/badges')}
-        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center"
+        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center touch-manipulation"
         aria-label="Badges"
         title="Badges"
+        type="button"
       >
         <Award className="w-4 h-4 text-yellow-500" />
       </button>
       <button
         onClick={() => onNavigate('/bookmarks')}
-        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center"
+        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center touch-manipulation"
         aria-label="Bookmarks"
         title="Bookmarks"
+        type="button"
       >
         <BookOpen className="w-4 h-4 text-blue-500" />
       </button>
       <button
         onClick={() => onNavigate('/tests')}
-        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center"
+        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center touch-manipulation"
         aria-label="Tests"
         title="Tests"
+        type="button"
       >
         <Target className="w-4 h-4 text-green-500" />
       </button>
       <button
         onClick={() => onNavigate('/stats')}
-        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center"
+        className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-center touch-manipulation"
         aria-label="Statistics"
         title="Statistics"
+        type="button"
       >
         <Activity className="w-4 h-4 text-purple-500" />
       </button>
@@ -1121,12 +1135,13 @@ function VoiceInterviewCard({ onStart }: { onStart: () => void }) {
       <div className="bg-gradient-to-r from-primary/20 via-primary/15 to-emerald-500/20 rounded-xl border border-primary/30 p-3">
         <button
           onClick={onStart}
-          className="w-full flex items-center gap-3 hover:opacity-90 transition-all group"
+          className="w-full flex items-center gap-3 hover:opacity-90 transition-all group min-h-[80px] touch-manipulation"
+          aria-label="Start Voice Interview practice"
         >
           {/* Animated mic icon */}
           <div className="relative flex-shrink-0">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform">
-              <Mic className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform">
+              <Mic className="w-7 h-7 text-white" />
             </div>
             <div className="absolute inset-0 rounded-xl bg-primary/30 animate-ping opacity-30" />
           </div>
@@ -1156,7 +1171,8 @@ function VoiceInterviewCard({ onStart }: { onStart: () => void }) {
           <span className="text-[10px] text-muted-foreground">Focused practice?</span>
           <button
             onClick={() => setLocation('/voice-session')}
-            className="text-[10px] text-primary hover:underline flex items-center gap-1"
+            className="text-[10px] text-primary hover:underline flex items-center gap-1 min-h-[32px] px-2 py-1 -mx-2 touch-manipulation"
+            aria-label="Go to Micro Sessions"
           >
             <Target className="w-2.5 h-2.5" />
             Micro Sessions

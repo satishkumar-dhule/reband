@@ -1,5 +1,10 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
+// Vite-native CSS imports (replaces @import chain in index.css for faster rendering)
+import "./styles/tailwind.css";
+import "./styles/github-tokens.css";
+import "./styles/design-system.css";
+import "./styles/genz-design-system.css";
 import "./index.css";
 import { initializeAnalytics } from "./lib/analytics";
 import { registerServiceWorker } from "./lib/service-worker";

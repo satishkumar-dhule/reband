@@ -9,7 +9,7 @@ import {
   User, Settings, Target, 
   Award, BookOpen,
   Mail, Link as LinkIcon, MapPin, Twitter,
-  ChevronLeft, Home
+  ChevronLeft, Home, Coins, Gift, History, Mic
 } from 'lucide-react';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 
@@ -32,9 +32,12 @@ const learningHistory = [
 export default function ProfileGenZ() {
   const [, setLocation] = useLocation();
   const { preferences, toggleShuffleQuestions, togglePrioritizeUnvisited, toggleHideCertifications } = useUserPreferences();
-  const { balance } = useCredits();
+  const { balance, state: creditsState, history, onRedeemCoupon, config } = useCredits();
   const [totalCompleted, setTotalCompleted] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponMessage, setCouponMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const allQuestions = getAllQuestions();
@@ -43,7 +46,13 @@ export default function ProfileGenZ() {
     allQuestions.forEach(q => {
       const stored = localStorage.getItem(`progress-${q.channel}`);
       if (stored) {
-        const completedIds = new Set(JSON.parse(stored));
+        let completedQuestions = [];
+        try {
+          completedQuestions = JSON.parse(stored);
+        } catch {
+          completedQuestions = [];
+        }
+        const completedIds = new Set(completedQuestions);
         if (completedIds.has(q.id)) {
           allCompletedIds.add(q.id);
         }
@@ -53,6 +62,25 @@ export default function ProfileGenZ() {
     setTotalCompleted(allCompletedIds.size);
     setIsLoading(false);
   }, []);
+
+  const handleCouponSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!couponCode.trim()) {
+      setCouponMessage({ type: 'error', text: 'Please enter a coupon code' });
+      return;
+    }
+    setIsSubmitting(true);
+    const result = onRedeemCoupon(couponCode);
+    setCouponMessage({
+      type: result.success ? 'success' : 'error',
+      text: result.message
+    });
+    if (result.success) {
+      setCouponCode('');
+    }
+    setIsSubmitting(false);
+    setTimeout(() => setCouponMessage(null), 3000);
+  };
 
   const level = Math.floor(balance / 100);
   const achievedCount = achievements.filter(a => a.achieved).length;
@@ -154,6 +182,87 @@ export default function ProfileGenZ() {
                     <span className="font-semibold">{totalCompleted}</span>
                     <span className="text-[var(--gh-fg-muted)]">completed</span>
                   </div>
+                </div>
+
+                {/* Credits Section */}
+                <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Coins className="w-4 h-4 text-[var(--gh-attention-fg)]" />
+                    <span className="text-sm font-semibold text-[var(--gh-fg)]">{balance.toLocaleString()} Credits</span>
+                  </div>
+                  <p className="text-xs text-[var(--gh-fg-muted)] mb-3">
+                    Earned: {creditsState.totalEarned.toLocaleString()} · Spent: {creditsState.totalSpent.toLocaleString()}
+                  </p>
+
+                  {/* How to earn */}
+                  <div className="bg-[var(--gh-canvas)] rounded-lg p-2 mb-3">
+                    <h4 className="text-xs font-semibold text-[var(--gh-attention-fg)] mb-1 flex items-center gap-1">
+                      <Mic className="w-3 h-3" /> Earn Credits
+                    </h4>
+                    <div className="space-y-0.5 text-xs text-[var(--gh-fg-muted)]">
+                      <div className="flex justify-between">
+                        <span>Voice interview attempt</span>
+                        <span className="text-[var(--gh-success-fg)]">+{config.VOICE_ATTEMPT}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Successful interview</span>
+                        <span className="text-[var(--gh-success-fg)]">+{config.VOICE_SUCCESS_BONUS} bonus</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>View question</span>
+                        <span className="text-[var(--gh-danger-fg)]">-{config.QUESTION_VIEW_COST}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Coupon Redemption */}
+                  <form onSubmit={handleCouponSubmit}>
+                    <h4 className="text-xs font-semibold mb-1 flex items-center gap-1">
+                      <Gift className="w-3 h-3" /> Redeem Coupon
+                    </h4>
+                    <div className="flex gap-1">
+                      <label htmlFor="coupon-code" className="sr-only">Coupon code</label>
+                      <input
+                        id="coupon-code"
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        placeholder="Enter code"
+                        className="flex-1 px-2 py-1.5 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md text-xs placeholder:text-[var(--gh-fg-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--gh-accent-fg)]"
+                      />
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="px-3 py-1.5 bg-[var(--gh-accent-fg)] text-white text-xs font-semibold rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    {couponMessage && (
+                      <p className={`text-xs mt-1 ${couponMessage.type === 'success' ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
+                        {couponMessage.text}
+                      </p>
+                    )}
+                  </form>
+
+                  {/* Transaction History */}
+                  {history.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-[var(--gh-border)]">
+                      <h4 className="text-xs font-semibold mb-2 flex items-center gap-1">
+                        <History className="w-3 h-3" /> Recent Activity
+                      </h4>
+                      <div className="space-y-1 max-h-24 overflow-y-auto">
+                        {history.slice(0, 5).map((tx) => (
+                          <div key={tx.id} className="flex justify-between text-xs">
+                            <span className="text-[var(--gh-fg-muted)] truncate flex-1">{tx.description}</span>
+                            <span className={tx.amount > 0 ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}>
+                              {tx.amount > 0 ? '+' : ''}{tx.amount}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-6 border-t border-[var(--gh-border)] space-y-2">

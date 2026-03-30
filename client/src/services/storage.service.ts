@@ -123,10 +123,13 @@ function setNumber(key: string, value: number): void {
 // USER PREFERENCES
 // ============================================
 const defaultPreferences: UserPreferences = {
-  role: DEFAULTS.ROLE,
+  role: null,
   subscribedChannels: [],
+  subscribedCertifications: [],
   onboardingComplete: false,
   createdAt: new Date().toISOString(),
+  shuffleQuestions: true,
+  prioritizeUnvisited: true,
 };
 
 export const PreferencesStorage = {
@@ -362,8 +365,109 @@ export const ActivityStorage = {
 
 // ============================================
 // ONBOARDING STORAGE
+// Single source of truth: PreferencesStorage (user-preferences object)
+// This layer provides onboarding-specific methods that sync with PreferencesStorage
 // ============================================
 export const OnboardingStorage = {
+  // ---- Core Onboarding State ----
+
+  /**
+   * Check if onboarding has been completed
+   * Uses PreferencesStorage as source of truth
+   */
+  isOnboardingComplete(): boolean {
+    return PreferencesStorage.get().onboardingComplete;
+  },
+
+  /**
+   * Mark onboarding as complete - syncs with PreferencesStorage
+   * Should be called when user finishes the onboarding flow
+   */
+  completeOnboarding(): void {
+    PreferencesStorage.update({ onboardingComplete: true });
+  },
+
+  /**
+   * Reset onboarding state - clears both PreferencesStorage and legacy keys
+   * Useful for re-onboarding flow
+   */
+  resetOnboarding(): void {
+    PreferencesStorage.update({
+      onboardingComplete: false,
+      role: DEFAULTS.ROLE,
+      subscribedChannels: [],
+    });
+    removeItem(STORAGE_KEYS.ONBOARDING_ROLE);
+    removeItem(STORAGE_KEYS.ONBOARDING_CHANNELS);
+  },
+
+  // ---- Role Selection ----
+
+  /**
+   * Get selected role during onboarding
+   * Uses PreferencesStorage as source of truth
+   */
+  getRole(): string | null {
+    return PreferencesStorage.get().role || null;
+  },
+
+  /**
+   * Save role selection during onboarding - syncs with PreferencesStorage
+   */
+  setRole(roleId: string): void {
+    PreferencesStorage.update({ role: roleId });
+  },
+
+  // ---- Subscribed Channels ----
+
+  /**
+   * Get channels selected during onboarding
+   * Uses PreferencesStorage as source of truth
+   */
+  getSubscribedChannels(): string[] {
+    return PreferencesStorage.get().subscribedChannels;
+  },
+
+  /**
+   * Save subscribed channels during onboarding - syncs with PreferencesStorage
+   */
+  setSubscribedChannels(channelIds: string[]): void {
+    PreferencesStorage.update({ subscribedChannels: channelIds });
+  },
+
+  /**
+   * Add a channel to subscriptions
+   */
+  addSubscribedChannel(channelId: string): void {
+    const channels = this.getSubscribedChannels();
+    if (!channels.includes(channelId)) {
+      this.setSubscribedChannels([...channels, channelId]);
+    }
+  },
+
+  /**
+   * Remove a channel from subscriptions
+   */
+  removeSubscribedChannel(channelId: string): void {
+    const channels = this.getSubscribedChannels();
+    this.setSubscribedChannels(channels.filter(id => id !== channelId));
+  },
+
+  // ---- Onboarding Progress ----
+
+  /**
+   * Check if onboarding has started (any state saved)
+   */
+  hasStarted(): boolean {
+    return (
+      this.getRole() !== null ||
+      this.getSubscribedChannels().length > 0 ||
+      this.isOnboardingComplete()
+    );
+  },
+
+  // ---- UI Hint Flags ----
+
   hasSeenIntro(): boolean {
     return getBoolean(STORAGE_KEYS.MARVEL_INTRO_SEEN, false);
   },

@@ -139,6 +139,8 @@ export interface CodingStats {
 // ============================================
 // USER TYPES
 // ============================================
+export type RoleId = 'frontend' | 'backend' | 'fullstack' | 'devops' | 'data' | 'ml';
+
 export interface UserPreferences {
   role: string | null;
   subscribedChannels: string[];

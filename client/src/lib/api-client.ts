@@ -272,23 +272,26 @@ export async function fetchStats(): Promise<ChannelDetailedStats[]> {
   }
   
   const channels = await fetchChannels();
-  const stats: ChannelDetailedStats[] = [];
   
-  for (const channel of channels) {
-    try {
-      const data = await loadChannelData(channel.id);
-      stats.push({
-        id: channel.id,
-        total: data.stats.total,
-        beginner: data.stats.beginner,
-        intermediate: data.stats.intermediate,
-        advanced: data.stats.advanced
-      });
-    } catch {
-      // Skip if channel fails
-    }
-  }
+  // Parallelize channel data loading
+  const results = await Promise.all(
+    channels.map(async (channel) => {
+      try {
+        const data = await loadChannelData(channel.id);
+        return {
+          id: channel.id,
+          total: data.stats.total,
+          beginner: data.stats.beginner,
+          intermediate: data.stats.intermediate,
+          advanced: data.stats.advanced,
+        };
+      } catch {
+        return null;
+      }
+    })
+  );
   
+  const stats = results.filter((s): s is ChannelDetailedStats => s !== null);
   statsCache.data = stats;
   return stats;
 }

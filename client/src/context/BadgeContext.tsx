@@ -4,7 +4,7 @@
  * Now uses unified notification system for display
  */
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, ReactNode } from 'react';
 import { 
   Badge, BadgeProgress, calculateBadgeProgress
 } from '../lib/badges';
@@ -77,15 +77,29 @@ export function BadgeProvider({ children }: { children: ReactNode }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isReady, setIsReady] = useState(false);
 
-  // Listen for question completion events to trigger badge recalculation
+  // Debounce ref for question-completed events
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recalculateDebounce = useRef<any>();
+
+  // Listen for question completion events to trigger badge recalculation (debounced)
   useEffect(() => {
     const handleQuestionCompleted = () => {
-      setRefreshKey(k => k + 1);
+      // Clear existing timeout
+      if (recalculateDebounce.current) {
+        clearTimeout(recalculateDebounce.current);
+      }
+      // Debounce recalculation by 500ms
+      recalculateDebounce.current = setTimeout(() => {
+        setRefreshKey(k => k + 1);
+      }, 500);
     };
     
     window.addEventListener('question-completed', handleQuestionCompleted);
-    return () => window.removeEventListener('question-completed', handleQuestionCompleted);
-  }, []);
+    return () => {
+      window.removeEventListener('question-completed', handleQuestionCompleted);
+      if (recalculateDebounce.current) clearTimeout(recalculateDebounce.current);
+    };
+  }, [stats, refreshKey, isReady]);
   
   // Wait a bit for questions to load before calculating badges
   useEffect(() => {

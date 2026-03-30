@@ -24,8 +24,13 @@ class DatabaseStorageSync {
   private syncInProgress = false;
   private syncInterval: ReturnType<typeof setInterval> | null = null;
   private userId = 'anonymous';
+  private isStaticProduction = false;
 
   constructor() {
+    // Check if we're in static production mode (no server available)
+    this.isStaticProduction = import.meta.env.PROD && 
+      !import.meta.env.VITE_USE_SERVER;
+    
     this.init();
   }
 
@@ -33,7 +38,8 @@ class DatabaseStorageSync {
     await browserDB.ready();
     this.loadUserId();
     
-    if (this.config.autoSync) {
+    // Skip auto-sync in static production - no server endpoint exists
+    if (this.config.autoSync && !this.isStaticProduction) {
       this.startAutoSync();
     }
   }
@@ -113,6 +119,12 @@ class DatabaseStorageSync {
   }
 
   private async syncRecord(sync: SyncRecord): Promise<boolean> {
+    // Skip sync in static production - no server endpoint exists
+    if (this.isStaticProduction) {
+      console.debug('Skipping sync in static production mode');
+      return false;
+    }
+    
     try {
       const endpoint = `/api/sync`;
       const response = await fetch(endpoint, {
@@ -139,6 +151,11 @@ class DatabaseStorageSync {
   }
 
   private async fetchLatestFromDatabase(): Promise<void> {
+    // Skip fetching from server in static production mode
+    if (this.isStaticProduction) {
+      return;
+    }
+    
     try {
       const channelsResponse = await fetch('/api/channels');
       if (channelsResponse.ok) {

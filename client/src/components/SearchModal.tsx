@@ -288,7 +288,7 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="lg:hidden fixed inset-0 z-[200] bg-background/95 backdrop-blur-xl flex flex-col pb-safe"
+            className="lg:hidden fixed inset-0 z-[200] bg-background/95 backdrop-blur-xl flex flex-col pb-safe search-modal-backdrop"
             style={{ top: 0, left: 0, right: 0, bottom: 0, position: 'fixed', height: '100dvh' }}
             data-testid="search-modal-mobile"
             role="dialog"
@@ -387,7 +387,7 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="hidden lg:flex fixed inset-0 z-[200] bg-background/80 backdrop-blur-sm items-start justify-center pt-[10vh] px-4"
+            className="hidden lg:flex fixed inset-0 z-[200] bg-background/80 backdrop-blur-sm items-start justify-center pt-[10vh] px-4 search-modal-backdrop"
             onClick={onClose}
             data-testid="search-modal-desktop"
           >
@@ -396,7 +396,7 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+              className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] search-modal-content"
               onClick={e => e.stopPropagation()}
               role="dialog"
               aria-modal="true"

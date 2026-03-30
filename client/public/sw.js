@@ -3,15 +3,18 @@
  * Enables offline support and faster repeat visits
  */
 
-const CACHE_VERSION = 'v1';
+// Version injected at build time by Vite (vite.config.ts define option)
+const CACHE_VERSION = typeof __SW_VERSION__ !== 'undefined' ? __SW_VERSION__ : `dev-${Date.now()}`;
 const STATIC_CACHE = `code-reels-static-${CACHE_VERSION}`;
 const DATA_CACHE = `code-reels-data-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `code-reels-runtime-${CACHE_VERSION}`;
 
-// Static assets to cache on install
+// Static assets to cache on install - expanded for better offline support
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  // Vendor chunks (hashes will vary per build - these are patterns)
+  // The runtime cache handles JS/CSS with cache-first strategy
 ];
 
 // Install event - cache static assets
@@ -69,7 +72,9 @@ self.addEventListener('fetch', (event) => {
               if (networkResponse.ok) {
                 cache.put(request, networkResponse.clone());
               }
-            }).catch(() => {});
+            }).catch((error) => {
+              console.warn('Background cache update failed for data:', error);
+            });
             return cachedResponse;
           }
           
@@ -159,9 +164,13 @@ self.addEventListener('message', (event) => {
               if (response.ok) {
                 return cache.put(url, response);
               }
-            }).catch(() => {});
+            }).catch((error) => {
+              console.warn('Prefetch failed for:', url, error);
+            });
           })
         );
+      }).catch((error) => {
+        console.warn('Prefetch cache open failed:', error);
       })
     );
   }

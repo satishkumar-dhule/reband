@@ -240,13 +240,57 @@ function preprocessMarkdown(text: string): string {
 export default function ReviewSessionGenZ() {
   const [, setLocation] = useLocation();
   const { onSRSReview } = useCredits();
+  const [isLoading, setIsLoading] = useState(true);
   const [cards] = useState(mockReviewCards);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
   const [streak, setStreak] = useState(0);
 
+  // Simulate initial data load for smoother UX
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
   const currentCard = cards[currentIndex];
+  
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="max-w-3xl mx-auto px-4 py-8">
+          <div className="space-y-6">
+            {/* Header skeleton */}
+            <div className="flex items-center justify-between">
+              <div className="h-6 w-32 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
+              <div className="flex gap-4">
+                <div className="h-5 w-16 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
+                <div className="h-5 w-16 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
+              </div>
+            </div>
+            
+            {/* Progress bar skeleton */}
+            <div className="h-2 w-full bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
+            
+            {/* Card skeleton */}
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-6 md:p-8 space-y-4">
+              <div className="flex gap-2">
+                <div className="h-5 w-20 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
+                <div className="h-5 w-24 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
+              </div>
+              <div className="h-32 flex items-center justify-center">
+                <div className="h-8 w-3/4 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
+              </div>
+              <div className="flex justify-center py-4">
+                <div className="h-12 w-40 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
   const progress = (reviewedCount / cards.length) * 100;
 
   const handleConfidence = (level: string) => {

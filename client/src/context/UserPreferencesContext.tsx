@@ -19,6 +19,7 @@ const defaultPreferences: UserPreferences = {
 
 interface UserPreferencesContextType {
   preferences: UserPreferences;
+  isInitialized: boolean;
   setRole: (roleId: string) => void;
   subscribeChannel: (channelId: string) => void;
   unsubscribeChannel: (channelId: string) => void;
@@ -47,6 +48,13 @@ function isCrawler(): boolean {
 }
 
 export function UserPreferencesProvider({ children }: { children: ReactNode }) {
+  // Sync initialization - preferences are loaded synchronously from localStorage or defaults
+  // No need for setTimeout which blocks navigation
+  const [isInitialized] = useState(() => {
+    if (typeof window === 'undefined') return false; // SSR
+    return true; // Preferences loaded synchronously - no blocking needed
+  });
+  
   const [preferences, setPreferences] = useState<UserPreferences>(() => {
     if (typeof window === 'undefined') return defaultPreferences;
     
@@ -59,33 +67,35 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
       };
     }
     
+    // Load from localStorage first - this is the primary source of truth
     return PreferencesStorage.get();
   });
 
   // Save to localStorage whenever preferences change (skip for crawlers)
   useEffect(() => {
-    if (!isCrawler()) {
+    if (!isCrawler() && isInitialized) {
       PreferencesStorage.set(preferences);
     }
-  }, [preferences]);
+  }, [preferences, isInitialized]);
 
 
   const setRole = useCallback((roleId: string) => {
-    const recommended = getRecommendedChannels(roleId);
-    const recommendedIds = recommended.map(c => c.id);
-    
-    const newPrefs: UserPreferences = {
-      role: roleId,
-      subscribedChannels: recommendedIds,
-      onboardingComplete: true,
-      createdAt: new Date().toISOString()
-    };
-    
-    // Save to localStorage immediately
-    PreferencesStorage.set(newPrefs);
-    
-    // Update state
-    setPreferences(newPrefs);
+    setPreferences(prev => {
+      const recommended = getRecommendedChannels(roleId);
+      const recommendedIds = recommended.map(c => c.id);
+      
+      const newPrefs: UserPreferences = {
+        ...prev,
+        role: roleId,
+        subscribedChannels: recommendedIds,
+        onboardingComplete: true,
+        createdAt: new Date().toISOString()
+      };
+      
+      // Save to localStorage immediately
+      PreferencesStorage.set(newPrefs);
+      return newPrefs;
+    });
   }, []);
 
   const subscribeChannel = useCallback((channelId: string) => {
@@ -136,11 +146,15 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const skipOnboarding = useCallback(() => {
-    setPreferences(prev => ({
-      ...prev,
-      subscribedChannels: DEFAULTS.SUBSCRIBED_CHANNELS as unknown as string[],
-      onboardingComplete: true
-    }));
+    setPreferences(prev => {
+      const newPrefs: UserPreferences = {
+        ...prev,
+        subscribedChannels: DEFAULTS.SUBSCRIBED_CHANNELS as unknown as string[],
+        onboardingComplete: true
+      };
+      PreferencesStorage.set(newPrefs);
+      return newPrefs;
+    });
   }, []);
 
   const toggleShuffleQuestions = useCallback(() => {
@@ -206,6 +220,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(() => ({
     preferences,
+    isInitialized,
     setRole,
     subscribeChannel,
     unsubscribeChannel,
@@ -224,9 +239,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
     toggleHideCertifications
   }), [
     preferences,
-    preferences.onboardingComplete,
-    preferences.subscribedChannels,
-    preferences.subscribedCertifications,
+    isInitialized,
     setRole,
     subscribeChannel,
     unsubscribeChannel,
@@ -240,8 +253,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
     resetPreferences,
     skipOnboarding,
     toggleShuffleQuestions,
-    togglePrioritizeUnvisited,
-    toggleHideCertifications
+    togglePrioritizeUnvisited
   ]);
 
   return (

@@ -650,10 +650,21 @@ export function saveSessionState(state: SessionState): void {
   }
 }
 
+const SESSION_EXPIRY_HOURS = 24;
+
 export function loadSessionState(): SessionState | null {
   try {
     const saved = localStorage.getItem(SESSION_STATE_KEY);
-    return saved ? JSON.parse(saved) : null;
+    if (!saved) return null;
+    const parsed = JSON.parse(saved);
+    if (parsed.lastAccessedAt) {
+      const ageHours = (Date.now() - new Date(parsed.lastAccessedAt).getTime()) / (1000 * 60 * 60);
+      if (ageHours > SESSION_EXPIRY_HOURS) {
+        clearSessionState();
+        return null;
+      }
+    }
+    return parsed;
   } catch (e) {
     console.error('Failed to load session state:', e);
     return null;
@@ -671,11 +682,26 @@ export function clearSessionState(): void {
 export function saveSessionToHistory(result: SessionResult): void {
   try {
     const history = getSessionHistory();
+    const exists = history.some(h => h.sessionId === result.sessionId);
+    if (exists) return;
     history.unshift(result);
-    localStorage.setItem(SESSION_HISTORY_KEY, JSON.stringify(history.slice(0, 20)));
+    const trimmed = history.slice(0, 20);
+    localStorage.setItem(SESSION_HISTORY_KEY, JSON.stringify(trimmed));
   } catch (e) {
     console.error('Failed to save session to history:', e);
   }
+}
+
+export function clearSessionHistory(): void {
+  try {
+    localStorage.removeItem(SESSION_HISTORY_KEY);
+  } catch (e) {
+    console.error('Failed to clear session history:', e);
+  }
+}
+
+export function getHistoryCount(): number {
+  return getSessionHistory().length;
 }
 
 export function getSessionHistory(): SessionResult[] {

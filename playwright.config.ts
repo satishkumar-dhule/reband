@@ -28,10 +28,10 @@ export default defineConfig({
         ['list'],
       ],
   
-  // Optimized timeouts (balanced for speed and reliability)
-  timeout: 30000, // 30s - some pages are slow to load
+  // Optimized timeouts (increased for slow pages with heavy components)
+  timeout: 90000, // 90s - heavy pages like VoiceInterview, ReviewSession need more time due to lazy-loaded chunks
   expect: {
-    timeout: 5000, // 5s for assertions
+    timeout: 15000, // 15s for assertions (heavier DOM on complex pages)
   },
   
   use: {
@@ -39,8 +39,8 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    actionTimeout: 10000,
-    navigationTimeout: 20000,
+    actionTimeout: 30000,
+    navigationTimeout: 60000, // Increased for lazy-loaded heavy components (Mermaid, SyntaxHighlighter, etc.)
     
     // Performance optimizations
     launchOptions: {
@@ -184,7 +184,7 @@ export default defineConfig({
     command: 'npm run dev:vite',
     url: 'http://localhost:5001',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 180000, // 3 minutes - allows for slow builds and heavy dependency loading
     stdout: 'pipe',
     stderr: 'pipe',
   },

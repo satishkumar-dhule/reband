@@ -10,7 +10,7 @@ import { SEOHead } from '../components/SEOHead';
 import { getAllQuestionsAsync } from '../lib/questions-loader';
 import { useCredits } from '../context/CreditsContext';
 import { useAchievementContext } from '../context/AchievementContext';
-import { useUserPreferences } from '../hooks/use-user-preferences';
+import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import { CreditsDisplay } from '../components/CreditsDisplay';
 import { AppLayout } from '../components/layout/AppLayout';
@@ -140,12 +140,28 @@ export default function VoiceSessionGenZ() {
       if (err === 'not-allowed') {
         setError('Microphone access denied.');
         setPageState('editing');
+      } else if (err === 'no-speech') {
+        setError('No speech detected. Please try again.');
+        setPageState('editing');
+      } else if (err === 'audio-capture') {
+        setError('Microphone not found. Please check your audio devices.');
+        setPageState('editing');
+      } else if (err === 'network') {
+        setError('Network error. Please check your internet connection.');
+        setPageState('editing');
+      } else if (err === 'aborted') {
+        // User intentionally stopped - no need to show error
+        setPageState('editing');
+      } else {
+        setError(`Speech recognition error: ${err}`);
+        setPageState('editing');
       }
     }
   });
 
   useEffect(() => {
     async function loadData() {
+      setPageState('loading');
       try {
         const questions = await getAllQuestionsAsync();
         setAllQuestions(questions);
@@ -191,6 +207,10 @@ export default function VoiceSessionGenZ() {
   }, [pageState]);
 
   const startNewSession = useCallback((session: VoiceSession) => {
+    if (allQuestions.length === 0) {
+      setError('Questions not loaded yet. Please wait or refresh.');
+      return;
+    }
     const sessionQuestions = buildSessionQuestions(session, allQuestions);
     if (sessionQuestions.length < 3) {
       setError('Not enough questions available for this session');

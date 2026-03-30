@@ -3,16 +3,18 @@
  * Provides professional syntax highlighting, auto-completion, and code editing
  */
 
-import { useRef, useCallback } from 'react';
-import Editor, { OnMount, OnChange, loader, Monaco } from '@monaco-editor/react';
+import { useRef, useCallback, useState, useEffect } from 'react';
+import Editor, { OnMount, OnChange } from '@monaco-editor/react';
 import { useTheme } from '../context/ThemeContext';
 
 // Light themes list for theme detection - only premium-dark now
 const lightThemes: string[] = [];
 
-// Define custom VS Code Dark+ inspired theme
-loader.init().then((monaco) => {
-  monaco.editor.defineTheme('vscode-dark-plus', {
+// Lazy load Monaco and define custom theme only when editor mounts
+const initMonacoTheme = async () => {
+  const monaco = await import('@monaco-editor/react');
+  const m = await monaco.loader.init();
+  m.editor.defineTheme('vscode-dark-plus', {
     base: 'vs-dark',
     inherit: true,
     rules: [
@@ -50,7 +52,8 @@ loader.init().then((monaco) => {
       'editorBracketMatch.border': '#00FF88',
     },
   });
-});
+  return m;
+};
 
 interface CodeEditorProps {
   value: string;
@@ -71,6 +74,12 @@ export function CodeEditor({
   const { theme } = useTheme();
   const editorRef = useRef<unknown>(null);
   const isDark = !lightThemes.includes(theme);
+  const [themeReady, setThemeReady] = useState(false);
+
+  useEffect(() => {
+    // Lazy load Monaco and define custom theme only when component mounts
+    initMonacoTheme().then(() => setThemeReady(true));
+  }, []);
 
   const handleEditorDidMount: OnMount = useCallback((editor) => {
     editorRef.current = editor;
@@ -93,7 +102,7 @@ export function CodeEditor({
         value={value}
         onChange={handleChange}
         onMount={handleEditorDidMount}
-        theme={isDark ? 'vscode-dark-plus' : 'light'}
+        theme={isDark && themeReady ? 'vscode-dark-plus' : 'light'}
         options={{
           readOnly,
           minimap: { enabled: true, scale: 1, showSlider: 'mouseover' },

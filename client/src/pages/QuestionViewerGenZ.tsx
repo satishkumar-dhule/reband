@@ -107,7 +107,16 @@ export default function QuestionViewerGenZ() {
     
     if (targetQuestionId) {
       const foundIndex = questions.findIndex(q => q.id === targetQuestionId);
-      if (foundIndex >= 0 && foundIndex !== currentIndex) {
+      if (foundIndex === -1) {
+        // Question not found - show error and redirect to first question
+        toast({
+          title: "Question not found",
+          description: "The requested question could not be found in this channel",
+        });
+        if (questions[0]) {
+          setLocation(`/channel/${channelId}/${questions[0].id}`, { replace: true });
+        }
+      } else if (foundIndex !== currentIndex) {
         setCurrentIndex(foundIndex);
       }
       if (questionIdFromSearch) {
@@ -265,7 +274,7 @@ export default function QuestionViewerGenZ() {
     });
   };
 
-  if (loading && !currentQuestion) {
+  if (loading) {
     return (
       <AppLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -283,6 +292,23 @@ export default function QuestionViewerGenZ() {
           <div className="bg-[var(--gh-danger-subtle)] border border-[var(--gh-danger-fg)]/20 text-[var(--gh-danger-fg)] p-6 rounded-md mb-6">
             <h2 className="text-lg font-semibold mb-2">Error loading channel</h2>
             <p>{error?.message || "Channel not found"}</p>
+          </div>
+          <Link href="/channels">
+            <Button variant="secondary" size="sm">Back to Topics</Button>
+          </Link>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Check for empty questions array (channel has no questions)
+  if (questions.length === 0) {
+    return (
+      <AppLayout>
+        <div className="max-w-4xl mx-auto px-4 py-12 text-center">
+          <div className="bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] p-6 rounded-md mb-6">
+            <h2 className="text-lg font-semibold mb-2 text-[var(--gh-fg)]">No questions in this channel</h2>
+            <p className="text-[var(--gh-fg-muted)]">This channel doesn't have any questions yet. Check back later or try a different topic.</p>
           </div>
           <Link href="/channels">
             <Button variant="secondary" size="sm">Back to Topics</Button>

@@ -85,7 +85,7 @@ export default function BadgesGenZ() {
                 Achievements
               </h1>
               <p className="text-[var(--gh-fg-muted)]">
-                You've earned {stats.unlocked} of {stats.total} total badges. Keep it up!
+                You've earned {stats?.unlocked ?? 0} of {stats?.total ?? 0} total badges. Keep it up!
               </p>
             </div>
 
@@ -93,22 +93,22 @@ export default function BadgesGenZ() {
             <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-6 mb-8">
               <div className="flex items-center justify-between gap-4 mb-2">
                 <span className="text-sm font-medium text-[var(--gh-fg)]">Overall Progress</span>
-                <span className="text-sm font-bold text-[var(--gh-fg)]">{stats.percentage}%</span>
+                <span className="text-sm font-bold text-[var(--gh-fg)]">{stats?.percentage ?? 0}%</span>
               </div>
               <div className="gh-progress mb-4">
                 <div 
                   className="gh-progress-bar" 
-                  style={{ width: `${stats.percentage}%` }}
+                  style={{ width: `${stats?.percentage ?? 0}%` }}
                 />
               </div>
               <div className="flex gap-4 text-sm">
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-[var(--gh-success-emphasis)]" />
-                  <span className="text-[var(--gh-fg-muted)]">{stats.unlocked} Earned</span>
+                  <span className="text-[var(--gh-fg-muted)]">{stats?.unlocked ?? 0} Earned</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-[var(--gh-border)]" />
-                  <span className="text-[var(--gh-fg-muted)]">{stats.locked} Locked</span>
+                  <span className="text-[var(--gh-fg-muted)]">{stats?.locked ?? 0} Locked</span>
                 </div>
               </div>
             </div>

@@ -41,7 +41,13 @@ export default function StatsGenZ() {
     const modProgress = channels.map(ch => {
       const questions = getQuestions(ch.id);
       const stored = localStorage.getItem(`progress-${ch.id}`);
-      const completedIds = stored ? new Set(JSON.parse(stored)) : new Set();
+      let completedIdsArray = [];
+      try {
+        completedIdsArray = stored ? JSON.parse(stored) : [];
+      } catch {
+        completedIdsArray = [];
+      }
+      const completedIds = new Set(completedIdsArray);
 
       Array.from(completedIds).forEach((id) => allCompletedIds.add(id as string));
 

@@ -17,7 +17,7 @@ import { SEOHead } from '../components/SEOHead';
 import { getAllQuestionsAsync } from '../lib/questions-loader';
 import { useCredits } from '../context/CreditsContext';
 import { useAchievementContext } from '../context/AchievementContext';
-import { useUserPreferences } from '../hooks/use-user-preferences';
+import { useUserPreferences } from '../context/UserPreferencesContext';
 import { CreditsDisplay } from '../components/CreditsDisplay';
 import { ListenButton } from '../components/ListenButton';
 import { evaluateVoiceAnswer, type EvaluationResult } from '../lib/voice-evaluation';

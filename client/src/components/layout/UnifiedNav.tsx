@@ -36,7 +36,7 @@ import { useCredits } from '../../context/CreditsContext';
 import { useSidebar } from '../../context/SidebarContext';
 import { useUserPreferences } from '../../context/UserPreferencesContext';
 import { cn } from '../../lib/utils';
-import { useState } from 'react';
+import { useState, useMemo, memo, useCallback } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 interface NavItem {
@@ -169,7 +169,7 @@ export function MobileBottomNav() {
             exit={{ opacity: 0, y: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className="fixed inset-x-0 bottom-0 z-50 glass-card border-t border-border rounded-t-[32px] shadow-2xl overflow-hidden lg:hidden max-h-[80vh] flex flex-col"
-            style={{ background: 'hsl(0 0% 6% / 0.95)' }}
+            style={{ background: 'var(--gh-canvas-overlay)' }}
           >
             {/* Drag Handle */}
             <div className="flex justify-center pt-3 pb-2">
@@ -192,7 +192,7 @@ export function MobileBottomNav() {
                 <button
                   onClick={() => setShowMenu(null)}
                   aria-label="Close submenu"
-                  className="w-10 h-10 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
+                  className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors touch-manipulation"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
@@ -218,11 +218,14 @@ export function MobileBottomNav() {
                     }}
                     className={cn(
                       "w-full flex items-center gap-4 p-4 rounded-[20px] transition-all relative overflow-hidden min-h-[56px] touch-manipulation",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                       isActive 
                         ? "bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30" 
                         : "bg-muted/50 hover:bg-muted border-2 border-transparent",
                       isVoice && !isActive && "bg-gradient-to-br from-primary/10 to-primary/5 border-primary/10"
                     )}
+                    type="button"
+                    aria-current={isActive ? 'page' : undefined}
                   >
                     {/* Icon - Glow effect for active state */}
                     <div className={cn(
@@ -282,10 +285,23 @@ export function MobileBottomNav() {
       {/* Bottom Navigation Bar - Premium Glassmorphism */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden pb-safe">
         <div className="glass-card border-t border-border shadow-2xl" style={{ 
-          background: 'hsl(0 0% 6% / 0.95)',
+background: 'var(--gh-canvas-overlay)',
           backdropFilter: 'blur(24px) saturate(200%)',
           WebkitBackdropFilter: 'blur(24px) saturate(200%)'
         }}>
+          {/* Active Indicator - Simple CSS transition instead of layoutId */}
+          <div 
+            className="h-1 rounded-full transition-all duration-200 ease-out"
+style={{ 
+               background: 'var(--gh-success-fg)',
+               boxShadow: '0 0 20px var(--gh-success-fg)',
+               width: 'calc(100% / 5 - 16px)',
+               marginLeft: `calc(${(mainNavItems.findIndex(i => activeSection === i.id) || 0)} * (100% / 5))`,
+               transform: `translateX(${((mainNavItems.findIndex(i => activeSection === i.id) || 0) - 1) * 4}px)`,
+               maxWidth: '48px',
+               marginRight: 'auto'
+             }}
+          />
           <div className="flex items-center justify-around h-16 px-2 max-w-md mx-auto">
             {mainNavItems.map((item) => {
               const isActive = activeSection === item.id;
@@ -298,24 +314,24 @@ export function MobileBottomNav() {
                   key={item.id}
                   onClick={() => handleNavClick(item)}
                   className={cn(
-                    "relative flex flex-col items-center justify-center flex-1 h-full transition-all",
+                    "relative flex flex-col items-center justify-center flex-1 h-full transition-all touch-manipulation",
                     isActive || isMenuOpen ? "text-primary" : "text-muted-foreground"
                   )}
                   aria-label={item.label}
+                  type="button"
                 >
-                  {/* Active Indicator - Neon Green Glow */}
-                  {(isActive || isMenuOpen) && (
-                    <motion.div
-                      layoutId="mobile-nav-indicator"
-                      className="absolute top-0 w-12 h-1 rounded-full"
-                      style={{ 
-                        background: 'hsl(150 100% 50%)',
-                        boxShadow: '0 0 20px hsl(150 100% 50% / 0.5)'
-                      }}
-                      transition={{ type: "spring", bounce: 0.3, duration: 0.5 }}
-                    />
-                  )}
-                  
+                  {/* Active Indicator - CSS-only transition */}
+                  <div
+                    className={cn(
+                      "absolute top-0 w-12 h-1 rounded-full transition-opacity duration-200",
+                      (isActive || isMenuOpen) ? "opacity-100" : "opacity-0"
+                    )}
+                    style={{ 
+                      background: 'var(--gh-success-fg)',
+                      boxShadow: '0 0 20px var(--gh-success-fg)'
+                    }}
+                  />
+                   
                   {/* Icon Container */}
                   <motion.div
                     whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
@@ -352,6 +368,130 @@ export function MobileBottomNav() {
 
 
 // ============================================
+// NAV ITEM COMPONENT - Memoized for performance
+// ============================================
+
+interface NavItemProps {
+  item: NavItem;
+  isActive: boolean;
+  isCollapsed: boolean;
+}
+
+const NavItemComponent = memo(function NavItem({ item, isActive, isCollapsed }: NavItemProps) {
+  const [, setLocation] = useLocation();
+  const Icon = item.icon;
+  const isVoice = item.id === 'voice';
+  
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setLocation(item.path);
+    }
+  }, [item.path, setLocation]);
+
+  const handleClick = useCallback(() => {
+    setLocation(item.path);
+  }, [item.path, setLocation]);
+  
+  const button = (
+    <button
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      aria-current={isActive ? 'page' : undefined}
+      className={cn(
+        "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-out group overflow-hidden",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
+        isCollapsed && "justify-center px-2",
+        isActive 
+          ? "text-primary" 
+          : "text-muted-foreground hover:text-foreground"
+      )}
+      style={isActive ? {
+        background: 'hsl(150 100% 50% / 0.1)',
+        border: '1px solid hsl(150 100% 50% / 0.15)'
+      } : {
+        background: 'transparent'
+      }}
+    >
+      <div className={cn(
+        "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-all duration-200 ease-out",
+        isActive 
+          ? "text-primary-foreground" 
+          : isVoice
+            ? "text-primary"
+            : "text-muted-foreground group-hover:text-foreground",
+        !isActive && !isVoice && "group-hover:bg-muted/50"
+      )}
+      style={isActive ? {
+        background: 'hsl(150 100% 50%)',
+        boxShadow: '0 0 12px hsl(150 100% 50% / 0.3)'
+      } : isVoice ? {
+        background: 'hsl(150 100% 50% / 0.15)'
+      } : {
+        background: 'transparent'
+      }}>
+        <Icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
+      </div>
+      
+      {(!isCollapsed) && (
+        <>
+          <span className="text-sm font-medium flex-1 text-left">
+            {item.label}
+          </span>
+          {item.badge && (
+            <span className={cn(
+              "text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0",
+              item.badge === 'NEW' 
+                ? "bg-emerald-500/20 text-emerald-400"
+                : "bg-amber-500/20 text-amber-400"
+            )}>
+              {item.badge}
+            </span>
+          )}
+        </>
+      )}
+    </button>
+  );
+  
+  // Use Radix Tooltip when collapsed for keyboard accessibility and collision detection
+  if (isCollapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          {button}
+        </TooltipTrigger>
+        <TooltipContent 
+          side="right" 
+          align="center"
+          className="gap-1.5 flex items-center"
+          style={{ 
+            background: 'hsl(0 0% 8% / 0.95)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            border: '1px solid hsl(0 0% 15%)'
+          }}
+        >
+          <span className="text-sm font-medium">{item.label}</span>
+          {item.badge && (
+            <span className={cn(
+              "text-[10px] px-1.5 py-0.5 rounded font-medium",
+              item.badge === 'NEW' 
+                ? "bg-emerald-500/20 text-emerald-400"
+                : "bg-amber-500/20 text-amber-400"
+            )}>
+              {item.badge}
+            </span>
+          )}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+  
+  return <div className="relative">{button}</div>;
+});
+
+// ============================================
 // DESKTOP SIDEBAR - Collapsible Premium Design
 // ============================================
 
@@ -374,114 +514,11 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
     ? learnSubNav.filter(item => item.id !== 'certifications')
     : learnSubNav;
 
-  const NavItem = ({ item, showLabel = true }: { item: NavItem; showLabel?: boolean }) => {
-    const Icon = item.icon;
-    const active = isActive(item.path);
-    const isVoice = item.id === 'voice';
-    
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        setLocation(item.path);
-      }
-    };
-    
-    const button = (
-      <button
-        onClick={() => setLocation(item.path)}
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
-        aria-current={active ? 'page' : undefined}
-        className={cn(
-          "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-out group overflow-hidden",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
-          isCollapsed && "justify-center px-2",
-          active 
-            ? "text-primary" 
-            : "text-muted-foreground hover:text-foreground"
-        )}
-        style={active ? {
-          background: 'hsl(150 100% 50% / 0.1)',
-          border: '1px solid hsl(150 100% 50% / 0.15)'
-        } : {
-          background: 'transparent'
-        }}
-      >
-        <div className={cn(
-          "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 transition-all duration-200 ease-out",
-          active 
-            ? "text-primary-foreground" 
-            : isVoice
-              ? "text-primary"
-              : "text-muted-foreground group-hover:text-foreground",
-          !active && !isVoice && "group-hover:bg-muted/50"
-        )}
-        style={active ? {
-          background: 'hsl(150 100% 50%)',
-          boxShadow: '0 0 12px hsl(150 100% 50% / 0.3)'
-        } : isVoice ? {
-          background: 'hsl(150 100% 50% / 0.15)'
-        } : {
-          background: 'transparent'
-        }}>
-          <Icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
-        </div>
-        
-        {showLabel && !isCollapsed && (
-          <span className="text-sm font-medium flex-1 text-left">
-            {item.label}
-          </span>
-        )}
-        
-        {showLabel && !isCollapsed && item.badge && (
-          <span className={cn(
-            "text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0",
-            item.badge === 'NEW' 
-              ? "bg-emerald-500/20 text-emerald-400"
-              : "bg-amber-500/20 text-amber-400"
-          )}>
-            {item.badge}
-          </span>
-        )}
-      </button>
-    );
-    
-    // Use Radix Tooltip when collapsed for keyboard accessibility and collision detection
-    if (isCollapsed) {
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            {button}
-          </TooltipTrigger>
-          <TooltipContent 
-            side="right" 
-            align="center"
-            className="gap-1.5 flex items-center"
-            style={{ 
-              background: 'hsl(0 0% 8% / 0.95)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              border: '1px solid hsl(0 0% 15%)'
-            }}
-          >
-            <span className="text-sm font-medium">{item.label}</span>
-            {item.badge && (
-              <span className={cn(
-                "text-[10px] px-1.5 py-0.5 rounded font-medium",
-                item.badge === 'NEW' 
-                  ? "bg-emerald-500/20 text-emerald-400"
-                  : "bg-amber-500/20 text-amber-400"
-              )}>
-                {item.badge}
-              </span>
-            )}
-          </TooltipContent>
-        </Tooltip>
-      );
-    }
-    
-    return <div className="relative">{button}</div>;
-  };
+  // Memoize active state check to avoid recalculation on every render
+  const getIsActive = useCallback((path: string) => 
+    location === path || location.startsWith(path.replace(/\/$/, '') + '/'),
+    [location]
+  );
 
   const SectionHeader = ({ icon: Icon, label }: { icon: React.ElementType; label: string }) => {
     if (isCollapsed) return <div className="h-px my-3 mx-2" style={{ background: 'hsl(0 0% 15% / 0.5)' }} />;
@@ -596,19 +633,19 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
         isCollapsed && "px-1"
       )}>
         {/* Home */}
-        <NavItem item={{ id: 'home', label: 'Home', icon: Home, path: '/' }} />
+        <NavItemComponent item={{ id: 'home', label: 'Home', icon: Home, path: '/' }} isActive={getIsActive('/')} isCollapsed={isCollapsed} />
         
         {/* Learn Section */}
         <SectionHeader icon={GraduationCap} label="Learn" />
-        {filteredLearnSubNav.map(item => <NavItem key={item.id} item={item} />)}
+        {filteredLearnSubNav.map(item => <NavItemComponent key={item.id} item={item} isActive={getIsActive(item.path)} isCollapsed={isCollapsed} />)}
         
         {/* Practice Section */}
         <SectionHeader icon={Mic} label="Practice" />
-        {practiceSubNav.map(item => <NavItem key={item.id} item={item} />)}
+        {practiceSubNav.map(item => <NavItemComponent key={item.id} item={item} isActive={getIsActive(item.path)} isCollapsed={isCollapsed} />)}
         
         {/* Progress Section */}
         <SectionHeader icon={BarChart3} label="Progress" />
-        {progressSubNav.map(item => <NavItem key={item.id} item={item} />)}
+        {progressSubNav.map(item => <NavItemComponent key={item.id} item={item} isActive={getIsActive(item.path)} isCollapsed={isCollapsed} />)}
       </nav>
 
       {/* Credits Footer */}
@@ -672,11 +709,12 @@ export function UnifiedMobileHeader({ title, showBack, onSearchClick }: UnifiedM
             <button
               onClick={() => window.history.back()}
               aria-label="Go back"
-              className="w-9 h-9 flex items-center justify-center rounded-[12px] transition-colors"
+              className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-[12px] transition-colors touch-manipulation"
               style={{
                 background: 'hsl(0 0% 10% / 0.5)',
                 border: '1px solid hsl(0 0% 12%)'
               }}
+              type="button"
             >
               <ChevronLeft className="w-5 h-5 text-foreground" strokeWidth={2} />
             </button>
@@ -709,11 +747,12 @@ export function UnifiedMobileHeader({ title, showBack, onSearchClick }: UnifiedM
           <button
             onClick={() => setLocation('/profile')}
             aria-label="View credits"
-            className="flex items-center gap-1 px-2 py-1.5 rounded-[10px] transition-colors"
-            style={{
-              background: 'hsl(45 100% 50% / 0.15)',
-              border: '1px solid hsl(45 100% 50% / 0.25)'
-            }}
+            className="flex items-center gap-1 px-2 py-1.5 rounded-[10px] transition-colors min-h-[36px] touch-manipulation"
+style={{
+               background: 'var(--gh-attention-emphasis) / 0.15',
+               border: '1px solid hsl(45 100% 50% / 0.25)'
+             }}
+            type="button"
           >
             <Coins className="w-3.5 h-3.5" strokeWidth={2.5} style={{ color: 'hsl(45 100% 60%)' }} />
             <span className="text-xs font-bold" style={{ color: 'hsl(45 100% 60%)' }}>{formatCredits(balance)}</span>
@@ -723,11 +762,12 @@ export function UnifiedMobileHeader({ title, showBack, onSearchClick }: UnifiedM
           <button
             onClick={onSearchClick}
             aria-label="Search"
-            className="w-9 h-9 flex items-center justify-center rounded-[12px] transition-colors"
+            className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-[12px] transition-colors touch-manipulation"
             style={{
               background: 'hsl(0 0% 10% / 0.5)',
               border: '1px solid hsl(0 0% 12%)'
             }}
+            type="button"
           >
             <Search className="w-4 h-4 text-foreground" strokeWidth={2} />
           </button>

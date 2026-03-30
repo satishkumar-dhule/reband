@@ -1,17 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
-import { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Mic, Code, RotateCcw, BookOpen, ChevronRight,
   Flame, CheckCircle2, Layers, TrendingUp,
   Clock, BookMarked, Activity, Brain, Award,
-  Circle, Star, GitFork, AlertCircle
+  Circle, Star, GitFork, AlertCircle, Coins
 } from "lucide-react";
 import { AppLayout } from "../components/layout/AppLayout";
 import { SEOHead } from "@/components/SEOHead";
 import { allChannelsConfig } from "../lib/channels-config";
 import { cn } from "../lib/utils";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "../components/ui/breadcrumb";
+import { useCredits } from "../context/CreditsContext";
 
 interface ApiChannel {
   id: string;
@@ -31,6 +32,10 @@ function useApiChannels() {
         const response = await fetch(`${basePath}data/channels.json`);
         if (!response.ok) throw new Error(`Failed to fetch channels: ${response.status}`);
         const data = await response.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          setError('No channels available');
+          return;
+        }
         setChannels(data);
       } catch (err) {
         // Fallback: try API endpoint in dev mode
@@ -139,7 +144,7 @@ function ContributionGrid() {
   );
 }
 
-function ChannelCard({ channelId, questionCount }: { channelId: string; questionCount: number }) {
+const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }: { channelId: string; questionCount: number }) {
   const [, setLocation] = useLocation();
   const config = allChannelsConfig.find((c) => c.id === channelId);
   if (!config) return null;
@@ -200,7 +205,7 @@ function ChannelCard({ channelId, questionCount }: { channelId: string; question
       </div>
     </button>
   );
-}
+});
 
 function StatBadge({ icon: Icon, label, value, color }: {
   icon: any; label: string; value: string | number; color: string;
@@ -217,24 +222,32 @@ function StatBadge({ icon: Icon, label, value, color }: {
 export default function Home() {
   const [, setLocation] = useLocation();
   const { data: apiChannels = [], isLoading, error } = useApiChannels();
+  const { balance } = useCredits();
 
-  const channelMap = Object.fromEntries(
-    apiChannels.map((c: ApiChannel) => [c.id, c.questionCount])
+  const channelMap = useMemo(() => 
+    Object.fromEntries(apiChannels.map((c: ApiChannel) => [c.id, c.questionCount])),
+    [apiChannels]
   );
 
-  const totalQuestions = apiChannels.reduce(
-    (s: number, c: ApiChannel) => s + c.questionCount, 0
+  const totalQuestions = useMemo(() => 
+    apiChannels.reduce((s: number, c: ApiChannel) => s + c.questionCount, 0),
+    [apiChannels]
   );
-  const totalCompleted = allChannelsConfig.reduce((s, c) => {
-    const total = channelMap[c.id] ?? 0;
-    return s + getProgress(c.id, total).completed;
-  }, 0);
 
-  const overallProgress = totalQuestions > 0
-    ? Math.round((totalCompleted / totalQuestions) * 100)
-    : 0;
+  const totalCompleted = useMemo(() => 
+    allChannelsConfig.reduce((s, c) => {
+      const total = channelMap[c.id] ?? 0;
+      return s + getProgress(c.id, total).completed;
+    }, 0),
+    [allChannelsConfig, channelMap]
+  );
 
-  const streak = (() => {
+  const overallProgress = useMemo(() => 
+    totalQuestions > 0 ? Math.round((totalCompleted / totalQuestions) * 100) : 0,
+    [totalQuestions, totalCompleted]
+  );
+
+  const streak = useMemo(() => {
     let currentStreak = 0;
     try {
       const statsStr = localStorage.getItem("daily-stats");
@@ -248,9 +261,9 @@ export default function Home() {
       }
     } catch {}
     return currentStreak;
-  })();
+  }, []);
 
-  const pinnedChannels = apiChannels.slice(0, 6);
+  const pinnedChannels = apiChannels.slice(0, Math.min(6, apiChannels.length));
   const today = new Intl.DateTimeFormat(undefined, {
     weekday: "long",
     month: "long",
@@ -363,6 +376,24 @@ export default function Home() {
 
             {/* ── Right sidebar ── */}
             <div className="hidden lg:block w-72 shrink-0 space-y-6">
+
+              {/* Credits card */}
+              <section className="gh-card p-4">
+                <div className="flex items-center gap-2">
+                  <Coins className="w-4 h-4 text-[var(--gh-attention-fg)]" />
+                  <h2 className="text-sm font-semibold text-[var(--gh-fg)]">Credits</h2>
+                </div>
+                <div className="mt-3 text-center">
+                  <p className="text-2xl font-bold text-[var(--gh-fg)]">{balance.toLocaleString()}</p>
+                  <p className="text-xs text-[var(--gh-fg-muted)]">Available credits</p>
+                </div>
+                <Link 
+                  href="/profile" 
+                  className="block mt-3 text-xs text-center text-[var(--gh-accent-fg)] hover:underline"
+                >
+                  View credits & redeem coupons →
+                </Link>
+              </section>
 
               {/* Stats card */}
               <section className="gh-card p-4">
