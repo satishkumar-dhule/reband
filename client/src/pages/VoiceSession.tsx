@@ -61,7 +61,7 @@ export default function VoiceSession() {
   const [error, setError] = useState<string | null>(null);
   const [practiceTranscript, setPracticeTranscript] = useState('');
   
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const { onVoiceInterview } = useCredits();
   const { trackEvent } = useAchievementContext();
@@ -195,7 +195,7 @@ export default function VoiceSession() {
       
       const verdict = result.overallScore >= 60 ? 'hire' : 'no-hire';
       onVoiceInterview(verdict);
-      trackEvent({ type: 'voice_interview_completed', timestamp: new Date().toISOString() });
+      trackEvent('voice_interview_completed');
       setPageState('results');
     } else {
       const updated = nextQuestion(sessionState);

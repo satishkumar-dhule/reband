@@ -33,23 +33,26 @@ export function FloatingButton({
   useEffect(() => {
     if (!hideOnScroll) return;
 
-    // Use RAF throttle for smooth 60fps performance
+    let lastScrollY = window.scrollY;
+
     const handleScroll = rafThrottle(() => {
       const currentScrollY = window.scrollY;
       
-      // Hide when scrolling down, show when scrolling up
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         setIsVisible(false);
       } else {
         setIsVisible(true);
       }
       
-      setLastScrollY(currentScrollY);
+      lastScrollY = currentScrollY;
     });
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, hideOnScroll]);
+    return () => {
+      handleScroll.cancel();
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [hideOnScroll]);
 
   const positionClasses = {
     'bottom-right': 'bottom-[5.5rem] pb-safe right-4 md:bottom-6 md:right-6',

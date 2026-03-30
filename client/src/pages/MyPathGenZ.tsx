@@ -159,7 +159,7 @@ export default function MyPathGenZ() {
   useEffect(() => {
     async function loadCerts() {
       try {
-        const basePath = import.meta.env.BASE_URL || '/';
+        const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
         const response = await fetch(`${basePath}data/certifications.json`);
         if (response.ok) {
           const data = await response.json();

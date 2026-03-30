@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 interface ProgressEntry {
   questionId: string;
@@ -14,19 +14,31 @@ export function useProgress(channelId: string, validQuestionIds?: string[]) {
     // Load simple completed list
     const savedCompleted = localStorage.getItem(`progress-${channelId}`);
     if (savedCompleted) {
-      setCompleted(JSON.parse(savedCompleted));
+      try {
+        setCompleted(JSON.parse(savedCompleted));
+      } catch {
+        setCompleted([]);
+      }
     }
 
     // Load detailed history
     const savedHistory = localStorage.getItem(`history-${channelId}`);
     if (savedHistory) {
-      setHistory(JSON.parse(savedHistory));
+      try {
+        setHistory(JSON.parse(savedHistory));
+      } catch {
+        setHistory([]);
+      }
     }
 
     // Load last visited index
     const savedIndex = localStorage.getItem(`last-index-${channelId}`);
     if (savedIndex) {
+      try {
         setLastVisitedIndex(parseInt(savedIndex));
+      } catch {
+        setLastVisitedIndex(0);
+      }
     }
   }, [channelId]);
 
@@ -40,12 +52,12 @@ export function useProgress(channelId: string, validQuestionIds?: string[]) {
     return completed.filter(id => validSet.has(id));
   }, [completed, validQuestionIds]);
 
-  const saveLastVisitedIndex = (index: number) => {
+  const saveLastVisitedIndex = useCallback((index: number) => {
       localStorage.setItem(`last-index-${channelId}`, index.toString());
       setLastVisitedIndex(index);
-  }
+  }, [channelId]);
 
-  const markCompleted = (questionId: string) => {
+  const markCompleted = useCallback((questionId: string) => {
     setCompleted((prev) => {
       if (prev.includes(questionId)) return prev;
       const next = [...prev, questionId];
@@ -63,17 +75,17 @@ export function useProgress(channelId: string, validQuestionIds?: string[]) {
     
     // Dispatch event to trigger badge check
     window.dispatchEvent(new CustomEvent('question-completed'));
-  };
+  }, [channelId]);
 
   // Clean up stale completed IDs that no longer exist in the channel
-  const cleanupStaleProgress = (currentValidIds: string[]) => {
+  const cleanupStaleProgress = useCallback((currentValidIds: string[]) => {
     const validSet = new Set(currentValidIds);
     const cleaned = completed.filter(id => validSet.has(id));
     if (cleaned.length !== completed.length) {
       localStorage.setItem(`progress-${channelId}`, JSON.stringify(cleaned));
       setCompleted(cleaned);
     }
-  };
+  }, [completed, channelId]);
 
   return { 
     completed: validCompleted, 
@@ -120,7 +132,12 @@ export function useGlobalStats() {
     // Load global activity
     const activityKey = 'global-activity';
     const saved = localStorage.getItem(activityKey);
-    const activity: { date: string; count: number }[] = saved ? JSON.parse(saved) : [];
+    let activity: { date: string; count: number }[] = [];
+    try {
+      activity = saved ? JSON.parse(saved) : [];
+    } catch {
+      activity = [];
+    }
     
     // Also aggregate from channel history for backward compatibility
     const allHistory: ProgressEntry[] = [];
@@ -130,7 +147,11 @@ export function useGlobalStats() {
     historyKeys.forEach(key => {
       const savedHistory = localStorage.getItem(key);
       if (savedHistory) {
-        allHistory.push(...JSON.parse(savedHistory));
+        try {
+          allHistory.push(...JSON.parse(savedHistory));
+        } catch {
+          // Skip corrupted history data
+        }
       }
     });
 

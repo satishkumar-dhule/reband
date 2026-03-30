@@ -103,7 +103,7 @@ async function callGroq(request: AIRequest): Promise<AIResponse> {
       const data = await response.json();
       if (data.choices?.[0]?.message?.content) {
         return {
-          content: data.choices[0].message.content,
+          content: data.choices[0]?.message?.content,
           provider: 'groq',
           model,
         };
@@ -143,7 +143,7 @@ async function callGemini(request: AIRequest): Promise<AIResponse> {
       const data = await response.json();
       if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
         return {
-          content: data.candidates[0].content.parts[0].text,
+          content: data.candidates[0]?.content?.parts?.[0]?.text,
           provider: 'gemini',
           model,
         };
@@ -178,7 +178,7 @@ async function callOpenAI(request: AIRequest): Promise<AIResponse> {
       const data = await response.json();
       if (data.choices?.[0]?.message?.content) {
         return {
-          content: data.choices[0].message.content,
+          content: data.choices[0]?.message?.content,
           provider: 'openai',
           model,
         };
@@ -213,7 +213,7 @@ async function callCohere(request: AIRequest): Promise<AIResponse> {
       const data = await response.json();
       if (data.generations?.[0]?.text) {
         return {
-          content: data.generations[0].text,
+          content: data.generations[0]?.text,
           provider: 'cohere',
           model,
         };
@@ -252,7 +252,7 @@ async function callHuggingFace(request: AIRequest): Promise<AIResponse> {
       const data = await response.json();
       if (data[0]?.generated_text) {
         return {
-          content: data[0].generated_text,
+          content: data[0]?.generated_text,
           provider: 'huggingface',
           model,
         };

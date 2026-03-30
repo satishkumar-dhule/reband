@@ -297,14 +297,15 @@ export default function TrainingMode() {
         for (const channel of subscribedChannels) {
           try {
             const data = await ChannelService.getData(channel.id);
+            const questions = data.questions || [];
             // In interview mode, filter for voice-suitable questions
             const channelQuestions = isInterviewMode 
-              ? data.questions.filter((q: Question) => 
+              ? questions.filter((q: Question) => 
                   q.voiceSuitable !== false && 
                   q.answer && 
                   q.answer.length > 100
                 )
-              : data.questions;
+              : questions;
             allQuestions.push(...channelQuestions);
           } catch (e) {
             console.error(`Failed to load ${channel.id}`, e);

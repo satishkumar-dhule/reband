@@ -92,11 +92,18 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recognitionRef = useRef<any>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const playbackIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const playbackIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const finalTranscriptRef = useRef<string>('');
+  const audioUrlRef = useRef<string | null>(null);
+
+  const onTranscriptUpdateRef = useRef(onTranscriptUpdate);
+
+  useEffect(() => {
+    onTranscriptUpdateRef.current = onTranscriptUpdate;
+  }, [onTranscriptUpdate]);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -137,15 +144,15 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
         finalTranscript: finalTranscriptRef.current
       }));
 
-      if (onTranscriptUpdate) {
-        onTranscriptUpdate(fullTranscript, wordCount);
+      if (onTranscriptUpdateRef.current) {
+        onTranscriptUpdateRef.current(fullTranscript, wordCount);
       }
     };
 
     recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
-      if (onError) {
-        onError(new Error(`Speech recognition error: ${event.error}`));
+      if (onErrorRef.current) {
+        onErrorRef.current(new Error(`Speech recognition error: ${event.error}`));
       }
     };
 
@@ -160,7 +167,7 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
         }
       }
     };
-  }, [onTranscriptUpdate, onError]);
+  }, []);
 
   // Auto-start if requested - use refs to avoid stale closure issues
   const autoStartRef = useRef(autoStart);
@@ -304,7 +311,12 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
   const playRecording = useCallback(() => {
     if (!state.audioBlob) return;
 
+    // Clean up previous URL
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+    }
     const url = URL.createObjectURL(state.audioBlob);
+    audioUrlRef.current = url;
     const audio = new Audio(url);
     audioRef.current = audio;
 
@@ -340,6 +352,10 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
       audioRef.current.pause();
       audioRef.current = null;
     }
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
     if (playbackIntervalRef.current) {
       clearInterval(playbackIntervalRef.current);
       playbackIntervalRef.current = null;
@@ -361,6 +377,28 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
       stopRecordingRef.current();
     }
   }, [state.duration, maxDuration, state.isRecording, stopRecording]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current);
+        audioUrlRef.current = null;
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      if (playbackIntervalRef.current) {
+        clearInterval(playbackIntervalRef.current);
+        playbackIntervalRef.current = null;
+      }
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []);
 
   return {
     state,

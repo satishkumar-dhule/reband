@@ -68,6 +68,7 @@ export function useSwipe(
   const [swipeDirectionLocked, setSwipeDirectionLocked] = useState<'horizontal' | 'vertical' | null>(null);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.targetTouches.length === 0) return;
     touchEndX.current = null;
     touchEndY.current = null;
     touchStartX.current = e.targetTouches[0].clientX;
@@ -76,6 +77,7 @@ export function useSwipe(
   }, []);
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.targetTouches.length === 0) return;
     touchEndX.current = e.targetTouches[0].clientX;
     touchEndY.current = e.targetTouches[0].clientY;
 

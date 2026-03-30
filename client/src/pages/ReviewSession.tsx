@@ -20,6 +20,7 @@ import {
 } from '../lib/spaced-repetition';
 import { getQuestionById } from '../lib/questions-loader';
 import { useAchievementContext } from '../context/AchievementContext';
+import { useCredits } from '../context/CreditsContext';
 import { ListenButton } from '../components/ListenButton';
 import type { Question } from '../types';
 import { EnhancedMermaid } from '../components/EnhancedMermaid';
@@ -231,11 +232,7 @@ export default function ReviewSession() {
     }
     
     // Track achievement event
-    trackEvent({
-      type: 'srs_review',
-      timestamp: new Date().toISOString(),
-      data: { rating },
-    });
+    trackEvent('srs_review', { rating });
 
     // Update session stats
     setSessionStats(prev => ({ ...prev, [rating]: prev[rating] + 1 }));

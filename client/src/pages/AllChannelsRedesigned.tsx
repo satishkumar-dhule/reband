@@ -66,7 +66,9 @@ export default function AllChannelsRedesigned() {
     loadTests().then(tests => {
       const counts: Record<string, number> = {};
       tests.forEach(test => {
-        counts[test.channelId] = test.questions.length;
+        if (test.questions) {
+          counts[test.channelId] = test.questions.length;
+        }
       });
       setTestCounts(counts);
     }).catch(err => {

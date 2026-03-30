@@ -82,7 +82,7 @@ function useCertifications() {
     async function fetchCertifications() {
       try {
         // Fetch from static JSON file (generated at build time from database)
-        const basePath = import.meta.env.BASE_URL || '/';
+        const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
         const response = await fetch(`${basePath}data/certifications.json`);
         if (!response.ok) throw new Error('Failed to fetch certifications');
         const data = await response.json();
@@ -482,7 +482,12 @@ function CertificationCard({
   // Get progress from localStorage
   const progressKey = `cert-progress-${certification.id}`;
   const savedProgress = localStorage.getItem(progressKey);
-  const completedCount = savedProgress ? JSON.parse(savedProgress).length : 0;
+  let completedCount = 0;
+  try {
+    completedCount = savedProgress ? JSON.parse(savedProgress).length : 0;
+  } catch {
+    completedCount = 0;
+  }
 
   return (
     <motion.div

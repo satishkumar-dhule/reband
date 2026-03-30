@@ -114,7 +114,7 @@ export default function VoiceSessionGenZ() {
   const [liveWPM, setLiveWPM] = useState(0);
   const [sessionDuration, setSessionDuration] = useState(0);
   
-  const sessionTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const sessionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const { onVoiceInterview } = useCredits();
   const { trackEvent } = useAchievementContext();
@@ -268,7 +268,7 @@ export default function VoiceSessionGenZ() {
       
       const verdict = result.overallScore >= 60 ? 'hire' : 'no-hire';
       onVoiceInterview(verdict);
-      trackEvent({ type: 'voice_interview_completed', timestamp: new Date().toISOString() });
+      trackEvent('voice_interview_completed');
       setPageState('results');
     } else {
       const updated = nextQuestion(sessionState);
@@ -481,7 +481,9 @@ export default function VoiceSessionGenZ() {
   }
 
   if (pageState === 'feedback' && currentQuestion) {
-    const feedback = sessionState?.answers[sessionState.currentQuestionIndex]?.feedback;
+    const answer = sessionState?.answers[sessionState.currentQuestionIndex];
+    const feedbackScore = answer?.score ?? 0;
+    const feedback = answer?.feedback;
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto px-4 py-8">
@@ -511,8 +513,8 @@ export default function VoiceSessionGenZ() {
             <div className="space-y-6">
               <GHCard title="AI Score">
                 <div className="text-center py-4">
-                  <div className="text-5xl font-black text-[var(--gh-success-fg)] mb-2">82%</div>
-                  <div className="text-sm font-semibold uppercase tracking-widest text-[var(--gh-fg-muted)]">Pass Standard</div>
+                  <div className="text-5xl font-black text-[var(--gh-success-fg)] mb-2">{feedbackScore}%</div>
+                  <div className="text-sm font-semibold uppercase tracking-widest text-[var(--gh-fg-muted)]">{feedbackScore >= 60 ? 'Pass Standard' : 'Needs Improvement'}</div>
                 </div>
                 <div className="space-y-4 pt-4 border-t border-[var(--gh-border-muted)]">
                   {[

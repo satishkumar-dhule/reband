@@ -231,7 +231,7 @@ export const QuestionService = {
         questions = questions.filter(q => q.difficulty === filters.difficulty);
       }
       if (filters.company && filters.company !== 'all') {
-        questions = questions.filter(q => q.companies?.includes(filters.company));
+        questions = questions.filter(q => q.companies?.includes(filters.company as string));
       }
 
       return questions.map(castQuestion);

@@ -71,7 +71,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Debounced validation
-  const [validationTimeout, setValidationTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [validationTimeout, setValidationTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   // Pattern detection based on question text
   const detectPatterns = useCallback(async (questionText: string) => {

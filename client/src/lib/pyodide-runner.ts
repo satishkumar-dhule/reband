@@ -65,7 +65,11 @@ export async function initPyodide(): Promise<PyodideInterface> {
     });
 
     return pyodideInstance;
-  })();
+  })().catch(err => {
+    // Reset loading promise on failure so callers can retry
+    loadingPromise = null;
+    throw err;
+  });
 
   return loadingPromise;
 }

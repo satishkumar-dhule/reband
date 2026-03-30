@@ -251,7 +251,9 @@ export function AICompanion({ pageContent, onNavigate, onAction, availableAction
         setCohereKey(settings.cohereKey || '');
         setHuggingfaceKey(settings.huggingfaceKey || '');
         setElevenlabsKey(settings.elevenlabsKey || '');
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to load AI settings:', error);
+      }
     }
 
     // Load conversation history from localStorage (non-sensitive)
@@ -259,7 +261,9 @@ export function AICompanion({ pageContent, onNavigate, onAction, availableAction
     if (savedMessages) {
       try {
         setMessages(JSON.parse(savedMessages));
-      } catch {}
+      } catch (error) {
+        console.warn('Failed to load AI messages:', error);
+      }
     }
   }, []);
 
@@ -1255,9 +1259,11 @@ Assistant (in ${languageName}):`;
         if (!response.ok) continue;
         const data = await response.json();
         if (data.choices?.[0]?.message?.content) {
-          return data.choices[0].message.content;
+          return data.choices?.[0]?.message?.content;
         }
-      } catch {}
+      } catch (error) {
+        console.warn(`Groq model ${model} failed:`, error);
+      }
     }
     throw new Error('All Groq models failed');
   };
@@ -1287,9 +1293,11 @@ Assistant (in ${languageName}):`;
         if (!response.ok) continue;
         const data = await response.json();
         if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-          return data.candidates[0].content.parts[0].text;
+          return data.candidates?.[0]?.content?.parts?.[0]?.text;
         }
-      } catch {}
+      } catch (error) {
+        console.warn(`Gemini model failed:`, error);
+      }
     }
     throw new Error('All Gemini models failed');
   };
@@ -1317,9 +1325,11 @@ Assistant (in ${languageName}):`;
         if (!response.ok) continue;
         const data = await response.json();
         if (data.choices?.[0]?.message?.content) {
-          return data.choices[0].message.content;
+          return data.choices[0]?.message?.content;
         }
-      } catch {}
+      } catch (error) {
+        console.warn(`OpenAI model failed:`, error);
+      }
     }
     throw new Error('All OpenAI models failed');
   };
@@ -1347,9 +1357,11 @@ Assistant (in ${languageName}):`;
         if (!response.ok) continue;
         const data = await response.json();
         if (data.generations?.[0]?.text) {
-          return data.generations[0].text;
+          return data.generations[0]?.text;
         }
-      } catch {}
+      } catch (error) {
+        console.warn(`Cohere model failed:`, error);
+      }
     }
     throw new Error('All Cohere models failed');
   };
@@ -1381,9 +1393,11 @@ Assistant (in ${languageName}):`;
         if (!response.ok) continue;
         const data = await response.json();
         if (data[0]?.generated_text) {
-          return data[0].generated_text;
+          return data[0]?.generated_text;
         }
-      } catch {}
+      } catch (error) {
+        console.warn(`HuggingFace model failed:`, error);
+      }
     }
     throw new Error('All HuggingFace models failed');
   };

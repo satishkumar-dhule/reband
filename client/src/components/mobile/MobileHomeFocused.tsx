@@ -399,13 +399,9 @@ function QuickQuizCard({
     }
     
     // Track achievement event
-    trackEvent({
-      type: 'quiz_answered',
-      timestamp: new Date().toISOString(),
-      data: {
-        isCorrect,
-        difficulty: currentQuestion.difficulty,
-      },
+    trackEvent('quiz_answered', {
+      isCorrect,
+      difficulty: currentQuestion.difficulty,
     });
     
     if (isCorrect) {

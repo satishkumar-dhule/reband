@@ -420,14 +420,10 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
       markCompleted(currentQuestion.id);
       trackActivity();
       
-      trackEvent({
-        type: 'question_completed',
-        timestamp: new Date().toISOString(),
-        data: {
-          questionId: currentQuestion.id,
-          difficulty: currentQuestion.difficulty,
-          channel: currentQuestion.channel,
-        },
+      trackEvent('question_completed', {
+        questionId: currentQuestion.id,
+        difficulty: currentQuestion.difficulty,
+        channel: currentQuestion.channel,
       });
     }
   }, [currentQuestion?.id]);

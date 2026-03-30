@@ -215,14 +215,10 @@ export default function QuestionViewer() {
       trackActivity();
       
       // Track achievement event
-      trackEvent({
-        type: 'question_completed',
-        timestamp: new Date().toISOString(),
-        data: {
-          questionId: currentQuestion.id,
-          difficulty: currentQuestion.difficulty,
-          channel: currentQuestion.channel,
-        },
+      trackEvent('question_completed', {
+        questionId: currentQuestion.id,
+        difficulty: currentQuestion.difficulty,
+        channel: currentQuestion.channel,
       });
     }
   }, [currentQuestion?.id]);

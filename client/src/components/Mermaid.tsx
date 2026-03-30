@@ -105,6 +105,7 @@ const appThemeToMermaid: Record<string, MermaidTheme> = {
 
 // Lazy-loaded mermaid instance - singleton pattern for lazy loading
 let mermaidInstance: any = null;
+let currentMermaidTheme: MermaidTheme | null = null;
 
 async function getMermaid() {
   if (!mermaidInstance) {

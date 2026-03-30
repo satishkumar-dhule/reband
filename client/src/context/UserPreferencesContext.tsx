@@ -253,7 +253,8 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
     resetPreferences,
     skipOnboarding,
     toggleShuffleQuestions,
-    togglePrioritizeUnvisited
+    togglePrioritizeUnvisited,
+    toggleHideCertifications
   ]);
 
   return (

@@ -1,17 +1,13 @@
 import { ReactNode, useEffect } from "react";
 import { useLocation } from "wouter";
-
-const PREFERENCES_KEY = 'user-preferences';
+import { PreferencesStorage } from "../services/storage.service";
 
 /**
  * Check if user has completed onboarding (i.e., is "authenticated" in this app)
  */
 export function isAuthenticated(): boolean {
   try {
-    const stored = localStorage.getItem(PREFERENCES_KEY);
-    if (!stored) return false;
-    const prefs = JSON.parse(stored);
-    return prefs?.onboardingComplete === true;
+    return PreferencesStorage.get().onboardingComplete === true;
   } catch {
     return false;
   }

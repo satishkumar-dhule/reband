@@ -11,7 +11,7 @@ import type { Question, ChannelDetailedStats } from '../types';
 export type { Question };
 
 // Base path for static data files
-const DATA_BASE = import.meta.env.BASE_URL + 'data';
+const DATA_BASE = import.meta.env.BASE_URL.replace(/\/$/, '') + '/data';
 
 // In-memory cache for questions
 const questionsCache = new Map<string, Question>();

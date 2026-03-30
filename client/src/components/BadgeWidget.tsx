@@ -27,7 +27,12 @@ export function BadgeWidget() {
     channels.forEach(ch => {
       const questions = getQuestions(ch.id);
       const stored = localStorage.getItem(`progress-${ch.id}`);
-      const completedIds = stored ? new Set(JSON.parse(stored)) : new Set<string>();
+      let completedIds = new Set<string>();
+      try {
+        completedIds = stored ? new Set(JSON.parse(stored)) : new Set<string>();
+      } catch {
+        completedIds = new Set<string>();
+      }
       
       Array.from(completedIds).forEach((id) => allCompletedIds.add(id as string));
       

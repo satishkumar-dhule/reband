@@ -25,23 +25,30 @@ function useApiChannels() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+    
     async function fetchChannels() {
       try {
-        // Use static JSON in production, API in dev
-        const basePath = import.meta.env.BASE_URL || '/';
-        const response = await fetch(`${basePath}data/channels.json`);
+        const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
+        const response = await fetch(`${basePath}data/channels.json`, { signal: controller.signal });
+        if (cancelled) return;
         if (!response.ok) throw new Error(`Failed to fetch channels: ${response.status}`);
         const data = await response.json();
+        if (cancelled) return;
         if (!Array.isArray(data) || data.length === 0) {
           setError('No channels available');
           return;
         }
         setChannels(data);
       } catch (err) {
-        // Fallback: try API endpoint in dev mode
+        if (cancelled) return;
+        if (err instanceof Error && err.name === 'AbortError') return;
+        
         if (import.meta.env.DEV) {
           try {
-            const r = await fetch("/api/channels");
+            const r = await fetch("/api/channels", { signal: controller.signal });
+            if (cancelled) return;
             if (!r.ok) throw new Error(`Failed to fetch channels: ${r.status}`);
             const data = await r.json();
             setChannels(data);
@@ -52,10 +59,13 @@ function useApiChannels() {
         }
         setError(err instanceof Error ? err.message : 'Failed to load channels');
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
     fetchChannels();
+    return () => { cancelled = true; controller.abort(); };
   }, []);
 
   return { data: channels, isLoading: loading, error };
@@ -259,7 +269,9 @@ export default function Home() {
         if (stats.find((x: any) => x.date === d.toISOString().split("T")[0])) currentStreak++;
         else break;
       }
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to calculate streak:', error);
+    }
     return currentStreak;
   }, []);
 

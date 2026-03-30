@@ -14,7 +14,7 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) & { cancel: () => void } {
-  let timeout: NodeJS.Timeout | null = null;
+  let timeout: ReturnType<typeof setTimeout> | null = null;
   
   const executedFunction = (...args: Parameters<T>) => {
     const later = () => {

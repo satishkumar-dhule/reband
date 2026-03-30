@@ -57,8 +57,12 @@ export default function QuestionViewerGenZ() {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   const [markedQuestions, setMarkedQuestions] = useState<string[]>(() => {
-    const saved = localStorage.getItem(`marked-${channelId}`);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(`marked-${channelId}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
   const [srsCard, setSrsCard] = useState<ReviewCard | null>(null);
   const [showRatingButtons, setShowRatingButtons] = useState(false);
@@ -154,7 +158,7 @@ export default function QuestionViewerGenZ() {
       setLocation(`/channel/${channelId}/${currentQuestion.id}`, { replace: true });
     }
     saveLastVisitedIndex(currentIndex);
-  }, [currentIndex, isInitialized, loading, channelId, currentQuestion, targetQuestionId, setLocation]);
+  }, [currentIndex, isInitialized, loading, channelId, currentQuestion, targetQuestionId, setLocation, saveLastVisitedIndex]);
 
   useEffect(() => {
     if (currentQuestion) {
@@ -162,14 +166,10 @@ export default function QuestionViewerGenZ() {
       markCompleted(currentQuestion.id);
       trackActivity();
       
-      trackEvent({
-        type: 'question_completed',
-        timestamp: new Date().toISOString(),
-        data: {
-          questionId: currentQuestion.id,
-          difficulty: currentQuestion.difficulty,
-          channel: currentQuestion.channel,
-        },
+      trackEvent('question_completed', {
+        questionId: currentQuestion.id,
+        difficulty: currentQuestion.difficulty,
+        channel: currentQuestion.channel,
       });
     }
   }, [currentQuestion, trackEvent, markCompleted]);
@@ -262,11 +262,7 @@ export default function QuestionViewerGenZ() {
     setHasRated(true);
     setShowRatingButtons(false);
     
-    trackEvent({
-      type: 'srs_review',
-      timestamp: new Date().toISOString(),
-      data: { rating },
-    });
+    trackEvent('srs_review', { rating });
 
     toast({
       title: "Review recorded",

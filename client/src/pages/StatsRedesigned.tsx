@@ -53,7 +53,12 @@ export default function StatsRedesigned() {
     const modProgress = channels.map(ch => {
       const questions = getQuestions(ch.id);
       const stored = localStorage.getItem(`progress-${ch.id}`);
-      const completedIds = stored ? new Set(JSON.parse(stored)) : new Set();
+      let completedIds = new Set();
+      try {
+        completedIds = stored ? new Set(JSON.parse(stored)) : new Set();
+      } catch {
+        completedIds = new Set();
+      }
 
       Array.from(completedIds).forEach((id) => allCompletedIds.add(id as string));
       if (completedIds.size > 0) channelsWithProgress.push(ch.id);

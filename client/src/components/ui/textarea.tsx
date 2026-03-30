@@ -3,7 +3,8 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 export interface TextareaProps
-  extends React.ComponentProps<"textarea"> {
+  extends React.ComponentProps<"textarea"> 
+{
   /**
    * Optional character limit to display
    */
@@ -41,7 +42,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       helperText,
       resizable = true,
       id,
-      aria-describedby,
       ...props
     },
     ref
@@ -74,7 +74,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     // Build aria-describedby
     const describedBy = [
-      aria-describedby,
+      (props as any)['aria-describedby'],
       error && errorId,
       helperText && helperId,
       showCount && maxLength && countId,

@@ -72,8 +72,12 @@ export default function Profile() {
   // Calculate stats
   const totalQuestions = channelStats.reduce((sum, s) => sum + s.total, 0);
   const totalCompleted = subscribedChannels.reduce((sum, channel) => {
-    const channelProgress = JSON.parse(localStorage.getItem(`progress-${channel.id}`) || '[]');
-    return sum + channelProgress.length;
+    try {
+      const channelProgress = JSON.parse(localStorage.getItem(`progress-${channel.id}`) || '[]');
+      return sum + channelProgress.length;
+    } catch {
+      return sum;
+    }
   }, 0);
 
   const streak = (() => {

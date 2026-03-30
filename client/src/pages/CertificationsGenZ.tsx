@@ -69,7 +69,7 @@ function useCertifications() {
   useEffect(() => {
     async function fetchCertifications() {
       try {
-        const basePath = import.meta.env.BASE_URL || '/';
+        const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
         const response = await fetch(`${basePath}data/certifications.json`);
         if (!response.ok) throw new Error(`Failed to fetch certifications (${response.status})`);
         const data = await response.json();

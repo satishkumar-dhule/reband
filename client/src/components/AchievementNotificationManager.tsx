@@ -12,27 +12,27 @@ import { useUnifiedNotifications } from './UnifiedNotificationManager';
 export function AchievementNotificationManager() {
   const { pendingAchievements, consumePendingAchievement } = useAchievementContext();
   const { pendingBadges, consumePendingBadge } = useBadgeContext();
-  const { showAchievement, showBadge } = useUnifiedNotifications();
+  const { showToast } = useUnifiedNotifications();
 
   // Feed pending achievements into unified notification system
   useEffect(() => {
     if (pendingAchievements.length > 0) {
       const achievement = consumePendingAchievement();
       if (achievement) {
-        showAchievement(achievement, achievement.rewards);
+        showToast(achievement.title, achievement.description, 'success');
       }
     }
-  }, [pendingAchievements, consumePendingAchievement, showAchievement]);
+  }, [pendingAchievements, consumePendingAchievement, showToast]);
 
   // Feed pending badges into unified notification system
   useEffect(() => {
     if (pendingBadges.length > 0) {
       const badge = consumePendingBadge();
       if (badge) {
-        showBadge(badge);
+        showToast(`Badge: ${badge.name}`, badge.description || '', 'success');
       }
     }
-  }, [pendingBadges, consumePendingBadge, showBadge]);
+  }, [pendingBadges, consumePendingBadge, showToast]);
 
   // No longer renders anything - unified system handles display
   return null;

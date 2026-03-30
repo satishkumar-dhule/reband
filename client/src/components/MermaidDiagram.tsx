@@ -162,7 +162,9 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
             <div style="font-size: 12px; opacity: 0.8;"></div>
           `;
           // Safely set error message using textContent to prevent XSS
-          errorDiv.lastElementChild!.textContent = err.message || 'Unknown error';
+          if (errorDiv.lastElementChild) {
+            errorDiv.lastElementChild.textContent = err.message || 'Unknown error';
+          }
           containerRef.current.appendChild(errorDiv);
         }
       }

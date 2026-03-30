@@ -111,7 +111,21 @@ export default function LearningPaths() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-        const response = await fetch(`/api/learning-paths?${params.toString()}`, { signal: controller.signal });
+        // Use static JSON in production, API in dev
+        const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
+        let response: Response;
+        
+        try {
+          response = await fetch(`${basePath}data/learning-paths.json?${params.toString()}`, { signal: controller.signal });
+          if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
+        } catch {
+          // Fallback: try API endpoint in dev mode
+          if (import.meta.env.DEV) {
+            response = await fetch(`/api/learning-paths?${params.toString()}`, { signal: controller.signal });
+          } else {
+            throw new Error('Learning paths data not available');
+          }
+        }
         clearTimeout(timeoutId);
         
         if (cancelled) return;

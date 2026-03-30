@@ -28,11 +28,9 @@ export function useLevel() {
       const currentLevel = newMetrics.level;
       
       setMetrics(prev => {
-        // Check for level up by comparing with previous state
         if (currentLevel > prev.level) {
           setPreviousLevel(prev.level);
           setShowLevelUp(true);
-          setTimeout(() => setShowLevelUp(false), 5000);
         }
         return newMetrics;
       });
@@ -40,6 +38,13 @@ export function useLevel() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Auto-hide level up notification
+  useEffect(() => {
+    if (!showLevelUp) return;
+    const timeout = setTimeout(() => setShowLevelUp(false), 5000);
+    return () => clearTimeout(timeout);
+  }, [showLevelUp]);
 
   // Current level data
   const currentLevel = useMemo(() => {

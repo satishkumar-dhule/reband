@@ -42,6 +42,7 @@ interface InterviewerComments {
 type InterviewState = 'loading' | 'ready' | 'recording' | 'editing' | 'processing' | 'evaluated';
 
 function getRandomComment(comments: string[]): string {
+  if (!comments || comments.length === 0) return '';
   return comments[Math.floor(Math.random() * comments.length)];
 }
 
@@ -67,8 +68,8 @@ export default function VoiceInterview() {
   const [sessionId, setSessionId] = useState<string>('voice-session-state');
   const [showAnswer, setShowAnswer] = useState(false); // Hide answer until after recording
   
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const commentTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const commentTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const { onVoiceInterview, config } = useCredits();
   const { trackEvent } = useAchievementContext();
@@ -219,7 +220,7 @@ export default function VoiceInterview() {
       setEvaluation(result);
       const credits = onVoiceInterview(result.verdict);
       setEarnedCredits({ total: credits.totalCredits, bonus: credits.bonusCredits });
-      trackEvent({ type: 'voice_interview_completed', timestamp: new Date().toISOString() });
+      trackEvent('voice_interview_completed');
       if (result.score >= 60) showComment('good_score');
       else showComment('bad_score');
       setShowAnswer(true); // Reveal answer after evaluation

@@ -8,28 +8,16 @@ export default function NotFound() {
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
-    // Auto-redirect countdown
-    const timer = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
+    if (countdown === 0) {
+      setLocation('/');
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown(prev => prev - 1);
     }, 1000);
 
-    // Navigate when countdown reaches 0
-    const navigateTimer = setTimeout(() => {
-      if (countdown === 1) {
-        setLocation('/');
-      }
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-      clearTimeout(navigateTimer);
-    };
+    return () => clearTimeout(timer);
   }, [countdown, setLocation]);
 
   return (

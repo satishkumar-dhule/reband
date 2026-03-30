@@ -79,13 +79,14 @@ export default function VoicePractice() {
   const [showAnswer, setShowAnswer] = useState(false);
   
   // Refs
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startTimeRef = useRef<number>(0);
   const recordingStateRef = useRef<RecordingState>('idle');
   const [recognitionReady, setRecognitionReady] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
   
   const currentQuestion = questions[currentIndex];
   const targetWords = currentQuestion?.answer ? countWords(currentQuestion.answer) : 0;
@@ -94,6 +95,20 @@ export default function VoicePractice() {
   useEffect(() => {
     recordingStateRef.current = recordingState;
   }, [recordingState]);
+
+  // Cleanup audio URL on unmount
+  useEffect(() => {
+    return () => {
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current);
+        audioUrlRef.current = null;
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   // Load questions
   useEffect(() => {
@@ -113,7 +128,7 @@ export default function VoicePractice() {
           try {
             const data = await ChannelService.getData(channel.id);
             // Filter for voice-suitable questions
-            const suitable = data.questions.filter((q: Question) => 
+            const suitable = (data.questions || []).filter((q: Question) => 
               q.voiceSuitable !== false && q.answer && q.answer.length > 100
             );
             allQuestions.push(...suitable);
@@ -354,13 +369,18 @@ export default function VoicePractice() {
     if (!audioBlob) return;
     
     try {
-      // Stop any currently playing audio
+      // Stop any currently playing audio and clean up previous URL
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current);
+        audioUrlRef.current = null;
+      }
       
       const audioUrl = URL.createObjectURL(audioBlob);
+      audioUrlRef.current = audioUrl;
       const audio = new Audio(audioUrl);
       audioRef.current = audio;
       
@@ -371,12 +391,19 @@ export default function VoicePractice() {
       
       audio.onended = () => {
         setIsPlayingAudio(false);
-        URL.revokeObjectURL(audioUrl);
+        if (audioUrlRef.current) {
+          URL.revokeObjectURL(audioUrlRef.current);
+          audioUrlRef.current = null;
+        }
         console.log('✅ Audio playback finished');
       };
       
       audio.onerror = (e) => {
         setIsPlayingAudio(false);
+        if (audioUrlRef.current) {
+          URL.revokeObjectURL(audioUrlRef.current);
+          audioUrlRef.current = null;
+        }
         console.error('❌ Audio playback error:', e);
         toast({
           title: "Playback Error",
@@ -387,6 +414,10 @@ export default function VoicePractice() {
       
       audio.play().catch(err => {
         setIsPlayingAudio(false);
+        if (audioUrlRef.current) {
+          URL.revokeObjectURL(audioUrlRef.current);
+          audioUrlRef.current = null;
+        }
         console.error('❌ Audio play() rejected:', err);
         toast({
           title: "Playback Error",

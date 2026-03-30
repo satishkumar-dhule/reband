@@ -79,7 +79,7 @@ export function BadgeProvider({ children }: { children: ReactNode }) {
 
   // Debounce ref for question-completed events
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recalculateDebounce = useRef<any>();
+  const recalculateDebounce = useRef<any>(null);
 
   // Listen for question completion events to trigger badge recalculation (debounced)
   useEffect(() => {
@@ -99,7 +99,7 @@ export function BadgeProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('question-completed', handleQuestionCompleted);
       if (recalculateDebounce.current) clearTimeout(recalculateDebounce.current);
     };
-  }, [stats, refreshKey, isReady]);
+  }, []);
   
   // Wait a bit for questions to load before calculating badges
   useEffect(() => {
@@ -132,14 +132,18 @@ export function BadgeProvider({ children }: { children: ReactNode }) {
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith('progress-')) {
         const channelId = key.replace('progress-', '');
-        const completed = JSON.parse(localStorage.getItem(key) || '[]');
-        completed.forEach((id: string) => {
-          if (!allCompletedIds.includes(id)) {
-            allCompletedIds.push(id);
+        try {
+          const completed = JSON.parse(localStorage.getItem(key) || '[]');
+          completed.forEach((id: string) => {
+            if (!allCompletedIds.includes(id)) {
+              allCompletedIds.push(id);
+            }
+          });
+          if (completed.length > 0 && !channelsWithProgress.includes(channelId)) {
+            channelsWithProgress.push(channelId);
           }
-        });
-        if (completed.length > 0 && !channelsWithProgress.includes(channelId)) {
-          channelsWithProgress.push(channelId);
+        } catch {
+          // Skip corrupted data
         }
       }
     });
@@ -179,10 +183,14 @@ export function BadgeProvider({ children }: { children: ReactNode }) {
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith('progress-')) {
         const channelId = key.replace('progress-', '');
-        const completed = JSON.parse(localStorage.getItem(key) || '[]');
-        const total = channelQuestionCounts[channelId] || 0;
-        if (total > 0) {
-          channelCompletionPcts.push(Math.round((completed.length / total) * 100));
+        try {
+          const completed = JSON.parse(localStorage.getItem(key) || '[]');
+          const total = channelQuestionCounts[channelId] || 0;
+          if (total > 0) {
+            channelCompletionPcts.push(Math.round((completed.length / total) * 100));
+          }
+        } catch {
+          // Skip corrupted data
         }
       }
     });

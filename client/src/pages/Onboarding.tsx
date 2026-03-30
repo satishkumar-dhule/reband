@@ -130,7 +130,7 @@ export default function OnboardingPage() {
     if (selectedChannels.length > 0) {
       OnboardingStorage.setSubscribedChannels(selectedChannels);
       const current = PreferencesStorage.get();
-      const mergedChannels = [...new Set([...current.subscribedChannels, ...selectedChannels])];
+      const mergedChannels = Array.from(new Set([...current.subscribedChannels, ...selectedChannels]));
       PreferencesStorage.update({
         subscribedChannels: mergedChannels
       });

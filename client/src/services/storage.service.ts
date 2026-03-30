@@ -44,7 +44,13 @@ function removeItem(key: string): void {
 
 function getString(key: string, defaultValue: string = ''): string {
   if (typeof window === 'undefined') return defaultValue;
-  return localStorage.getItem(key) ?? defaultValue;
+  
+  try {
+    return localStorage.getItem(key) ?? defaultValue;
+  } catch (error) {
+    console.error(`Failed to read ${key} from localStorage:`, error);
+    return defaultValue;
+  }
 }
 
 function setString(key: string, value: string): void {

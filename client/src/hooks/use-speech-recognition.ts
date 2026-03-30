@@ -79,6 +79,22 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
   const finalTranscriptRef = useRef<string>('');
   const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const onResultRef = useRef(onResult);
+  const onInterimRef = useRef(onInterim);
+  const onFinalRef = useRef(onFinal);
+  const onStartRef = useRef(onStart);
+  const onEndRef = useRef(onEnd);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onResultRef.current = onResult;
+    onInterimRef.current = onInterim;
+    onFinalRef.current = onFinal;
+    onStartRef.current = onStart;
+    onEndRef.current = onEnd;
+    onErrorRef.current = onError;
+  }, [onResult, onInterim, onFinal, onStart, onEnd, onError]);
+
   // Initialize recognition
   useEffect(() => {
     if (!isSpeechRecognitionSupported) return;
@@ -93,7 +109,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
 
     recognition.onstart = () => {
       setIsListening(true);
-      onStart?.();
+      onStartRef.current?.();
     };
 
     recognition.onresult = (event: any) => {
@@ -107,12 +123,12 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
 
         if (result.isFinal) {
           final += text + ' ';
-          onResult?.({ transcript: text, isFinal: true, confidence });
-          onFinal?.(text);
+          onResultRef.current?.({ transcript: text, isFinal: true, confidence });
+          onFinalRef.current?.(text);
         } else {
           interim += text;
-          onResult?.({ transcript: text, isFinal: false, confidence });
-          onInterim?.(text);
+          onResultRef.current?.({ transcript: text, isFinal: false, confidence });
+          onInterimRef.current?.(text);
         }
       }
 
@@ -128,7 +144,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
 
     recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
-      onError?.(event.error);
+      onErrorRef.current?.(event.error);
 
       if (event.error === 'not-allowed') {
         setIsListening(false);
@@ -138,7 +154,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
     recognition.onend = () => {
       setIsListening(false);
       setInterimTranscript('');
-      onEnd?.();
+      onEndRef.current?.();
 
       // Auto-restart if enabled
       if (autoRestart) {
@@ -164,7 +180,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
         // Already stopped
       }
     };
-  }, [continuous, interimResults, lang, maxAlternatives, autoRestart, onResult, onInterim, onFinal, onStart, onEnd, onError]);
+  }, [continuous, interimResults, lang, maxAlternatives, autoRestart]);
 
   const start = useCallback(() => {
     if (!recognitionRef.current) return;

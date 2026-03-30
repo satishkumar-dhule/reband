@@ -104,7 +104,7 @@ export function GenZHomePage() {
     try {
       setIsLoading(true);
       setCuratedPathsError(null);
-      const basePath = import.meta.env.BASE_URL || '/';
+      const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
       const response = await fetch(`${basePath}data/learning-paths.json`);
       if (response.ok) {
         const data = await response.json();

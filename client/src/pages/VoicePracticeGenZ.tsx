@@ -78,7 +78,7 @@ export default function VoicePracticeGenZ() {
   const [sessionTotalTime, setSessionTotalTime] = useState(0);
 
   const currentQuestion = questions[currentIndex];
-  const targetWords = currentQuestion?.answer.split(' ').length || 100;
+  const targetWords = currentQuestion?.answer?.split(' ').length || 100;
 
   const {
     transcript: hookTranscript,

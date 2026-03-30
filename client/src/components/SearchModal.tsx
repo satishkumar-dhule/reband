@@ -211,7 +211,7 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
             {getDifficultyIcon(result.question.difficulty)}
             <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{result.question.channel}/{result.question.subChannel}</span>
             <div className="flex items-center gap-1 ml-auto">
-              {hasCompanies && <span className="flex items-center gap-0.5 text-[9px] bg-blue-400/10 px-1.5 py-0.5 rounded" style={{ color: 'var(--info, #3b82f6)' }}><Building2 className="w-2.5 h-2.5" />{result.question.companies!.length}</span>}
+              {hasCompanies && <span className="flex items-center gap-0.5 text-[9px] bg-blue-400/10 px-1.5 py-0.5 rounded" style={{ color: 'var(--info, #3b82f6)' }}><Building2 className="w-2.5 h-2.5" />{result.question.companies?.length ?? 0}</span>}
               {hasVideo && <span className="flex items-center text-[9px] bg-red-400/10 px-1.5 py-0.5 rounded" style={{ color: 'var(--destructive, #ef4444)' }}><Video className="w-2.5 h-2.5" /></span>}
               {hasDiagram && <span className="flex items-center text-[9px] bg-green-400/10 px-1.5 py-0.5 rounded" style={{ color: 'var(--success, #22c55e)' }}><GitBranch className="w-2.5 h-2.5" /></span>}
             </div>

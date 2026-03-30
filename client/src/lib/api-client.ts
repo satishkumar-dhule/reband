@@ -4,7 +4,7 @@
  */
 
 // Base path for static data files
-const DATA_BASE = import.meta.env.BASE_URL + 'data';
+const DATA_BASE = import.meta.env.BASE_URL.replace(/\/$/, '') + '/data';
 
 export interface Question {
   id: string;
@@ -204,8 +204,8 @@ export async function fetchQuestion(questionId: string): Promise<Question> {
   }
   
   // Slow path: search through all loaded channels
-  for (const [channelId, data] of channelCache) {
-    const question = data.questions.find(q => q.id === questionId);
+  for (const [channelId, data] of Array.from(channelCache.entries())) {
+    const question = data.questions.find((q: Question) => q.id === questionId);
     if (question) {
       questionIdToChannel.set(questionId, channelId);
       return question;

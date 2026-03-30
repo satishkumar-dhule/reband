@@ -117,6 +117,17 @@ declare module '*.json' {
   export default content;
 }
 
+declare module 'mermaid/dist/mermaid.esm.mjs' {
+  const mermaid: {
+    initialize: (config: Record<string, unknown>) => void;
+    run: (config: { nodes: HTMLElement[] }) => Promise<void>;
+    render: (id: string, text: string) => Promise<{ svg: string }>;
+    contentLoaded: () => void;
+    parse: (text: string) => Promise<boolean>;
+  };
+  export default mermaid;
+}
+
 // Global CSS custom properties
 declare namespace CSS {
   interface Property {

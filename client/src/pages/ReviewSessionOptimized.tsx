@@ -118,11 +118,7 @@ export default function ReviewSessionOptimized() {
     onSRSReview(rating);
     
     // Track achievement
-    trackEvent({
-      type: 'srs_review',
-      timestamp: new Date().toISOString(),
-      data: { rating },
-    });
+    trackEvent('srs_review', { rating });
 
     // Update stats
     setSessionStats(prev => ({ ...prev, [rating]: prev[rating] + 1 }));

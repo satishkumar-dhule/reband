@@ -143,7 +143,9 @@ export default function CertificationPractice() {
     try {
       const saved = localStorage.getItem(checkpointsKey);
       if (saved) setPassedCheckpoints(new Set(JSON.parse(saved)));
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to load checkpoints from localStorage:', error);
+    }
   }, [checkpointsKey]);
 
   useEffect(() => {
@@ -177,7 +179,7 @@ export default function CertificationPractice() {
           try {
             console.log(`Fetching channel: ${mapping.channelId}`);
             const data = await ChannelService.getData(mapping.channelId);
-            let channelQuestions = data.questions;
+            let channelQuestions = data.questions || [];
             channelIds.push(mapping.channelId);
             
             console.log(`Found ${channelQuestions.length} questions in ${mapping.channelId}`);

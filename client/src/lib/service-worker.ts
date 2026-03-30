@@ -3,7 +3,7 @@
  * Registers the service worker for offline support
  */
 
-const SW_URL = import.meta.env.BASE_URL + 'sw.js';
+const SW_URL = import.meta.env.BASE_URL.replace(/\/$/, '') + '/sw.js';
 
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
@@ -18,7 +18,7 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
 
   try {
     const registration = await navigator.serviceWorker.register(SW_URL, {
-      scope: import.meta.env.BASE_URL,
+      scope: import.meta.env.BASE_URL.replace(/\/$/, '') + '/',
     });
 
     // Handle updates

@@ -224,8 +224,8 @@ const DropdownMenuShortcut = ({
         className
       )}
       {...props}
-    )
-  }
+    />
+  );
 }
 DropdownMenuShortcut.displayName = "DropdownMenuShortcut"
 

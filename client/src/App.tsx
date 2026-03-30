@@ -76,6 +76,7 @@ const Certifications = lazy(() => import("@/pages/CertificationsGenZ"));
 const Tests = lazy(() => import("@/pages/TestsGenZ"));
 const MyPath = lazy(() => import("@/pages/MyPathGenZ"));
 const BotActivity = lazy(() => import("@/pages/BotActivity"));
+const TrainingMode = lazy(() => import("@/pages/TrainingMode"));
 
 /**
  * OnboardingGuard - Redirects new users to onboarding
@@ -182,10 +183,13 @@ function MinimalApp() {
         {/* Bot activity */}
         <Route path="/bot-activity" component={BotActivity} />
         
-        {/* Home must be LAST - catches all unmatched routes */}
+        {/* Training */}
+        <Route path="/training" component={TrainingMode} />
+        
+        {/* Home route - must come BEFORE catch-all */}
         <Route path="/" component={Home} />
         
-        {/* 404 - must be LAST */}
+        {/* 404 - catch-all must be LAST */}
         <Route component={NotFound} />
       </Switch>
     </Suspense>

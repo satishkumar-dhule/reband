@@ -42,11 +42,7 @@ export function useAchievements() {
   useEffect(() => {
     const unsubscribe = addAchievementListener((achievements) => {
       setNewlyUnlocked(achievements);
-      // Refresh progress
       setProgress(calculateAchievementProgress());
-      
-      // Clear notification after 5 seconds
-      setTimeout(() => setNewlyUnlocked([]), 5000);
     });
 
     return unsubscribe;

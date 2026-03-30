@@ -23,6 +23,7 @@ import { ChannelService } from '../services/api.service';
 import { loadTests, getSessionQuestions, TestQuestion, Test } from '../lib/tests';
 import { generateProgressiveSequence } from '../lib/progressive-quiz';
 import { spendCredits } from '../lib/credits';
+import { useCredits } from '../context/CreditsContext';
 import type { Question } from '../types';
 import {
   ChevronLeft, ChevronRight, Award, ExternalLink,
@@ -174,7 +175,7 @@ export default function CertificationPractice() {
         for (const mapping of certification.channelMappings) {
           try {
             const data = await ChannelService.getData(mapping.channelId);
-            let channelQuestions = data.questions;
+            let channelQuestions = data.questions || [];
             channelIds.push(mapping.channelId);
             
             if (mapping.subChannels && mapping.subChannels.length > 0) {
