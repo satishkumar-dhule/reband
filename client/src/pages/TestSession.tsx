@@ -113,6 +113,9 @@ export default function TestSession() {
       } else {
         setSessionState('loading');
       }
+    }).catch(err => {
+      console.error('Failed to load test for channel:', err);
+      setSessionState('loading');
     });
   }, [channelId]);
 

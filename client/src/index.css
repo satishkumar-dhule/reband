@@ -225,11 +225,7 @@
   --color-text-tertiary: var(--color-text-tertiary, hsl(215 8% 55%));
   --color-text-disabled: var(--color-text-disabled, hsl(215 8% 40%));
   
-  /* Typography - Use consolidated CSS variables */
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-  
-  /* Font sizes mapped to type scale */
+  /* Typography - mapped from outer :root definitions */
   --text-xs: var(--text-xs);
   --text-sm: var(--text-sm);
   --text-base: var(--text-base);
@@ -1765,7 +1761,7 @@ textarea:focus-visible {
 /* ===== MERMAID DIAGRAMS ===== */
 .mermaid-container {
   max-width: 100%;
-  overflow: visible;
+  overflow: auto;
   position: relative;
   min-height: 100px;
   margin: 1rem 0;
@@ -2997,6 +2993,8 @@ body, #root {
 
 /* Premium card hover effects */
 .channels-grid > div {
+  position: relative;
+  z-index: 1;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

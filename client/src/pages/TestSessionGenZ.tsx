@@ -45,6 +45,9 @@ export default function TestSessionGenZ() {
       } else {
         setSessionState('loading');
       }
+    }).catch(err => {
+      console.error('Failed to load test for channel:', err);
+      setSessionState('loading');
     });
   }, [channelId]);
 

@@ -102,8 +102,8 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
-        const text = result[0].transcript;
-        const confidence = result[0].confidence;
+        const text = result[0]?.transcript || '';
+        const confidence = result[0]?.confidence ?? 0;
 
         if (result.isFinal) {
           final += text + ' ';

@@ -52,7 +52,8 @@ export async function executeCodeSandboxed(
           
           self.postMessage({ success: true, output: result, logs: logs });
         } catch (err) {
-          self.postMessage({ success: false, error: err.message, logs: logs || [] });
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          self.postMessage({ success: false, error: errorMessage, logs: logs || [] });
         }
       }
     `;

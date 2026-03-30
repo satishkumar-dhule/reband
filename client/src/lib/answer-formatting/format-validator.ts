@@ -452,7 +452,8 @@ export class FormatValidator implements IFormatValidator {
         continue;
       }
       
-      const firstBulletChar = bulletLines[0].match(/^\s*([-*+])/)?.[1];
+      // Use optional chaining to safely access first bullet character
+      const firstBulletChar = bulletLines[0]?.match(/^\s*([-*+])/)?.[1];
       if (bulletChar !== firstBulletChar) {
         this.addViolation({
           rule: `${patternId}-bullet-consistency`,

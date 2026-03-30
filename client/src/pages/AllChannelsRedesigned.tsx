@@ -69,6 +69,8 @@ export default function AllChannelsRedesigned() {
         counts[test.channelId] = test.questions.length;
       });
       setTestCounts(counts);
+    }).catch(err => {
+      console.error('Failed to load tests:', err);
     });
   }, []);
 

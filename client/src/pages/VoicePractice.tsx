@@ -385,7 +385,15 @@ export default function VoicePractice() {
         });
       };
       
-      audio.play();
+      audio.play().catch(err => {
+        setIsPlayingAudio(false);
+        console.error('❌ Audio play() rejected:', err);
+        toast({
+          title: "Playback Error",
+          description: "Failed to play recording",
+          variant: "destructive",
+        });
+      });
     } catch (err) {
       console.error('❌ Failed to play audio:', err);
       toast({

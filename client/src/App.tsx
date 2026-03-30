@@ -11,6 +11,7 @@ import { AchievementProvider } from "@/context/AchievementContext";
 import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
 import { UnifiedNotificationManager } from "@/components/UnifiedNotificationManager";
 import { LiveRegionProvider } from "@/components/LiveRegion";
+import { SidebarProvider } from "@/context/SidebarContext";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import NotFound from "@/pages/not-found";
@@ -200,6 +201,7 @@ function FullApp() {
   
   return (
     <LiveRegionProvider>
+      <SidebarProvider>
       <CreditsProvider>
         <AchievementProvider>
           <UnifiedNotificationManager>
@@ -214,6 +216,7 @@ function FullApp() {
           </UnifiedNotificationManager>
         </AchievementProvider>
       </CreditsProvider>
+      </SidebarProvider>
     </LiveRegionProvider>
   );
 }

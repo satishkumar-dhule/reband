@@ -136,7 +136,9 @@ class BrowserDB {
   private startSync(): void {
     if (typeof window !== 'undefined') {
       this.syncInterval = window.setInterval(() => {
-        this.syncWithDatabase();
+        this.syncWithDatabase().catch(err => {
+          console.warn('Auto-sync failed:', err);
+        });
       }, 30000);
     }
   }
@@ -155,10 +157,14 @@ class BrowserDB {
   }
 
   async ready(): Promise<void> {
-    // Non-blocking: resolve immediately if already ready
+    // Already ready, return immediately
     if (this.isDbReady) return;
-    // Fire-and-forget: let init continue in background, don't block
-    this.dbReady.catch(() => {});
+    // Wait for DB to finish initializing (or fail gracefully)
+    try {
+      await this.dbReady;
+    } catch {
+      // DB init failed, operations will gracefully skip
+    }
   }
 
   private getStore(name: keyof DBSchema, mode: IDBTransactionMode = 'readonly'): IDBObjectStore {

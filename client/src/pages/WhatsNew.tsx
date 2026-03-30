@@ -136,6 +136,10 @@ export default function WhatsNew() {
   useEffect(() => {
     fetchChangelog()
       .then(setData)
+      .catch(err => {
+        console.error('Failed to fetch changelog:', err);
+        setData(defaultChangelog);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 

@@ -200,12 +200,12 @@ export class MetricsCollector {
     questionValidations.forEach(events => {
       // Sort by timestamp and check first event
       events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-      if (events[0].passed) {
+      if (events.length > 0 && events[0].passed) {
         firstAttemptPasses++;
       }
     });
 
-    return (firstAttemptPasses / questionValidations.size) * 100;
+    return questionValidations.size > 0 ? (firstAttemptPasses / questionValidations.size) * 100 : 0;
   }
 
   /**
@@ -329,7 +329,7 @@ export class MetricsCollector {
     let firstAttemptPasses = 0;
     questionValidations.forEach(events => {
       events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-      if (events[0].passed) {
+      if (events.length > 0 && events[0].passed) {
         firstAttemptPasses++;
       }
     });
