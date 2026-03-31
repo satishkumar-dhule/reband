@@ -11,6 +11,7 @@ import {
   getCertificationById, 
   getPrerequisiteCertifications,
 } from '../lib/certifications-config';
+import { Button, IconButton } from '@/components/unified/Button';
 
 import { SEOHead } from '../components/SEOHead';
 import { QuestionPanel } from '../components/QuestionPanel';
@@ -449,21 +450,21 @@ export default function CertificationPractice() {
           className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90dvh] max-h-[90svh] overflow-hidden flex flex-col pb-safe"
         >
           {/* Header */}
-          <div className="p-4 border-b border-border bg-gradient-to-r from-amber-500/10 via-primary/10 to-amber-500/10">
+          <div className="p-4 border-b border-border bg-gradient-to-r from-[var(--gh-attention-subtle,#fef3c7)]/50 via-primary/10 to-[var(--gh-attention-subtle,#fef3c7)]/50">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  showResults ? (testResults.passed ? 'bg-green-500/20' : 'bg-red-500/20') : 'bg-amber-500/20'
+                  showResults ? (testResults.passed ? 'bg-[var(--gh-success-subtle,#dcfce7)]' : 'bg-[var(--gh-danger-subtle,#fee2e2)]') : 'bg-[var(--gh-attention-subtle,#fef3c7)]'
                 }`}>
                   {showResults ? (
-                    testResults.passed ? <Unlock className="w-5 h-5 text-green-500" /> : <Lock className="w-5 h-5 text-red-500" />
+                    testResults.passed ? <Unlock className="w-5 h-5 text-[var(--gh-success-fg,#16a34a)]" /> : <Lock className="w-5 h-5 text-[var(--gh-danger-fg,#dc2626)]" />
                   ) : (
-                    <Zap className="w-5 h-5 text-amber-500" />
+                    <Zap className="w-5 h-5 text-[var(--gh-attention-fg,#d97706)]" />
                   )}
                 </div>
                 <div>
                   <h3 className="font-bold">
-                    {showResults ? (testResults.passed ? '🎉 Passed!' : '❌ Failed') : 'Checkpoint Test'}
+                    {showResults ? (testResults.passed ? 'Passed!' : 'Failed') : 'Checkpoint Test'}
                   </h3>
                   <p className="text-xs text-muted-foreground">
                     {showResults ? `${testResults.correct}/${testResults.total} correct` : `Q${currentTestIndex + 1}/${testQuestions.length} • Tap answer to submit`}
@@ -476,7 +477,7 @@ export default function CertificationPractice() {
                   {testQuestions.map((_, i) => (
                     <div key={i} className={`w-2.5 h-2.5 rounded-full ${
                       i < testAnswers.length
-                        ? testAnswers[i]?.isCorrect ? 'bg-green-500' : 'bg-red-500'
+                        ? testAnswers[i]?.isCorrect ? 'bg-[var(--gh-success-fg,#16a34a)]' : 'bg-[var(--gh-danger-fg,#dc2626)]'
                         : i === currentTestIndex ? 'bg-primary' : 'bg-muted'
                     }`} />
                   ))}
@@ -507,18 +508,19 @@ export default function CertificationPractice() {
                     <div key={q.id} className={`border rounded-xl overflow-hidden ${
                       answer?.isCorrect ? 'border-green-500/30' : 'border-red-500/30'
                     }`}>
-                      <button
+                      <Button
+                        variant="ghost"
                         onClick={() => toggleResultExpand(index)}
-                        className="w-full p-3 flex items-center gap-3 text-left hover:bg-muted/30"
+                        className="w-full justify-start gap-3 text-left"
                       >
                         {answer?.isCorrect ? (
-                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-[var(--gh-success-fg,#16a34a)] flex-shrink-0" />
                         ) : (
-                          <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                          <XCircle className="w-5 h-5 text-[var(--gh-danger-fg,#dc2626)] flex-shrink-0" />
                         )}
                         <span className="flex-1 text-sm line-clamp-1">{q.question}</span>
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      </button>
+                      </Button>
 
                       <AnimatePresence>
                         {isExpanded && (
@@ -575,24 +577,26 @@ export default function CertificationPractice() {
                     const showResult = showingFeedback && (isSelected || isCorrect);
                     
                     return (
-                      <button
+                      <Button
                         key={option.id}
+                        variant={showResult ? (isCorrect ? 'success' : isSelected ? 'danger' : 'outline') : 'outline'}
+                        size="md"
                         onClick={() => handleAnswerClick(option.id)}
                         disabled={showingFeedback}
-                        className={`w-full p-4 text-left border-2 rounded-xl transition-all ${
+                        className={`w-full justify-start text-left h-auto py-4 ${
                           showResult
                             ? isCorrect
-                              ? 'border-green-500 bg-green-500/10'
+                              ? 'border-[var(--gh-success-fg,#16a34a)] bg-[var(--gh-success-subtle,#dcfce7)]/10'
                               : isSelected
-                              ? 'border-red-500 bg-red-500/10'
-                              : 'border-border'
-                            : 'border-border hover:border-primary/50 hover:bg-muted/30'
-                        } ${showingFeedback ? 'cursor-default' : ''}`}
+                              ? 'border-[var(--gh-danger-fg,#dc2626)] bg-[var(--gh-danger-subtle,#fee2e2)]/10'
+                              : ''
+                            : 'hover:border-primary/50 hover:bg-muted/30'
+                        }`}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                            showResult && isCorrect ? 'border-green-500 bg-green-500' :
-                            showResult && isSelected && !isCorrect ? 'border-red-500 bg-red-500' :
+                            showResult && isCorrect ? 'border-[var(--gh-success-fg,#16a34a)] bg-[var(--gh-success-fg,#16a34a)]' :
+                            showResult && isSelected && !isCorrect ? 'border-[var(--gh-danger-fg,#dc2626)] bg-[var(--gh-danger-fg,#dc2626)]' :
                             'border-muted-foreground/30'
                           }`}>
                             {showResult && isCorrect && <Check className="w-3 h-3 text-white" />}
@@ -600,7 +604,7 @@ export default function CertificationPractice() {
                           </div>
                           <span className="text-sm">{option.text}</span>
                         </div>
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -624,25 +628,25 @@ export default function CertificationPractice() {
             {showResults ? (
               <div className="flex gap-3">
                 {testResults.passed ? (
-                  <button onClick={closeTestAndContinue} className="flex-1 py-3 bg-green-500 text-white rounded-xl font-medium flex items-center justify-center gap-2">
-                    <Unlock className="w-5 h-5" /> Continue
-                  </button>
+                  <Button variant="success" size="lg" fullWidth onClick={closeTestAndContinue} icon={<Unlock className="w-5 h-5" />}>
+                    Continue
+                  </Button>
                 ) : (
                   <>
-                    <button onClick={retryTest} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-medium flex items-center justify-center gap-2">
-                      <RefreshCw className="w-4 h-4" /> Retry
-                    </button>
-                    <button onClick={() => setShowSkipConfirm(true)} className="flex-1 py-3 bg-muted rounded-xl font-medium flex items-center justify-center gap-2 text-muted-foreground">
-                      <SkipForward className="w-4 h-4" /> Skip (-{SKIP_TEST_PENALTY})
-                    </button>
+                    <Button variant="primary" size="lg" fullWidth onClick={retryTest} icon={<RefreshCw className="w-4 h-4" />}>
+                      Retry
+                    </Button>
+                    <Button variant="secondary" size="lg" fullWidth onClick={() => setShowSkipConfirm(true)} icon={<SkipForward className="w-4 h-4" />}>
+                      Skip (-{SKIP_TEST_PENALTY})
+                    </Button>
                   </>
                 )}
               </div>
             ) : (
               <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <button onClick={() => setShowSkipConfirm(true)} className="flex items-center gap-1 hover:text-foreground">
-                  <SkipForward className="w-4 h-4" /> Skip (-{SKIP_TEST_PENALTY})
-                </button>
+                <Button variant="ghost" size="sm" onClick={() => setShowSkipConfirm(true)} icon={<SkipForward className="w-4 h-4" />}>
+                  Skip (-{SKIP_TEST_PENALTY})
+                </Button>
                 <span>Tap an answer to submit</span>
               </div>
             )}
@@ -681,16 +685,18 @@ export default function CertificationPractice() {
                 <span>Balance: <b>{formatCredits(balance)}</b></span>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => setShowSkipConfirm(false)} className="flex-1 py-2.5 bg-muted rounded-xl font-medium">
+                <Button variant="secondary" size="md" fullWidth onClick={() => setShowSkipConfirm(false)}>
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="danger"
+                  size="md"
+                  fullWidth
                   onClick={skipTestWithPenalty}
                   disabled={balance < SKIP_TEST_PENALTY}
-                  className="flex-1 py-2.5 bg-red-500 text-white rounded-xl font-medium disabled:opacity-50"
                 >
                   Skip
-                </button>
+                </Button>
               </div>
             </div>
           </motion.div>
@@ -711,9 +717,7 @@ export default function CertificationPractice() {
           <div className="max-w-7xl mx-auto px-3 py-2">
             {/* Main row: Back, Title, Progress, Credits */}
             <div className="flex items-center gap-2">
-              <button onClick={exitSession} className="p-1.5 hover:bg-muted rounded-md shrink-0" title="Exit and save progress">
-                <ArrowLeft className="w-4 h-4" />
-              </button>
+              <IconButton icon={<ArrowLeft className="w-4 h-4" />} size="sm" onClick={exitSession} variant="ghost" aria-label="Exit and save progress" />
               
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -742,42 +746,50 @@ export default function CertificationPractice() {
               {/* Right side: Difficulty pills + Credits */}
               <div className="flex items-center gap-1 shrink-0">
                 {['all', 'beginner', 'intermediate', 'advanced'].map(diff => (
-                  <button key={diff} onClick={() => { setSelectedDifficulty(diff); setCurrentIndex(0); }}
-                    className={`px-2 py-0.5 text-[10px] rounded-md capitalize hidden sm:block ${
+                  <Button
+                    key={diff}
+                    size="xs"
+                    variant={selectedDifficulty === diff ? 'primary' : 'ghost'}
+                    onClick={() => { setSelectedDifficulty(diff); setCurrentIndex(0); }}
+                    className={`hidden sm:inline-flex capitalize ${
                       selectedDifficulty === diff 
-                        ? diff === 'beginner' ? 'bg-green-500/20 text-green-500' 
-                          : diff === 'intermediate' ? 'bg-yellow-500/20 text-yellow-500'
-                          : diff === 'advanced' ? 'bg-red-500/20 text-red-500'
-                          : 'bg-primary text-primary-foreground'
-                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                    }`}>
+                        ? diff === 'beginner' ? 'bg-[var(--gh-success-subtle,#dcfce7)] text-[var(--gh-success-fg,#16a34a)]' 
+                          : diff === 'intermediate' ? 'bg-[var(--gh-attention-subtle,#fef9c3)] text-[var(--gh-attention-fg,#ca8a04)]'
+                          : diff === 'advanced' ? 'bg-[var(--gh-danger-subtle,#fee2e2)] text-[var(--gh-danger-fg,#dc2626)]'
+                          : ''
+                        : ''
+                    }`}
+                  >
                     {diff === 'all' ? 'All' : diff === 'beginner' ? 'Easy' : diff === 'intermediate' ? 'Med' : 'Hard'}
-                  </button>
+                  </Button>
                 ))}
-                <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-md ml-1">
-                  <Coins className="w-3 h-3 text-amber-500" />
-                  <span className="text-[10px] font-bold text-amber-500 tabular-nums">{formatCredits(balance)}</span>
+                <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-[var(--gh-attention-subtle,#fef3c7)] border border-[var(--gh-attention-subtle,#fef3c7)] rounded-md ml-1">
+                  <Coins className="w-3 h-3 text-[var(--gh-attention-fg,#d97706)]" />
+                  <span className="text-[10px] font-bold text-[var(--gh-attention-fg,#d97706)] tabular-nums">{formatCredits(balance)}</span>
                 </div>
-                <button onClick={() => setShowInfo(!showInfo)} className="p-1 hover:bg-muted rounded-md">
-                  <Info className="w-3.5 h-3.5" />
-                </button>
+                <IconButton icon={<Info className="w-3.5 h-3.5" />} size="sm" variant="ghost" onClick={() => setShowInfo(!showInfo)} aria-label="Toggle info" />
               </div>
             </div>
 
             {/* Mobile difficulty filter - only on small screens */}
             <div className="flex items-center gap-1 mt-1.5 sm:hidden overflow-x-auto no-scrollbar">
               {['all', 'beginner', 'intermediate', 'advanced'].map(diff => (
-                <button key={diff} onClick={() => { setSelectedDifficulty(diff); setCurrentIndex(0); }}
-                  className={`px-2 py-0.5 text-[10px] rounded-md capitalize shrink-0 ${
+                <Button
+                  key={diff}
+                  size="xs"
+                  variant={selectedDifficulty === diff ? 'primary' : 'ghost'}
+                  onClick={() => { setSelectedDifficulty(diff); setCurrentIndex(0); }}
+                  className={`shrink-0 capitalize ${
                     selectedDifficulty === diff 
-                      ? diff === 'beginner' ? 'bg-green-500/20 text-green-500' 
-                        : diff === 'intermediate' ? 'bg-yellow-500/20 text-yellow-500'
-                        : diff === 'advanced' ? 'bg-red-500/20 text-red-500'
-                        : 'bg-primary text-primary-foreground'
-                      : 'bg-muted/50 text-muted-foreground'
-                  }`}>
+                      ? diff === 'beginner' ? 'bg-[var(--gh-success-subtle,#dcfce7)] text-[var(--gh-success-fg,#16a34a)]' 
+                        : diff === 'intermediate' ? 'bg-[var(--gh-attention-subtle,#fef9c3)] text-[var(--gh-attention-fg,#ca8a04)]'
+                        : diff === 'advanced' ? 'bg-[var(--gh-danger-subtle,#fee2e2)] text-[var(--gh-danger-fg,#dc2626)]'
+                        : ''
+                      : ''
+                  }`}
+                >
                   {diff === 'all' ? 'All' : diff === 'beginner' ? 'Easy' : diff === 'intermediate' ? 'Medium' : 'Hard'}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -807,7 +819,7 @@ export default function CertificationPractice() {
           </div>
         ) : error ? (
           <div className="flex items-center justify-center h-[60vh] text-center">
-            <div><p className="text-red-500 mb-2">{error}</p><button onClick={() => window.location.reload()} className="text-primary">Retry</button></div>
+            <div><p className="text-[var(--gh-danger-fg,#dc2626)] mb-2">{error}</p><Button variant="ghost" size="sm" onClick={() => window.location.reload()}>Retry</Button></div>
           </div>
         ) : totalQuestions === 0 ? (
           <ComingSoon 
@@ -831,8 +843,12 @@ export default function CertificationPractice() {
             {/* Mobile */}
             <div className="lg:hidden flex flex-col h-[calc(100vh-140px)]">
               <div className="flex border-b border-border">
-                <button onClick={() => setMobileView('question')} className={`flex-1 py-2 text-sm font-medium ${mobileView === 'question' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Question</button>
-                <button onClick={() => setMobileView('answer')} className={`flex-1 py-2 text-sm font-medium ${mobileView === 'answer' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Answer</button>
+                <Button variant="ghost" size="sm" fullWidth onClick={() => setMobileView('question')} className={`rounded-none ${mobileView === 'question' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>
+                  Question
+                </Button>
+                <Button variant="ghost" size="sm" fullWidth onClick={() => setMobileView('answer')} className={`rounded-none ${mobileView === 'answer' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>
+                  Answer
+                </Button>
               </div>
               <div className="flex-1 overflow-y-auto pb-14 momentum-scroll touch-pan-y" onTouchStart={swipeHandlers.onTouchStart} onTouchMove={swipeHandlers.onTouchMove} onTouchEnd={swipeHandlers.onTouchEnd}>
                 {mobileView === 'question' ? (
@@ -846,16 +862,17 @@ export default function CertificationPractice() {
             {/* Nav - Minimal */}
             <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border py-1.5 px-3">
               <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
-                <button onClick={goToPrev} disabled={currentIndex === 0} className="flex items-center gap-1 px-2.5 py-1.5 bg-muted rounded-md disabled:opacity-40 text-xs">
-                  <ChevronLeft className="w-4 h-4" />Prev
-                </button>
-                <button onClick={markCompleted} disabled={isCompleted} className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium ${isCompleted ? 'bg-green-500/10 text-green-500' : 'bg-primary text-primary-foreground'}`}>
-                  <Check className="w-3.5 h-3.5" />{isCompleted ? 'Done' : 'Mark Done'}
-                </button>
-                <button onClick={goToNext} disabled={currentIndex === totalQuestions - 1} className="flex items-center gap-1 px-2.5 py-1.5 bg-muted rounded-md disabled:opacity-40 text-xs">
-                  Next<ChevronRight className="w-4 h-4" />
-                  {isTestCheckpoint(currentIndex + 1) && !isCheckpointPassed(currentIndex + 1) && <Lock className="w-3 h-3 text-amber-500" />}
-                </button>
+                <Button variant="secondary" size="sm" onClick={goToPrev} disabled={currentIndex === 0} icon={<ChevronLeft className="w-4 h-4" />}>
+                  Prev
+                </Button>
+                <Button variant={isCompleted ? 'success' : 'primary'} size="sm" onClick={markCompleted} disabled={isCompleted} icon={<Check className="w-3.5 h-3.5" />}>
+                  {isCompleted ? 'Done' : 'Mark Done'}
+                </Button>
+                <Button variant="secondary" size="sm" onClick={goToNext} disabled={currentIndex === totalQuestions - 1}>
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                  {isTestCheckpoint(currentIndex + 1) && !isCheckpointPassed(currentIndex + 1) && <Lock className="w-3 h-3 text-[var(--gh-attention-fg,#d97706)]" />}
+                </Button>
               </div>
             </div>
           </>

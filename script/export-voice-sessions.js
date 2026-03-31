@@ -21,8 +21,8 @@ async function main() {
   console.log('=== Export Voice Sessions ===\n');
   
   const db = createClient({
-    url: process.env.TURSO_DATABASE_URL,
-    authToken: process.env.TURSO_AUTH_TOKEN,
+    url: 'file:local.db',
+    authToken: undefined,
   });
   
   try {

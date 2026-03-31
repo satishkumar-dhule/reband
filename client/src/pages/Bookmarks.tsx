@@ -12,6 +12,8 @@ import {
   CheckCircle, Building2, X, BookOpen, Home
 } from 'lucide-react';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { Button, IconButton } from '../components/unified/Button';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../components/ui/select';
 
 interface BookmarkedQuestion extends Question {
   channelId: string;
@@ -129,46 +131,39 @@ export default function Bookmarks() {
               <div className="bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border)] px-4 py-3 flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2 flex-1 min-w-[200px]">
                   <Filter className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                  <label htmlFor="filter-channel" className="sr-only">
-                    Filter by channel
-                  </label>
-                  <select
-                    id="filter-channel"
-                    value={filterChannel}
-                    onChange={e => setFilterChannel(e.target.value)}
-                    className="h-8 px-2 text-sm rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-[var(--gh-fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-emphasis)]"
-                    data-testid="filter-channel"
-                  >
-                    <option value="all">All channels</option>
-                    {channelsWithBookmarks.map(ch => (
-                      <option key={ch} value={ch}>{fmt(ch)}</option>
-                    ))}
-                  </select>
-                  <label htmlFor="filter-difficulty" className="sr-only">
-                    Filter by difficulty
-                  </label>
-                  <select
-                    id="filter-difficulty"
-                    value={filterDifficulty}
-                    onChange={e => setFilterDifficulty(e.target.value)}
-                    className="h-8 px-2 text-sm rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-[var(--gh-fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-emphasis)]"
-                    data-testid="filter-difficulty"
-                  >
-                    <option value="all">All difficulties</option>
-                    <option value="beginner">Easy</option>
-                    <option value="intermediate">Medium</option>
-                    <option value="advanced">Hard</option>
-                  </select>
+                  <Select value={filterChannel} onValueChange={setFilterChannel}>
+                    <SelectTrigger className="h-8 w-[160px]" data-testid="filter-channel">
+                      <SelectValue placeholder="All channels" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All channels</SelectItem>
+                      {channelsWithBookmarks.map(ch => (
+                        <SelectItem key={ch} value={ch}>{fmt(ch)}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={filterDifficulty} onValueChange={setFilterDifficulty}>
+                    <SelectTrigger className="h-8 w-[140px]" data-testid="filter-difficulty">
+                      <SelectValue placeholder="All difficulties" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All difficulties</SelectItem>
+                      <SelectItem value="beginner">Easy</SelectItem>
+                      <SelectItem value="intermediate">Medium</SelectItem>
+                      <SelectItem value="advanced">Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {hasFilters && (
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => { setFilterChannel('all'); setFilterDifficulty('all'); }}
-                    className="gh-btn gh-btn-outline h-8 px-3 text-sm"
                     data-testid="button-clear-filters"
                   >
                     <X className="w-3.5 h-3.5" /> Clear filters
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -181,13 +176,13 @@ export default function Bookmarks() {
                     <p className="text-[var(--gh-fg-muted)] mb-6">
                       Bookmark questions while studying to build your personalized study list.
                     </p>
-                    <button
+                    <Button
+                      variant="primary"
                       onClick={() => setLocation('/channels')}
-                      className="gh-btn gh-btn-primary"
                       data-testid="button-browse"
                     >
                       Browse Channels
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ) : filteredQuestions.length === 0 ? (
@@ -245,14 +240,14 @@ export default function Bookmarks() {
 
                         {/* Actions */}
                         <div className="flex items-center gap-2 shrink-0 self-center">
-                          <button
+                          <IconButton
+                            icon={<Trash2 className="w-4 h-4" />}
+                            variant="outline"
+                            size="sm"
                             onClick={e => { e.stopPropagation(); removeBookmark(question); }}
-                            className="gh-btn gh-btn-outline p-2 text-[var(--gh-fg-muted)] hover:text-[var(--gh-danger-fg)] hover:border-[var(--gh-danger-emphasis)]"
                             aria-label="Remove bookmark"
                             data-testid={`remove-bookmark-${question.id}`}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          />
                           <ChevronRight className="w-4 h-4 text-[var(--gh-fg-subtle)] group-hover:text-[var(--gh-accent-fg)]" />
                         </div>
                       </div>

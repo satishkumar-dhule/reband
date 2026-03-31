@@ -4,8 +4,8 @@ name: 🧹 Daily Maintenance
 
 on:
   schedule:
-    # Run daily at 2 AM UTC
-    - cron: '0 2 * * *'
+    # Run daily at 3 AM UTC (after content generation at 2 AM completes)
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 permissions:
@@ -23,16 +23,12 @@ jobs:
       
       - name: Run migrations (if needed)
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           echo "🔄 Running database migrations..."
           node script/migrations/add-is-new-column.js || echo "⚠️  Migration skipped or already applied"
       
       - name: Clear old NEW flags
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           echo "🧹 Clearing NEW flags for questions older than 7 days..."
           node script/maintenance/clear-old-new-flags.js

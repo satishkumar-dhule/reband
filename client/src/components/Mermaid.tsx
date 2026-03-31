@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { X, ZoomIn, ZoomOut, Maximize2, Palette } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { Button, IconButton } from '@/components/unified/Button';
 
 // Mermaid theme configurations matching mermaid.live themes
 type MermaidTheme = 'default' | 'neutral' | 'dark' | 'forest' | 'base';
@@ -153,9 +154,10 @@ async function initMermaid(mermaidTheme: MermaidTheme, force = false) {
 interface MermaidProps {
   chart: string;
   themeOverride?: MermaidTheme;
+  caption?: string;
 }
 
-export function Mermaid({ chart, themeOverride }: MermaidProps) {
+export function Mermaid({ chart, themeOverride, caption }: MermaidProps) {
   const { theme: appTheme } = useTheme();
   const ref = useRef<HTMLDivElement>(null);
   const expandedContainerRef = useRef<HTMLDivElement>(null);
@@ -340,78 +342,86 @@ export function Mermaid({ chart, themeOverride }: MermaidProps) {
           <div className="flex items-center gap-1">
             {/* Theme picker */}
             <div className="relative">
-              <button
+              <IconButton
+                icon={<Palette className="w-3.5 h-3.5" />}
                 onClick={() => setShowThemePicker(!showThemePicker)}
-                className="p-1.5 hover:bg-white/10 rounded transition-colors flex items-center gap-1"
-                title="Change theme"
-              >
-                <Palette className="w-3.5 h-3.5 text-white/70" />
-                <span className="text-[9px] text-white/50 hidden sm:inline">{effectiveMermaidTheme}</span>
-              </button>
+                variant="ghost"
+                size="sm"
+                aria-label="Change theme"
+                className="text-white/70 hover:text-white"
+              />
               {showThemePicker && (
                 <div className="absolute top-full right-0 mt-1 bg-black border border-white/20 rounded shadow-lg z-10 min-w-[120px]">
                   {mermaidThemes.map((t) => (
-                    <button
+                    <Button
                       key={t.id}
+                      variant="ghost"
+                      size="sm"
                       onClick={() => {
                         handleThemeChange(t.id);
                         setShowThemePicker(false);
                       }}
-                      className={`w-full px-3 py-1.5 text-left text-[10px] hover:bg-white/10 flex items-center gap-2 ${
+                      className={`w-full justify-start px-3 py-1.5 text-left text-[10px] ${
                         effectiveMermaidTheme === t.id ? 'text-primary' : 'text-white/70'
                       }`}
                     >
                       <span className="w-2 h-2 rounded-full" style={{ backgroundColor: t.color }} />
                       {t.name}
-                    </button>
+                    </Button>
                   ))}
                   <div className="border-t border-white/10 mt-1 pt-1">
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => {
                         handleThemeChange(null);
                         setShowThemePicker(false);
                       }}
-                      className="w-full px-3 py-1.5 text-left text-[10px] text-white/50 hover:bg-white/10"
+                      className="w-full justify-start px-3 py-1.5 text-left text-[10px] text-white/50"
                     >
                       Auto (match app)
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
             </div>
             <div className="w-px h-4 bg-white/20 mx-1" />
-            <button
+            <IconButton
+              icon={<ZoomOut className="w-3.5 h-3.5" />}
               onClick={() => setZoomLevel(z => Math.max(0.5, z - 0.25))}
-              className="p-1.5 hover:bg-white/10 rounded transition-colors"
-              title="Zoom out"
-            >
-              <ZoomOut className="w-3.5 h-3.5 text-white/70" />
-            </button>
+              variant="ghost"
+              size="sm"
+              aria-label="Zoom out"
+              className="text-white/70 hover:text-white"
+            />
             <span className="text-[10px] text-white/50 w-12 text-center font-mono">
               {Math.round(zoomLevel * 100)}%
             </span>
-            <button
+            <IconButton
+              icon={<ZoomIn className="w-3.5 h-3.5" />}
               onClick={() => setZoomLevel(z => Math.min(4, z + 0.25))}
-              className="p-1.5 hover:bg-white/10 rounded transition-colors"
-              title="Zoom in"
-            >
-              <ZoomIn className="w-3.5 h-3.5 text-white/70" />
-            </button>
-            <button
+              variant="ghost"
+              size="sm"
+              aria-label="Zoom in"
+              className="text-white/70 hover:text-white"
+            />
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={handleFitToScreen}
-              className="px-2 py-1 text-[9px] text-white/50 hover:text-white hover:bg-white/10 rounded transition-colors uppercase tracking-wider"
-              title="Fit to screen"
+              className="text-white/50 hover:text-white uppercase tracking-wider"
             >
               Fit
-            </button>
+            </Button>
             <div className="w-px h-4 bg-white/20 mx-1" />
-            <button
+            <IconButton
+              icon={<X className="w-3.5 h-3.5" />}
               onClick={() => setIsExpanded(false)}
-              className="p-1.5 hover:bg-white/10 rounded transition-colors"
-              title="Close"
-            >
-              <X className="w-3.5 h-3.5 text-white/70" />
-            </button>
+              variant="ghost"
+              size="sm"
+              aria-label="Close"
+              className="text-white/70 hover:text-white"
+            />
           </div>
         </div>
 
@@ -442,14 +452,22 @@ export function Mermaid({ chart, themeOverride }: MermaidProps) {
         onClick={() => !isMobile && setIsExpanded(true)}
         dangerouslySetInnerHTML={{ __html: typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(svgContent, { USE_PROFILES: { svg: true } }) : svgContent }}
       />
+      {/* Caption */}
+      {caption && (
+        <div className="text-center text-xs text-white/50 mt-1 px-2">
+          {caption}
+        </div>
+      )}
       {/* Expand button - hidden on mobile */}
-      <button
+      <IconButton
+        icon={<Maximize2 className="w-3 h-3 text-white" />}
         onClick={(e) => { e.stopPropagation(); setIsExpanded(true); }}
-        className="absolute top-1 right-1 p-1.5 bg-black/70 hover:bg-primary rounded opacity-0 group-hover:opacity-100 transition-all border border-white/20 hidden sm:block"
+        variant="ghost"
+        size="sm"
         title="Expand diagram"
-      >
-        <Maximize2 className="w-3 h-3 text-white" />
-      </button>
+        aria-label="Expand diagram"
+        className="absolute top-1 right-1 p-1.5 bg-black/70 hover:bg-primary rounded opacity-0 group-hover:opacity-100 transition-all border border-white/20 hidden sm:block"
+      />
     </div>
   );
 }

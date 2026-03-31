@@ -28,10 +28,10 @@ const MAX_SKIP_ATTEMPTS = 5; // Max questions to try before giving up
 const GA_MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID || 'G-47MSM57H95'; // Same as main app
 
 // Database connection
-const url = process.env.TURSO_DATABASE_URL_RO || process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN_RO || process.env.TURSO_AUTH_TOKEN;
-const writeUrl = process.env.TURSO_DATABASE_URL;
-const writeToken = process.env.TURSO_AUTH_TOKEN;
+const url = 'file:local.db';
+const authToken = undefined;
+const writeUrl = 'file:local.db';
+const writeToken = undefined;
 
 if (!url) {
   console.error('❌ Missing TURSO_DATABASE_URL environment variable');

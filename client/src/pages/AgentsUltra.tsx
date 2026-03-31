@@ -10,7 +10,7 @@ import {
   Bot, Code, TestTube, Library, Microscope,
   Star, Bell, DoorOpen, MessageSquare, HardDrive
 } from "lucide-react";
-import { messageBus } from "@/agents/core/AgentMessageBus";
+import { Button } from "@/components/unified/Button";
 
 const iconsMap: Record<string, any> = {
   Palette, Sparkles, Accessibility, Smartphone,
@@ -22,49 +22,49 @@ const iconsMap: Record<string, any> = {
 };
 
 // 30 Autonomous Agents Configuration
-// Using consistent design system colors (GitHub-style semantic palette)
+// Using GitHub CSS variables for semantic colors
 const agents = [
-  // UI/UX Agents (1-5) - Purple/Pink/Teal accent colors
-  { id: 'ui-ux-architect', name: 'UI/UX Architect', icon: 'Palette', color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/30', category: 'UI/UX', desc: 'Design & prototyping' },
-  { id: 'design-system', name: 'Design System', icon: 'Layers', color: 'text-violet-500', bg: 'bg-violet-500/10', border: 'border-violet-500/30', category: 'UI/UX', desc: 'Component libraries' },
-  { id: 'accessibility', name: 'Accessibility', icon: 'Accessibility', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', category: 'UI/UX', desc: 'WCAG compliance' },
-  { id: 'animation', name: 'Animation', icon: 'Sparkles', color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30', category: 'UI/UX', desc: 'Motion & transitions' },
-  { id: 'responsive', name: 'Responsive', icon: 'Smartphone', color: 'text-pink-500', bg: 'bg-pink-500/10', border: 'border-pink-500/30', category: 'UI/UX', desc: 'Multi-device layouts' },
+  // UI/UX Agents (1-5)
+  { id: 'ui-ux-architect', name: 'UI/UX Architect', icon: 'Palette', color: 'text-[var(--gh-accent-fg)]', bg: 'bg-[var(--gh-accent-subtle)]', border: 'border-[var(--gh-accent-emphasis)]', category: 'UI/UX', desc: 'Design & prototyping' },
+  { id: 'design-system', name: 'Design System', icon: 'Layers', color: 'text-[var(--gh-accent-fg)]', bg: 'bg-[var(--gh-accent-subtle)]', border: 'border-[var(--gh-accent-emphasis)]', category: 'UI/UX', desc: 'Component libraries' },
+  { id: 'accessibility', name: 'Accessibility', icon: 'Accessibility', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'UI/UX', desc: 'WCAG compliance' },
+  { id: 'animation', name: 'Animation', icon: 'Sparkles', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'UI/UX', desc: 'Motion & transitions' },
+  { id: 'responsive', name: 'Responsive', icon: 'Smartphone', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'UI/UX', desc: 'Multi-device layouts' },
   
-  // Database Agents (6-10) - Blue/Sky/Teal colors
-  { id: 'db-architect', name: 'DB Architect', icon: 'HardDrive', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Database', desc: 'Schema design' },
-  { id: 'query-optimizer', name: 'Query Optimizer', icon: 'Search', color: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/30', category: 'Database', desc: 'SQL performance' },
-  { id: 'migration', name: 'Migration', icon: 'RefreshCw', color: 'text-teal-500', bg: 'bg-teal-500/10', border: 'border-teal-500/30', category: 'Database', desc: 'Data migration' },
-  { id: 'backup', name: 'Backup', icon: 'Save', color: 'text-slate-500', bg: 'bg-slate-500/10', border: 'border-slate-500/30', category: 'Database', desc: 'Disaster recovery' },
-  { id: 'cache', name: 'Cache Manager', icon: 'Zap', color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/30', category: 'Database', desc: 'Redis caching' },
+  // Database Agents (6-10)
+  { id: 'db-architect', name: 'DB Architect', icon: 'HardDrive', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Database', desc: 'Schema design' },
+  { id: 'query-optimizer', name: 'Query Optimizer', icon: 'Search', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Database', desc: 'SQL performance' },
+  { id: 'migration', name: 'Migration', icon: 'RefreshCw', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Database', desc: 'Data migration' },
+  { id: 'backup', name: 'Backup', icon: 'Save', color: 'text-[var(--gh-fg-muted)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Database', desc: 'Disaster recovery' },
+  { id: 'cache', name: 'Cache Manager', icon: 'Zap', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Database', desc: 'Redis caching' },
   
-  // Google Agents (11-15) - Google brand colors
-  { id: 'google-analytics', name: 'Google Analytics', icon: 'BarChart', color: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/30', category: 'Google', desc: 'User tracking' },
-  { id: 'google-auth', name: 'Google Auth', icon: 'Lock', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Google', desc: 'OAuth/SSO' },
-  { id: 'google-cloud', name: 'Google Cloud', icon: 'Cloud', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', category: 'Google', desc: 'GCP deployment' },
-  { id: 'google-maps', name: 'Google Maps', icon: 'Map', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30', category: 'Google', desc: 'Location services' },
-  { id: 'google-sheets', name: 'Google Sheets', icon: 'FileText', color: 'text-green-600', bg: 'bg-green-600/10', border: 'border-green-600/30', category: 'Google', desc: 'Data export' },
+  // Google Agents (11-15)
+  { id: 'google-analytics', name: 'Google Analytics', icon: 'BarChart', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Google', desc: 'User tracking' },
+  { id: 'google-auth', name: 'Google Auth', icon: 'Lock', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Google', desc: 'OAuth/SSO' },
+  { id: 'google-cloud', name: 'Google Cloud', icon: 'Cloud', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Google', desc: 'GCP deployment' },
+  { id: 'google-maps', name: 'Google Maps', icon: 'Map', color: 'text-[var(--gh-danger-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Google', desc: 'Location services' },
+  { id: 'google-sheets', name: 'Google Sheets', icon: 'FileText', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Google', desc: 'Data export' },
   
-  // DevOps Agents (16-20) - Cyan/Blue colors
-  { id: 'ci-cd', name: 'CI/CD Pipeline', icon: 'RefreshCw', color: 'text-cyan-500', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', category: 'DevOps', desc: 'Automation' },
-  { id: 'docker', name: 'Docker', icon: 'Box', color: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/30', category: 'DevOps', desc: 'Containers' },
-  { id: 'kubernetes', name: 'Kubernetes', icon: 'Globe', color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', category: 'DevOps', desc: 'Orchestration' },
-  { id: 'monitoring', name: 'Monitoring', icon: 'Activity', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/30', category: 'DevOps', desc: 'System health' },
-  { id: 'security', name: 'Security', icon: 'Shield', color: 'text-violet-600', bg: 'bg-violet-600/10', border: 'border-violet-600/30', category: 'DevOps', desc: 'Security scanning' },
+  // DevOps Agents (16-20)
+  { id: 'ci-cd', name: 'CI/CD Pipeline', icon: 'RefreshCw', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'DevOps', desc: 'Automation' },
+  { id: 'docker', name: 'Docker', icon: 'Box', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'DevOps', desc: 'Containers' },
+  { id: 'kubernetes', name: 'Kubernetes', icon: 'Globe', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'DevOps', desc: 'Orchestration' },
+  { id: 'monitoring', name: 'Monitoring', icon: 'Activity', color: 'text-[var(--gh-danger-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'DevOps', desc: 'System health' },
+  { id: 'security', name: 'Security', icon: 'Shield', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'DevOps', desc: 'Security scanning' },
   
-  // AI/ML Agents (21-25) - Purple/Lime colors
-  { id: 'ai-assistant', name: 'AI Assistant', icon: 'Bot', color: 'text-fuchsia-500', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/30', category: 'AI/ML', desc: 'NLP & generative' },
-  { id: 'code-generator', name: 'Code Generator', icon: 'Code', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/30', category: 'AI/ML', desc: 'Code generation' },
-  { id: 'testing', name: 'Testing', icon: 'TestTube', color: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', category: 'AI/ML', desc: 'QA & coverage' },
-  { id: 'documentation', name: 'Documentation', icon: 'Library', color: 'text-slate-500', bg: 'bg-slate-500/10', border: 'border-slate-500/30', category: 'AI/ML', desc: 'API docs' },
-  { id: 'analytics-ml', name: 'ML Analytics', icon: 'Microscope', color: 'text-purple-500', bg: 'bg-purple-500/10', border: 'border-purple-500/30', category: 'AI/ML', desc: 'Data insights' },
+  // AI/ML Agents (21-25)
+  { id: 'ai-assistant', name: 'AI Assistant', icon: 'Bot', color: 'text-[var(--gh-accent-fg)]', bg: 'bg-[var(--gh-accent-subtle)]', border: 'border-[var(--gh-accent-emphasis)]', category: 'AI/ML', desc: 'NLP & generative' },
+  { id: 'code-generator', name: 'Code Generator', icon: 'Code', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'AI/ML', desc: 'Code generation' },
+  { id: 'testing', name: 'Testing', icon: 'TestTube', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'AI/ML', desc: 'QA & coverage' },
+  { id: 'documentation', name: 'Documentation', icon: 'Library', color: 'text-[var(--gh-fg-muted)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'AI/ML', desc: 'API docs' },
+  { id: 'analytics-ml', name: 'ML Analytics', icon: 'Microscope', color: 'text-[var(--gh-accent-fg)]', bg: 'bg-[var(--gh-accent-subtle)]', border: 'border-[var(--gh-accent-emphasis)]', category: 'AI/ML', desc: 'Data insights' },
   
-  // Feature Agents (26-30) - Orange/Rose/Teal colors
-  { id: 'onboarding', name: 'Onboarding', icon: 'Star', color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30', category: 'Features', desc: 'User guidance' },
-  { id: 'notifications', name: 'Notifications', icon: 'Bell', color: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/30', category: 'Features', desc: 'Push & email' },
-  { id: 'search', name: 'Search', icon: 'Search', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/30', category: 'Features', desc: 'Indexing' },
-  { id: 'api-gateway', name: 'API Gateway', icon: 'DoorOpen', color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', category: 'Features', desc: 'Routes & rate limiting' },
-  { id: 'feedback', name: 'Feedback', icon: 'MessageSquare', color: 'text-teal-500', bg: 'bg-teal-500/10', border: 'border-teal-500/30', category: 'Features', desc: 'Surveys' },
+  // Feature Agents (26-30)
+  { id: 'onboarding', name: 'Onboarding', icon: 'Star', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Features', desc: 'User guidance' },
+  { id: 'notifications', name: 'Notifications', icon: 'Bell', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Features', desc: 'Push & email' },
+  { id: 'search', name: 'Search', icon: 'Search', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Features', desc: 'Indexing' },
+  { id: 'api-gateway', name: 'API Gateway', icon: 'DoorOpen', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Features', desc: 'Routes & rate limiting' },
+  { id: 'feedback', name: 'Feedback', icon: 'MessageSquare', color: 'text-[var(--gh-fg)]', bg: 'bg-[var(--gh-canvas)]', border: 'border-[var(--gh-border)]', category: 'Features', desc: 'Surveys' },
 ];
 
 // Get agent component based on selection
@@ -81,9 +81,9 @@ function AgentPanel({ agent }: { agent: typeof agents[0] }) {
       </div>
       <p className="text-muted-foreground mb-4">{agent.desc}</p>
       <div className="flex gap-2 flex-wrap">
-        <span className="px-3 py-1 rounded-full text-xs bg-primary/10 text-primary">Status: Active</span>
+        <span className="px-3 py-1 rounded-full text-xs bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)]">Status: Active</span>
         <span className={`px-3 py-1 rounded-full text-xs ${agent.bg} ${agent.color}`}>Message Passing: Enabled</span>
-        <span className="px-3 py-1 rounded-full text-xs bg-blue-500/10 text-blue-500">Async: Ready</span>
+        <span className="px-3 py-1 rounded-full text-xs bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)]">Async: Ready</span>
       </div>
     </div>
   );
@@ -110,7 +110,7 @@ export default function AgentsUltra() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-[var(--gh-accent-emphasis)] flex items-center justify-center">
                 <span className="text-white font-bold">DP</span>
               </div>
               <div>
@@ -119,8 +119,8 @@ export default function AgentsUltra() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <span className="px-3 py-1 rounded-full text-xs bg-emerald-500/10 text-emerald-500">● System Online</span>
-              <span className="px-3 py-1 rounded-full text-xs bg-blue-500/10 text-blue-500">Message Bus: Active</span>
+              <span className="px-3 py-1 rounded-full text-xs bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)]">● System Online</span>
+              <span className="px-3 py-1 rounded-full text-xs bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)]">Message Bus: Active</span>
             </div>
           </div>
         </div>
@@ -159,26 +159,28 @@ export default function AgentsUltra() {
                   <div key={category} className="p-2">
                     <p className="text-xs font-medium text-muted-foreground px-2 py-1 uppercase">{category}</p>
                     {agents.filter(a => a.category === category).map(agent => (
-                      <button
+                      <Button
                         key={agent.id}
-                        onClick={() => handleAgentSelect(agent)}
-                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                        variant={selectedAgent.id === agent.id ? 'primary' : 'ghost'}
+                        size="sm"
+                        className={`w-full justify-start gap-3 ${
                           selectedAgent.id === agent.id 
-                            ? 'bg-primary/10 text-primary' 
-                            : 'hover:bg-muted'
+                            ? '' 
+                            : 'text-muted-foreground'
                         }`}
+                        onClick={() => handleAgentSelect(agent)}
                       >
                         <span className="text-lg">{agent.icon}</span>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 text-left">
                           <p className="font-medium text-sm truncate">{agent.name}</p>
                           <p className="text-xs text-muted-foreground truncate">{agent.desc}</p>
                         </div>
                         <span className={`w-2 h-2 rounded-full ${
                           agentStatus[agent.id] === 'processing' 
-                            ? 'bg-amber-500 animate-pulse' 
-                            : 'bg-emerald-500'
+                            ? 'bg-[var(--gh-danger-fg)] animate-pulse' 
+                            : 'bg-[var(--gh-accent-fg)]'
                         }`} />
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 ))}
@@ -195,22 +197,22 @@ export default function AgentsUltra() {
               <h3 className="text-lg font-semibold mb-4">🔄 Message Passing Demo</h3>
               <div className="space-y-2 font-mono text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-500">→</span>
+                  <span className="text-[var(--gh-accent-fg)]">→</span>
                   <span className="text-muted-foreground">User:</span>
                   <span>Requesting data from {selectedAgent.name}...</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-amber-500">↔</span>
+                  <span className="text-[var(--gh-danger-fg)]">↔</span>
                   <span className="text-muted-foreground">Message Bus:</span>
                   <span>Routing message to {selectedAgent.id} via async queue</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-emerald-500">✓</span>
+                  <span className="text-[var(--gh-accent-fg)]">✓</span>
                   <span className="text-muted-foreground">{selectedAgent.name}:</span>
                   <span>Processing request and coordinating with other agents...</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-purple-500">←</span>
+                  <span className="text-[var(--gh-accent-fg)]">←</span>
                   <span className="text-muted-foreground">Response:</span>
                   <span>Data returned to UI successfully</span>
                 </div>

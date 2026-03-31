@@ -20,6 +20,7 @@ import {
 } from '../lib/badges';
 import { channels, getQuestions, getAllQuestions, getQuestionDifficulty } from '../lib/data';
 import { useGlobalStats } from '../hooks/use-progress';
+import { Button, IconButton } from '@/components/unified/Button';
 
 const categoryIcons: Record<string, React.ReactNode> = {
   streak: <Flame className="w-4 h-4" />,
@@ -248,27 +249,29 @@ export default function Badges() {
 
           {/* Category Tabs */}
           <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-4 px-4 no-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <button
+            <Button
+              variant={!selectedCategory ? 'primary' : 'ghost'}
+              size="sm"
               onClick={() => setSelectedCategory(null)}
-              className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap flex-shrink-0
-                ${!selectedCategory ? 'bg-primary text-primary-foreground' : 'bg-muted/50 hover:bg-muted'}`}
+              className="whitespace-nowrap flex-shrink-0"
             >
               All
-            </button>
+            </Button>
             {categories.map(cat => {
               const catBadges = badgesByCategory[cat] || [];
               const catUnlocked = catBadges.filter(b => b.isUnlocked).length;
               return (
-                <button
+                <Button
                   key={cat}
+                  variant={selectedCategory === cat ? 'primary' : 'ghost'}
+                  size="sm"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 flex-shrink-0
-                    ${selectedCategory === cat ? 'bg-primary text-primary-foreground' : 'bg-muted/50 hover:bg-muted'}`}
+                  className="whitespace-nowrap flex-shrink-0"
                 >
                   {categoryIcons[cat]}
                   <span>{getCategoryLabel(cat)}</span>
                   <span className="opacity-70 text-[10px]">{catUnlocked}/{catBadges.length}</span>
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -348,7 +351,7 @@ export default function Badges() {
                     <BadgeRing progress={bp} size="sm" showProgress={false} />
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-bold">{bp.badge.name}</div>
-                      <div className="h-1.5 bg-muted/30 rounded-full overflow-hidden mt-1">
+                      <div className="h-1.5 bg-[var(--gh-muted)] rounded-full overflow-hidden mt-1">
                         <div
                           className="h-full rounded-full transition-all"
                           style={{ 
@@ -401,13 +404,15 @@ export default function Badges() {
                   onClick={e => e.stopPropagation()}
                 >
                   {/* Floating close button with 3D depth */}
-                  <button
+                  <IconButton
+                    icon={<X className="w-4 h-4" />}
                     onClick={() => setSelectedBadge(null)}
-                    className="absolute top-4 left-4 p-2 hover:bg-muted rounded-full transition-colors"
+                    size="sm"
+                    variant="ghost"
+                    aria-label="Close"
+                    className="absolute top-4 left-4"
                     style={{ transform: 'translateZ(20px)' }}
-                  >
-                    <X className="w-4 h-4 text-muted-foreground" />
-                  </button>
+                  />
                   
                   <div className="flex flex-col items-center text-center pt-2">
                     {/* Badge Icon with 3D pop-out effect */}
@@ -456,16 +461,16 @@ export default function Badges() {
                     
                     {/* Progress Section - slightly recessed */}
                     <div 
-                      className="w-full mt-6 p-4 bg-muted/20 rounded-xl"
+                      className="w-full mt-6 p-4 bg-[var(--gh-canvas-subtle)] rounded-xl"
                       style={{ transform: 'translateZ(5px)' }}
                     >
                       <div className="flex justify-between gap-4 text-sm mb-2">
-                        <span className="text-muted-foreground">Progress</span>
-                        <span className="font-bold">
+                        <span className="text-[var(--gh-fg-muted)]">Progress</span>
+                        <span className="font-bold text-[var(--gh-fg)]">
                           {selectedBadge.current}/{selectedBadge.badge.requirement} {selectedBadge.badge.unit}
                         </span>
                       </div>
-                      <div className="h-2.5 bg-muted/40 rounded-full overflow-hidden">
+                      <div className="h-2.5 bg-[var(--gh-border)] rounded-full overflow-hidden">
                         <motion.div
                           className="h-full rounded-full"
                           style={{ backgroundColor: getTierColor(selectedBadge.badge.tier) }}
@@ -482,9 +487,9 @@ export default function Badges() {
                       style={{ transform: 'translateZ(10px)' }}
                     >
                       {selectedBadge.isUnlocked ? (
-                        <div className="flex items-center justify-center gap-2 py-2.5 px-4 bg-green-500/10 rounded-xl border border-green-500/20">
-                          <Check className="w-4 h-4 text-green-500" />
-                          <span className="text-sm font-medium text-green-500">
+                        <div className="flex items-center justify-center gap-2 py-2.5 px-4 bg-[var(--gh-success-subtle)] rounded-xl border border-[var(--gh-success-border)]">
+                          <Check className="w-4 h-4 text-[var(--gh-success-fg)]" />
+                          <span className="text-sm font-medium text-[var(--gh-success-fg)]">
                             Unlocked {selectedBadge.unlockedAt 
                               ? new Date(selectedBadge.unlockedAt).toLocaleDateString('en-GB', { 
                                   day: '2-digit', 
@@ -495,9 +500,9 @@ export default function Badges() {
                           </span>
                         </div>
                       ) : (
-                        <div className="flex items-center justify-center gap-2 py-2.5 px-4 bg-muted/30 rounded-xl">
-                          <Lock className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">
+                        <div className="flex items-center justify-center gap-2 py-2.5 px-4 bg-[var(--gh-muted)] rounded-xl">
+                          <Lock className="w-4 h-4 text-[var(--gh-fg-muted)]" />
+                          <span className="text-sm text-[var(--gh-fg-muted)]">
                             {selectedBadge.badge.requirement - selectedBadge.current} {selectedBadge.badge.unit} to unlock
                           </span>
                         </div>

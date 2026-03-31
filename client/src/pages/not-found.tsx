@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { Home, Search, ArrowLeft, AlertCircle, Compass } from 'lucide-react';
+import { Button } from '@/components/unified/Button';
 
 export default function NotFound() {
   const [, setLocation] = useLocation();
@@ -94,31 +95,34 @@ export default function NotFound() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-3 justify-center"
+          className="flex flex-col sm:flex-row gap-2 justify-center"
         >
-          <button
+          <Button
             onClick={() => setLocation('/')}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all"
+            variant="primary"
+            size="lg"
+            icon={<Home className="w-5 h-5" />}
           >
-            <Home className="w-5 h-5" />
             Go Home Now
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={() => window.history.back()}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-card border border-border text-foreground rounded-lg font-semibold hover:bg-muted transition-all"
+            variant="outline"
+            size="lg"
+            icon={<ArrowLeft className="w-5 h-5" />}
           >
-            <ArrowLeft className="w-5 h-5" />
             Go Back
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={() => setLocation('/channels')}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-card border border-border text-foreground rounded-lg font-semibold hover:bg-muted transition-all"
+            variant="outline"
+            size="lg"
+            icon={<Search className="w-5 h-5" />}
           >
-            <Search className="w-5 h-5" />
             Browse Channels
-          </button>
+          </Button>
         </motion.div>
 
         {/* Helpful links */}
@@ -138,13 +142,15 @@ export default function NotFound() {
               { label: 'Coding', path: '/coding' },
               { label: 'About', path: '/about' },
             ].map(link => (
-              <button
+              <Button
                 key={link.path}
                 onClick={() => setLocation(link.path)}
-                className="px-3 py-1.5 text-xs bg-muted hover:bg-muted/80 text-foreground rounded-full transition-all"
+                variant="ghost"
+                size="sm"
+                rounded="full"
               >
                 {link.label}
-              </button>
+              </Button>
             ))}
           </div>
         </motion.div>

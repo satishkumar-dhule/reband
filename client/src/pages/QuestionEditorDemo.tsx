@@ -12,6 +12,7 @@ import { useLocation } from 'wouter';
 import { QuestionEditor } from '../components/QuestionEditor';
 import type { Question } from '@/lib/answer-formatting/types';
 import { toast } from '@/hooks/use-toast';
+import { Button, IconButton } from '@/components/unified/Button';
 
 // Sample questions for demo
 const sampleQuestions: Partial<Question>[] = [
@@ -113,12 +114,12 @@ export default function QuestionEditorDemo() {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <button
+              <IconButton
                 onClick={() => setLocation('/')}
-                className="p-2 hover:bg-muted rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
+                icon={<ArrowLeft className="w-5 h-5" />}
+                aria-label="Go back"
+                size="sm"
+              />
               <div>
                 <h1 className="text-2xl font-bold">Question Editor Demo</h1>
                 <p className="text-muted-foreground">
@@ -127,13 +128,14 @@ export default function QuestionEditorDemo() {
               </div>
             </div>
 
-            <button
+            <Button
               onClick={handleCreateNew}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              variant="primary"
+              size="md"
             >
               <Plus className="w-4 h-4" />
               Create Question
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -199,12 +201,13 @@ export default function QuestionEditorDemo() {
                       )}
                     </div>
 
-                    <button
+                    <IconButton
                       onClick={() => handleEditQuestion(question)}
-                      className="p-2 hover:bg-muted rounded-lg transition-colors shrink-0"
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </button>
+                      icon={<Edit3 className="w-4 h-4" />}
+                      aria-label="Edit question"
+                      size="sm"
+                      variant="ghost"
+                    />
                   </div>
                 </motion.div>
               ))}
@@ -214,7 +217,7 @@ export default function QuestionEditorDemo() {
           {/* Saved Questions */}
           <div>
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-green-600" />
+              <FileText className="w-5 h-5 text-success" />
               Saved Questions ({savedQuestions.length})
             </h2>
             <p className="text-muted-foreground mb-6">
@@ -227,12 +230,13 @@ export default function QuestionEditorDemo() {
                 <p className="text-muted-foreground mb-4">
                   No saved questions yet
                 </p>
-                <button
+                <Button
                   onClick={handleCreateNew}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                  variant="primary"
+                  size="md"
                 >
                   Create Your First Question
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="space-y-4">
@@ -242,7 +246,7 @@ export default function QuestionEditorDemo() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-card border border-border rounded-lg p-4 hover:border-green-500/50 transition-colors"
+                    className="bg-card border border-border rounded-lg p-4 hover:border-[var(--gh-success-fg)]/50 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
@@ -260,10 +264,10 @@ export default function QuestionEditorDemo() {
                           {question.validationScore && (
                             <span className={`px-2 py-1 text-xs rounded ${
                               question.validationScore >= 90
-                                ? 'bg-green-500/10 text-green-600'
+                                ? 'bg-success/10 text-success'
                                 : question.validationScore >= 70
-                                ? 'bg-yellow-500/10 text-yellow-600'
-                                : 'bg-red-500/10 text-red-600'
+                                ? 'bg-warning/10 text-warning'
+                                : 'bg-danger/10 text-danger'
                             }`}>
                               Score: {question.validationScore}/100
                             </span>
@@ -276,19 +280,20 @@ export default function QuestionEditorDemo() {
 
                         {question.detectedPattern && (
                           <div className="mt-2">
-                            <span className="px-2 py-1 bg-purple-500/10 text-purple-600 text-xs rounded">
+                            <span className="px-2 py-1 bg-accent/10 text-accent text-xs rounded">
                               Pattern: {question.detectedPattern}
                             </span>
                           </div>
                         )}
                       </div>
 
-                      <button
+                      <IconButton
                         onClick={() => handleEditQuestion(question)}
-                        className="p-2 hover:bg-muted rounded-lg transition-colors shrink-0"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
+                        icon={<Edit3 className="w-4 h-4" />}
+                        aria-label="Edit question"
+                        size="sm"
+                        variant="ghost"
+                      />
                     </div>
                   </motion.div>
                 ))}

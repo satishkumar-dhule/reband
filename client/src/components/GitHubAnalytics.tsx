@@ -76,22 +76,22 @@ export function GitHubAnalytics() {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
         <div className="bg-muted/10 rounded p-2 text-center">
-          <Eye className="w-3.5 h-3.5 mx-auto mb-1 text-blue-500" />
+          <Eye className="w-3.5 h-3.5 mx-auto mb-1 text-[var(--gh-accent-emphasis)]" />
           <div className="text-sm font-bold">{totalViews.toLocaleString()}</div>
           <div className="text-[9px] text-muted-foreground">Views (14d)</div>
         </div>
         <div className="bg-muted/10 rounded p-2 text-center">
-          <Users className="w-3.5 h-3.5 mx-auto mb-1 text-green-500" />
+          <Users className="w-3.5 h-3.5 mx-auto mb-1 text-[var(--gh-success-fg)]" />
           <div className="text-sm font-bold">{uniqueVisitors.toLocaleString()}</div>
           <div className="text-[9px] text-muted-foreground">Unique Visitors</div>
         </div>
         <div className="bg-muted/10 rounded p-2 text-center">
-          <Star className="w-3.5 h-3.5 mx-auto mb-1 text-yellow-500" />
+          <Star className="w-3.5 h-3.5 mx-auto mb-1 text-[var(--gh-warning-fg)]" />
           <div className="text-sm font-bold">{totalStars}</div>
           <div className="text-[9px] text-muted-foreground">Stars</div>
         </div>
         <div className="bg-muted/10 rounded p-2 text-center">
-          <GitFork className="w-3.5 h-3.5 mx-auto mb-1 text-purple-500" />
+          <GitFork className="w-3.5 h-3.5 mx-auto mb-1 text-[var(--gh-accent-fg)]" />
           <div className="text-sm font-bold">{totalForks}</div>
           <div className="text-[9px] text-muted-foreground">Forks</div>
         </div>

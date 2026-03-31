@@ -14,7 +14,7 @@ import { Haptics } from '../lib/haptics';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
 import { AppLayout } from '../components/layout/AppLayout';
-import { Button } from '../components/unified/Button';
+import { Button, IconButton } from '@/components/unified/Button';
 import {
   getCard, recordReview, addToSRS,
   getMasteryLabel, getMasteryColor,
@@ -25,6 +25,13 @@ import {
   Brain, RotateCcw, Check, Zap, Sparkles, Layers,
   Home, Filter, Calendar, Building2
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { cn } from '../lib/utils';
 
 export default function QuestionViewerGenZ() {
@@ -399,25 +406,19 @@ export default function QuestionViewerGenZ() {
         <div className="border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]">
           <div className="max-w-7xl mx-auto px-4">
             <nav className="flex gap-1 -mb-px" aria-label="Main view">
-              <button
+              <Button
                 onClick={() => setActiveMainTab('questions')}
-                className={cn(
-                  "px-4 py-3 text-sm font-medium border-b-2 transition-colors",
-                  activeMainTab === 'questions'
-                    ? "border-[var(--gh-accent-emphasis)] text-[var(--gh-fg)]"
-                    : "border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]"
-                )}
+                variant={activeMainTab === 'questions' ? 'primary' : 'ghost'}
+                size="md"
+                className="rounded-none border-b-2"
               >
                 Questions
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setActiveMainTab('flashcards')}
-                className={cn(
-                  "px-4 py-3 text-sm font-medium border-b-2 transition-colors",
-                  activeMainTab === 'flashcards'
-                    ? "border-[var(--gh-accent-emphasis)] text-[var(--gh-fg)]"
-                    : "border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]"
-                )}
+                variant={activeMainTab === 'flashcards' ? 'primary' : 'ghost'}
+                size="md"
+                className="rounded-none border-b-2"
               >
                 Flashcards
                 {flashcards.length > 0 && (
@@ -425,18 +426,15 @@ export default function QuestionViewerGenZ() {
                     {flashcards.length}
                   </span>
                 )}
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setActiveMainTab('voice')}
-                className={cn(
-                  "px-4 py-3 text-sm font-medium border-b-2 transition-colors",
-                  activeMainTab === 'voice'
-                    ? "border-[var(--gh-accent-emphasis)] text-[var(--gh-fg)]"
-                    : "border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]"
-                )}
+                variant={activeMainTab === 'voice' ? 'primary' : 'ghost'}
+                size="md"
+                className="rounded-none border-b-2"
               >
                 Voice
-              </button>
+              </Button>
             </nav>
           </div>
         </div>
@@ -460,25 +458,20 @@ export default function QuestionViewerGenZ() {
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <button 
+                  <IconButton
                     onClick={toggleMark}
-                    className={cn(
-                      "p-1.5 rounded-md border transition-colors",
-                      markedQuestions.includes(currentQuestion?.id || '')
-                        ? "bg-amber-50 border-amber-400 text-amber-600"
-                        : "border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:bg-[var(--gh-canvas-subtle)]"
-                    )}
+                    variant={markedQuestions.includes(currentQuestion?.id || '') ? 'secondary' : 'ghost'}
+                    size="sm"
                     aria-label="Bookmark"
-                  >
-                    <Bookmark className={cn("w-4 h-4", markedQuestions.includes(currentQuestion?.id || '') && "fill-current")} />
-                  </button>
-                  <button 
+                    icon={<Bookmark className={cn("w-4 h-4", markedQuestions.includes(currentQuestion?.id || '') && "fill-current")} />}
+                  />
+                  <IconButton
                     onClick={handleShare}
-                    className="p-1.5 rounded-md border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:bg-[var(--gh-canvas-subtle)]"
+                    variant="ghost"
+                    size="sm"
                     aria-label="Share"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </button>
+                    icon={<Share2 className="w-4 h-4" />}
+                  />
                 </div>
               </div>
 
@@ -697,16 +690,16 @@ export default function QuestionViewerGenZ() {
                     <Filter className="w-3.5 h-3.5" />
                     Sub-topic
                   </label>
-                  <select 
-                    id="sub-topic-select"
-                    value={selectedSubChannel}
-                    onChange={(e) => setSelectedSubChannel(e.target.value)}
-                    className="w-full bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md px-2 py-1.5 text-sm focus:ring-2 focus:ring-[var(--gh-accent-emphasis)] outline-none"
-                  >
-                    {channel.subChannels.map(sc => (
-                      <option key={sc.id} value={sc.id}>{sc.name}</option>
-                    ))}
-                  </select>
+                  <Select value={selectedSubChannel} onValueChange={setSelectedSubChannel}>
+                    <SelectTrigger id="sub-topic-select">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {channel.subChannels.map(sc => (
+                        <SelectItem key={sc.id} value={sc.id}>{sc.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
@@ -714,17 +707,17 @@ export default function QuestionViewerGenZ() {
                     <Zap className="w-3.5 h-3.5" />
                     Difficulty
                   </label>
-                  <select 
-                    id="difficulty-select"
-                    value={selectedDifficulty}
-                    onChange={(e) => setSelectedDifficulty(e.target.value)}
-                    className="w-full bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md px-2 py-1.5 text-sm focus:ring-2 focus:ring-[var(--gh-accent-emphasis)] outline-none"
-                  >
-                    <option value="all">All Difficulties</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
+                  <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                    <SelectTrigger id="difficulty-select">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Difficulties</SelectItem>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {companiesWithCounts && companiesWithCounts.length > 0 && (
@@ -733,17 +726,17 @@ export default function QuestionViewerGenZ() {
                       <Building2 className="w-3.5 h-3.5" />
                       Company
                     </label>
-                    <select 
-                      id="company-select"
-                      value={selectedCompany}
-                      onChange={(e) => setSelectedCompany(e.target.value)}
-                      className="w-full bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md px-2 py-1.5 text-sm focus:ring-2 focus:ring-[var(--gh-accent-emphasis)] outline-none"
-                    >
-                      <option value="all">All Companies</option>
-                      {companiesWithCounts.map(c => (
-                        <option key={c.name} value={c.name}>{c.name} ({c.count})</option>
-                      ))}
-                    </select>
+                    <Select value={selectedCompany} onValueChange={setSelectedCompany}>
+                      <SelectTrigger id="company-select">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Companies</SelectItem>
+                        {companiesWithCounts.map(c => (
+                          <SelectItem key={c.name} value={c.name}>{c.name} ({c.count})</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
               </div>

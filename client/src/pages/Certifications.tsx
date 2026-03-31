@@ -11,6 +11,8 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { useIsMobile } from '../hooks/use-mobile';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { SEOHead } from '../components/SEOHead';
+import { Button, IconButton, MotionButton } from '../components/unified/Button';
+import { Input } from '../components/ui/input';
 import {
   Search, Award, Clock, ChevronRight, Play, BookOpen,
   Cloud, Shield, Database, Brain, Code, Users, Box,
@@ -66,10 +68,10 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 const difficultyConfig: Record<string, { color: string; bg: string }> = {
-  beginner: { color: 'text-green-500', bg: 'bg-green-500/10' },
-  intermediate: { color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
-  advanced: { color: 'text-orange-500', bg: 'bg-orange-500/10' },
-  expert: { color: 'text-red-500', bg: 'bg-red-500/10' }
+  beginner: { color: 'text-[var(--gh-success-fg)]', bg: 'bg-[var(--gh-success-subtle)]' },
+  intermediate: { color: 'text-[var(--gh-attention-fg)]', bg: 'bg-[var(--gh-attention-subtle)]' },
+  advanced: { color: 'text-[var(--gh-orange-fg)]', bg: 'bg-[var(--gh-orange-subtle)]' },
+  expert: { color: 'text-[var(--gh-danger-fg)]', bg: 'bg-[var(--gh-danger-subtle)]' }
 };
 
 // Custom hook to fetch certifications from static JSON (built from database)
@@ -169,13 +171,10 @@ export default function Certifications() {
             <h2 className="text-lg font-semibold text-[var(--gh-fg)] mb-2">Failed to load certifications</h2>
             <p className="text-sm text-[var(--gh-fg-muted)]">{error}</p>
           </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
-          >
+          <Button onClick={() => window.location.reload()} variant="primary">
             <RefreshCw className="w-4 h-4" />
             Try Again
-          </button>
+          </Button>
         </div>
       </AppLayout>
     );
@@ -219,9 +218,9 @@ export default function Certifications() {
                   <span>Exam-Aligned Questions</span>
                 </div>
               <div className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-amber-500" />
+                <Zap className="w-5 h-5 text-[var(--gh-attention-fg)]" />
                 <h2 className="text-lg font-semibold">Ready for Exam Practice</h2>
-                <span className="text-xs px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-full font-semibold">
+                <span className="text-xs px-2 py-0.5 bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)] rounded-full">
                   {featuredCerts.length} available
                 </span>
               </div>
@@ -236,9 +235,9 @@ export default function Certifications() {
           {featuredCerts.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Zap className="w-5 h-5 text-amber-500" />
+                <Zap className="w-5 h-5 text-[var(--gh-attention-fg)]" />
                 <h2 className="text-lg font-semibold">Ready for Exam Practice</h2>
-                <span className="text-xs px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-full">
+                <span className="text-xs px-2 py-0.5 bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)] rounded-full">
                   {featuredCerts.length} available
                 </span>
               </div>
@@ -263,40 +262,38 @@ export default function Certifications() {
           <div className="space-y-4">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
+              <Input
                 type="text"
                 placeholder="Search certifications..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-card border border-border rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="pl-12 pr-4 py-3 text-sm"
               />
             </div>
 
             {/* Category Pills */}
             <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-              <button
+              <Button
+                variant={!selectedCategory ? 'primary' : 'ghost'}
+                size="sm"
+                rounded="full"
                 onClick={() => setSelectedCategory(null)}
-                className={`px-4 py-2 text-sm font-medium rounded-full whitespace-nowrap transition-all flex-shrink-0
-                  ${!selectedCategory 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
+                className="whitespace-nowrap flex-shrink-0"
               >
                 All
-              </button>
+              </Button>
               {certificationCategories.map(cat => (
-                <button
+                <Button
                   key={cat.id}
+                  variant={selectedCategory === cat.id ? 'primary' : 'ghost'}
+                  size="sm"
+                  rounded="full"
                   onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-                  className={`px-4 py-2 text-sm font-medium rounded-full whitespace-nowrap transition-all flex items-center gap-2 flex-shrink-0
-                    ${selectedCategory === cat.id 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                    }`}
+                  className="whitespace-nowrap flex-shrink-0"
                 >
                   {iconMap[cat.icon]}
                   {cat.name}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -394,20 +391,17 @@ function FeaturedCertCard({
             {iconMap[certification.icon] || <Award className="w-5 h-5" />}
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <IconButton
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleSubscribe();
               }}
-              className={`p-1.5 rounded-lg transition-all ${
-                isSubscribed
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-              }`}
+              icon={isSubscribed ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              variant={isSubscribed ? 'primary' : 'ghost'}
+              size="sm"
+              aria-label={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
               title={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
-            >
-              {isSubscribed ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-            </button>
+            />
             <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${diff.bg} ${diff.color} capitalize`}>
               {certification.difficulty}
             </span>
@@ -442,20 +436,24 @@ function FeaturedCertCard({
 
         {/* Action Buttons */}
         <div className="flex gap-2">
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
+            fullWidth
             onClick={onPractice}
-            className="flex-1 py-2 px-3 bg-muted hover:bg-muted/80 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors"
+            icon={<BookOpen className="w-4 h-4" />}
           >
-            <BookOpen className="w-4 h-4" />
             Study
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            fullWidth
             onClick={onExam}
-            className="flex-1 py-2 px-3 bg-primary text-primary-foreground rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity"
+            icon={<Play className="w-4 h-4" />}
           >
-            <Play className="w-4 h-4" />
             Exam Mode
-          </button>
+          </Button>
         </div>
       </div>
     </motion.div>
@@ -502,22 +500,19 @@ function CertificationCard({
           {iconMap[certification.icon] || <Award className="w-5 h-5" />}
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <IconButton
             onClick={(e) => {
               e.stopPropagation();
               onToggleSubscribe();
             }}
-            className={`p-1.5 rounded-lg transition-all ${
-              isSubscribed
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-            }`}
+            icon={isSubscribed ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+            variant={isSubscribed ? 'primary' : 'ghost'}
+            size="sm"
+            aria-label={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
             title={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
-          >
-            {isSubscribed ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-          </button>
+          />
           {hasQuestions && (
-            <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-amber-500/10 text-amber-500 uppercase tracking-wide">
+            <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)] uppercase tracking-wide">
               Exam
             </span>
           )}
@@ -603,8 +598,8 @@ function ConfirmationDialog({
         <div className="flex items-start gap-4 p-6 pb-4">
           <div className={`p-3 rounded-xl ${
             type === "danger" 
-              ? "bg-red-500/10 text-red-500" 
-              : "bg-amber-500/10 text-amber-500"
+              ? "bg-[var(--gh-danger-subtle)] text-[var(--gh-danger-fg)]" 
+              : "bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)]"
           }`}>
             <AlertTriangle className="w-6 h-6" />
           </div>
@@ -612,35 +607,34 @@ function ConfirmationDialog({
             <h3 className="text-lg font-semibold text-foreground mb-1">{title}</h3>
             <p className="text-sm text-muted-foreground">{message}</p>
           </div>
-          <button
+          <IconButton
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-muted text-muted-foreground transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+            icon={<X className="w-5 h-5" />}
+            variant="ghost"
+            size="sm"
+            aria-label="Close"
+          />
         </div>
 
         {/* Actions */}
         <div className="flex gap-3 p-6 pt-2 border-t border-border bg-muted/30">
-          <button
+          <Button
+            variant="secondary"
+            fullWidth
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 bg-muted hover:bg-muted/80 text-foreground rounded-lg font-medium transition-colors"
           >
             {cancelText}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={type === "danger" ? "danger" : "primary"}
+            fullWidth
             onClick={() => {
               onConfirm();
               onClose();
             }}
-            className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors ${
-              type === "danger"
-                ? "bg-[var(--gh-danger-emphasis)] hover:bg-[var(--gh-danger-hover)] text-white"
-                : "bg-primary hover:bg-primary/90 text-primary-foreground"
-            }`}
           >
             {confirmText}
-          </button>
+          </Button>
         </div>
       </motion.div>
     </div>

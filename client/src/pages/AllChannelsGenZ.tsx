@@ -9,6 +9,8 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { allChannelsConfig } from '../lib/channels-config';
 import { useChannelStats } from '../hooks/use-stats';
 import { SEOHead } from '../components/SEOHead';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/unified/Button';
 import {
   Search, Box, Terminal, Layout, Server, Database, Infinity, Activity, Cloud, Layers,
   Brain, Eye, FileText, Code, Shield, Network, Monitor, Smartphone, CheckCircle,
@@ -110,40 +112,34 @@ export function AllChannelsGenZ() {
               </p>
             </div>
             <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
                 type="text"
                 placeholder="Search topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-1.5 bg-muted border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="pl-9"
               />
             </div>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            <button
+            <Button
               onClick={() => setSelectedCategory(null)}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                !selectedCategory 
-                  ? 'bg-primary text-primary-foreground border-transparent' 
-                  : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground'
-              }`}
+              variant={!selectedCategory ? 'primary' : 'ghost'}
+              size="sm"
             >
               All Topics
-            </button>
+            </Button>
             {categories.map(cat => (
-              <button
+              <Button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                  selectedCategory === cat
-                    ? 'bg-primary text-primary-foreground border-transparent'
-                    : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground'
-                }`}
+                variant={selectedCategory === cat ? 'primary' : 'ghost'}
+                size="sm"
               >
                 {categoryLabels[cat] || cat}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -166,12 +162,13 @@ export function AllChannelsGenZ() {
             <p className="text-muted-foreground mt-1 text-center max-w-md">
               {error.message || 'Something went wrong while loading the topics.'}
             </p>
-            <button
+            <Button
               onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 text-sm font-medium bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors"
+              variant="danger"
+              size="sm"
             >
               Try again
-            </button>
+            </Button>
           </div>
         ) : filteredChannels.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -236,15 +233,16 @@ export function AllChannelsGenZ() {
             <p className="text-muted-foreground mt-1">
               Try adjusting your search or filters to find what you're looking for.
             </p>
-            <button
+            <Button
               onClick={() => {
                 setSearchQuery('');
                 setSelectedCategory(null);
               }}
-              className="mt-4 px-4 py-2 text-sm font-medium bg-muted text-foreground border border-border rounded-md hover:bg-muted/80 transition-colors"
+              variant="outline"
+              size="sm"
             >
               Clear all filters
-            </button>
+            </Button>
           </div>
         )}
       </div>

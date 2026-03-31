@@ -17,6 +17,7 @@ import { QuestionFeedback } from './QuestionFeedback';
 import { SimilarQuestions } from './SimilarQuestions';
 import { formatTag } from '../lib/utils';
 import { BlogService } from '../services/api.service';
+import { Button, IconButton } from './unified/Button';
 
 type MediaTab = 'tldr' | 'diagram' | 'eli5' | 'video';
 
@@ -212,35 +213,37 @@ function ExpandableCard({
 
   const variantStyles = {
     default: 'bg-card border-border',
-    highlight: 'bg-primary/5 border-primary/20',
-    success: 'bg-green-500/5 border-green-500/20',
-    purple: 'bg-purple-500/5 border-purple-500/20',
+    highlight: 'bg-[var(--gh-accent-emphasis)]/5 border-[var(--gh-accent-emphasis)]/20',
+    success: 'bg-gh-success-subtle border-gh-success/20',
+    purple: 'bg-gh-done-subtle border-gh-done/20',
   };
 
   const iconStyles = {
     default: 'text-muted-foreground',
-    highlight: 'text-primary',
-    success: 'text-green-500',
-    purple: 'text-purple-500',
+    highlight: 'text-[var(--gh-accent-emphasis)]',
+    success: 'text-gh-success',
+    purple: 'text-gh-done',
   };
 
   return (
     <div className={`rounded-lg border overflow-hidden ${variantStyles[variant]}`}>
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between px-2.5 py-1.5 hover:bg-muted/30 transition-colors"
+        className="w-full justify-start px-2.5 py-1.5 h-auto"
       >
         <div className="flex items-center gap-1.5">
           <span className={iconStyles[variant]}>{icon}</span>
           <span className="font-medium text-xs">{title}</span>
           {badge && (
-            <span className="px-1 py-0.5 bg-primary/10 text-primary text-[8px] font-medium rounded">
+            <span className="px-1 py-0.5 bg-[var(--gh-accent-emphasis)]/10 text-[var(--gh-accent-emphasis)] text-[8px] font-medium rounded">
               {badge}
             </span>
           )}
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${isExpanded ? '' : '-rotate-90'}`} />
-      </button>
+        <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground ml-auto transition-transform ${isExpanded ? '' : '-rotate-90'}`} />
+      </Button>
       
       {isMobile ? (
         isExpanded && <div className="px-2.5 pb-2">{children}</div>
@@ -282,23 +285,14 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
             {language || 'code'}
           </span>
         </div>
-        <button
-          onClick={handleCopy}
+        <IconButton
+          icon={copied ? <Check aria-hidden="true" className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" /> : <Copy aria-hidden="true" className="w-3 h-3 sm:w-4 sm:h-4" />}
+          variant="ghost"
+          size="sm"
           aria-label="Copy code"
-          className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded transition-colors"
-        >
-          {copied ? (
-            <>
-              <Check aria-hidden="true" className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
-              <span className="text-green-500">Copied</span>
-            </>
-          ) : (
-            <>
-              <Copy aria-hidden="true" className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span>Copy</span>
-            </>
-          )}
-        </button>
+          onClick={handleCopy}
+        />
+        {copied && <span className="text-gh-success text-[10px] sm:text-xs mr-2">Copied</span>}
       </div>
       <SyntaxHighlighter
         language={language || 'text'}
@@ -380,10 +374,10 @@ function TabbedMediaPanel({
   if (availableTabs.length === 0) return null;
 
   const tabConfig = {
-    tldr: { label: 'TL;DR', icon: <Lightbulb className="w-3.5 h-3.5" />, color: 'text-primary' },
-    diagram: { label: 'Diagram', icon: <GitBranch className="w-3.5 h-3.5" />, color: 'text-purple-400' },
-    eli5: { label: 'ELI5', icon: <Baby className="w-3.5 h-3.5" />, color: 'text-green-400' },
-    video: { label: 'Video', icon: <Play className="w-3.5 h-3.5" />, color: 'text-pink-400' },
+    tldr: { label: 'TL;DR', icon: <Lightbulb className="w-3.5 h-3.5" />, color: 'text-[var(--gh-accent-emphasis)]' },
+    diagram: { label: 'Diagram', icon: <GitBranch className="w-3.5 h-3.5" />, color: 'text-gh-done' },
+    eli5: { label: 'ELI5', icon: <Baby className="w-3.5 h-3.5" />, color: 'text-gh-success' },
+    video: { label: 'Video', icon: <Play className="w-3.5 h-3.5" />, color: 'text-gh-pink' },
   };
 
   return (
@@ -391,15 +385,17 @@ function TabbedMediaPanel({
       {/* Tab Headers */}
       <div className="flex border-b border-white/10 bg-black/20" role="tablist">
         {availableTabs.map((tab) => (
-          <button
+          <Button
             key={tab}
+            variant={activeTab === tab ? 'primary' : 'ghost'}
+            size="sm"
             role="tab"
             aria-selected={activeTab === tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs sm:text-sm font-medium transition-all relative ${
+            className={`flex-1 justify-center gap-1.5 px-2 py-1.5 text-xs sm:text-sm font-medium transition-all relative !hover:bg-transparent ${
               activeTab === tab 
                 ? `${tabConfig[tab].color} bg-white/5` 
-                : 'text-white/50 hover:text-white/70 hover:bg-white/5'
+                : 'text-white/50'
             }`}
           >
             <span className={activeTab === tab ? tabConfig[tab].color : ''}>{tabConfig[tab].icon}</span>
@@ -408,13 +404,13 @@ function TabbedMediaPanel({
               <motion.div
                 layoutId="activeTabIndicator"
                 className={`absolute bottom-0 left-0 right-0 h-0.5 ${
-                  tab === 'tldr' ? 'bg-primary' :
-                  tab === 'diagram' ? 'bg-purple-400' :
-                  tab === 'eli5' ? 'bg-green-400' : 'bg-pink-400'
+                  tab === 'tldr' ? 'bg-[var(--gh-accent-emphasis)]' :
+                  tab === 'diagram' ? 'bg-gh-done' :
+                  tab === 'eli5' ? 'bg-gh-success' : 'bg-gh-pink'
                 }`}
               />
             )}
-          </button>
+          </Button>
         ))}
       </div>
       
@@ -430,7 +426,7 @@ function TabbedMediaPanel({
               transition={{ duration: 0.2 }}
               className="flex items-start gap-2"
             >
-              <Lightbulb aria-hidden="true" className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <Lightbulb aria-hidden="true" className="w-4 h-4 text-[var(--gh-accent-emphasis)] shrink-0 mt-0.5" />
               <p className="text-sm text-foreground/90 leading-relaxed">{renderWithInlineCode(question.answer)}</p>
             </motion.div>
           )}
@@ -446,6 +442,7 @@ function TabbedMediaPanel({
               <EnhancedMermaid 
                 chart={question.diagram!} 
                 onRenderResult={handleDiagramRenderResult}
+                caption={`${question.channel} / ${question.subChannel}`}
               />
             </motion.div>
           )}
@@ -516,7 +513,7 @@ export function AnswerPanel({ question }: AnswerPanelProps) {
             
             if (isInline) {
               return (
-                <code className="px-1 py-0.5 bg-primary/10 text-primary rounded text-[0.85em] font-mono">
+                <code className="px-1 py-0.5 bg-[var(--gh-accent-emphasis)]/10 text-[var(--gh-accent-emphasis)] rounded text-[0.85em] font-mono">
                   {children}
                 </code>
               );
@@ -526,7 +523,7 @@ export function AnswerPanel({ question }: AnswerPanelProps) {
               if (!isValidMermaidDiagram(codeContent)) return null;
               return (
                 <div className="my-3">
-                  <EnhancedMermaid chart={codeContent} />
+                  <EnhancedMermaid chart={codeContent} caption="Diagram from code block" />
                 </div>
               );
             }
@@ -564,7 +561,7 @@ export function AnswerPanel({ question }: AnswerPanelProps) {
             
             return (
               <li className="flex gap-2 text-foreground/90 text-sm [counter-increment:list-counter]">
-                <span className="shrink-0 text-primary mt-0.5">
+                <span className="shrink-0 text-[var(--gh-accent-emphasis)] mt-0.5">
                   {isOrdered ? <span className="text-xs font-medium before:content-[counter(list-counter)'.']" /> : '•'}
                 </span>
                 <span className="flex-1">{children}</span>
@@ -573,14 +570,14 @@ export function AnswerPanel({ question }: AnswerPanelProps) {
           },
           a({ href, children }) {
             return (
-              <a href={href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+              <a href={href} className="text-[var(--gh-accent-emphasis)] hover:underline" target="_blank" rel="noopener noreferrer">
                 {children}
               </a>
             );
           },
           blockquote({ children }) {
             return (
-              <blockquote className="border-l-2 border-primary/50 pl-3 py-1 my-2 bg-primary/5 text-muted-foreground italic text-sm">
+              <blockquote className="border-l-2 border-[var(--gh-accent-emphasis)]/50 pl-3 py-1 my-2 bg-[var(--gh-accent-emphasis)]/5 text-muted-foreground italic text-sm">
                 {children}
               </blockquote>
             );
@@ -668,9 +665,9 @@ export function AnswerPanel({ question }: AnswerPanelProps) {
             )}
             {blogPost && (
               <a href={`https://openstackdaily.github.io${blogPost.url}`} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-md text-[10px]">
-                <FileText className="w-2.5 h-2.5 text-primary" />
-                <span className="text-primary">Blog</span>
+                className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--gh-accent-emphasis)]/10 hover:bg-[var(--gh-accent-emphasis)]/20 border border-[var(--gh-accent-emphasis)]/30 rounded-md text-[10px]">
+                <FileText className="w-2.5 h-2.5 text-[var(--gh-accent-emphasis)]" />
+                <span className="text-[var(--gh-accent-emphasis)]">Blog</span>
               </a>
             )}
           </div>

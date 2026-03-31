@@ -8,6 +8,7 @@ import {
 import { SEOHead } from '../components/SEOHead';
 import { AppLayout } from '../components/layout/AppLayout';
 import { defaultChangelog, fetchChangelog, type ChangelogData, type ChangelogEntry } from '../lib/changelog';
+import { Button, IconButton } from '@/components/unified/Button';
 
 const typeConfig = {
   added: { icon: Plus, color: 'text-green-400', bg: 'bg-green-500/20', label: 'New Questions' },
@@ -37,10 +38,14 @@ function ChangelogEntryCard({ entry, index }: { entry: ChangelogEntry; index: nu
       transition={{ delay: index * 0.05 }}
       className="border border-border rounded-lg overflow-hidden bg-card"
     >
-      <button
+      <Button
+        variant="ghost"
+        className="w-full justify-start h-auto p-0"
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-start gap-4 text-left hover:bg-muted/30 transition-colors"
+        aria-expanded={expanded}
+        aria-controls={`entry-${index}`}
       >
+        <div className="w-full p-4 flex items-start gap-4 text-left">
         <div className={`p-2 rounded-lg ${config.bg} shrink-0`}>
           <Icon className={`w-4 h-4 ${config.color}`} />
         </div>
@@ -60,7 +65,8 @@ function ChangelogEntryCard({ entry, index }: { entry: ChangelogEntry; index: nu
         <div className="shrink-0 text-muted-foreground">
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </div>
-      </button>
+        </div>
+      </Button>
 
       <AnimatePresence>
         {expanded && entry.details && (
@@ -166,15 +172,13 @@ export default function WhatsNew() {
         <div className="font-mono">
           {/* RSS Link */}
           <div className="flex justify-end mb-4">
-            <a
-              href="/rss.xml"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-widest bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 rounded transition-colors"
-              title="Subscribe to RSS Feed"
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open('/rss.xml', '_blank')}
             >
               <Rss className="w-3.5 h-3.5" /> RSS
-            </a>
+            </Button>
           </div>
 
           {/* Stats Summary */}

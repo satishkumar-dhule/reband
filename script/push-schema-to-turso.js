@@ -39,16 +39,16 @@ if (missingVars.length > 0) {
 }
 
 // Check if using read-only credentials
-if (process.env.TURSO_DATABASE_URL.includes('-ro') || 
-    process.env.TURSO_AUTH_TOKEN_RO === process.env.TURSO_AUTH_TOKEN) {
+if ('file:local.db'.includes('-ro') || 
+    undefined_RO === undefined) {
   console.warn('⚠️  Warning: You may be using read-only credentials!');
   console.warn('   Make sure TURSO_DATABASE_URL and TURSO_AUTH_TOKEN');
   console.warn('   are set to your read-write credentials.\n');
 }
 
 console.log('📋 Database Configuration:');
-console.log(`   URL: ${process.env.TURSO_DATABASE_URL}`);
-console.log(`   Token: ****${process.env.TURSO_AUTH_TOKEN.slice(-4)}`);
+console.log(`   URL: ${'file:local.db'}`);
+console.log(`   Token: ****${undefined.slice(-4)}`);
 console.log('');
 
 // Read and display schema information

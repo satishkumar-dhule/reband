@@ -62,6 +62,9 @@ import {
 import { GiscusComments } from '../components/GiscusComments';
 import { mascotEvents } from '../components/PixelMascot';
 import { useCredits } from '../context/CreditsContext';
+import { Button, IconButton } from '../components/unified/Button';
+import { Input } from '../components/ui/input';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../components/ui/select';
 
 type ViewState = 'list' | 'challenge';
 
@@ -487,13 +490,15 @@ export default function CodingChallenge() {
             <div className="max-w-4xl mx-auto">
               {/* Header */}
               <header className="flex items-center justify-between mb-6">
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setLocation('/')}
-                  className="flex items-center gap-1.5 hover:text-primary text-[10px] uppercase tracking-widest font-bold font-mono"
+                  className="gap-1.5 text-[10px] uppercase tracking-widest font-bold font-mono"
                   data-testid="back-home"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> Home
-                </button>
+                </Button>
                 <h1 className="text-base sm:text-xl font-bold uppercase font-mono" data-testid="page-title">
                   <span className="text-primary">&gt;</span> Coding Challenges
                 </h1>
@@ -528,23 +533,24 @@ export default function CodingChallenge() {
                   </div>
                   <div className="text-[9px] text-muted-foreground uppercase">Avg Time</div>
                 </div>
-                <button 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => setLocation('/profile')}
-                  className="border border-[var(--gh-attention-fg)]/30 p-3 bg-[var(--gh-attention-subtle)] rounded-lg text-center hover:bg-[var(--gh-attention-subtle)]/50 transition-colors"
+                  className="border-[var(--gh-attention-fg)]/30 bg-[var(--gh-attention-subtle)] hover:bg-[var(--gh-attention-subtle)]/50 flex-col h-auto py-3"
                 >
-                  <Coins className="w-5 h-5 mx-auto mb-1 text-[var(--gh-attention-fg)]" />
+                  <Coins className="w-5 h-5 text-[var(--gh-attention-fg)]" />
                   <div className="text-lg font-bold text-[var(--gh-attention-fg)]">{formatCredits(balance)}</div>
                   <div className="text-[9px] text-muted-foreground uppercase">Credits</div>
-                </button>
+                </Button>
               </motion.div>
 
               {/* Voice Interview CTA */}
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
+              <Button
+                variant="outline"
+                fullWidth
                 onClick={() => setLocation('/voice-interview')}
-                className="w-full mb-6 p-3 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 rounded-lg flex items-center gap-3 hover:from-emerald-500/20 hover:to-teal-500/20 transition-colors"
+                className="mb-6 p-3 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/30 hover:from-emerald-500/20 hover:to-teal-500/20 h-auto justify-start"
               >
                 <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
                   <Mic className="w-5 h-5 text-emerald-500" />
@@ -556,54 +562,62 @@ export default function CodingChallenge() {
                 <span className="text-xs font-bold text-[var(--gh-success-fg)] flex items-center gap-1">
                   <Coins className="w-3 h-3" />+{config.VOICE_ATTEMPT}
                 </span>
-              </motion.button>
+              </Button>
 
               {/* Search Bar */}
               <div className="relative mb-6">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <Input
                   type="text"
                   placeholder="Search challenges by name, category, or tag..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="w-full pl-10 pr-10 py-3"
                   data-testid="search-input"
                   aria-label="Search challenges"
                 />
                 {searchQuery && (
-                  <button
+                  <IconButton
+                    icon={<X className="w-4 h-4" />}
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-1 top-1/2 -translate-y-1/2"
                     aria-label="Clear search"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                  />
                 )}
               </div>
 
               {/* Quick Start */}
               <div className="flex gap-2 mb-6" data-testid="quick-start">
-                <button
+                <Button
+                  variant="primary"
+                  size="lg"
+                  fullWidth
                   onClick={() => startRandom()}
-                  className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                  className="gap-2"
                   data-testid="random-challenge-btn"
                 >
                   <Zap className="w-4 h-4" /> Random Challenge
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="success"
+                  size="lg"
                   onClick={() => startRandom('easy')}
-                  className="px-4 py-3 border border-[var(--gh-success-fg)]/50 text-[var(--gh-success-fg)] font-bold rounded-lg hover:bg-[var(--gh-success-subtle)] transition-colors"
+                  className="px-4"
                   data-testid="easy-btn"
                 >
                   Easy
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
                   onClick={() => startRandom('medium')}
-                  className="px-4 py-3 border border-[var(--gh-attention-fg)]/50 text-[var(--gh-attention-fg)] font-bold rounded-lg hover:bg-[var(--gh-attention-subtle)] transition-colors"
+                  className="px-4 text-[var(--gh-attention-fg)]"
                   data-testid="medium-btn"
                 >
                   Medium
-                </button>
+                </Button>
               </div>
 
               {/* Ultra Compact Hierarchical Tree View */}
@@ -721,14 +735,16 @@ export default function CodingChallenge() {
         {viewState === 'challenge' && currentChallenge && (
           <main className="min-h-screen min-h-dvh flex flex-col" data-testid="challenge-view">
             {/* Header */}
-            <header className="border-b border-border p-3 flex items-center justify-between flex-shrink-0">
-              <button
+              <header className="border-b border-border p-3 flex items-center justify-between flex-shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={goBack}
-                className="flex items-center gap-1.5 hover:text-primary text-[10px] uppercase tracking-widest font-bold font-mono"
+                className="gap-1.5 text-[10px] uppercase tracking-widest font-bold font-mono"
                 data-testid="back-btn"
               >
                 <ArrowLeft className="w-3.5 h-3.5" /> Back
-              </button>
+              </Button>
               <div className="flex items-center gap-3">
                 <h2 className="font-bold text-sm hidden sm:block">{currentChallenge.title}</h2>
                 <span
@@ -748,20 +764,15 @@ export default function CodingChallenge() {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <select
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value as Language)}
-                  className="appearance-none bg-card border border-border rounded-lg px-3 py-1.5 pr-8 text-xs font-mono text-foreground cursor-pointer hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 8px center',
-                  }}
-                  data-testid="language-select"
-                >
-                  <option value="javascript" className="bg-card text-foreground">JavaScript</option>
-                  <option value="python" className="bg-card text-foreground">Python</option>
-                </select>
+                <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
+                  <SelectTrigger className="h-8 w-[140px] text-xs font-mono" data-testid="language-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="javascript">JavaScript</SelectItem>
+                    <SelectItem value="python">Python</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </header>
 
@@ -769,24 +780,24 @@ export default function CodingChallenge() {
             <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
               {/* Problem Description Panel - Collapsible on Mobile */}
               <div className="lg:w-[400px] xl:w-[450px] border-b lg:border-b-0 lg:border-r border-border flex flex-col overflow-hidden flex-shrink-0">
-                {/* Mobile Collapsible Header */}
-                <button
-                  onClick={() => setIsProblemCollapsed(!isProblemCollapsed)}
-                  className="lg:hidden flex items-center justify-between p-3 bg-muted/20 border-b border-border hover:bg-muted/30 transition-colors"
-                  data-testid="problem-collapse-toggle"
-                  aria-expanded={!isProblemCollapsed}
-                  aria-controls="problem-description-content"
-                >
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-primary" />
-                    <span className="font-bold text-sm">Problem Description</span>
-                  </div>
-                  {isProblemCollapsed ? (
-                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                  ) : (
-                    <ChevronUp className="w-5 h-5 text-muted-foreground" />
-                  )}
-                </button>
+                  {/* Mobile Collapsible Header */}
+                  <button
+                    onClick={() => setIsProblemCollapsed(!isProblemCollapsed)}
+                    className="lg:hidden flex items-center justify-between p-3 bg-muted/20 border-b border-border hover:bg-muted/30 transition-colors w-full"
+                    data-testid="problem-collapse-toggle"
+                    aria-expanded={!isProblemCollapsed}
+                    aria-controls="problem-description-content"
+                  >
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-primary" />
+                      <span className="font-bold text-sm">Problem Description</span>
+                    </div>
+                    {isProblemCollapsed ? (
+                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                    ) : (
+                      <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                    )}
+                  </button>
                 
                 <AnimatePresence initial={false}>
                   {!isProblemCollapsed && (
@@ -841,14 +852,16 @@ export default function CodingChallenge() {
 
                   {/* Hints */}
                   <div className="mb-4">
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => setShowHints(!showHints)}
-                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-[var(--gh-attention-fg)] transition-colors"
+                      className="gap-2 text-xs text-muted-foreground"
                       data-testid="hints-toggle"
                     >
                       <Lightbulb className="w-4 h-4" />
                       {showHints ? 'Hide Hints' : `Show Hints (${currentChallenge.hints.length})`}
-                    </button>
+                    </Button>
                     <AnimatePresence>
                       {showHints && (
                         <motion.div
@@ -868,13 +881,15 @@ export default function CodingChallenge() {
                             </div>
                           ))}
                           {hintIndex < currentChallenge.hints.length - 1 && (
-                            <button
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => setHintIndex(hintIndex + 1)}
-                              className="text-xs text-[var(--gh-attention-fg)] hover:underline"
+                              className="text-xs text-[var(--gh-attention-fg)] p-0 h-auto"
                               data-testid="next-hint-btn"
                             >
                               Show next hint →
-                            </button>
+                            </Button>
                           )}
                         </motion.div>
                       )}
@@ -952,27 +967,27 @@ export default function CodingChallenge() {
 
               {/* Code Editor Panel - Collapsible on Mobile */}
               <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-                {/* Mobile Collapsible Header */}
-                <button
-                  onClick={() => setIsCodeCollapsed(!isCodeCollapsed)}
-                  className="lg:hidden flex items-center justify-between p-3 bg-muted/20 border-b border-border hover:bg-muted/30 transition-colors"
-                  data-testid="code-collapse-toggle"
-                  aria-expanded={!isCodeCollapsed}
-                  aria-controls="code-editor-content"
-                >
-                  <div className="flex items-center gap-2">
-                    <Code className="w-4 h-4 text-primary" />
-                    <span className="font-bold text-sm">Code Editor</span>
-                    <span className="text-xs text-muted-foreground font-mono">
-                      ({language === 'javascript' ? 'JS' : 'PY'})
-                    </span>
-                  </div>
-                  {isCodeCollapsed ? (
-                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                  ) : (
-                    <ChevronUp className="w-5 h-5 text-muted-foreground" />
-                  )}
-                </button>
+                  {/* Mobile Collapsible Header */}
+                  <button
+                    onClick={() => setIsCodeCollapsed(!isCodeCollapsed)}
+                    className="lg:hidden flex items-center justify-between p-3 bg-muted/20 border-b border-border hover:bg-muted/30 transition-colors w-full"
+                    data-testid="code-collapse-toggle"
+                    aria-expanded={!isCodeCollapsed}
+                    aria-controls="code-editor-content"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Code className="w-4 h-4 text-primary" />
+                      <span className="font-bold text-sm">Code Editor</span>
+                      <span className="text-xs text-muted-foreground font-mono">
+                        ({language === 'javascript' ? 'JS' : 'PY'})
+                      </span>
+                    </div>
+                    {isCodeCollapsed ? (
+                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                    ) : (
+                      <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                    )}
+                  </button>
                 
                 <AnimatePresence initial={false}>
                   {!isCodeCollapsed && (
@@ -998,28 +1013,24 @@ export default function CodingChallenge() {
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <button
+                    <IconButton
                       onClick={copyCode}
-                      className="p-2 min-w-[32px] min-h-[32px] hover:bg-muted/30 rounded transition-colors flex items-center justify-center"
+                      icon={copied ? <Check className="w-4 h-4 text-[var(--gh-success-fg)]" /> : <Copy className="w-4 h-4" />}
+                      variant="ghost"
+                      size="sm"
                       title="Copy code"
                       data-testid="copy-btn"
                       aria-label="Copy code"
-                    >
-                      {copied ? (
-                        <Check className="w-4 h-4 text-[var(--gh-success-fg)]" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </button>
-                    <button
+                    />
+                    <IconButton
                       onClick={resetCode}
-                      className="p-2 min-w-[32px] min-h-[32px] hover:bg-muted/30 rounded transition-colors flex items-center justify-center"
+                      icon={<RotateCcw className="w-4 h-4" />}
+                      variant="ghost"
+                      size="sm"
                       title="Reset code"
                       data-testid="reset-btn"
                       aria-label="Reset code"
-                    >
-                      <RotateCcw className="w-4 h-4 text-muted-foreground" />
-                    </button>
+                    />
                   </div>
                 </div>
 

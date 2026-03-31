@@ -46,7 +46,7 @@ export function GenZProgress({
         />
       </div>
       {showLabel && (
-        <div className="mt-2 text-sm text-[var(--muted-foreground,#6b7280)] text-right">
+        <div className="mt-2 text-sm text-muted-foreground text-right">
           {value} / {max}
         </div>
       )}

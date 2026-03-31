@@ -2,8 +2,8 @@ name: 🔄 Scheduled Deploy
 
 on:
   schedule:
-    # Run daily at 2 AM UTC (after content generation completes)
-    - cron: '0 2 * * *'
+    # Run daily at 6 AM UTC (after blog deploy at 5 AM)
+    - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
       reason:
@@ -60,10 +60,6 @@ jobs:
             exit 1
           fi
         env:
-          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
-          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
       
       - name: Cache build output
         uses: actions/cache@v4

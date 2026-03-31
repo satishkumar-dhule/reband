@@ -42,8 +42,8 @@ function section(title) {
 
 // Database client
 const dbClient = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN
+  url: 'file:local.db',
+  authToken: undefined
 });
 
 // Test results
@@ -393,7 +393,7 @@ async function main() {
   console.log(`\nEnvironment:`);
   console.log(`  QDRANT_URL: ${process.env.QDRANT_URL ? '✅ Set' : '❌ Missing'}`);
   console.log(`  EMBEDDING_MODEL: ${process.env.EMBEDDING_MODEL || 'tfidf (default)'}`);
-  console.log(`  Database: ${process.env.TURSO_DATABASE_URL ? '✅ Connected' : '❌ Missing'}`);
+  console.log(`  Database: ${'file:local.db' ? '✅ Connected' : '❌ Missing'}`);
   
   const startTime = Date.now();
   

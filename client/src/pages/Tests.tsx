@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { AppLayout } from '../components/layout/AppLayout';
+import { Button } from '@/components/unified/Button';
 import { 
   Test, loadTests, getAllTestProgress, TestProgress, getTestStats,
   getChannelTheme, checkAndExpireTests, checkTestExpiration
@@ -87,15 +88,15 @@ export default function Tests() {
             animate={{ opacity: 1, y: 0 }}
             className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6"
           >
-            <div className="border border-green-500/30 p-3 bg-gradient-to-br from-green-500/10 to-emerald-500/5 rounded-lg text-center relative overflow-hidden">
+            <div className="border border-[var(--gh-success-emphasis,var(--gh-green-500,currentColor))]/30 p-3 bg-gradient-to-br from-[var(--gh-success-emphasis,var(--gh-green-500,#22c55e))]/10 to-emerald-500/5 rounded-lg text-center relative overflow-hidden">
               <div className="absolute inset-0 bg-green-500/5 animate-pulse" />
-              <Trophy className="w-5 h-5 mx-auto mb-1 text-green-500 relative z-10" />
-              <div className="text-lg font-bold text-green-500 relative z-10">{passedCount}</div>
+              <Trophy className="w-5 h-5 mx-auto mb-1 text-[var(--gh-success-emphasis,var(--gh-green-500,#22c55e))] relative z-10" />
+              <div className="text-lg font-bold text-[var(--gh-success-emphasis,var(--gh-green-500,#22c55e))] relative z-10">{passedCount}</div>
               <div className="text-[9px] text-muted-foreground uppercase relative z-10">Passed</div>
             </div>
-            <div className="border border-blue-500/30 p-3 bg-gradient-to-br from-blue-500/10 to-cyan-500/5 rounded-lg text-center">
-              <Target className="w-5 h-5 mx-auto mb-1 text-blue-500" />
-              <div className="text-lg font-bold text-blue-500">{stats.totalAttempts}</div>
+            <div className="border border-[var(--gh-accent-emphasis,#0969da)]/30 p-3 bg-gradient-to-br from-[var(--gh-accent-emphasis,#0969da)]/10 to-cyan-500/5 rounded-lg text-center">
+              <Target className="w-5 h-5 mx-auto mb-1 text-[var(--gh-accent-emphasis,#0969da)]" />
+              <div className="text-lg font-bold text-[var(--gh-accent-emphasis,#0969da)]">{stats.totalAttempts}</div>
               <div className="text-[9px] text-muted-foreground uppercase">Attempts</div>
             </div>
             <div className="border border-purple-500/30 p-3 bg-gradient-to-br from-purple-500/10 to-violet-500/5 rounded-lg text-center">
@@ -103,14 +104,14 @@ export default function Tests() {
               <div className="text-lg font-bold text-purple-500">{stats.averageScore}%</div>
               <div className="text-[9px] text-muted-foreground uppercase">Avg Score</div>
             </div>
-            <button 
+            <div 
               onClick={() => setLocation('/profile')}
-              className="border border-amber-500/30 p-3 bg-gradient-to-br from-amber-500/10 to-yellow-500/5 rounded-lg text-center hover:from-amber-500/20 hover:to-yellow-500/10 transition-all"
+              className="border border-amber-500/30 p-3 bg-gradient-to-br from-amber-500/10 to-yellow-500/5 rounded-lg text-center hover:from-amber-500/20 hover:to-yellow-500/10 transition-all cursor-pointer"
             >
               <Coins className="w-5 h-5 mx-auto mb-1 text-amber-500" />
               <div className="text-lg font-bold text-amber-500">--</div>
               <div className="text-[9px] text-muted-foreground uppercase">Credits</div>
-            </button>
+            </div>
           </motion.div>
 
           {/* Expired Tests Alert */}
@@ -137,12 +138,12 @@ export default function Tests() {
           </AnimatePresence>
 
           {/* Voice Interview CTA - Enhanced */}
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             onClick={() => setLocation('/voice-interview')}
-            className="w-full mb-6 p-4 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/30 rounded-lg flex items-center gap-4 hover:from-emerald-500/20 hover:via-teal-500/20 hover:to-cyan-500/20 transition-all group shadow-lg shadow-emerald-500/10"
+            className="mb-6 p-4 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/30 rounded-lg flex items-center gap-4 group shadow-lg shadow-emerald-500/10 cursor-pointer hover:border-emerald-500/50 transition-colors"
           >
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500/30 to-teal-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
               <Mic className="w-6 h-6 text-emerald-500" />
@@ -160,7 +161,7 @@ export default function Tests() {
               </span>
               <ChevronRight className="w-5 h-5 text-emerald-500 group-hover:translate-x-1 transition-transform" />
             </div>
-          </motion.button>
+          </motion.div>
 
           {/* Tests List - Vibrant Channel Cards */}
           {loading ? (
@@ -179,12 +180,13 @@ export default function Tests() {
               <p className="text-sm text-muted-foreground mb-4">
                 Tests are being generated by our bot. Check back soon!
               </p>
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => setLocation('/')}
                 className="text-primary hover:underline text-sm"
               >
                 Continue Learning
-              </button>
+              </Button>
             </motion.div>
           ) : (
             <div className="space-y-3">
@@ -205,7 +207,7 @@ export default function Tests() {
                     onClick={() => setLocation(`/test/${test.channelId}`)}
                     className={`border p-4 bg-card rounded-lg cursor-pointer transition-all group relative overflow-hidden ${
                       isPassed 
-                        ? 'border-green-500/50 hover:border-green-500' 
+                        ? 'border-[var(--gh-success-emphasis,#22c55e)]/50 hover:border-[var(--gh-success-emphasis,#22c55e)]' 
                         : isExpired
                         ? 'border-amber-500/50 hover:border-amber-500'
                         : 'border-border hover:border-primary/50'
@@ -220,7 +222,7 @@ export default function Tests() {
                         isPassed ? 'ring-2 ring-green-500/50' : isExpired ? 'ring-2 ring-amber-500/50' : ''
                       }`}>
                         {isPassed ? (
-                          <CheckCircle className="w-6 h-6 text-green-500" />
+                          <CheckCircle className="w-6 h-6 text-[var(--gh-success-emphasis,#22c55e)]" />
                         ) : isExpired ? (
                           <RefreshCw className="w-6 h-6 text-amber-500" />
                         ) : (
@@ -233,7 +235,7 @@ export default function Tests() {
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <h3 className={`font-bold leading-tight ${theme.primary}`}>{test.title}</h3>
                           {isPassed && (
-                            <span className="px-1.5 py-0.5 bg-green-500/20 text-green-500 text-[9px] uppercase rounded flex items-center gap-1">
+                            <span className="px-1.5 py-0.5 bg-[var(--gh-success-emphasis,#22c55e)]/20 text-[var(--gh-success-emphasis,#22c55e)] text-[9px] uppercase rounded flex items-center gap-1">
                               <CheckCircle className="w-3 h-3" /> Passed
                             </span>
                           )}

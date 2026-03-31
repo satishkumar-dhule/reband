@@ -20,6 +20,7 @@ import { ChannelService } from '../services/api.service';
 import { useToast } from '@/hooks/use-toast';
 import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import type { Question } from '../types';
+import { Button, IconButton } from '@/components/unified/Button';
 
 type PracticeMode = 'training' | 'interview';
 type RecordingState = 'idle' | 'recording' | 'recorded';
@@ -503,12 +504,13 @@ export default function VoicePractice() {
           </div>
           <h2 className="text-xl font-bold text-[var(--gh-fg)] mb-2">No Questions Available</h2>
           <p className="text-[var(--gh-fg-muted)] mb-6">Subscribe to channels to access practice questions</p>
-          <button
+          <Button
             onClick={() => setLocation('/channels')}
-            className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-semibold hover:bg-[var(--gh-success-fg)] transition-colors"
+            variant="success"
+            size="lg"
           >
             Browse Channels
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -523,12 +525,13 @@ export default function VoicePractice() {
           <p className="text-[var(--gh-fg-muted)] mb-6">
             Voice practice requires the Web Speech API. Please use Chrome, Edge, or Safari.
           </p>
-          <button
+          <Button
             onClick={() => setLocation('/')}
-            className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-medium rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors"
+            variant="success"
+            size="lg"
           >
             Go Home
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -550,12 +553,13 @@ export default function VoicePractice() {
           <header className="sticky top-0 z-50 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]/95 backdrop-blur-md">
             <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <button
+                <IconButton
+                  icon={<ArrowLeft className="w-4 h-4" />}
                   onClick={() => setLocation('/')}
-                  className="p-1.5 hover:bg-[var(--gh-canvas-subtle)] rounded-lg transition-colors"
-                >
-                  <ArrowLeft className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                </button>
+                  aria-label="Go back"
+                  size="sm"
+                  variant="ghost"
+                />
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--gh-danger-emphasis)] to-[var(--gh-danger-fg)] flex items-center justify-center">
                     <Mic className="w-4 h-4 text-[var(--gh-fg-on-emphasis)]" />
@@ -570,17 +574,14 @@ export default function VoicePractice() {
               </div>
               
               {/* Mode Toggle */}
-              <button
+              <Button
                 onClick={toggleMode}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  mode === 'interview'
-                    ? 'bg-[var(--gh-danger-fg)]/20 text-[var(--gh-danger-fg)] border border-[var(--gh-danger-fg)]/30'
-                    : 'bg-[var(--gh-success-fg)]/20 text-[var(--gh-success-fg)] border border-[var(--gh-success-fg)]/30'
-                }`}
+                variant={mode === 'interview' ? 'danger' : 'success'}
+                size="sm"
+                icon={mode === 'interview' ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               >
-                {mode === 'interview' ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 {mode === 'interview' ? 'Interview Mode' : 'Training Mode'}
-              </button>
+              </Button>
             </div>
             
             {/* Progress Bar */}
@@ -740,22 +741,14 @@ export default function VoicePractice() {
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-medium text-[var(--gh-fg-muted)]">Your Response</span>
                         {audioBlob && recordingState === 'recorded' && (
-                          <button
+                          <Button
                             onClick={isPlayingAudio ? stopAudioPlayback : playRecording}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-fg)] text-[var(--gh-fg-on-emphasis)] rounded-lg transition-colors"
+                            variant="success"
+                            size="sm"
+                            icon={isPlayingAudio ? <Square className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
                           >
-                            {isPlayingAudio ? (
-                              <>
-                                <Square className="w-3.5 h-3.5" />
-                                Stop
-                              </>
-                            ) : (
-                              <>
-                                <Volume2 className="w-3.5 h-3.5" />
-                                Replay
-                              </>
-                            )}
-                          </button>
+                            {isPlayingAudio ? 'Stop' : 'Replay'}
+                          </Button>
                         )}
                       </div>
                       <div className="p-4 bg-[var(--gh-canvas)] rounded-xl max-h-[300px] overflow-y-auto momentum-scroll custom-scrollbar border border-[var(--gh-border)]">
@@ -788,14 +781,15 @@ export default function VoicePractice() {
                   <div className="flex items-center justify-center gap-3">
                     {recordingState === 'idle' && (
                       <>
-                        <button
+                        <Button
                           onClick={startRecording}
                           disabled={!recognitionReady}
-                          className="flex items-center gap-2 px-6 py-3 bg-[var(--gh-danger-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-danger-fg)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                          variant="danger"
+                          size="lg"
+                          icon={<Mic className="w-5 h-5" />}
                         >
-                          <Mic className="w-5 h-5" />
                           Start Recording
-                        </button>
+                        </Button>
                         {!recognitionReady && (
                           <span className="text-xs text-[var(--gh-fg-subtle)]">Initializing microphone...</span>
                         )}
@@ -803,23 +797,25 @@ export default function VoicePractice() {
                     )}
                     
                     {recordingState === 'recording' && (
-                      <button
+                      <Button
                         onClick={stopRecording}
-                        className="flex items-center gap-2 px-6 py-3 bg-[var(--gh-danger-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-danger-fg)] transition-all"
+                        variant="danger"
+                        size="lg"
+                        icon={<Square className="w-5 h-5" />}
                       >
-                        <Square className="w-5 h-5" />
                         Stop Recording
-                      </button>
+                      </Button>
                     )}
                     
                     {recordingState === 'recorded' && (
-                      <button
+                      <Button
                         onClick={tryAgain}
-                        className="flex items-center gap-2 px-5 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors"
+                        variant="outline"
+                        size="lg"
+                        icon={<RotateCcw className="w-4 h-4" />}
                       >
-                        <RotateCcw className="w-4 h-4" />
                         Try Again
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -867,20 +863,24 @@ export default function VoicePractice() {
 
                 {/* Navigation */}
                 <div className="flex gap-3">
-                  <button
+                  <Button
                     onClick={goToPrevious}
                     disabled={currentIndex === 0}
-                    className="px-6 py-3 bg-[var(--gh-canvas-subtle)] hover:bg-[var(--gh-border)] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-semibold transition-colors text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] border border-[var(--gh-border)]"
+                    variant="secondary"
+                    size="lg"
                   >
                     Previous
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={goToNext}
-                    className="flex-1 px-6 py-3 bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-fg)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+                    variant="success"
+                    size="lg"
+                    fullWidth
+                    icon={<ChevronRight className="w-5 h-5" />}
+                    iconPosition="right"
                   >
                     {currentIndex === questions.length - 1 ? 'Finish' : 'Next Question'}
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
+                  </Button>
                 </div>
               </motion.div>
             </AnimatePresence>

@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { Volume2, VolumeX, Loader2 } from 'lucide-react';
 import { speak, stop, getIsSpeaking, isTTSSupported } from '../lib/text-to-speech';
+import { Button, IconButton } from './unified/Button';
 
 interface ListenButtonProps {
   text: string;
@@ -93,20 +94,15 @@ export function ListenButton({
     lg: 'w-5 h-5',
   };
   
+  const buttonVariant = isPlaying ? 'primary' : 'outline';
+  
   return (
-    <button
+    <Button
+      variant={buttonVariant}
+      size={size === 'sm' ? 'sm' : 'md'}
       onClick={handleClick}
       disabled={isLoading}
-      className={`
-        inline-flex items-center rounded-lg font-medium transition-all
-        ${isPlaying 
-          ? 'bg-primary text-primary-foreground' 
-          : 'bg-primary/10 text-primary hover:bg-primary/20'
-        }
-        ${sizeClasses[size]}
-        ${className}
-        disabled:opacity-50
-      `}
+      className={className}
       aria-label={isPlaying ? 'Stop listening' : 'Listen to answer'}
     >
       {isLoading ? (
@@ -117,7 +113,7 @@ export function ListenButton({
         <Volume2 className={iconSizes[size]} />
       )}
       <span>{isPlaying ? 'Stop' : label}</span>
-    </button>
+    </Button>
   );
 }
 
@@ -197,28 +193,20 @@ export function ListenIconButton({
   };
   
   return (
-    <button
+    <IconButton
       onClick={handleClick}
       disabled={isLoading}
-      className={`
-        rounded-lg transition-all
-        ${isPlaying 
-          ? 'bg-primary text-primary-foreground' 
-          : 'bg-primary/10 text-primary hover:bg-primary/20'
-        }
-        ${sizeClasses[size]}
-        ${className}
-        disabled:opacity-50
-      `}
+      size={size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'}
+      variant={isPlaying ? 'primary' : 'ghost'}
+      className={className}
       aria-label={isPlaying ? 'Stop listening' : 'Listen to answer'}
-    >
-      {isLoading ? (
+      icon={isLoading ? (
         <Loader2 className={`${iconSizes[size]} animate-spin`} />
       ) : isPlaying ? (
         <VolumeX className={iconSizes[size]} />
       ) : (
         <Volume2 className={iconSizes[size]} />
       )}
-    </button>
+    />
   );
 }

@@ -15,6 +15,7 @@ import { SEOHead } from '../components/SEOHead';
 import { QuestionFeedback } from '../components/QuestionFeedback';
 import { QuestionHistoryIcon } from '../components/unified/QuestionHistory';
 import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrapper';
+import { Button } from '@/components/unified/Button';
 import {
   Test, TestQuestion, getTestForChannel, getSessionQuestions,
   calculateScore, saveTestAttempt, TestAttempt, getTestProgress,
@@ -353,12 +354,14 @@ export default function TestSession() {
           <p className="text-muted-foreground">
             {!test ? 'No test available for this channel yet' : 'Loading test...'}
           </p>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setLocation('/')}
-            className="mt-4 text-primary hover:underline text-sm"
+            className="mt-4"
           >
             Go back home
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -463,43 +466,38 @@ export default function TestSession() {
 
                 <div className="space-y-2">
                   {sessionId && localStorage.getItem(sessionId) && (
-                    <button
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      fullWidth
                       onClick={() => startTest(true)}
-                      className={`w-full py-3 ${theme.badge} text-white font-bold rounded hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg ${theme.glow}`}
+                      icon={<Play className="w-5 h-5" />}
                     >
-                      <Play className="w-5 h-5" /> Resume Test
-                    </button>
+                      Resume Test
+                    </Button>
                   )}
-                  <button
+                  <Button
+                    variant={sessionId && localStorage.getItem(sessionId) ? 'secondary' : 'primary'}
+                    size="lg"
+                    fullWidth
                     onClick={() => {
                       if (sessionId && localStorage.getItem(sessionId)) {
-                        // Clear old session before starting new
                         clearSession();
                       }
                       startTest(false);
                     }}
-                    className={`w-full py-3 ${sessionId && localStorage.getItem(sessionId) ? 'bg-muted text-foreground' : `${theme.badge} text-white shadow-lg ${theme.glow}`} font-bold rounded hover:opacity-90 transition-all flex items-center justify-center gap-2`}
+                    icon={isExpired ? <RefreshCw className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
                   >
-                    {isExpired ? (
-                      <>
-                        <RefreshCw className="w-5 h-5" /> Retake Test
-                      </>
-                    ) : sessionId && localStorage.getItem(sessionId) ? (
-                      <>
-                        <Zap className="w-5 h-5" /> Start New Test
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-5 h-5" /> Start Test
-                      </>
-                    )}
-                  </button>
-                  <button
+                    {isExpired ? 'Retake Test' : sessionId && localStorage.getItem(sessionId) ? 'Start New Test' : 'Start Test'}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="md"
+                    fullWidth
                     onClick={() => setLocation(`/channel/${channelId}`)}
-                    className="w-full py-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
                   >
                     Back to Channel
-                  </button>
+                  </Button>
                 </div>
               </div>
             </motion.div>
@@ -512,14 +510,15 @@ export default function TestSession() {
             {/* Header - COMPACT */}
             <header className="border-b border-border p-2.5 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <button
+                <Button
+                  variant="ghost"
+                  size="xs"
                   onClick={exitTest}
-                  className="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                   title="Exit and save progress"
+                  icon={<Home className="w-3.5 h-3.5" />}
                 >
-                  <Home className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Exit</span>
-                </button>
+                </Button>
                 <div className="h-4 w-px bg-border" />
                 <span className="text-xs text-muted-foreground">
                   {currentIndex + 1}/{questions.length}
@@ -533,18 +532,16 @@ export default function TestSession() {
               </div>
               
               {/* Auto-submit toggle */}
-              <button
+              <Button
+                variant={autoSubmit ? 'outline' : 'ghost'}
+                size="xs"
                 onClick={toggleAutoSubmit}
-                className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium transition-all ${
-                  autoSubmit 
-                    ? 'bg-primary/20 text-primary border border-primary/30' 
-                    : 'bg-muted/30 text-muted-foreground border border-transparent'
-                }`}
                 title={autoSubmit ? 'Auto-advance ON' : 'Auto-advance OFF'}
+                icon={<Zap className={`w-3 h-3 ${autoSubmit ? 'text-primary' : ''}`} />}
+                className="rounded-full"
               >
-                <Zap className={`w-3 h-3 ${autoSubmit ? 'text-primary' : ''}`} />
                 <span className="hidden sm:inline">Auto</span>
-              </button>
+              </Button>
               
               <span className="text-xs text-muted-foreground">
                 {answeredCount}/{questions.length}
@@ -609,11 +606,14 @@ export default function TestSession() {
                         const isMultiple = currentQuestion.type === 'multiple';
                         
                         return (
-                          <button
+                          <Button
                             key={option.id}
                             onClick={() => handleOptionSelect(option.id)}
                             disabled={showFeedback !== null}
-                            className={`w-full p-4 text-left border rounded-lg transition-all ${
+                            variant={showCorrect ? 'success' : showWrong ? 'danger' : isSelected ? 'outline' : 'ghost'}
+                            size="md"
+                            fullWidth
+                            className={`justify-start p-4 h-auto text-left ${
                               showCorrect
                                 ? 'border-green-500 bg-green-500/20'
                                 : showWrong
@@ -623,7 +623,7 @@ export default function TestSession() {
                                 : 'border-border hover:border-primary/50'
                             } ${showFeedback ? 'cursor-default' : ''}`}
                           >
-                            <div className="flex items-start gap-3">
+                            <div className="flex items-start gap-3 w-full">
                               <div className={`w-6 h-6 ${isMultiple ? 'rounded-md' : 'rounded-full'} border-2 flex items-center justify-center flex-shrink-0 ${
                                 showCorrect
                                   ? 'border-green-500 bg-green-500'
@@ -639,7 +639,7 @@ export default function TestSession() {
                               </div>
                               <span className="text-sm">{renderWithInlineCode(option.text)}</span>
                             </div>
-                          </button>
+                          </Button>
                         );
                       })}
                     </div>
@@ -658,14 +658,16 @@ export default function TestSession() {
             {/* Navigation - SINGLE LINE COMPACT */}
             <footer className="border-t border-border p-2 w-full overflow-x-hidden">
               <div className="max-w-2xl mx-auto flex items-center justify-between gap-2 w-full">
-                <button
+                <Button
+                  variant="ghost"
+                  size="xs"
                   onClick={goPrev}
                   disabled={currentIndex === 0}
-                  className="flex items-center gap-0.5 px-2 py-1 text-xs disabled:opacity-30 hover:text-primary transition-colors shrink-0"
+                  icon={<ArrowLeft className="w-3.5 h-3.5" />}
+                  className="shrink-0"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Prev</span>
-                </button>
+                </Button>
 
                 {/* Compact question indicator */}
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
@@ -679,9 +681,10 @@ export default function TestSession() {
 
                 {currentIndex === questions.length - 1 ? (
                   currentQuestion?.type === 'multiple' ? (
-                    <button
+                    <Button
+                      variant="primary"
+                      size="xs"
                       onClick={() => {
-                        // For last multiple choice question, show feedback then submit
                         const userAnswers = answers[currentQuestion.id] || [];
                         if (userAnswers.length === 0) return;
                         
@@ -697,36 +700,42 @@ export default function TestSession() {
                         }, 800);
                       }}
                       disabled={(answers[currentQuestion.id] || []).length === 0 || showFeedback !== null}
-                      className="px-2.5 py-1 bg-primary text-primary-foreground text-xs font-bold rounded hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shrink-0"
+                      className="shrink-0"
                     >
                       Submit
-                    </button>
+                    </Button>
                   ) : (
-                    <button
+                    <Button
+                      variant="primary"
+                      size="xs"
                       onClick={submitTest}
-                      className="px-2.5 py-1 bg-primary text-primary-foreground text-xs font-bold rounded hover:bg-primary/90 transition-colors shrink-0"
+                      className="shrink-0"
                     >
                       Submit
-                    </button>
+                    </Button>
                   )
                 ) : currentQuestion?.type === 'multiple' ? (
-                  <button
+                  <Button
+                    variant="primary"
+                    size="xs"
                     onClick={confirmMultipleChoice}
                     disabled={(answers[currentQuestion.id] || []).length === 0 || showFeedback !== null}
-                    className="flex items-center gap-0.5 px-2.5 py-1 text-xs bg-primary text-primary-foreground font-bold rounded hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shrink-0"
+                    icon={<ArrowRight className="w-3.5 h-3.5" />}
+                    className="shrink-0"
                   >
                     <span className="hidden sm:inline">Confirm</span>
                     <span className="sm:hidden">OK</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  </Button>
                 ) : (
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="xs"
                     onClick={goNext}
-                    className="flex items-center gap-0.5 px-2 py-1 text-xs hover:text-primary transition-colors shrink-0"
+                    icon={<ArrowRight className="w-3.5 h-3.5" />}
+                    className="shrink-0"
                   >
                     <span className="hidden sm:inline">Next</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  </Button>
                 )}
               </div>
             </footer>
@@ -796,29 +805,24 @@ export default function TestSession() {
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/50">
                   <div className="flex bg-muted/30 rounded-lg p-1 gap-1">
                     {(['all', 'incorrect', 'correct'] as const).map((filter) => (
-                      <button
+                      <Button
                         key={filter}
+                        variant={reviewFilter === filter ? 'primary' : 'ghost'}
+                        size="xs"
                         onClick={() => setReviewFilter(filter)}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
-                          reviewFilter === filter
-                            ? filter === 'correct' 
-                              ? 'bg-green-500 text-white shadow-sm'
-                              : filter === 'incorrect'
-                              ? 'bg-red-500 text-white shadow-sm'
-                              : 'bg-background text-foreground shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
                       >
                         {filter === 'all' ? `All (${result.total})` : 
                          filter === 'correct' ? `✓ ${result.correct}` : 
                          `✗ ${result.total - result.correct}`}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                   
                   <div className="flex-1" />
                   
-                  <button
+                  <Button
+                    variant="outline"
+                    size="xs"
                     onClick={() => {
                       const questionResults = getQuestionResults();
                       const allIndices = questionResults
@@ -835,10 +839,9 @@ export default function TestSession() {
                         setExpandedQuestions(new Set(allIndices));
                       }
                     }}
-                    className="px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground border border-border rounded-lg transition-all hover:bg-muted/30"
                   >
                     {expandedQuestions.size > 0 ? 'Collapse All' : 'Expand All'}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </header>
@@ -869,7 +872,9 @@ export default function TestSession() {
                         } ${isExpanded ? 'shadow-lg' : 'shadow-sm hover:shadow-md'}`}
                       >
                         {/* Collapsed Header - Always Visible */}
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="md"
                           onClick={() => {
                             setExpandedQuestions(prev => {
                               const newSet = new Set(prev);
@@ -881,7 +886,7 @@ export default function TestSession() {
                               return newSet;
                             });
                           }}
-                          className={`w-full px-4 py-3 flex items-center gap-3 transition-all ${
+                          className={`w-full justify-start px-4 py-3 h-auto gap-3 ${
                             item.isCorrect 
                               ? 'bg-gradient-to-r from-green-500/10 to-transparent hover:from-green-500/20' 
                               : 'bg-gradient-to-r from-red-500/10 to-transparent hover:from-red-500/20'
@@ -938,7 +943,7 @@ export default function TestSession() {
                           >
                             <ChevronDown className={`w-5 h-5 ${isExpanded ? 'text-primary' : 'text-muted-foreground'}`} />
                           </motion.div>
-                        </button>
+                          </Button>
 
                         {/* Expanded Content */}
                         <AnimatePresence>

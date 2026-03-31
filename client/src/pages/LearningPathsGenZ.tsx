@@ -8,7 +8,8 @@ import {
   Code, Server, Rocket, Target, Sparkles, Brain,
   Plus, ChevronRight, Check, X, Search, Home, Clock, Trophy
 } from 'lucide-react';
-import { Button } from "../components/ui/button";
+import { Button } from '@/components/unified/Button';
+import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 
 // Certification type
@@ -275,8 +276,8 @@ export default function LearningPathsGenZ() {
                 <p className="text-[var(--gh-fg-muted)]">Curated journeys designed to help you master specific domains.</p>
               </div>
               <Button 
+                variant="primary"
                 onClick={() => setShowCustom(true)}
-                className="bg-[var(--gh-accent-emphasis)] text-white hover:opacity-90"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Custom Path
@@ -285,17 +286,19 @@ export default function LearningPathsGenZ() {
 
             <div className="flex border-b border-[var(--gh-border)] mb-6 overflow-x-auto gap-2">
               {['all', 'Beginner', 'Intermediate', 'Advanced'].map((tab) => (
-                <button
+                <Button
                   key={tab}
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setActiveTab(tab as any)}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                  className={`border-b-2 rounded-none ${
                     activeTab === tab
                       ? 'border-[var(--gh-accent-fg)] text-[var(--gh-fg)]'
-                      : 'border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]'
+                      : 'border-transparent text-[var(--gh-fg-muted)]'
                   }`}
                 >
                   {tab === 'all' ? 'All Paths' : tab}
-                </button>
+                </Button>
               ))}
             </div>
 
@@ -377,31 +380,30 @@ export default function LearningPathsGenZ() {
                 <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-xl max-w-2xl w-full max-h-[90dvh] max-h-[90svh] flex flex-col pb-safe">
                   <div className="p-4 border-b border-[var(--gh-border)] flex items-center justify-between">
                     <h2 className="font-semibold">Create Custom Path</h2>
-                    <button onClick={resetCustomPath} className="text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]">
+                    <Button variant="ghost" size="sm" onClick={resetCustomPath}>
                       <X className="w-5 h-5" />
-                    </button>
+                    </Button>
                   </div>
                   
                   <div className="p-6 overflow-y-auto momentum-scroll space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-[var(--gh-fg)] mb-2">Path Name</label>
-                      <input 
+                      <Input 
                         type="text"
                         placeholder="e.g., My Interview Prep"
                         value={customPath.name}
                         onChange={(e) => setCustomPath(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg)] focus:ring-2 focus:ring-[var(--gh-accent-fg)] outline-none"
                       />
                     </div>
 
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--gh-fg-muted)]" />
-                      <input 
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--gh-fg-muted)] pointer-events-none" />
+                      <Input 
                         type="text"
                         placeholder="Search topics..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg)] focus:ring-2 focus:ring-[var(--gh-accent-fg)] outline-none"
+                        className="pl-10"
                       />
                     </div>
 
@@ -409,18 +411,16 @@ export default function LearningPathsGenZ() {
                       <h3 className="text-sm font-semibold mb-3">Select Channels ({customPath.channels.length})</h3>
                       <div className="grid grid-cols-2 gap-2">
                         {filteredChannels.slice(0, 10).map(ch => (
-                          <button
+                          <Button
                             key={ch.id}
                             onClick={() => toggleChannel(ch.id)}
-                            className={`flex items-center justify-between px-3 py-2 rounded-md text-sm border transition-colors ${
-                              customPath.channels.includes(ch.id)
-                                ? 'bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-fg)] text-[var(--gh-accent-fg)]'
-                                : 'bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:border-[var(--gh-fg-subtle)]'
-                            }`}
+                            variant={customPath.channels.includes(ch.id) ? 'primary' : 'outline'}
+                            size="sm"
+                            className="justify-between"
                           >
                             {ch.name}
                             {customPath.channels.includes(ch.id) && <Check className="w-3.5 h-3.5" />}
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     </div>
@@ -443,18 +443,16 @@ export default function LearningPathsGenZ() {
                       ) : (
                         <div className="grid grid-cols-2 gap-2">
                           {filteredCerts.slice(0, 10).map(cert => (
-                            <button
+                            <Button
                               key={cert.id}
                               onClick={() => toggleCertification(cert.id)}
-                              className={`flex items-center justify-between px-3 py-2 rounded-md text-sm border transition-colors ${
-                                customPath.certifications.includes(cert.id)
-                                  ? 'bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-fg)] text-[var(--gh-accent-fg)]'
-                                  : 'bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:border-[var(--gh-fg-subtle)]'
-                              }`}
+                              variant={customPath.certifications.includes(cert.id) ? 'primary' : 'outline'}
+                              size="sm"
+                              className="justify-between"
                             >
                               {cert.name}
                               {customPath.certifications.includes(cert.id) && <Check className="w-3.5 h-3.5" />}
-                            </button>
+                            </Button>
                           ))}
                         </div>
                       )}
@@ -464,7 +462,7 @@ export default function LearningPathsGenZ() {
                   <div className="p-4 border-t border-[var(--gh-border)] flex justify-end gap-3">
                     <Button variant="outline" onClick={resetCustomPath}>Cancel</Button>
                     <Button 
-                      className="bg-[var(--gh-accent-emphasis)] text-white hover:opacity-90"
+                      variant="primary"
                       disabled={!customPath.name || customPath.channels.length === 0}
                       onClick={handleCreateCustomPath}
                     >

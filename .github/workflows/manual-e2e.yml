@@ -60,10 +60,6 @@ jobs:
       - name: Fetch test data
         run: node script/fetch-questions-for-build.js
         env:
-          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
-          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
 
       - name: Install Playwright (if not cached)
         run: |

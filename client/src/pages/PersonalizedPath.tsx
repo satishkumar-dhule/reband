@@ -7,6 +7,15 @@ import {
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { SEOHead } from '@/components/SEOHead';
+import { Button } from '@/components/unified/Button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   getUserProfile,
   getPersonalizedLearningPath,
@@ -93,18 +102,18 @@ export default function PersonalizedPath() {
                   <label className="block text-sm font-semibold text-foreground mb-2">
                     What's your target role?
                   </label>
-                  <select
-                    value={selectedJobTitle}
-                    onChange={(e) => setSelectedJobTitle(e.target.value)}
-                    className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="">Select a role...</option>
-                    {jobTitles.map(jt => (
-                      <option key={jt.id} value={jt.id}>
-                        {jt.title}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={selectedJobTitle} onValueChange={setSelectedJobTitle}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a role..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {jobTitles.map(jt => (
+                        <SelectItem key={jt.id} value={jt.id}>
+                          {jt.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Experience Level */}
@@ -114,17 +123,14 @@ export default function PersonalizedPath() {
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                     {(['entry', 'mid', 'senior', 'staff', 'principal'] as const).map(level => (
-                      <button
+                      <Button
                         key={level}
+                        variant={selectedExperience === level ? 'primary' : 'outline'}
+                        size="sm"
                         onClick={() => setSelectedExperience(level)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                          selectedExperience === level
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-background border border-border text-foreground hover:bg-muted'
-                        }`}
                       >
                         {level.charAt(0).toUpperCase() + level.slice(1)}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -134,32 +140,26 @@ export default function PersonalizedPath() {
                   <label className="block text-sm font-semibold text-foreground mb-2">
                     Target Company (Optional)
                   </label>
-                  <input
+                  <Input
                     type="text"
                     value={targetCompany}
                     onChange={(e) => setTargetCompany(e.target.value)}
                     placeholder="e.g., Google, Amazon, Meta..."
-                    className="w-full px-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
 
-                <button
+                <Button
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  loading={isSubmitting}
+                  disabled={!selectedJobTitle}
                   onClick={handleCreateProfile}
-                  disabled={isSubmitting || !selectedJobTitle}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  icon={<ArrowRight className="w-5 h-5" />}
+                  iconPosition="right"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      Create My Learning Path
-                      <ArrowRight className="w-5 h-5" />
-                    </>
-                  )}
-                </button>
+                  Create My Learning Path
+                </Button>
               </div>
             </motion.div>
           </div>
@@ -208,13 +208,14 @@ export default function PersonalizedPath() {
                   </div>
                 </div>
               </div>
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setShowSetup(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-background border border-border rounded-lg text-sm font-medium hover:bg-muted transition-all"
+                icon={<Edit2 className="w-4 h-4" />}
               >
-                <Edit2 className="w-4 h-4" />
                 Edit Profile
-              </button>
+              </Button>
             </div>
           </motion.div>
 

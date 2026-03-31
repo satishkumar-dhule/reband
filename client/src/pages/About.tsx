@@ -14,6 +14,8 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { trackEasterEggUnlocked } from '../hooks/use-analytics';
 import { getAllQuestions, channels } from '../lib/data';
 import { cn } from '../lib/utils';
+import { Button, MotionButton, IconButton } from '@/components/unified/Button';
+import { Input } from '@/components/ui/input';
 
 // Animated counter component
 function AnimatedCounter({ value, duration = 2 }: { value: number; duration?: number }) {
@@ -76,16 +78,17 @@ function CodeSnippet({ code, language = 'bash' }: { code: string; language?: str
 
   return (
     <div className="relative group">
-      <pre className="bg-background/80 text-green-400 p-4 rounded-lg text-xs overflow-x-auto font-mono">
+      <pre className="bg-background/80 p-4 rounded-lg text-xs overflow-x-auto font-mono text-[var(--gh-fg)]">
         <code>{code}</code>
       </pre>
-      <button
+      <IconButton
         onClick={handleCopy}
-        className="absolute top-2 right-2 p-1.5 bg-muted rounded opacity-0 group-hover:opacity-100 transition-opacity"
+        size="sm"
+        icon={copied ? <Check className="w-3 h-3 text-[var(--gh-success-fg)]" /> : <Copy className="w-3 h-3" />}
         aria-label="Copy to clipboard"
-      >
-        {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
-      </button>
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
+        variant="ghost"
+      />
     </div>
   );
 }
@@ -139,8 +142,8 @@ function GlitchText({ children, className }: { children: string; className?: str
       <span className={cn(isGlitching && "animate-pulse")}>{children}</span>
       {isGlitching && (
         <>
-          <span className="absolute top-0 left-0.5 text-cyan-500 opacity-70 clip-glitch-1">{children}</span>
-          <span className="absolute top-0 -left-0.5 text-red-500 opacity-70 clip-glitch-2">{children}</span>
+          <span className="absolute top-0 left-0.5 text-[var(--gh-accent-fg)] opacity-70 clip-glitch-1">{children}</span>
+          <span className="absolute top-0 -left-0.5 text-[var(--gh-danger-fg)] opacity-70 clip-glitch-2">{children}</span>
         </>
       )}
     </span>
@@ -169,7 +172,7 @@ function MatrixRain() {
     const draw = () => {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#0f0';
+      ctx.fillStyle = 'var(--gh-success-fg, #3fb950)';
       ctx.font = `${fontSize}px monospace`;
       
       for (let i = 0; i < drops.length; i++) {
@@ -332,13 +335,17 @@ export default function About() {
             <div className="relative z-10 p-6 sm:p-10">
               <div className="flex items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <div className="w-3 h-3 rounded-full bg-[var(--gh-danger-fg)]" />
+                  <div className="w-3 h-3 rounded-full bg-[var(--gh-accent-fg)]" />
+                  <div className="w-3 h-3 rounded-full bg-[var(--gh-success-fg)]" />
                 </div>
-                <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 hover-elevate rounded transition-colors" aria-label={soundEnabled ? "Mute sound effects" : "Enable sound effects"}>
-                  {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                </button>
+                <IconButton
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  icon={soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                  aria-label={soundEnabled ? "Mute sound effects" : "Enable sound effects"}
+                  size="sm"
+                  variant="ghost"
+                />
               </div>
               
               <div className="text-center">
@@ -382,22 +389,23 @@ export default function About() {
 
                 {/* CTA Buttons */}
                 <div className="flex flex-wrap justify-center gap-3">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <MotionButton
                     onClick={() => setLocation('/voice-interview')}
-                    className="px-6 py-3 bg-gradient-to-r from-primary to-cyan-500 text-foreground font-bold rounded-lg flex items-center gap-2 shadow-lg shadow-primary/30"
+                    icon={<Play className="w-4 h-4" />}
+                    variant="primary"
+                    size="lg"
                   >
-                    <Play className="w-4 h-4" /> Start Practicing
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    Start Practicing
+                  </MotionButton>
+                  <MotionButton
                     onClick={() => setTerminalOpen(!terminalOpen)}
-                    className="px-6 py-3 bg-background/80 text-green-400 font-bold rounded-lg flex items-center gap-2 border border-green-500/30"
+                    icon={<Terminal className="w-4 h-4" />}
+                    variant="outline"
+                    size="lg"
+                    className="border-[var(--gh-success-fg)]/30 text-[var(--gh-success-fg)] hover:bg-[var(--gh-success-fg)]/10"
                   >
-                    <Terminal className="w-4 h-4" /> Open Terminal
-                  </motion.button>
+                    Open Terminal
+                  </MotionButton>
                 </div>
               </div>
             </div>
@@ -412,26 +420,26 @@ export default function About() {
                 exit={{ opacity: 0, height: 0 }}
                 className="mb-8 overflow-hidden"
               >
-                <div className="bg-background rounded-xl border border-green-500/30 overflow-hidden">
-                  <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border-b border-green-500/30">
-                    <Terminal className="w-4 h-4 text-green-400" />
-                    <span className="text-xs text-green-400 font-mono">code-reels@terminal ~ </span>
+                <div className="bg-background rounded-xl border border-[var(--gh-success-fg)]/30 overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-[var(--gh-success-fg)]/10 border-b border-[var(--gh-success-fg)]/30">
+                    <Terminal className="w-4 h-4 text-[var(--gh-success-fg)]" />
+                    <span className="text-xs text-[var(--gh-success-fg)] font-mono">code-reels@terminal ~ </span>
                   </div>
                   <div className="p-4 font-mono text-sm max-h-64 overflow-y-auto">
-                    <div className="text-green-400 mb-2">Welcome to Code Reels Terminal! Type 'help' for commands.</div>
+                    <div className="text-[var(--gh-success-fg)] mb-2">Welcome to Code Reels Terminal! Type 'help' for commands.</div>
                     {commandHistory.map((line, i) => (
-                      <div key={i} className={cn("mb-1", line.startsWith('$') ? 'text-cyan-400' : 'text-green-400/80')}>
+                      <div key={i} className={cn("mb-1", line.startsWith('$') ? 'text-[var(--gh-accent-fg)]' : 'text-[var(--gh-success-fg)]/80')}>
                         {line}
                       </div>
                     ))}
                     <div className="flex items-center gap-2">
-                      <span className="text-cyan-400">$</span>
-                      <input
+                      <span className="text-[var(--gh-accent-fg)]">$</span>
+                      <Input
                         type="text"
                         value={currentCommand}
                         onChange={(e) => setCurrentCommand(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleTerminalCommand(currentCommand)}
-                        className="flex-1 bg-transparent text-green-400 outline-none"
+                        className="flex-1 bg-transparent"
                         placeholder="Type a command..."
                       />
                     </div>
@@ -445,18 +453,20 @@ export default function About() {
           <div className="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-10 mb-6">
             <div className="flex gap-1 overflow-x-auto scrollbar-hide">
               {(['mission', 'features', 'tech', 'community', 'developer'] as const).map((tab) => (
-                <button
+                <Button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
+                  variant={activeTab === tab ? 'primary' : 'ghost'}
+                  size="sm"
                   className={cn(
-                    "px-4 py-3 text-xs uppercase tracking-widest font-bold border-b-2 transition-all whitespace-nowrap",
+                    "px-4 py-3 text-xs uppercase tracking-widest font-bold border-b-2 rounded-none",
                     activeTab === tab 
                       ? 'border-primary text-primary' 
-                      : 'border-transparent text-muted-foreground hover-elevate'
+                      : 'border-transparent hover:bg-transparent'
                   )}
                 >
                   {tab}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -482,8 +492,8 @@ export default function About() {
                       </p>
                       <div className="flex flex-wrap gap-3">
                         <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">Free Forever</span>
-                        <span className="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-sm font-medium">Open Source</span>
-                        <span className="px-3 py-1 bg-purple-500/10 text-purple-500 rounded-full text-sm font-medium">Community Driven</span>
+                        <span className="px-3 py-1 bg-[var(--gh-success-fg)]/10 text-[var(--gh-success-fg)] rounded-full text-sm font-medium">Open Source</span>
+                        <span className="px-3 py-1 bg-[var(--gh-accent-fg)]/10 text-[var(--gh-accent-fg)] rounded-full text-sm font-medium">Community Driven</span>
                       </div>
                     </div>
 
@@ -641,18 +651,30 @@ pnpm dev
                       Code Reels is built by the community, for the community. Contribute questions, report bugs, or help improve the platform!
                     </p>
                     <div className="flex flex-wrap gap-3">
-                      <a href="https://github.com/open-interview/open-interview" target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg font-bold text-sm hover:opacity-90 transition-opacity">
-                        <Github className="w-4 h-4" /> Star on GitHub
-                      </a>
-                      <a href="https://github.com/open-interview/open-interview/issues/new" target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-5 py-2.5 border border-border rounded-lg font-bold text-sm hover:border-primary transition-colors">
-                        <Bug className="w-4 h-4" /> Report Bug
-                      </a>
-                      <a href="https://github.com/open-interview/open-interview/discussions" target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-5 py-2.5 border border-border rounded-lg font-bold text-sm hover:border-primary transition-colors">
-                        <MessageSquare className="w-4 h-4" /> Discussions
-                      </a>
+                      <Button
+                        variant="primary"
+                        size="md"
+                        icon={<Github className="w-4 h-4" />}
+                        onClick={() => window.open('https://github.com/open-interview/open-interview', '_blank')}
+                      >
+                        Star on GitHub
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="md"
+                        icon={<Bug className="w-4 h-4" />}
+                        onClick={() => window.open('https://github.com/open-interview/open-interview/issues/new', '_blank')}
+                      >
+                        Report Bug
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="md"
+                        icon={<MessageSquare className="w-4 h-4" />}
+                        onClick={() => window.open('https://github.com/open-interview/open-interview/discussions', '_blank')}
+                      >
+                        Discussions
+                      </Button>
                     </div>
                   </div>
 
@@ -736,14 +758,15 @@ git push origin feature/awesome-feature`} />
                       <p className="text-muted-foreground flex items-center justify-center gap-2 text-sm mb-4">
                         <Briefcase className="w-4 h-4 shrink-0" /> Software Engineer
                       </p>
-                      <a
-                        href="https://satishkumar-dhule.github.io/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-cyan-500 text-foreground rounded-lg font-bold text-sm hover:opacity-90 transition-opacity shadow-lg"
+                      <Button
+                        variant="primary"
+                        size="md"
+                        icon={<Globe className="w-4 h-4" />}
+                        onClick={() => window.open('https://satishkumar-dhule.github.io/', '_blank')}
+                        className="bg-gradient-to-r from-primary to-cyan-500 shadow-lg"
                       >
-                        <Globe className="w-4 h-4" /> Portfolio
-                      </a>
+                        Portfolio
+                      </Button>
                     </div>
                   </div>
 
@@ -758,58 +781,58 @@ git push origin feature/awesome-feature`} />
                       Believes in open source and giving back to the developer community.
                     </p>
                     <div className="flex flex-wrap gap-3">
-                      <a
-                        href="https://satishkumar-dhule.github.io/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm hover:border-primary hover:text-primary transition-colors"
+                      <Button
+                        variant="outline"
+                        size="md"
+                        icon={<Globe className="w-4 h-4" />}
+                        onClick={() => window.open('https://satishkumar-dhule.github.io/', '_blank')}
                       >
-                        <Globe className="w-4 h-4" /> Website
-                      </a>
-                      <a
-                        href="https://github.com/satishkumar-dhule"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm hover:border-primary hover:text-primary transition-colors"
+                        Website
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="md"
+                        icon={<Github className="w-4 h-4" />}
+                        onClick={() => window.open('https://github.com/satishkumar-dhule', '_blank')}
                       >
-                        <Github className="w-4 h-4" /> GitHub
-                      </a>
-                      <a
-                        href="https://linkedin.com/in/satishkumar-dhule"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm hover:border-primary hover:text-primary transition-colors"
+                        GitHub
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="md"
+                        icon={<Linkedin className="w-4 h-4" />}
+                        onClick={() => window.open('https://linkedin.com/in/satishkumar-dhule', '_blank')}
                       >
-                        <Linkedin className="w-4 h-4" /> LinkedIn
-                      </a>
+                        LinkedIn
+                      </Button>
                     </div>
                   </div>
 
                   {/* Support */}
-                  <div className="border border-dashed border-amber-500/30 rounded-xl p-6 bg-amber-500/5 mb-8">
+                  <div className="border border-dashed border-[var(--gh-accent-fg)]/30 rounded-xl p-6 bg-[var(--gh-accent-fg)]/5 mb-8">
                     <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                      <Heart className="w-5 h-5 text-amber-500" /> Support the Project
+                      <Heart className="w-5 h-5 text-[var(--gh-accent-fg)]" /> Support the Project
                     </h3>
                     <p className="text-muted-foreground mb-4">
                       If Code Reels has helped you in your interview prep journey, consider supporting the project!
                     </p>
                     <div className="flex flex-wrap gap-3">
-                      <a
-                        href="https://github.com/open-interview/open-interview"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-foreground rounded-lg font-bold text-sm hover:bg-amber-600 transition-colors"
+                      <Button
+                        variant="primary"
+                        size="md"
+                        icon={<Award className="w-4 h-4" />}
+                        onClick={() => window.open('https://github.com/open-interview/open-interview', '_blank')}
                       >
-                        <Award className="w-4 h-4" /> Star on GitHub
-                      </a>
-                      <a
-                        href="https://github.com/open-interview/open-interview/fork"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2 border border-amber-500/30 rounded-lg font-bold text-sm hover:bg-amber-500/10 transition-colors"
+                        Star on GitHub
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="md"
+                        icon={<GitBranch className="w-4 h-4" />}
+                        onClick={() => window.open('https://github.com/open-interview/open-interview/fork', '_blank')}
                       >
-                        <GitBranch className="w-4 h-4" /> Fork & Contribute
-                      </a>
+                        Fork & Contribute
+                      </Button>
                     </div>
                   </div>
                 </motion.div>
@@ -826,7 +849,7 @@ git push origin feature/awesome-feature`} />
                 transition={{ delay: 0.5 }}
                 className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-4"
               >
-                Made with <Heart className="w-4 h-4 text-red-500 animate-pulse" /> and <Coffee className="w-4 h-4 text-amber-500" /> by developers, for developers
+                Made with <Heart className="w-4 h-4 text-[var(--gh-danger-fg)] animate-pulse" /> and <Coffee className="w-4 h-4 text-[var(--gh-accent-fg)]" /> by developers, for developers
               </motion.div>
               <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
                 <span>Open Source</span>

@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { useInterviewIntelligence } from '../hooks/use-interview-intelligence';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
-import { Button } from './ui/button';
+import { Button } from './unified/Button';
 import { Badge } from './ui/badge';
 import { 
   Brain, Building2, Dna, Target, Download, ChevronRight,
@@ -67,15 +67,15 @@ export function InterviewIntelligence() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Brain className="w-4 h-4 text-purple-500" />
+            <Brain className="w-4 h-4 text-[var(--gh-accent-emphasis)]" />
             Your Cognitive Profile
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {primaryPattern && (
-            <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+            <div className="p-3 rounded-lg bg-[var(--gh-accent-emphasis)]/10 border border-[var(--gh-accent-emphasis)]/20">
               <div className="flex items-center gap-2 mb-1">
-                <Sparkles className="w-4 h-4 text-purple-500" />
+                <Sparkles className="w-4 h-4 text-[var(--gh-accent-emphasis)]" />
                 <span className="font-medium text-sm">{primaryPattern[1].name}</span>
               </div>
               <p className="text-xs text-muted-foreground">{primaryPattern[1].description}</p>
@@ -101,20 +101,21 @@ export function InterviewIntelligence() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-blue-500" />
+            <Building2 className="w-4 h-4 text-[var(--gh-accent-emphasis)]" />
             Company Readiness
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {companyReadiness.slice(0, 6).map((company) => (
-            <button
+            <Button
               key={company.companyId}
+              variant="ghost"
               onClick={() => setSelectedCompany(
                 selectedCompany === company.companyId ? null : company.companyId
               )}
-              className="w-full p-2 rounded-lg hover:bg-muted/50 transition-colors text-left"
+              className="w-full justify-start h-auto p-2 rounded-lg text-left font-normal"
             >
-              <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center justify-between mb-1 w-full">
                 <span className="text-sm font-medium">{company.companyName}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">
@@ -128,7 +129,7 @@ export function InterviewIntelligence() {
               <Progress value={company.readinessScore} className="h-1.5" />
               
               {selectedCompany === company.companyId && (
-                <div className="mt-2 pt-2 border-t space-y-2">
+                <div className="mt-2 pt-2 border-t border-[var(--gh-border)] space-y-2">
                   <div className="flex flex-wrap gap-1">
                     {company.strengths.slice(0, 3).map(s => (
                       <Badge key={s} variant="secondary" className="text-xs">
@@ -146,7 +147,7 @@ export function InterviewIntelligence() {
                   </Badge>
                 </div>
               )}
-            </button>
+            </Button>
           ))}
         </CardContent>
       </Card>
@@ -154,7 +155,7 @@ export function InterviewIntelligence() {
 
       {/* Mock Interview */}
       {mockInterview && (
-        <Card className="border-primary/20">
+        <Card className="border-[var(--gh-accent-emphasis)]/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Target className="w-4 h-4 text-green-500" />
@@ -192,7 +193,7 @@ export function InterviewIntelligence() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Dna className="w-4 h-4 text-cyan-500" />
+              <Dna className="w-4 h-4 text-[var(--gh-accent-fg)]" />
               Knowledge DNA
             </CardTitle>
           </CardHeader>

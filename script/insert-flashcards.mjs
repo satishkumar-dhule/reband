@@ -7,8 +7,8 @@ import fs from 'fs';
 
 const INPUT_FILE = process.argv[2] || '/tmp/flashcards-algorithms.json';
 
-const url = process.env.TURSO_DATABASE_URL_RO || process.env.TURSO_DATABASE_URL || 'file:local.db';
-const authToken = process.env.TURSO_AUTH_TOKEN_RO || process.env.TURSO_AUTH_TOKEN;
+const url = 'file:local.db'_RO || 'file:local.db';
+const authToken = undefined;
 
 const client = createClient({ url, authToken });
 

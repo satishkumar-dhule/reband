@@ -14,6 +14,8 @@ import {
   Zap, Award, Trophy
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
+import { Textarea } from '@/components/ui/textarea';
+import { Button, IconButton, ButtonGroup } from '@/components/unified/Button';
 import { getAllQuestionsAsync } from '../lib/questions-loader';
 import { useCredits } from '../context/CreditsContext';
 import { useAchievementContext } from '../context/AchievementContext';
@@ -244,9 +246,9 @@ export default function VoiceSession() {
           </div>
           <h1 className="text-2xl font-bold text-[var(--gh-fg)] mb-3">Browser Not Supported</h1>
           <p className="text-[var(--gh-fg-muted)] mb-6">Voice sessions require the Web Speech API. Use Chrome, Edge, or Safari.</p>
-          <button onClick={() => setLocation('/')} className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-medium rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors">
+          <Button onClick={() => setLocation('/')} variant="primary">
             Go Home
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -282,9 +284,7 @@ export default function VoiceSession() {
           <header className="sticky top-0 z-50 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]/95 backdrop-blur-md">
             <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <button onClick={() => setLocation('/')} className="p-2 hover:bg-[var(--gh-canvas-subtle)] rounded-lg transition-colors">
-                  <Home className="w-5 h-5 text-[var(--gh-fg-muted)]" />
-                </button>
+                <IconButton icon={<Home />} onClick={() => setLocation('/')} aria-label="Go home" size="sm" />
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--gh-done-fg)] to-[var(--gh-danger-fg)] flex items-center justify-center">
                     <Target className="w-5 h-5 text-[var(--gh-fg-on-emphasis)]" />
@@ -307,12 +307,9 @@ export default function VoiceSession() {
                 </div>
                 <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-2">No Sessions Available</h2>
                 <p className="text-[var(--gh-fg-muted)] mb-6">Subscribe to channels to unlock voice sessions.</p>
-                <button
-                  onClick={() => setLocation('/channels')}
-                  className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-medium rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors"
-                >
+                <Button onClick={() => setLocation('/channels')} variant="primary">
                   Subscribe to Channels
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="space-y-8">
@@ -421,19 +418,12 @@ export default function VoiceSession() {
               </div>
 
               <div className="p-4 bg-[var(--gh-canvas)] border-t border-[var(--gh-border)] flex gap-3">
-                <button 
-                  onClick={exitSession} 
-                  className="flex-1 px-4 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors"
-                >
+                <Button onClick={exitSession} variant="outline" fullWidth>
                   Back
-                </button>
-                <button
-                  onClick={beginQuestions}
-                  className="flex-1 px-4 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors flex items-center justify-center gap-2"
-                >
-                  <Play className="w-5 h-5" />
+                </Button>
+                <Button onClick={beginQuestions} variant="success" fullWidth icon={<Play className="w-5 h-5" />}>
                   Start Session
-                </button>
+                </Button>
               </div>
             </div>
           </motion.div>
@@ -455,9 +445,7 @@ export default function VoiceSession() {
             <div className="max-w-4xl mx-auto px-4">
               <div className="h-16 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <button onClick={exitSession} className="p-2 hover:bg-[var(--gh-canvas-subtle)] rounded-lg transition-colors">
-                    <Home className="w-5 h-5 text-[var(--gh-fg-muted)]" />
-                  </button>
+                  <IconButton icon={<Home />} onClick={exitSession} aria-label="Exit session" size="sm" />
                   <div>
                     <h1 className="font-semibold text-[var(--gh-fg)] text-sm">{sessionState.session.topic}</h1>
                     <p className="text-xs text-[var(--gh-fg-muted)]">Question {sessionState.currentQuestionIndex + 1} of {sessionState.questions.length}</p>
@@ -573,31 +561,23 @@ export default function VoiceSession() {
               {/* Controls */}
               <div className="flex items-center justify-center gap-4">
                 {pageState === 'recording' && (
-                  <button
-                    onClick={stopRecording}
-                    className="flex items-center gap-3 px-8 py-4 bg-[var(--gh-danger-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-2xl hover:bg-[var(--gh-danger-fg)] transition-all"
-                  >
-                    <Square className="w-5 h-5" />
+                  <Button onClick={stopRecording} variant="danger" size="lg" icon={<Square className="w-5 h-5" />}>
                     Stop
-                  </button>
+                  </Button>
                 )}
                 {pageState === 'editing' && (
                   <div className="flex gap-3">
-                    <button
-                      onClick={retryQuestion}
-                      className="flex items-center gap-2 px-5 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors"
-                    >
-                      <RotateCcw className="w-4 h-4" />
+                    <Button onClick={retryQuestion} variant="outline" icon={<RotateCcw className="w-4 h-4" />}>
                       Re-record
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={submitCurrentAnswer}
                       disabled={!transcript.trim()}
-                      className="flex items-center gap-3 px-8 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-success-fg)] transition-all disabled:opacity-50"
+                      variant="success"
+                      icon={<CheckCircle className="w-5 h-5" />}
                     >
-                      <CheckCircle className="w-5 h-5" />
                       Submit
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -704,13 +684,9 @@ export default function VoiceSession() {
                         <p className="text-xs text-[var(--gh-fg-muted)] mb-3">
                           Read aloud to practice pronunciation and memorize key terms.
                         </p>
-                        <button
-                          onClick={startPracticeMode}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-[var(--gh-accent-fg)]/20 text-[var(--gh-accent-fg)] text-xs font-medium rounded-lg hover:bg-[var(--gh-accent-fg)]/30 transition-colors"
-                        >
-                          <Mic className="w-3.5 h-3.5" />
+                        <Button onClick={startPracticeMode} variant="primary" size="sm" icon={<Mic className="w-3.5 h-3.5" />}>
                           Practice Reading Aloud
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -719,29 +695,12 @@ export default function VoiceSession() {
 
               {/* Actions */}
               <div className="p-4 bg-[var(--gh-canvas)] border-t border-[var(--gh-border)] flex gap-3">
-                <button
-                  onClick={retryQuestion}
-                  className="flex-1 px-4 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors flex items-center justify-center gap-2"
-                >
-                  <RotateCcw className="w-4 h-4" />
+                <Button onClick={retryQuestion} variant="outline" fullWidth icon={<RotateCcw className="w-4 h-4" />}>
                   Retry
-                </button>
-                <button
-                  onClick={goToNextQuestion}
-                  className="flex-1 px-4 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors flex items-center justify-center gap-2"
-                >
-                  {isLastQuestion ? (
-                    <>
-                      <BarChart3 className="w-4 h-4" />
-                      Results
-                    </>
-                  ) : (
-                    <>
-                      Next
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
+                </Button>
+                <Button onClick={goToNextQuestion} variant="success" fullWidth icon={isLastQuestion ? <BarChart3 className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />} iconPosition="right">
+                  {isLastQuestion ? 'Results' : 'Next'}
+                </Button>
               </div>
             </div>
           </motion.div>
@@ -774,9 +733,7 @@ export default function VoiceSession() {
           <header className="sticky top-0 z-50 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]/95 backdrop-blur-md">
             <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <button onClick={stopPractice} className="p-2 hover:bg-[var(--gh-canvas-subtle)] rounded-lg transition-colors">
-                  <ArrowRight className="w-5 h-5 rotate-180 text-[var(--gh-fg-muted)]" />
-                </button>
+                <IconButton onClick={stopPractice} icon={<ArrowRight className="w-5 h-5 rotate-180" />} aria-label="Go back" size="sm" />
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[var(--gh-accent-fg)]/20 flex items-center justify-center">
                     <BookOpen className="w-5 h-5 text-[var(--gh-accent-fg)]" />
@@ -848,29 +805,12 @@ export default function VoiceSession() {
 
             {/* Controls */}
             <div className="flex gap-3">
-              <button
-                onClick={stopPractice}
-                className="flex-1 px-4 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors flex items-center justify-center gap-2"
-              >
-                <Square className="w-4 h-4" />
+              <Button onClick={stopPractice} variant="outline" fullWidth icon={<Square className="w-4 h-4" />}>
                 Back to Feedback
-              </button>
-              <button
-                onClick={finishPractice}
-                className="flex-1 px-4 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors flex items-center justify-center gap-2"
-              >
-                {isLastQuestion ? (
-                  <>
-                    <BarChart3 className="w-4 h-4" />
-                    Finish Session
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-4 h-4" />
-                    Done, Next Question
-                  </>
-                )}
-              </button>
+              </Button>
+              <Button onClick={finishPractice} variant="success" fullWidth icon={isLastQuestion ? <BarChart3 className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}>
+                {isLastQuestion ? 'Finish Session' : 'Done, Next Question'}
+              </Button>
             </div>
           </main>
         </div>
@@ -995,20 +935,12 @@ export default function VoiceSession() {
 
             {/* Actions */}
             <div className="flex gap-3">
-              <button 
-                onClick={() => setLocation('/')} 
-                className="flex-1 px-4 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors flex items-center justify-center gap-2"
-              >
-                <Home className="w-4 h-4" />
+              <Button onClick={() => setLocation('/')} variant="outline" fullWidth icon={<Home className="w-4 h-4" />}>
                 Home
-              </button>
-              <button 
-                onClick={exitSession} 
-                className="flex-1 px-4 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-semibold rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors flex items-center justify-center gap-2"
-              >
-                <Target className="w-4 h-4" />
+              </Button>
+              <Button onClick={exitSession} variant="success" fullWidth icon={<Target className="w-4 h-4" />}>
                 New Session
-              </button>
+              </Button>
             </div>
           </main>
         </div>

@@ -10,6 +10,9 @@ import {
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { SEOHead } from '@/components/SEOHead';
+import { Button } from '@/components/unified/Button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 
 interface LearningPath {
   id: string;
@@ -239,14 +242,14 @@ export default function LearningPaths() {
             
             {/* Search Bar - directly below title */}
             <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+              <Input
                 type="text"
                 placeholder="Search learning paths..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 aria-label="Search learning paths"
-                className="w-full pl-12 pr-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                className="pl-12 pr-4"
               />
             </div>
           </motion.div>
@@ -259,10 +262,10 @@ export default function LearningPaths() {
             className="mb-6"
           >
             <div className="flex items-center justify-between mb-4">
-              <button
+              <Button
+                variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
                 aria-expanded={showFilters}
-                className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-foreground hover:bg-muted transition-colors"
               >
                 <Filter className="w-4 h-4" />
                 <span className="font-medium">Filters</span>
@@ -271,16 +274,17 @@ export default function LearningPaths() {
                     Active
                   </span>
                 )}
-              </button>
+              </Button>
               
               {hasActiveFilters && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={clearFilters}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <X className="w-4 h-4" />
                   Clear all
-                </button>
+                </Button>
               )}
             </div>
 
@@ -289,64 +293,68 @@ export default function LearningPaths() {
                 {/* Path Type */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">Path Type</label>
-                  <select
-                    value={selectedPathType}
-                    onChange={(e) => setSelectedPathType(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="all">All Types</option>
-                    <option value="company">Company-Specific</option>
-                    <option value="job-title">Job Title</option>
-                    <option value="skill">Skill-Based</option>
-                    <option value="certification">Certification</option>
-                  </select>
+                  <Select value={selectedPathType} onValueChange={setSelectedPathType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="company">Company-Specific</SelectItem>
+                      <SelectItem value="job-title">Job Title</SelectItem>
+                      <SelectItem value="skill">Skill-Based</SelectItem>
+                      <SelectItem value="certification">Certification</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Difficulty */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">Difficulty</label>
-                  <select
-                    value={selectedDifficulty}
-                    onChange={(e) => setSelectedDifficulty(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="all">All Levels</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
+                  <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Levels" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Levels</SelectItem>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Company */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">Company</label>
-                  <select
-                    value={selectedCompany}
-                    onChange={(e) => setSelectedCompany(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="all">All Companies</option>
-                    {companies.map(company => (
-                      <option key={company} value={company}>{company}</option>
-                    ))}
-                  </select>
+                  <Select value={selectedCompany} onValueChange={setSelectedCompany}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Companies" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Companies</SelectItem>
+                      {companies.map(company => (
+                        <SelectItem key={company} value={company}>{company}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Job Title */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">Job Title</label>
-                  <select
-                    value={selectedJobTitle}
-                    onChange={(e) => setSelectedJobTitle(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="all">All Roles</option>
-                    {jobTitles.map(title => (
-                      <option key={title} value={title}>
-                        {title.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={selectedJobTitle} onValueChange={setSelectedJobTitle}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Roles" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Roles</SelectItem>
+                      {jobTitles.map(title => (
+                        <SelectItem key={title} value={title}>
+                          {title.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             )}
@@ -446,13 +454,16 @@ export default function LearningPaths() {
                         )}
 
                         {/* Action button */}
-                        <button
+                        <Button
+                          variant="primary"
+                          size="lg"
+                          fullWidth
                           onClick={() => handleStartPath(path)}
-                          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+                          icon={<ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+                          iconPosition="right"
                         >
                           Start Learning
-                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </motion.div>
@@ -473,12 +484,12 @@ export default function LearningPaths() {
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">Failed to load</h3>
               <p className="text-muted-foreground mb-4">{error}</p>
-              <button
+              <Button
+                variant="primary"
                 onClick={handleRetry}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
               >
                 Retry
-              </button>
+              </Button>
             </motion.div>
           )}
 
@@ -497,12 +508,12 @@ export default function LearningPaths() {
                 Try adjusting your filters or search query
               </p>
               {hasActiveFilters && (
-                <button
+                <Button
+                  variant="primary"
                   onClick={clearFilters}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
                 >
                   Clear Filters
-                </button>
+                </Button>
               )}
             </motion.div>
           )}

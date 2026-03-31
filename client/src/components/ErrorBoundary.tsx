@@ -5,6 +5,7 @@
 
 import { Component, type ReactNode } from 'react';
 import { AlertCircle, RefreshCw, Home } from 'lucide-react';
+import { Button } from '@/components/unified/Button';
 
 interface Props {
   children: ReactNode;
@@ -91,20 +92,14 @@ export class ErrorBoundary extends Component<Props, State> {
             )}
 
             <div className="flex gap-3 justify-center">
-              <button
-                onClick={this.handleRetry}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
-              >
+              <Button variant="primary" size="md" onClick={this.handleRetry}>
                 <RefreshCw className="w-4 h-4" />
                 Try Again
-              </button>
-              <button
-                onClick={this.handleGoHome}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg font-medium hover:bg-muted/80 transition-colors"
-              >
+              </Button>
+              <Button variant="secondary" size="md" onClick={this.handleGoHome}>
                 <Home className="w-4 h-4" />
                 Go Home
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -6,6 +6,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useCodeTheme, CODE_THEMES, POPULAR_THEMES, type CodeThemeId, type CodeTheme } from '../hooks/useCodeTheme';
 import { Palette, Check, Monitor, ChevronDown } from 'lucide-react';
+import { Button, IconButton } from './unified/Button';
+import { Input } from './ui/input';
 
 interface CodeThemeSelectorProps {
   variant?: 'dropdown' | 'compact';
@@ -47,18 +49,14 @@ export function CodeThemeSelector({ variant = 'dropdown', showAutoOption = true 
   if (variant === 'compact') {
     return (
       <div className="relative" ref={dropdownRef}>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-1.5 px-2 py-1 text-xs rounded-md hover:bg-muted transition-colors border border-border/50"
-          title="Code theme"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setIsOpen(!isOpen)} className="flex items-center gap-1.5 px-2" title="Code theme">
           <Palette className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">{displayTheme?.name || 'Auto'}</span>
           <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-        </button>
+        </Button>
 
         {isOpen && (
-          <div className="absolute right-0 top-full mt-1 z-50 bg-popover border border-border rounded-lg shadow-lg overflow-hidden min-w-[180px]">
+          <div className="absolute right-0 top-full mt-1 z-50 bg-[var(--gh-popover)] border border-[var(--gh-border-default)] rounded-lg shadow-lg overflow-hidden min-w-[180px]">
             <CompactThemeList
               currentTheme={codeTheme}
               onSelect={handleSelect}
@@ -72,11 +70,7 @@ export function CodeThemeSelector({ variant = 'dropdown', showAutoOption = true 
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors border border-border/50"
-        title="Change code theme"
-      >
+      <Button variant="ghost" onClick={() => setIsOpen(!isOpen)} className="flex items-center gap-2 px-3 py-2 text-sm" title="Change code theme">
         <div
           className="w-4 h-4 rounded-sm border border-border/30"
           style={{ background: displayTheme?.preview.background }}
@@ -86,13 +80,13 @@ export function CodeThemeSelector({ variant = 'dropdown', showAutoOption = true 
             {isAuto ? 'Auto' : displayTheme?.name}
           </span>
           {isAuto && (
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[10px] text-[var(--gh-fg-muted)]">
               Following system
             </span>
           )}
         </div>
         <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
+      </Button>
 
       {isOpen && (
         <div className="absolute right-0 top-full mt-2 z-50 bg-popover border border-border rounded-xl shadow-xl overflow-hidden w-80 max-h-[400px] overflow-y-auto">
@@ -130,19 +124,21 @@ function ThemeList({ currentTheme, onSelect, showAutoOption = true, themes = COD
       )}
       
       {showAutoOption && (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onSelect('auto')}
-          className={`w-full flex items-center gap-3 px-3 py-2 hover:bg-muted transition-colors ${
+          className={`w-full flex items-center gap-3 px-3 py-2 justify-start ${
             currentTheme === 'auto' ? 'bg-muted' : ''
           }`}
+          icon={<Monitor className="w-4 h-4 text-muted-foreground" />}
         >
-          <Monitor className="w-4 h-4 text-muted-foreground" />
           <div className="flex flex-col items-start gap-0.5">
             <span className="text-sm font-medium">Auto</span>
             <span className="text-[10px] text-muted-foreground">Follow system preference</span>
           </div>
           {currentTheme === 'auto' && <Check className="w-4 h-4 ml-auto text-primary" />}
-        </button>
+        </Button>
       )}
 
       <div className="px-3 py-1.5 mt-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold border-t border-border/50">
@@ -178,35 +174,41 @@ function CompactThemeList({ currentTheme, onSelect, showAutoOption = true }: Omi
   return (
     <div className="py-1">
       {showAutoOption && (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onSelect('auto')}
-          className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-muted transition-colors text-xs ${
+          className={`w-full flex items-center gap-2 px-2 py-1.5 justify-start text-xs ${
             currentTheme === 'auto' ? 'bg-muted text-primary' : 'text-muted-foreground'
           }`}
+          icon={<Monitor className="w-3 h-3" />}
         >
-          <Monitor className="w-3 h-3" />
           <span>Auto</span>
           {currentTheme === 'auto' && <Check className="w-3 h-3 ml-auto" />}
-        </button>
+        </Button>
       )}
       <div className="px-2 py-1 text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mt-1">
         Popular
       </div>
       {popularThemes.map((theme) => (
-        <button
+        <Button
           key={theme.id}
+          variant="ghost"
+          size="sm"
           onClick={() => onSelect(theme.id)}
-          className={`w-full flex items-center gap-2 px-2 py-1.5 hover:bg-muted transition-colors text-xs ${
+          className={`w-full flex items-center gap-2 px-2 py-1.5 justify-start text-xs ${
             currentTheme === theme.id ? 'bg-muted text-primary' : ''
           }`}
+          icon={
+            <div
+              className="w-3 h-3 rounded-sm border border-border/30"
+              style={{ background: theme.preview.background }}
+            />
+          }
         >
-          <div
-            className="w-3 h-3 rounded-sm border border-border/30"
-            style={{ background: theme.preview.background }}
-          />
           <span>{theme.name}</span>
           {currentTheme === theme.id && <Check className="w-3 h-3 ml-auto" />}
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -218,24 +220,26 @@ function ThemePicker({ currentTheme, onSelect, showAutoOption = true }: Omit<The
 
 function ThemeItem({ theme, isSelected, onSelect }: { theme: CodeTheme; isSelected: boolean; onSelect: () => void }) {
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={onSelect}
-      className={`w-full flex items-center gap-3 px-3 py-2 hover:bg-muted transition-colors ${
+      className={`w-full flex items-center gap-3 px-3 py-2 justify-start ${
         isSelected ? 'bg-muted' : ''
       }`}
-    >
-      {/* Mini preview */}
-      <div
-        className="w-8 h-8 rounded-md border border-border/30 overflow-hidden flex-shrink-0"
-        style={{ background: theme.preview.background }}
-      >
-        <div className="h-full flex flex-col justify-center px-1 gap-0.5">
-          <div className="h-1 rounded-sm" style={{ background: theme.preview.keyword, width: '60%' }} />
-          <div className="h-1 rounded-sm" style={{ background: theme.preview.string, width: '80%' }} />
-          <div className="h-1 rounded-sm" style={{ background: theme.preview.comment, width: '40%' }} />
+      icon={
+        <div
+          className="w-8 h-8 rounded-md border border-border/30 overflow-hidden flex-shrink-0"
+          style={{ background: theme.preview.background }}
+        >
+          <div className="h-full flex flex-col justify-center px-1 gap-0.5">
+            <div className="h-1 rounded-sm" style={{ background: theme.preview.keyword, width: '60%' }} />
+            <div className="h-1 rounded-sm" style={{ background: theme.preview.string, width: '80%' }} />
+            <div className="h-1 rounded-sm" style={{ background: theme.preview.comment, width: '40%' }} />
+          </div>
         </div>
-      </div>
-
+      }
+    >
       <div className="flex flex-col items-start gap-0.5 min-w-0">
         <span className={`text-sm font-medium truncate ${isSelected ? 'text-primary' : ''}`}>
           {theme.name}
@@ -244,18 +248,15 @@ function ThemeItem({ theme, isSelected, onSelect }: { theme: CodeTheme; isSelect
           {theme.description}
         </span>
       </div>
-
       {isSelected && (
         <Check className="w-4 h-4 ml-auto text-primary flex-shrink-0" />
       )}
-    </button>
+    </Button>
   );
 }
 
-// Inline mini selector for use in code block headers
 export function InlineCodeThemeSelector() {
   const { codeTheme, setCodeTheme, resolvedTheme, isAuto } = useCodeTheme();
-  const [showPicker, setShowPicker] = useState(false);
 
   const cycleThemes = () => {
     const themes = ['auto', 'vsc-dark-plus', 'vs', 'one-dark', 'ghcolors', 'night-owl'];
@@ -265,15 +266,17 @@ export function InlineCodeThemeSelector() {
   };
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="xs"
       onClick={cycleThemes}
-      className="group flex items-center gap-1.5 px-1.5 py-0.5 rounded hover:bg-white/10 transition-all"
+      className="group flex items-center gap-1.5 px-1.5 py-0.5"
       title={`Theme: ${isAuto ? 'Auto' : resolvedTheme.name} (click to cycle)`}
+      icon={<Palette className="w-3 h-3 text-muted-foreground group-hover:text-foreground transition-colors" />}
     >
-      <Palette className="w-3 h-3 text-muted-foreground group-hover:text-foreground transition-colors" />
       <span className="text-[9px] font-medium text-muted-foreground group-hover:text-foreground transition-colors uppercase tracking-wider">
         {isAuto ? 'AUTO' : resolvedTheme.name.split(' ')[0].toUpperCase()}
       </span>
-    </button>
+    </Button>
   );
 }

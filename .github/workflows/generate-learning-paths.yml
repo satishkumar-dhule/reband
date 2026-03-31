@@ -2,8 +2,8 @@ name: Generate Curated Learning Paths
 
 on:
   schedule:
-    # Run daily at 2 AM UTC to enhance paths with latest content
-    - cron: '0 2 * * *'
+    # Run daily at 4 AM UTC (after content generation and maintenance complete)
+    - cron: '0 4 * * *'
   workflow_dispatch: # Allow manual trigger
 
 permissions:
@@ -32,16 +32,11 @@ jobs:
 
       - name: Setup database
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           echo "Database URL configured"
 
       - name: Generate curated learning paths
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-          TURSO_WRITE_MODE: "true"
         run: |
           node script/generate-curated-paths.js
 

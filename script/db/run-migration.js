@@ -13,11 +13,11 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const url = process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN;
+const url = 'file:local.db';
+const authToken = undefined;
 
 if (!url) {
-  console.error('❌ Missing TURSO_DATABASE_URL environment variable');
+  console.error('❌ Missing database URL');
   process.exit(1);
 }
 

@@ -19,6 +19,7 @@ import {
   Clock, Award, TrendingUp, Volume2
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
+import { Button, IconButton } from '../components/unified/Button';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { ChannelService } from '../services/api.service';
 import { useVoiceRecording } from '../hooks/use-voice-recording';
@@ -414,12 +415,13 @@ export default function TrainingMode() {
           <p className="text-muted-foreground mb-6">
             Subscribe to channels to access training questions
           </p>
-          <button
+          <Button
             onClick={() => setLocation('/channels')}
-            className="px-6 py-3 bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-hover)] text-white rounded-xl font-semibold transition-colors"
+            variant="success"
+            size="lg"
           >
             Browse Channels
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -440,19 +442,19 @@ export default function TrainingMode() {
         {/* Header */}
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-border">
           <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <button
+            <IconButton
+              icon={<ArrowLeft className="w-5 h-5" />}
               onClick={exitTraining}
-              className="p-2 hover:bg-muted rounded-lg transition-colors"
-              title="Exit and save progress"
-            >
-              <ArrowLeft className="w-5 h-5 text-muted-foreground" />
-            </button>
+              aria-label="Exit and save progress"
+              size="sm"
+              variant="ghost"
+            />
 
             <div className="flex items-center gap-3">
               {isInterviewMode && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/30 rounded-lg">
-                  <Sparkles className="w-4 h-4 text-red-500" />
-                  <span className="text-sm font-semibold text-red-500">Interview Mode</span>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-danger/10 border border-danger/30 rounded-lg">
+                  <Sparkles className="w-4 h-4 text-danger" />
+                  <span className="text-sm font-semibold text-danger">Interview Mode</span>
                 </div>
               )}
               
@@ -463,19 +465,19 @@ export default function TrainingMode() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span className="text-sm font-semibold text-green-500">
-                  {completedQuestions.size}
-                </span>
-              </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-success/10 border border-success/30 rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-success" />
+                  <span className="text-sm font-semibold text-success">
+                    {completedQuestions.size}
+                  </span>
+                </div>
             </div>
           </div>
 
           {/* Progress bar */}
           <div className="h-1.5 bg-muted">
             <motion.div 
-              className="h-full bg-gradient-to-r from-primary to-purple-500"
+              className="h-full bg-gradient-to-r from-primary to-done"
               initial={{ width: 0 }}
               animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
               transition={{ duration: 0.3 }}
@@ -496,16 +498,16 @@ export default function TrainingMode() {
               {/* Question Card */}
               <div className="rounded-2xl border border-border bg-card p-6">
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-done flex items-center justify-center flex-shrink-0">
                     <Sparkles className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <h2 className="text-lg font-semibold text-foreground mb-2">{currentQuestion.question}</h2>
                     <div className="flex items-center gap-2 text-sm">
                       <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${
-                        currentQuestion.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
-                        currentQuestion.difficulty === 'intermediate' ? 'bg-amber-500/20 text-amber-400' :
-                        'bg-red-500/20 text-red-400'
+                        currentQuestion.difficulty === 'beginner' ? 'bg-success/20 text-success' :
+                        currentQuestion.difficulty === 'intermediate' ? 'bg-attention/20 text-attention' :
+                        'bg-danger/20 text-danger'
                       }`}>
                         {currentQuestion.difficulty}
                       </span>
@@ -526,7 +528,7 @@ export default function TrainingMode() {
                   <div className="bg-background rounded-xl p-5 border border-border">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <Eye className="w-4 h-4 text-green-500" />
+                        <Eye className="w-4 h-4 text-success" />
                         <span className="text-sm font-semibold text-foreground">
                           {isInterviewMode ? "Ideal Answer" : "Answer to Read"}
                         </span>
@@ -546,8 +548,8 @@ export default function TrainingMode() {
                   <div className="bg-background rounded-xl p-5 border border-border">
                     <div className="flex items-center justify-center py-8">
                       <div className="text-center">
-                        <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-4">
-                          <Eye className="w-8 h-8 text-red-500" />
+                        <div className="w-16 h-16 rounded-2xl bg-danger/10 flex items-center justify-center mx-auto mb-4">
+                          <Eye className="w-8 h-8 text-danger" />
                         </div>
                         <h3 className="text-lg font-semibold text-foreground mb-2">Answer Hidden</h3>
                         <p className="text-sm text-muted-foreground max-w-md">
@@ -586,23 +588,23 @@ export default function TrainingMode() {
                   >
                     {/* Score Header */}
                     <div className={`p-6 ${
-                      currentFeedback.score >= 85 ? 'bg-gradient-to-r from-green-500/20 to-green-400/10' :
-                      currentFeedback.score >= 60 ? 'bg-gradient-to-r from-primary/20 to-purple-500/10' :
-                      'bg-gradient-to-r from-amber-500/20 to-orange-500/10'
+                      currentFeedback.score >= 85 ? 'bg-gradient-to-r from-success/20 to-success/10' :
+                      currentFeedback.score >= 60 ? 'bg-gradient-to-r from-primary/20 to-done/10' :
+                      'bg-gradient-to-r from-attention/20 to-attention/10'
                     }`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
-                            currentFeedback.score >= 85 ? 'bg-green-500/30' :
+                            currentFeedback.score >= 85 ? 'bg-success/30' :
                             currentFeedback.score >= 60 ? 'bg-primary/30' :
-                            'bg-amber-500/30'
+                            'bg-attention/30'
                           }`}>
                             {currentFeedback.score >= 85 ? (
-                              <Trophy className="w-8 h-8 text-green-400" />
+                              <Trophy className="w-8 h-8 text-success" />
                             ) : currentFeedback.score >= 60 ? (
                               <Award className="w-8 h-8 text-primary" />
                             ) : (
-                              <TrendingUp className="w-8 h-8 text-amber-400" />
+                              <TrendingUp className="w-8 h-8 text-attention" />
                             )}
                           </div>
                           <div>
@@ -612,9 +614,9 @@ export default function TrainingMode() {
                         </div>
                         <div className="text-right">
                           <div className={`text-4xl font-bold ${
-                            currentFeedback.score >= 85 ? 'text-green-400' :
+                            currentFeedback.score >= 85 ? 'text-success' :
                             currentFeedback.score >= 60 ? 'text-primary' :
-                            'text-amber-400'
+                            'text-attention'
                           }`}>
                             {currentFeedback.score}%
                           </div>
@@ -647,7 +649,7 @@ export default function TrainingMode() {
                         </div>
                         <div className="text-center p-4 bg-background rounded-xl border border-border">
                           <div className="flex items-center justify-center gap-1.5 mb-2 text-muted-foreground">
-                            <Target className="w-4 h-4" />
+                            <Target className="w-4 h-4 text-primary" />
                             <span className="text-xs">Key Terms</span>
                           </div>
                           <div className="text-2xl font-bold text-foreground">
@@ -661,7 +663,7 @@ export default function TrainingMode() {
                       {currentFeedback.keyPhrases.length > 0 && (
                         <div className="mb-6">
                           <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-purple-400" />
+                            <Sparkles className="w-4 h-4 text-done" />
                             Key Terms from Answer
                           </h4>
                           <div className="flex flex-wrap gap-2">
@@ -670,8 +672,8 @@ export default function TrainingMode() {
                                 key={i}
                                 className={`px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5 ${
                                   phrase.matched 
-                                    ? 'bg-green-500/20 border border-green-500/40 text-green-400' 
-                                    : 'bg-red-500/10 border border-red-500/30 text-red-400'
+                                    ? 'bg-success/20 border border-success/40 text-success' 
+                                    : 'bg-danger/10 border border-danger/30 text-danger'
                                 }`}
                               >
                                 {phrase.matched ? (
@@ -687,21 +689,24 @@ export default function TrainingMode() {
                             ))}
                           </div>
                           {currentFeedback.matchedCount < currentFeedback.totalPhrases && (
-                            <p className="text-xs text-muted-foreground mt-3">
-                              💡 Try to include the missing terms in your next attempt
+                            <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1.5">
+                              <Sparkles className="w-3.5 h-3.5 text-primary" />
+                              Try to include the missing terms in your next attempt
                             </p>
                           )}
                         </div>
                       )}
 
                       {/* Try Again Button */}
-                      <button
+                      <Button
                         onClick={tryAgain}
-                        className="w-full mt-4 px-4 py-3 border border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground rounded-xl transition-colors flex items-center justify-center gap-2"
+                        variant="outline"
+                        size="lg"
+                        fullWidth
+                        icon={<ArrowLeft className="w-4 h-4" />}
                       >
-                        <ArrowLeft className="w-4 h-4" />
                         Try Again
-                      </button>
+                      </Button>
                     </div>
                   </motion.div>
                 )}
@@ -709,20 +714,24 @@ export default function TrainingMode() {
 
               {/* Navigation */}
               <div className="flex gap-3">
-                <button
+                <Button
                   onClick={goToPrevious}
                   disabled={currentIndex === 0}
-                  className="px-6 py-3 bg-muted hover:bg-muted/80 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-semibold transition-colors text-muted-foreground hover:text-foreground border border-border"
+                  variant="secondary"
+                  size="lg"
                 >
                   Previous
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={goToNext}
-                  className="flex-1 px-6 py-3 bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-hover)] text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+                  variant="success"
+                  size="lg"
+                  fullWidth
+                  icon={<ChevronRight className="w-5 h-5" />}
+                  iconPosition="right"
                 >
                   {currentIndex === questions.length - 1 ? 'Finish' : 'Next Question'}
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+                </Button>
               </div>
             </motion.div>
           </AnimatePresence>

@@ -12,6 +12,7 @@ import {
   getPrerequisiteCertifications,
 } from '../lib/certifications-config';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { Button, IconButton } from '@/components/unified/Button';
 import { useCredits } from '../context/CreditsContext';
 import { SEOHead } from '../components/SEOHead';
 import { QuestionPanel } from '../components/QuestionPanel';
@@ -503,7 +504,7 @@ export default function CertificationPractice() {
                   </div>
                 )}
 
-                {testQuestions.map((q, index) => {
+                  {testQuestions.map((q, index) => {
                   const answer = testAnswers[index];
                   const isExpanded = expandedResults.has(index);
                   const correctOption = q.options.find(o => o.isCorrect);
@@ -511,20 +512,21 @@ export default function CertificationPractice() {
 
                   return (
                     <div key={q.id} className={`border rounded-xl overflow-hidden ${
-                      answer?.isCorrect ? 'border-green-500/30' : 'border-red-500/30'
+                      answer?.isCorrect ? 'border-[var(--gh-success-fg,#16a34a)]/30' : 'border-[var(--gh-danger-fg,#dc2626)]/30'
                     }`}>
-                      <button
+                      <Button
+                        variant="ghost"
                         onClick={() => toggleResultExpand(index)}
-                        className="w-full p-3 flex items-center gap-3 text-left hover:bg-muted/30"
+                        className="w-full justify-start gap-3 text-left"
                       >
                         {answer?.isCorrect ? (
-                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-[var(--gh-success-fg,#16a34a)] flex-shrink-0" />
                         ) : (
-                          <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                          <XCircle className="w-5 h-5 text-[var(--gh-danger-fg,#dc2626)] flex-shrink-0" />
                         )}
                         <span className="flex-1 text-sm line-clamp-1">{q.question}</span>
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      </button>
+                      </Button>
 
                       <AnimatePresence>
                         {isExpanded && (
@@ -535,19 +537,19 @@ export default function CertificationPractice() {
                             className="overflow-hidden border-t border-border/50"
                           >
                             <div className="p-3 space-y-2 text-sm">
-                              <div className={`p-2 rounded ${answer?.isCorrect ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                              <div className={`p-2 rounded ${answer?.isCorrect ? 'bg-[var(--gh-success-subtle,#dcfce7)]/10' : 'bg-[var(--gh-danger-subtle,#fee2e2)]/10'}`}>
                                 <span className="text-xs text-muted-foreground">Your answer: </span>
-                                <span className={answer?.isCorrect ? 'text-green-500' : 'text-red-500'}>{selectedOption?.text}</span>
+                                <span className={answer?.isCorrect ? 'text-[var(--gh-success-fg,#16a34a)]' : 'text-[var(--gh-danger-fg,#dc2626)]'}>{selectedOption?.text}</span>
                               </div>
                               {!answer?.isCorrect && (
-                                <div className="p-2 rounded bg-green-500/10">
+                                <div className="p-2 rounded bg-[var(--gh-success-subtle,#dcfce7)]/10">
                                   <span className="text-xs text-muted-foreground">Correct: </span>
-                                  <span className="text-green-500">{correctOption?.text}</span>
+                                  <span className="text-[var(--gh-success-fg,#16a34a)]">{correctOption?.text}</span>
                                 </div>
                               )}
                               {q.explanation && (
-                                <div className="p-2 rounded bg-blue-500/10 flex gap-2">
-                                  <Lightbulb className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                                <div className="p-2 rounded bg-[var(--gh-accent-subtle,#dbeafe)]/10 flex gap-2">
+                                  <Lightbulb className="w-4 h-4 text-[var(--gh-accent-fg,#2563eb)] flex-shrink-0 mt-0.5" />
                                   <span className="text-muted-foreground">{q.explanation}</span>
                                 </div>
                               )}
@@ -581,32 +583,25 @@ export default function CertificationPractice() {
                     const showResult = showingFeedback && (isSelected || isCorrect);
                     
                     return (
-                      <button
-                        key={option.id}
-                        onClick={() => handleAnswerClick(option.id)}
-                        disabled={showingFeedback}
-                        className={`w-full p-4 text-left border-2 rounded-xl transition-all ${
-                          showResult
-                            ? isCorrect
-                              ? 'border-green-500 bg-green-500/10'
-                              : isSelected
-                              ? 'border-red-500 bg-red-500/10'
-                              : 'border-border'
-                            : 'border-border hover:border-primary/50 hover:bg-muted/30'
-                        } ${showingFeedback ? 'cursor-default' : ''}`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                            showResult && isCorrect ? 'border-green-500 bg-green-500' :
-                            showResult && isSelected && !isCorrect ? 'border-red-500 bg-red-500' :
-                            'border-muted-foreground/30'
-                          }`}>
-                            {showResult && isCorrect && <Check className="w-3 h-3 text-foreground" />}
-                            {showResult && isSelected && !isCorrect && <X className="w-3 h-3 text-foreground" />}
-                          </div>
-                          <span className="text-sm">{option.text}</span>
+                    <Button
+                      variant={showingFeedback ? (isCorrect ? 'success' : (isSelected ? 'danger' : 'outline')) : (isSelected ? 'primary' : 'outline')}
+                      onClick={() => handleAnswerClick(option.id)}
+                      disabled={showingFeedback}
+                      className="w-full justify-start p-4 h-auto"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          showingFeedback && isCorrect ? 'border-green-500 bg-green-500' :
+                          showingFeedback && isSelected && !isCorrect ? 'border-red-500 bg-red-500' :
+                          isSelected ? 'border-primary bg-primary' :
+                          'border-muted-foreground/30'
+                        }`}>
+                          {showingFeedback && isCorrect && <Check className="w-3 h-3 text-foreground" />}
+                          {showingFeedback && isSelected && !isCorrect && <X className="w-3 h-3 text-foreground" />}
                         </div>
-                      </button>
+                        <span className="text-sm">{option.text}</span>
+                      </div>
+                    </Button>
                     );
                   })}
                 </div>
@@ -630,25 +625,25 @@ export default function CertificationPractice() {
             {showResults ? (
               <div className="flex gap-3">
                 {testResults.passed ? (
-                  <button onClick={closeTestAndContinue} className="flex-1 py-3 bg-green-500 text-foreground rounded-xl font-medium flex items-center justify-center gap-2">
+                  <Button onClick={closeTestAndContinue} variant="success" fullWidth>
                     <Unlock className="w-5 h-5" /> Continue
-                  </button>
+                  </Button>
                 ) : (
                   <>
-                    <button onClick={retryTest} className="flex-1 py-3 bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground rounded-xl font-medium flex items-center justify-center gap-2">
-                      <RefreshCw className="w-4 h-4" /> Retry
-                    </button>
-                    <button onClick={() => setShowSkipConfirm(true)} className="flex-1 py-3 bg-muted rounded-xl font-medium flex items-center justify-center gap-2 text-muted-foreground">
-                      <SkipForward className="w-4 h-4" /> Skip (-{SKIP_TEST_PENALTY})
-                    </button>
+                    <Button onClick={retryTest} variant="primary" fullWidth icon={<RefreshCw className="w-4 h-4" />}>
+                      Retry
+                    </Button>
+                    <Button onClick={() => setShowSkipConfirm(true)} variant="secondary" fullWidth icon={<SkipForward className="w-4 h-4" />}>
+                      Skip (-{SKIP_TEST_PENALTY})
+                    </Button>
                   </>
                 )}
               </div>
             ) : (
               <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <button onClick={() => setShowSkipConfirm(true)} className="flex items-center gap-1 hover:text-foreground">
+                <Button variant="ghost" size="sm" onClick={() => setShowSkipConfirm(true)} className="flex items-center gap-1">
                   <SkipForward className="w-4 h-4" /> Skip (-{SKIP_TEST_PENALTY})
-                </button>
+                </Button>
                 <span>Tap an answer to submit</span>
               </div>
             )}
@@ -687,16 +682,17 @@ export default function CertificationPractice() {
                 <span>Balance: <b>{formatCredits(balance)}</b></span>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => setShowSkipConfirm(false)} className="flex-1 py-2.5 bg-muted rounded-xl font-medium">
+                <Button variant="secondary" onClick={() => setShowSkipConfirm(false)} className="flex-1">
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button 
                   onClick={skipTestWithPenalty}
                   disabled={balance < SKIP_TEST_PENALTY}
-                  className="flex-1 py-2.5 bg-red-500 text-foreground rounded-xl font-medium disabled:opacity-50"
+                  variant="danger"
+                  className="flex-1"
                 >
                   Skip
-                </button>
+                </Button>
               </div>
             </div>
           </motion.div>
@@ -736,9 +732,7 @@ export default function CertificationPractice() {
           <div className="max-w-7xl mx-auto px-3 py-2">
             {/* Main row: Back, Title, Progress, Credits */}
             <div className="flex items-center gap-2">
-              <button onClick={exitSession} className="p-1.5 hover:bg-muted rounded-md shrink-0" title="Exit and save progress">
-                <ArrowLeft className="w-4 h-4" />
-              </button>
+              <IconButton onClick={exitSession} aria-label="Exit and save progress" variant="ghost" size="sm" icon={<ArrowLeft className="w-4 h-4" />} className="p-1.5 shrink-0" />
               
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -766,44 +760,46 @@ export default function CertificationPractice() {
 
               {/* Right side: Difficulty pills + Credits */}
               <div className="flex items-center gap-1 shrink-0">
-                {['all', 'beginner', 'intermediate', 'advanced'].map(diff => (
-                  <button key={diff} onClick={() => { setSelectedDifficulty(diff); setCurrentIndex(0); }}
-                    className={`px-2 py-0.5 text-[10px] rounded-md capitalize hidden sm:block ${
-                      selectedDifficulty === diff 
-                        ? diff === 'beginner' ? 'bg-green-500/20 text-green-500' 
-                          : diff === 'intermediate' ? 'bg-yellow-500/20 text-yellow-500'
-                          : diff === 'advanced' ? 'bg-red-500/20 text-red-500'
-                          : 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground'
-                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                    }`}>
-                    {diff === 'all' ? 'All' : diff === 'beginner' ? 'Easy' : diff === 'intermediate' ? 'Med' : 'Hard'}
-                  </button>
-                ))}
+                {['all', 'beginner', 'intermediate', 'advanced'].map(diff => {
+                  const variant: 'primary' | 'secondary' | 'ghost' = selectedDifficulty === diff ? 'primary' : 'ghost';
+                  const diffColor = diff === 'beginner' ? 'text-green-500' : diff === 'intermediate' ? 'text-yellow-500' : diff === 'advanced' ? 'text-red-500' : '';
+                  return (
+                    <Button 
+                      key={diff} 
+                      onClick={() => { setSelectedDifficulty(diff); setCurrentIndex(0); }}
+                      variant={variant}
+                      size="sm"
+                      className={`px-2 py-0.5 text-[10px] rounded-md capitalize hidden sm:block ${selectedDifficulty === diff ? '' : diffColor}`}
+                    >
+                      {diff === 'all' ? 'All' : diff === 'beginner' ? 'Easy' : diff === 'intermediate' ? 'Med' : 'Hard'}
+                    </Button>
+                  );
+                })}
                 <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-md ml-1">
                   <Coins className="w-3 h-3 text-amber-500" />
                   <span className="text-[10px] font-bold text-amber-500 tabular-nums">{formatCredits(balance)}</span>
                 </div>
-                <button onClick={() => setShowInfo(!showInfo)} className="p-1 hover:bg-muted rounded-md">
-                  <Info className="w-3.5 h-3.5" />
-                </button>
+                <IconButton onClick={() => setShowInfo(!showInfo)} aria-label="Show info" variant="ghost" size="sm" icon={<Info className="w-3.5 h-3.5" />} className="p-1" />
               </div>
             </div>
 
             {/* Mobile difficulty filter - only on small screens */}
             <div className="flex items-center gap-1 mt-1.5 sm:hidden overflow-x-auto no-scrollbar">
-              {['all', 'beginner', 'intermediate', 'advanced'].map(diff => (
-                <button key={diff} onClick={() => { setSelectedDifficulty(diff); setCurrentIndex(0); }}
-                  className={`px-2 py-0.5 text-[10px] rounded-md capitalize shrink-0 ${
-                    selectedDifficulty === diff 
-                      ? diff === 'beginner' ? 'bg-green-500/20 text-green-500' 
-                        : diff === 'intermediate' ? 'bg-yellow-500/20 text-yellow-500'
-                        : diff === 'advanced' ? 'bg-red-500/20 text-red-500'
-                        : 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground'
-                      : 'bg-muted/50 text-muted-foreground'
-                  }`}>
-                  {diff === 'all' ? 'All' : diff === 'beginner' ? 'Easy' : diff === 'intermediate' ? 'Medium' : 'Hard'}
-                </button>
-              ))}
+              {['all', 'beginner', 'intermediate', 'advanced'].map(diff => {
+                const variant: 'primary' | 'secondary' | 'ghost' = selectedDifficulty === diff ? 'primary' : 'ghost';
+                const diffColor = diff === 'beginner' ? 'text-green-500' : diff === 'intermediate' ? 'text-yellow-500' : diff === 'advanced' ? 'text-red-500' : '';
+                return (
+                  <Button 
+                    key={diff} 
+                    onClick={() => { setSelectedDifficulty(diff); setCurrentIndex(0); }}
+                    variant={variant}
+                    size="sm"
+                    className={`px-2 py-0.5 text-[10px] rounded-md capitalize shrink-0 ${selectedDifficulty === diff ? '' : diffColor}`}
+                  >
+                    {diff === 'all' ? 'All' : diff === 'beginner' ? 'Easy' : diff === 'intermediate' ? 'Medium' : 'Hard'}
+                  </Button>
+                );
+              })}
             </div>
           </div>
         </header>
@@ -832,7 +828,7 @@ export default function CertificationPractice() {
           </div>
         ) : error ? (
           <div className="flex items-center justify-center h-[60vh] text-center">
-            <div><p className="text-red-500 mb-2">{error}</p><button onClick={() => window.location.reload()} className="text-primary">Retry</button></div>
+            <div><p className="text-red-500 mb-2">{error}</p><Button variant="primary" size="sm" onClick={() => window.location.reload()}>Retry</Button></div>
           </div>
         ) : totalQuestions === 0 ? (
           <ComingSoon 
@@ -856,8 +852,12 @@ export default function CertificationPractice() {
             {/* Mobile */}
             <div className="lg:hidden flex flex-col h-[calc(100vh-140px)]">
               <div className="flex border-b border-border">
-                <button onClick={() => setMobileView('question')} className={`flex-1 py-2 text-sm font-medium ${mobileView === 'question' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Question</button>
-                <button onClick={() => setMobileView('answer')} className={`flex-1 py-2 text-sm font-medium ${mobileView === 'answer' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}>Answer</button>
+                <Button variant={mobileView === 'question' ? 'primary' : 'ghost'} size="sm" onClick={() => setMobileView('question')} className="flex-1 rounded-none py-2 text-sm font-medium">
+                  Question
+                </Button>
+                <Button variant={mobileView === 'answer' ? 'primary' : 'ghost'} size="sm" onClick={() => setMobileView('answer')} className="flex-1 rounded-none py-2 text-sm font-medium">
+                  Answer
+                </Button>
               </div>
               <div className="flex-1 overflow-y-auto pb-14 momentum-scroll touch-pan-y" onTouchStart={swipeHandlers.onTouchStart} onTouchMove={swipeHandlers.onTouchMove} onTouchEnd={swipeHandlers.onTouchEnd}>
                 {mobileView === 'question' ? (
@@ -871,16 +871,16 @@ export default function CertificationPractice() {
             {/* Nav - Minimal */}
             <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border py-1.5 px-3">
               <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
-                <button onClick={goToPrev} disabled={currentIndex === 0} className="flex items-center gap-1 px-2.5 py-1.5 bg-muted rounded-md disabled:opacity-40 text-xs">
+                <Button variant="secondary" size="sm" onClick={goToPrev} disabled={currentIndex === 0} className="flex items-center gap-1 px-2.5 py-1.5 text-xs">
                   <ChevronLeft className="w-4 h-4" />Prev
-                </button>
-                <button onClick={markCompleted} disabled={isCompleted} className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium ${isCompleted ? 'bg-green-500/10 text-green-500' : 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground'}`}>
+                </Button>
+                <Button variant={isCompleted ? 'success' : 'primary'} size="sm" onClick={markCompleted} disabled={isCompleted} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium">
                   <Check className="w-3.5 h-3.5" />{isCompleted ? 'Done' : 'Mark Done'}
-                </button>
-                <button onClick={goToNext} disabled={currentIndex === totalQuestions - 1} className="flex items-center gap-1 px-2.5 py-1.5 bg-muted rounded-md disabled:opacity-40 text-xs">
+                </Button>
+                <Button variant="secondary" size="sm" onClick={goToNext} disabled={currentIndex === totalQuestions - 1} className="flex items-center gap-1 px-2.5 py-1.5 text-xs">
                   Next<ChevronRight className="w-4 h-4" />
                   {isTestCheckpoint(currentIndex + 1) && !isCheckpointPassed(currentIndex + 1) && <Lock className="w-3 h-3 text-amber-500" />}
-                </button>
+                </Button>
               </div>
             </div>
           </>

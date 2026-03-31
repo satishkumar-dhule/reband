@@ -6,6 +6,7 @@
  */
 
 import { Mic, Square, RotateCcw, CheckCircle, Play, Pause } from 'lucide-react';
+import { Button } from './Button';
 
 interface RecordingControlsProps {
   state: 'idle' | 'recording' | 'recorded' | 'playing';
@@ -36,70 +37,77 @@ export function RecordingControls({
     <div className={`flex items-center justify-center gap-3 ${className}`}>
       {/* Idle State - Show Start Button */}
       {state === 'idle' && (
-        <button
+        <Button
+          variant="danger"
+          size="lg"
           onClick={onStart}
           disabled={disabled}
-          className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] min-w-[44px] bg-[var(--gh-danger-fg)] hover:bg-[var(--gh-danger-hover)] active:bg-[var(--gh-danger-fg)] text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          icon={<Mic className="w-5 h-5" />}
         >
-          <Mic className="w-5 h-5" />
           Start Recording
-        </button>
+        </Button>
       )}
 
       {/* Recording State - Show Stop Button */}
       {state === 'recording' && (
-        <button
+        <Button
+          variant="danger"
+          size="lg"
           onClick={onStop}
-          className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] min-w-[44px] bg-[var(--gh-danger-fg)] hover:bg-[var(--gh-danger-hover)] active:bg-[var(--gh-danger-fg)] text-white rounded-lg font-semibold transition-colors animate-pulse motion-reduce:animate-none"
+          icon={<Square className="w-5 h-5" />}
+          className="animate-pulse"
         >
-          <Square className="w-5 h-5" />
           Stop Recording
-        </button>
+        </Button>
       )}
 
       {/* Recorded State - Show Play, Reset, Submit */}
       {state === 'recorded' && (
         <>
           {onPlay && (
-            <button
+            <Button
+              variant="primary"
+              size="md"
               onClick={onPlay}
-              className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] min-w-[44px] bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground rounded-lg font-semibold transition-colors"
+              icon={<Play className="w-5 h-5" />}
             >
-              <Play className="w-5 h-5" />
               Play
-            </button>
+            </Button>
           )}
           {onReset && (
-            <button
+            <Button
+              variant="ghost"
+              size="md"
               onClick={onReset}
-              className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] min-w-[44px] bg-muted hover:bg-muted/80 active:bg-muted/70 rounded-lg font-semibold transition-colors"
+              icon={<RotateCcw className="w-5 h-5" />}
             >
-              <RotateCcw className="w-5 h-5" />
               Re-record
-            </button>
+            </Button>
           )}
           {onSubmit && (
-            <button
+            <Button
+              variant="primary"
+              size="lg"
               onClick={onSubmit}
               disabled={disabled}
-              className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] min-w-[44px] bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              icon={<CheckCircle className="w-5 h-5" />}
             >
-              <CheckCircle className="w-5 h-5" />
               {submitLabel}
-            </button>
+            </Button>
           )}
         </>
       )}
 
       {/* Playing State - Show Stop Playback */}
       {state === 'playing' && onStopPlayback && (
-        <button
+        <Button
+          variant="primary"
+          size="md"
           onClick={onStopPlayback}
-          className="flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] min-w-[44px] bg-primary hover:bg-primary/90 active:bg-primary/80 text-primary-foreground rounded-lg font-semibold transition-colors"
+          icon={<Pause className="w-5 h-5" />}
         >
-          <Pause className="w-5 h-5" />
           Stop Playback
-        </button>
+        </Button>
       )}
     </div>
   );

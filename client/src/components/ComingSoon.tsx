@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { Home, ArrowLeft, Coffee, Sparkles } from 'lucide-react';
+import { Button } from './unified/Button';
 
 // Fun developer-themed SVG illustrations
 const illustrations = {
@@ -323,21 +324,23 @@ export function ComingSoon({
           className="flex items-center justify-center gap-3"
         >
           {showBackButton && (
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => window.history.back()}
-              className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg text-sm font-medium transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Go Back
-            </button>
+            </Button>
           )}
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={() => setLocation(redirectTo)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg text-sm font-medium transition-colors"
           >
             <Home className="w-4 h-4" />
             {redirectTo === '/' ? 'Go Home' : 'Browse More'}
-          </button>
+          </Button>
         </motion.div>
 
         {/* Fun fact */}
@@ -348,9 +351,9 @@ export function ComingSoon({
           className="mt-8 p-4 bg-muted/30 rounded-xl border border-border"
         >
           <div className="flex items-center gap-2 text-sm">
-            <Coffee className="w-4 h-4 text-amber-500" />
+            <Coffee className="w-4 h-4" style={{ color: 'var(--gh-accent-emphasis)' }} />
             <span className="text-muted-foreground">
-              <span className="font-medium text-foreground">Fun fact:</span> While you wait, our AI generates 10+ new questions daily!
+              <span className="font-medium" style={{ color: 'var(--gh-fg)' }}>Fun fact:</span> While you wait, our AI generates 10+ new questions daily!
             </span>
           </div>
         </motion.div>

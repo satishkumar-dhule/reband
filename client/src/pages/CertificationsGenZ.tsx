@@ -8,6 +8,8 @@ import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
+import { Button, IconButton } from '../components/unified/Button';
+import { Input } from '../components/ui/input';
 import {
   Search, Award, Clock, ChevronRight, Sparkles, TrendingUp, Check, Plus,
   Cloud, Shield, Database, Brain, Code, Users, Box, Terminal, Server, Cpu,
@@ -154,13 +156,10 @@ export default function CertificationsGenZ() {
             <h2 className="text-lg font-semibold text-[var(--gh-fg)] mb-2">Failed to load certifications</h2>
             <p className="text-sm text-[var(--gh-fg-muted)]">{error}</p>
           </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
-          >
+          <Button onClick={() => window.location.reload()} variant="primary">
             <RefreshCw className="w-4 h-4" />
             Try Again
-          </button>
+          </Button>
         </div>
       </AppLayout>
     );
@@ -203,14 +202,14 @@ export default function CertificationsGenZ() {
               className="max-w-2xl mx-auto mb-6 md:mb-8"
             >
               <div className="relative">
-                <Search className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-5 h-5 md:w-6 md:h-6 text-muted-foreground" />
-                <input
+                <Search className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-5 h-5 md:w-6 md:h-6 text-muted-foreground pointer-events-none" />
+                <Input
                   type="text"
                   placeholder="Search certifications..."
                   aria-label="Search certifications"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 md:pl-16 pr-4 md:pr-6 py-4 md:py-6 bg-muted/50 backdrop-blur-xl border border-border rounded-[20px] md:rounded-[24px] text-base md:text-xl focus:outline-none focus:border-primary transition-all"
+                  className="pl-12 md:pl-16 pr-4 md:pr-6 py-4 md:py-6 bg-muted/50 backdrop-blur-xl border border-border rounded-[20px] md:rounded-[24px] text-base md:text-xl focus:border-primary transition-all"
                 />
               </div>
             </motion.div>
@@ -222,28 +221,24 @@ export default function CertificationsGenZ() {
               transition={{ delay: 0.2 }}
               className="flex flex-wrap gap-2 md:gap-3 justify-center mb-8 md:mb-12"
             >
-              <button
+              <Button
                 onClick={() => setSelectedCategory(null)}
-                className={`px-4 md:px-6 py-2 md:py-3 rounded-full text-sm md:text-base font-semibold transition-all ${
-                  !selectedCategory
-                    ? 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground'
-                    : 'bg-muted/50 border border-border hover:bg-muted'
-                }`}
+                variant={!selectedCategory ? 'primary' : 'ghost'}
+                rounded="full"
+                className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-semibold"
               >
                 All
-              </button>
+              </Button>
               {categories.map((cat) => (
-                <button
+                <Button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-4 md:px-6 py-2 md:py-3 rounded-full text-sm md:text-base font-semibold transition-all ${
-                    selectedCategory === cat.id
-                      ? 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground'
-                      : 'bg-muted/50 border border-border hover:bg-muted'
-                  }`}
+                  variant={selectedCategory === cat.id ? 'primary' : 'ghost'}
+                  rounded="full"
+                  className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-semibold"
                 >
                   {cat.name}
-                </button>
+                </Button>
               ))}
             </motion.div>
 
@@ -298,10 +293,10 @@ export default function CertificationsGenZ() {
                       <div className="flex items-center gap-2">
                         <Target className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground flex-shrink-0" />
                         <span className={`text-xs font-semibold uppercase ${
-                          cert.difficulty === 'beginner' ? 'text-green-500' :
-                          cert.difficulty === 'intermediate' ? 'text-yellow-500' :
-                          cert.difficulty === 'advanced' ? 'text-orange-500' :
-                          'text-red-500'
+                          cert.difficulty === 'beginner' ? 'text-[var(--gh-success-fg)]' :
+                          cert.difficulty === 'intermediate' ? 'text-[var(--gh-attention-fg)]' :
+                          cert.difficulty === 'advanced' ? 'text-[var(--gh-orange-fg)]' :
+                          'text-[var(--gh-danger-fg)]'
                         }`}>
                           {cert.difficulty}
                         </span>
@@ -309,13 +304,10 @@ export default function CertificationsGenZ() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-2 md:gap-3">
-                        <button
+                        <Button
                           onClick={() => toggleStarted(cert.id)}
-                          className={`flex-1 px-4 md:px-6 py-2.5 md:py-3 rounded-[14px] md:rounded-[16px] text-sm md:text-base font-bold transition-all ${
-                            isStarted
-                              ? 'bg-muted border border-border hover:bg-foreground/10'
-                              : 'bg-gradient-to-r from-primary to-cyan-500 text-primary-foreground hover:scale-105'
-                          }`}
+                          variant={isStarted ? 'outline' : 'primary'}
+                          className="flex-1 px-4 md:px-6 py-2.5 md:py-3 rounded-[14px] md:rounded-[16px] text-sm md:text-base font-bold"
                         >
                           {isStarted ? (
                             <span className="flex items-center justify-center gap-2">
@@ -328,16 +320,17 @@ export default function CertificationsGenZ() {
                               <span className="hidden sm:inline">Start</span>
                             </span>
                           )}
-                        </button>
+                        </Button>
 
                         {isStarted && (
-                          <button
+                          <IconButton
                             onClick={() => navigate(`/channel/${cert.id}`)}
                             aria-label="View certification"
-                            className="px-4 md:px-6 py-2.5 md:py-3 bg-muted/50 hover:bg-muted rounded-[14px] md:rounded-[16px] border border-border transition-all"
-                          >
-                            <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
-                          </button>
+                            variant="ghost"
+                            size="sm"
+                            icon={<ChevronRight className="w-4 h-4 md:w-5 md:h-5" />}
+                            className="px-4 md:px-6 py-2.5 md:py-3"
+                          />
                         )}
                       </div>
                     </div>

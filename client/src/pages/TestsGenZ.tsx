@@ -8,6 +8,8 @@ import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
+import { Button } from '@/components/unified/Button';
+import { Input } from '@/components/ui/input';
 import { 
   Test, loadTests, getAllTestProgress, getTestStats,
   checkAndExpireTests
@@ -94,15 +96,15 @@ export default function TestsGenZ() {
               className="max-w-2xl mx-auto mb-12"
             >
               <div className="relative">
-                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
                 <label htmlFor="tests-search" className="sr-only">Search tests</label>
-                <input
+                <Input
                   id="tests-search"
                   type="text"
                   placeholder="Search tests..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-14 pr-6 py-4 bg-card border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                  className="pl-10"
                 />
               </div>
             </motion.div>
@@ -113,9 +115,9 @@ export default function TestsGenZ() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
-                className="p-6 bg-card border border-green-500/30 rounded-xl"
+                className="p-6 bg-card border border-[var(--gh-success-emphasis,#22c55e)]/30 rounded-xl"
               >
-                <Trophy className="w-8 h-8 mb-2 text-green-500" />
+                <Trophy className="w-8 h-8 mb-2 text-[var(--gh-success-emphasis,#22c55e)]" />
                 <div className="text-3xl font-black">{passedCount}</div>
                 <div className="text-sm text-muted-foreground">Passed</div>
               </motion.div>
@@ -124,9 +126,9 @@ export default function TestsGenZ() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="p-6 bg-card border border-blue-500/30 rounded-xl"
+                className="p-6 bg-card border border-[var(--gh-accent-emphasis,#0969da)]/30 rounded-xl"
               >
-                <Target className="w-8 h-8 mb-2 text-blue-500" />
+                <Target className="w-8 h-8 mb-2 text-[var(--gh-accent-emphasis,#0969da)]" />
                 <div className="text-3xl font-black">{stats.totalAttempts}</div>
                 <div className="text-sm text-muted-foreground">Attempts</div>
               </motion.div>
@@ -168,18 +170,19 @@ export default function TestsGenZ() {
                 animate={{ opacity: 1 }}
                 className="flex flex-col items-center justify-center min-h-[50vh] text-center"
               >
-                <div className="bg-red-500/10 border border-red-500/30 p-6 rounded-xl mb-6 max-w-md">
-                  <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                <div className="bg-[var(--gh-danger-emphasis,#cf222e)]/10 border border-[var(--gh-danger-emphasis,#cf222e)]/30 p-6 rounded-xl mb-6 max-w-md">
+                  <AlertTriangle className="w-12 h-12 text-[var(--gh-danger-emphasis,#cf222e)] mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Failed to load tests</h3>
                   <p className="text-muted-foreground mb-4">{error}</p>
                 </div>
-                <button
+                <Button
+                  variant="primary"
                   onClick={loadTestsData}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                  className="gap-2"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Try Again
-                </button>
+                </Button>
               </motion.div>
             ) : filteredTests.length === 0 ? (
               <motion.div
@@ -201,7 +204,7 @@ export default function TestsGenZ() {
                   const isExpired = testProgress?.expired;
 
                   return (
-                    <motion.button
+                    <motion.div
                       key={test.channelId}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -209,14 +212,14 @@ export default function TestsGenZ() {
                       whileHover={{ scale: 1.02, y: -4 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setLocation(`/test/${test.channelId}`)}
-                      className="group relative p-6 bg-card border border-border hover:border-primary/50 rounded-xl transition-all text-left overflow-hidden"
+                      className="group relative p-6 bg-card border border-border hover:border-primary/50 rounded-xl transition-all overflow-hidden cursor-pointer"
                     >
                       {/* Background gradient */}
                       <div 
                         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-primary/10 to-purple-500/10"
                       />
 
-                      <div className="relative space-y-4">
+                      <div className="relative space-y-4 w-full">
                         {/* Header */}
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
@@ -231,13 +234,13 @@ export default function TestsGenZ() {
                           </div>
 
                           {isPassed && (
-                            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-[var(--gh-success-emphasis,#22c55e)] flex items-center justify-center">
                               <CheckCircle className="w-5 h-5 text-white" />
                             </div>
                           )}
 
                           {isExpired && (
-                            <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-[var(--gh-danger-emphasis,#cf222e)] flex items-center justify-center">
                               <AlertTriangle className="w-5 h-5 text-white" />
                             </div>
                           )}
@@ -267,7 +270,7 @@ export default function TestsGenZ() {
                           <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-1 transition-all" />
                         </div>
                       </div>
-                    </motion.button>
+                    </motion.div>
                   );
                 })}
               </div>

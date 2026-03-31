@@ -1,12 +1,10 @@
 name: 🤖 Content Generation
 
 # Unified content generation workflow
-# Combines: content-pipeline.yml + hourly-generator.yml
-# Hourly: Quick question generation | Daily: Full pipeline
+# Runs daily at 2 AM UTC (full pipeline)
 
 on:
   schedule:
-    - cron: '0 * * * *'    # Hourly: Quick generation
     - cron: '0 2 * * *'    # Daily: Full pipeline
   
   workflow_dispatch:
@@ -29,6 +27,7 @@ on:
           - analysis
           - verifier
           - processor
+          - coding-challenges
           - blog-generator
           - voice-sessions
           - interview-intelligence
@@ -61,7 +60,6 @@ jobs:
   quick-generate:
     name: 🚀 Quick Generate
     if: |
-      (github.event.schedule == '0 * * * *') ||
       (github.event_name == 'workflow_dispatch' && inputs.mode == 'quick-generate')
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -78,7 +76,7 @@ jobs:
           if [ -n "${{ inputs.channel }}" ]; then
             echo "channels=${{ inputs.channel }}" >> $GITHUB_OUTPUT
             echo "count=${{ inputs.count || '10' }}" >> $GITHUB_OUTPUT
-          elif [ "${{ inputs.aggressive }}" == "true" ] || [ "${{ github.event_name }}" == "schedule" ]; then
+          elif [ "${{ inputs.aggressive }}" == "true" ]; then
             echo "channels=" >> $GITHUB_OUTPUT
             echo "count=25" >> $GITHUB_OUTPUT
           else
@@ -90,8 +88,6 @@ jobs:
         id: generate
         continue-on-error: true
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
@@ -115,8 +111,6 @@ jobs:
         if: steps.generate.outcome == 'success'
         continue-on-error: true
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
         run: |
@@ -147,8 +141,6 @@ jobs:
         id: creator
         continue-on-error: true
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
@@ -207,8 +199,6 @@ jobs:
         id: analysis
         continue-on-error: true
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
@@ -265,8 +255,6 @@ jobs:
         id: verifier
         continue-on-error: true
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
@@ -325,8 +313,6 @@ jobs:
         id: processor
         continue-on-error: true
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
@@ -362,8 +348,60 @@ jobs:
         continue-on-error: true
         run: |
           echo "Verifying processor output..."
-          # Add verification logic here
+          # Check if session files exist
+          if [ -d "client/public/data/sessions" ]; then
+            SESSION_COUNT=$(find client/public/data/sessions -name "*.json" -type f | wc -l)
+            echo "Processed $SESSION_COUNT session files"
+          fi
           echo "::notice::Processor bot completed successfully"
+
+  coding-challenges:
+    name: 💻 Coding Challenges
+    if: |
+      always() &&
+      ((github.event.schedule == '0 2 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'full-pipeline' || inputs.stage == 'coding-challenges')))
+    needs: [processor]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      challenge_count: ${{ steps.challenges.outputs.count }}
+      success: ${{ steps.challenges.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Generate Coding Challenges
+        id: challenges
+        continue-on-error: true
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+          INPUT_COUNT: ${{ inputs.count || '3' }}
+        run: |
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          EXIT_CODE=1
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
+            node script/coding-challenge-bot.js
+            EXIT_CODE=$?
+            
+            if [ $EXIT_CODE -eq 0 ]; then
+              break
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              WAIT_TIME=$((RETRY_COUNT * 30))
+              echo "Retrying in ${WAIT_TIME}s..."
+              sleep $WAIT_TIME
+            fi
+          done
+          
+          echo "count=${{ inputs.count || '3' }}" >> $GITHUB_OUTPUT
+          exit $EXIT_CODE
 
   blog-generator:
     name: 📰 Blog Generator
@@ -384,8 +422,6 @@ jobs:
         id: blog
         continue-on-error: true
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
@@ -458,8 +494,6 @@ jobs:
         id: voice
         continue-on-error: true
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
         run: |
@@ -526,8 +560,6 @@ jobs:
       - uses: ./.github/actions/setup-bot
       - name: Generate Intelligence
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
@@ -535,7 +567,7 @@ jobs:
 
   update-monitor:
     name: 📊 Update Monitor
-    needs: [blog-generator, voice-sessions, interview-intelligence]
+    needs: [blog-generator, voice-sessions, interview-intelligence, coding-challenges]
     if: always()
     runs-on: ubuntu-latest
     permissions:
@@ -545,8 +577,6 @@ jobs:
       - uses: ./.github/actions/setup-node-pnpm
       - name: Generate monitor data
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: node script/fetch-bot-monitor-data.js
       - name: Commit and push
         run: |
@@ -560,7 +590,7 @@ jobs:
 
   summary:
     name: 📋 Summary
-    needs: [quick-generate, creator, analysis, verifier, processor, blog-generator, voice-sessions, interview-intelligence, update-monitor]
+    needs: [quick-generate, creator, analysis, verifier, processor, coding-challenges, blog-generator, voice-sessions, interview-intelligence, update-monitor]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -575,6 +605,7 @@ jobs:
           echo "| 🔍 Analysis | ${{ needs.analysis.result == 'success' && '✅' || needs.analysis.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| ✅ Verifier | ${{ needs.verifier.result == 'success' && '✅' || needs.verifier.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| ⚙️ Processor | ${{ needs.processor.result == 'success' && '✅' || needs.processor.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 💻 Challenges | ${{ needs.coding-challenges.result == 'success' && '✅' || needs.coding-challenges.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 📰 Blog | ${{ needs.blog-generator.result == 'success' && '✅' || needs.blog-generator.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🎤 Voice | ${{ needs.voice-sessions.result == 'success' && '✅' || needs.voice-sessions.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🧠 Intelligence | ${{ needs.interview-intelligence.result == 'success' && '✅' || needs.interview-intelligence.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY

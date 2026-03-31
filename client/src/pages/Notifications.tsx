@@ -8,6 +8,7 @@ import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
+import { Button, IconButton } from '@/components/unified/Button';
 import {
   Bell, Check, Trash2, CheckCheck, Info, AlertCircle, 
   CheckCircle, AlertTriangle, X
@@ -155,21 +156,23 @@ export default function Notifications() {
               </div>
               <div className="flex gap-2">
                 {unreadCount > 0 && (
-                  <button
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={markAllAsRead}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                   >
                     <CheckCheck className="w-4 h-4" />
                     Mark all read
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={clearAll}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-muted text-muted-foreground rounded-lg hover:bg-muted/80 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                   Clear all
-                </button>
+                </Button>
               </div>
             </motion.div>
           )}
@@ -217,15 +220,15 @@ export default function Notifications() {
                           <h4 className={`font-medium text-sm ${notification.read ? 'text-muted-foreground' : ''}`}>
                             {notification.title}
                           </h4>
-                          <button
+                          <IconButton
+                            icon={<X className="w-4 h-4" />}
+                            aria-label="Dismiss notification"
+                            size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               clearNotification(notification.id);
                             }}
-                            className="p-1 hover:bg-muted rounded transition-colors flex-shrink-0"
-                          >
-                            <X className="w-4 h-4 text-muted-foreground" />
-                          </button>
+                          />
                         </div>
                         {notification.description && (
                           <p className="text-xs text-muted-foreground mt-1 line-clamp-2">

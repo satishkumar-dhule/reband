@@ -25,6 +25,7 @@ import { UnifiedQuestionPanel } from './UnifiedQuestionPanel';
 import { UnifiedAnswerPanel } from './UnifiedAnswerPanel';
 import { UnifiedMetadataBar } from './UnifiedMetadataBar';
 import { UnifiedProgressBar } from './UnifiedProgressBar';
+import { Button, IconButton } from '../unified/Button';
 import { cn } from '../../lib/utils';
 
 export interface UnifiedQuestionViewProps {
@@ -324,37 +325,36 @@ export function UnifiedQuestionView({
           <div className="bg-card/90 backdrop-blur-xl border-t border-border/50 shadow-lg">
             <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 gap-2 sm:gap-3 max-w-2xl mx-auto">
               {/* Previous button - OPTIMIZED */}
-              <motion.button
+              <IconButton
                 onClick={handlePrevious}
                 disabled={questionNumber === 1 || isTransitioning}
-                whileTap={{ scale: 0.92 }}
                 aria-label="Previous question"
+                icon={<ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />}
+                size="sm"
+                variant="ghost"
                 className={cn(
-                  'flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl',
-                  'bg-secondary/60 hover:bg-secondary transition-all duration-200',
-                  'disabled:opacity-20 disabled:cursor-not-allowed',
-                  'touch-manipulation select-none',
-                  'shadow-sm hover:shadow-md'
+                  'bg-[var(--gh-canvas-subtle)] hover:bg-[var(--gh-canvas-inset)]',
+                  'shadow-sm hover:shadow-md',
+                  'text-[var(--gh-fg-default)]'
                 )}
-              >
-                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-              </motion.button>
+              />
 
               {/* Center actions - OPTIMIZED */}
               <div className="flex items-center gap-2 flex-1 justify-center max-w-md">
                 {/* Answer toggle - OPTIMIZED */}
-                <motion.button
+                <Button
                   onClick={handleAnswerToggle}
-                  whileTap={{ scale: 0.95 }}
                   aria-label={internalShowAnswer ? "Hide answer" : "Show answer"}
+                  variant={internalShowAnswer ? "primary" : "outline"}
+                  size="md"
                   className={cn(
                     'flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 min-h-[44px] h-11 sm:h-12 rounded-xl',
-                    'bg-gradient-to-r font-medium transition-all duration-200',
+                    'font-medium transition-all duration-200',
                     'shadow-lg hover:shadow-xl',
                     'touch-manipulation select-none flex-1 max-w-[200px]',
                     internalShowAnswer
                       ? `${config.accentClass} text-white ${config.glow}`
-                      : 'from-secondary to-secondary/80 text-foreground hover:from-secondary/90 hover:to-secondary/70'
+                      : 'border-[var(--gh-border-default)] text-[var(--gh-fg-default)] hover:bg-[var(--gh-canvas-inset)]'
                   )}
                 >
                   {internalShowAnswer ? (
@@ -368,46 +368,48 @@ export function UnifiedQuestionView({
                       <span className="text-sm sm:text-base font-semibold">Reveal</span>
                     </>
                   )}
-                </motion.button>
+                </Button>
 
                 {/* Bookmark - OPTIMIZED */}
                 {onBookmark && (
-                  <motion.button
+                  <IconButton
                     onClick={handleBookmark}
-                    whileTap={{ scale: 0.92 }}
+                    disabled={isBookmarkAnimating}
                     aria-label="Bookmark question"
-                    animate={isBookmarkAnimating ? {
-                      scale: [1, 1.2, 1],
-                      rotate: [0, -10, 10, 0]
-                    } : {}}
-                    transition={{ duration: 0.6 }}
+                    icon={isBookmarked ? (
+                      <BookmarkCheck className="w-5 h-5 sm:w-5 sm:h-5 fill-current" />
+                    ) : (
+                      <Bookmark className="w-5 h-5 sm:w-5 sm:h-5" />
+                    )}
+                    size="sm"
+                    variant="ghost"
                     className={cn(
-                      'flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl',
+                      'min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl',
                       'transition-all duration-200',
                       'touch-manipulation select-none',
                       'shadow-sm hover:shadow-md',
                       isBookmarked
                         ? `${config.accentBg} ${config.accentText} border border-current`
-                        : 'bg-secondary/60 hover:bg-secondary text-muted-foreground'
+                        : 'bg-[var(--gh-canvas-subtle)] hover:bg-[var(--gh-canvas-inset)] text-[var(--gh-fg-muted)]'
                     )}
-                  >
-                    {isBookmarked ? (
-                      <BookmarkCheck className="w-5 h-5 sm:w-5 sm:h-5 fill-current" />
-                    ) : (
-                      <Bookmark className="w-5 h-5 sm:w-5 sm:h-5" />
-                    )}
-                  </motion.button>
+                  />
                 )}
               </div>
 
               {/* Next button - OPTIMIZED */}
-              <motion.button
+              <IconButton
                 onClick={handleNext}
                 disabled={questionNumber === totalQuestions || isTransitioning}
-                whileTap={{ scale: 0.92 }}
                 aria-label="Next question"
+                icon={isTransitioning ? (
+                  <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 text-white animate-spin" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                )}
+                size="sm"
+                variant="primary"
                 className={cn(
-                  'flex items-center justify-center min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl',
+                  'min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 rounded-xl',
                   'bg-gradient-to-r transition-all duration-200',
                   config.accentClass,
                   'disabled:opacity-20 disabled:cursor-not-allowed',
@@ -415,13 +417,7 @@ export function UnifiedQuestionView({
                   'shadow-lg hover:shadow-xl',
                   config.glow
                 )}
-              >
-                {isTransitioning ? (
-                  <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 text-white animate-spin" />
-                ) : (
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                )}
-              </motion.button>
+              />
             </div>
           </div>
         </motion.div>

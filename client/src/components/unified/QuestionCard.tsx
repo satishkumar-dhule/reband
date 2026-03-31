@@ -18,6 +18,7 @@ import { formatTag } from '../../lib/utils';
 import { DifficultyBadge } from './DifficultyBadge';
 import { QuestionHistoryIcon, QuestionType } from './QuestionHistory';
 import { Skeleton } from '../mobile/SkeletonLoader';
+import { Button, IconButton } from './Button';
 
 export type QuestionCardVariant = 'default' | 'compact' | 'detailed' | 'minimal';
 export type QuestionCardSize = 'sm' | 'md' | 'lg';
@@ -340,9 +341,9 @@ export function QuestionCard({
 
             {/* NEW badge - show for new questions */}
             {question.isNew && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-[var(--gh-accent-fg)]/10 to-pink-500/10 border border-[var(--gh-accent-fg)]/20 rounded-md">
-                <Sparkles className="w-3 h-3 text-[var(--gh-accent-fg)]" />
-                <span className={`font-bold bg-gradient-to-r from-[var(--gh-accent-fg)] to-pink-500 bg-clip-text text-transparent ${sizeConfig.meta}`}>NEW</span>
+              <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-gh-accent-subtle to-gh-done-subtle border border-gh-accent/20 rounded-md">
+                <Sparkles className="w-3 h-3 text-gh-accent" />
+                <span className={`font-bold bg-gradient-to-r from-gh-accent to-gh-done bg-clip-text text-transparent ${sizeConfig.meta}`}>NEW</span>
               </div>
             )}
 
@@ -362,20 +363,16 @@ export function QuestionCard({
 
             {/* Bookmark button */}
             {showBookmark && onToggleMark && (
-              <button
+              <IconButton
+                icon={<Bookmark className={`w-4 h-4 ${isMarked ? 'fill-current' : ''}`} />}
+                aria-label={isMarked ? 'Remove bookmark' : 'Bookmark question'}
+                size="sm"
+                variant={isMarked ? 'primary' : 'ghost'}
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggleMark();
                 }}
-                aria-label={isMarked ? 'Remove bookmark' : 'Bookmark question'}
-                className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-primary ${
-                  isMarked
-                    ? 'bg-primary/10 text-primary border border-primary/20'
-                    : 'bg-muted text-muted-foreground hover:text-primary'
-                }`}
-              >
-                <Bookmark className={`w-4 h-4 ${isMarked ? 'fill-current' : ''}`} />
-              </button>
+              />
             )}
           </div>
         </div>

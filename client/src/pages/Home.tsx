@@ -13,6 +13,7 @@ import { allChannelsConfig } from "../lib/channels-config";
 import { cn } from "../lib/utils";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "../components/ui/breadcrumb";
 import { useCredits } from "../context/CreditsContext";
+import { Button } from "@/components/unified/Button";
 
 interface ApiChannel {
   id: string;
@@ -168,7 +169,8 @@ const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }
   };
 
   return (
-    <button
+    <Button
+      variant="outline"
       onClick={() => setLocation(`/channel/${channelId}`)}
       onKeyDown={handleKeyDown}
       className="flex flex-col gap-3 p-4 rounded-md border border-[var(--gh-border)] hover:border-[var(--gh-accent-fg)] cursor-pointer bg-[var(--gh-canvas)] transition-colors group text-left w-full"
@@ -213,7 +215,7 @@ const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }
           {pct}%
         </span>
       </div>
-    </button>
+    </Button>
   );
 });
 
@@ -288,6 +290,13 @@ export default function Home() {
         title="DevPrep - Free Technical Interview Prep"
         description="Master technical interviews with 1000+ questions, spaced repetition flashcards, and voice practice. Free forever, no sign-up required."
       />
+      {/* Skip navigation link for keyboard users */}
+      <a 
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:font-medium focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
       <AppLayout>
       <div className="min-h-screen bg-[var(--gh-canvas-subtle)]" id="main-content">
         <div className="max-w-6xl mx-auto px-4 py-8 lg:px-8">
@@ -317,8 +326,9 @@ export default function Home() {
                   {quickActions.map((action) => {
                     const Icon = action.icon;
                     return (
-                      <button
+                      <Button
                         key={action.path}
+                        variant="outline"
                         onClick={() => setLocation(action.path)}
                         className="flex flex-col items-start gap-2 p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] hover:bg-[var(--gh-canvas-inset)] text-left transition-colors"
                         data-testid={`action-${action.path.replace("/", "")}`}
@@ -328,7 +338,7 @@ export default function Home() {
                           <div className="text-sm font-semibold text-[var(--gh-fg)]">{action.label}</div>
                           <div className="text-xs text-[var(--gh-fg-muted)] mt-0.5">{action.desc}</div>
                         </div>
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -365,12 +375,12 @@ export default function Home() {
                       <h3 className="text-base font-semibold text-[var(--gh-fg)] mb-2">Failed to load channels</h3>
                       <p className="text-sm text-[var(--gh-fg-muted)]">{error}</p>
                     </div>
-                    <button
+                    <Button
+                      variant="primary"
                       onClick={() => window.location.reload()}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--gh-accent-fg)] text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
                     >
                       Try Again
-                    </button>
+                    </Button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -494,21 +504,23 @@ export default function Home() {
                 <p className="text-xs text-[var(--gh-fg-muted)] mb-4">
                   Jump into a topic channel and start answering questions.
                 </p>
-                <div className="space-y-2">
-                  <button
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="primary"
                     onClick={() => setLocation("/channels")}
-                    className="gh-btn gh-btn-primary w-full justify-center"
+                    fullWidth
                     data-testid="button-explore-channels"
                   >
                     Explore all channels
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
                     onClick={() => setLocation("/learning-paths")}
-                    className="gh-btn gh-btn-secondary w-full justify-center"
+                    fullWidth
                     data-testid="button-view-paths"
                   >
                     View learning paths
-                  </button>
+                  </Button>
                 </div>
               </section>
 

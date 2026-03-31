@@ -233,7 +233,7 @@ export function UnifiedAnswerPanel({
         {/* Diagram tab */}
         {activeTab === 'diagram' && question.diagram && (
           <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 p-4">
-            <EnhancedMermaid chart={question.diagram} />
+            <EnhancedMermaid chart={question.diagram} caption={`${question.channel} / ${question.subChannel}`} />
           </div>
         )}
 

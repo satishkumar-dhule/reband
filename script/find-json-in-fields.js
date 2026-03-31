@@ -8,8 +8,8 @@ import 'dotenv/config';
 import { createClient } from '@libsql/client';
 
 const db = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
+  url: 'file:local.db',
+  authToken: undefined,
 });
 
 async function main() {

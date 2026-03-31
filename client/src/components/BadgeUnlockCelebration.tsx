@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { Badge } from '../lib/badges';
 import { getTierColor } from '../lib/badges';
+import { IconButton } from './unified/Button';
 
 // Icon mapping
 const iconMap: Record<string, React.ComponentType<any>> = {
@@ -103,15 +104,16 @@ export function BadgeUnlockCelebration({ badge, onClose }: BadgeUnlockCelebratio
             </div>
             
             {/* Close button */}
-            <button
+            <IconButton
+              icon={<X className="w-4 h-4" />}
+              aria-label="Close notification"
+              variant="ghost"
+              size="sm"
               onClick={(e) => {
                 e.stopPropagation();
                 onClose();
               }}
-              className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors flex-shrink-0"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            />
           </div>
           
           {/* Progress bar for auto-hide */}

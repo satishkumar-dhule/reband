@@ -14,6 +14,17 @@ import { useCredits } from '../context/CreditsContext';
 import { useLevel } from '../hooks/use-level';
 import { SEOHead } from '../components/SEOHead';
 import { MetricCard } from '../components/unified';
+import { Button } from '@/components/unified/Button';
+import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+  SelectGroup,
+} from '@/components/ui/select';
 import {
   Code, Trophy, Target, Flame, BookOpen, ChevronRight,
   Bell, HelpCircle, Zap, Calendar, TrendingUp, Bookmark, Shuffle, Eye,
@@ -230,9 +241,10 @@ export default function Profile() {
             transition={{ delay: 0.2 }}
             className="bg-card rounded-2xl border border-border overflow-hidden"
           >
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setLocation('/badges')}
-              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+              className="w-full justify-between"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
@@ -244,7 +256,7 @@ export default function Profile() {
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </button>
+            </Button>
           </motion.section>
 
           {/* Settings - in left column on desktop */}
@@ -372,31 +384,25 @@ export default function Profile() {
               </h4>
               <div className="flex gap-2">
                 <label htmlFor="coupon-code" className="sr-only">Coupon code</label>
-                <input
+                <Input
                   id="coupon-code"
                   type="text"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                   placeholder="Enter code"
-                  className="flex-1 px-3 py-2 bg-black/20 border border-border rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="flex-1"
                 />
-                <button
+                <Button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-amber-500 text-white text-sm font-bold rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  variant="primary"
+                  size="sm"
+                  loading={isSubmitting}
                 >
-                  {isSubmitting ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Applying...
-                    </>
-                  ) : (
-                    'Apply'
-                  )}
-                </button>
+                  Apply
+                </Button>
               </div>
               {couponMessage && (
-                <p className={`text-xs mt-2 ${couponMessage.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                <p className={`text-xs mt-2 ${couponMessage.type === 'success' ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
                   {couponMessage.text}
                 </p>
               )}
@@ -412,7 +418,7 @@ export default function Profile() {
                   {history.slice(0, 5).map((tx) => (
                     <div key={tx.id} className="flex justify-between text-xs">
                       <span className="text-muted-foreground truncate flex-1">{tx.description}</span>
-                      <span className={tx.amount > 0 ? 'text-green-400' : 'text-red-400'}>
+                      <span className={tx.amount > 0 ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}>
                         {tx.amount > 0 ? '+' : ''}{tx.amount}
                       </span>
                     </div>
@@ -496,10 +502,10 @@ function MenuItem({
   onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={onClick}
-      className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-b-0 active:bg-muted/70 cursor-pointer touch-manipulation"
+      className="w-full justify-between border-b border-border/50 last:border-b-0 rounded-none"
     >
       <div className="flex items-center gap-3 pointer-events-none">
         <span className="text-muted-foreground">{icon}</span>
@@ -509,7 +515,7 @@ function MenuItem({
         </div>
       </div>
       <ChevronRight className="w-5 h-5 text-muted-foreground pointer-events-none" />
-    </button>
+    </Button>
   );
 }
 
@@ -527,12 +533,11 @@ function ToggleItem({
   onToggle: () => void;
 }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       onClick={onToggle}
-      className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-b-0 active:bg-muted/70 cursor-pointer touch-manipulation"
+      className="w-full justify-between border-b border-border/50 last:border-b-0 rounded-none"
       aria-label={`${label}: ${enabled ? 'enabled' : 'disabled'}`}
-      aria-pressed={enabled}
     >
       <div className="flex items-center gap-3 pointer-events-none">
         <span className={enabled ? 'text-primary' : 'text-muted-foreground'}>{icon}</span>
@@ -553,7 +558,7 @@ function ToggleItem({
           }`}
         />
       </div>
-    </button>
+    </Button>
   );
 }
 
@@ -642,22 +647,25 @@ function VoiceSettings() {
         <label htmlFor="voice-select" className="text-xs font-medium text-muted-foreground mb-2 block">
           Voice
         </label>
-        <select
-          id="voice-select"
-          value={selectedVoice}
-          onChange={(e) => handleVoiceChange(e.target.value)}
-          className="w-full px-3 py-2.5 bg-muted/50 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-        >
-          {sortedLangs.map(lang => (
-            <optgroup key={lang} label={lang}>
-              {groupedVoices[lang].map(voice => (
-                <option key={voice.name} value={voice.name}>
-                  {voice.name}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
+        <Select value={selectedVoice} onValueChange={handleVoiceChange}>
+          <SelectTrigger id="voice-select" className="w-full">
+            <SelectValue placeholder="Select a voice" />
+          </SelectTrigger>
+          <SelectContent>
+            {sortedLangs.map(lang => (
+              <SelectGroup key={lang}>
+                <SelectItem key={lang} value={groupedVoices[lang][0].name}>
+                  {lang}
+                </SelectItem>
+                {groupedVoices[lang].slice(1).map(voice => (
+                  <SelectItem key={voice.name} value={voice.name}>
+                    {voice.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Speed Slider */}
@@ -670,14 +678,12 @@ function VoiceSettings() {
             {rate.toFixed(1)}x
           </span>
         </div>
-        <input
-          type="range"
-          min="0.5"
-          max="1.5"
-          step="0.1"
-          value={rate}
-          onChange={(e) => handleRateChange(parseFloat(e.target.value))}
-          className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+        <Slider
+          min={0.5}
+          max={1.5}
+          step={0.1}
+          value={[rate]}
+          onValueChange={([val]) => handleRateChange(val)}
         />
         <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
           <span>Slower</span>
@@ -686,17 +692,14 @@ function VoiceSettings() {
       </div>
 
       {/* Test Button */}
-      <button
+      <Button
         onClick={testVoice}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-          isPlaying
-            ? 'bg-primary text-primary-foreground'
-            : 'bg-primary/10 text-primary hover:bg-primary/20'
-        }`}
+        variant={isPlaying ? "primary" : "outline"}
+        className="w-full"
       >
         <Play className={`w-4 h-4 ${isPlaying ? 'animate-pulse' : ''}`} />
         {isPlaying ? 'Playing...' : 'Test Voice'}
-      </button>
+      </Button>
     </div>
   );
 }

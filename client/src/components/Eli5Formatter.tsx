@@ -12,6 +12,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Heart, Copy, Check } from 'lucide-react';
+import { Button } from './unified/Button';
 
 interface Eli5FormatterProps {
   content: string;
@@ -145,11 +146,11 @@ export function Eli5Formatter({ content }: Eli5FormatterProps) {
           </div>
           
           {/* Copy button */}
-          <motion.button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-amber-600 dark:text-amber-400 hover:bg-amber-100/60 dark:hover:bg-amber-900/40 rounded-lg transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-amber-600 dark:text-amber-400 hover:bg-amber-100/60 dark:hover:bg-amber-900/40"
             aria-label="Copy ELI5 content"
           >
             {copied ? (
@@ -163,7 +164,7 @@ export function Eli5Formatter({ content }: Eli5FormatterProps) {
                 <span>Copy</span>
               </>
             )}
-          </motion.button>
+          </Button>
         </div>
         
         {/* ELI5 Content - larger, friendlier text */}

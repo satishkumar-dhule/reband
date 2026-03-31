@@ -1,5 +1,5 @@
 /**
- * Fetch questions from Turso database and generate static JSON files for GitHub Pages build.
+ * Fetch questions from local SQLite database and generate static JSON files for GitHub Pages build.
  * This script runs during the build process to embed all questions into the static site.
  */
 import 'dotenv/config';
@@ -9,12 +9,11 @@ import path from 'path';
 
 const OUTPUT_DIR = 'client/public/data';
 
-// Use read-only credentials
-const url = process.env.TURSO_DATABASE_URL_RO || process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN_RO || process.env.TURSO_AUTH_TOKEN;
+const url = 'file:local.db';
+const authToken = undefined;
 
 if (!url) {
-  console.error('❌ Missing TURSO_DATABASE_URL environment variable');
+  console.error('❌ Missing database URL');
   process.exit(1);
 }
 

@@ -20,6 +20,7 @@ import { SEOHead } from "../components/SEOHead";
 import { AppLayout } from "../components/layout/AppLayout";
 import { MetricCard } from "../components/unified";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "../components/ui/breadcrumb";
+import { Button, IconButton } from "../components/unified/Button";
 import { cn } from "../lib/utils";
 
 // Types
@@ -80,22 +81,22 @@ const BOT_CONFIG: Record<string, {
   'creator': { 
     name: 'Creator Bot', 
     icon: Sparkles, 
-    color: 'text-cyan-500 bg-cyan-500/10 border-cyan-500/30',
-    gradient: 'from-cyan-500 to-blue-500',
+    color: 'text-[--gh-success-fg] bg-[--gh-success-subtle] border-[--gh-success-emphasis]/30',
+    gradient: 'from-[--gh-accent-emphasis] to-blue-500',
     description: 'Creates questions, challenges, voice keywords'
   },
   'verifier': { 
     name: 'Verifier Bot', 
     icon: Eye, 
-    color: 'text-amber-500 bg-amber-500/10 border-amber-500/30',
-    gradient: 'from-amber-500 to-orange-500',
+    color: 'text-[--gh-attention-fg] bg-[--gh-attention-subtle] border-[--gh-attention-emphasis]/30',
+    gradient: 'from-[--gh-attention-fg] to-orange-500',
     description: 'Quality checks, detects issues, flags content'
   },
   'processor': { 
     name: 'Processor Bot', 
     icon: Wrench, 
-    color: 'text-purple-500 bg-purple-500/10 border-purple-500/30',
-    gradient: 'from-purple-500 to-pink-500',
+    color: 'text-[--gh-accent-fg] bg-[--gh-accent-subtle] border-[--gh-accent-emphasis]/30',
+    gradient: 'from-[--gh-accent-emphasis] to-pink-500',
     description: 'Improves or deletes flagged content'
   }
 };
@@ -104,8 +105,8 @@ function getBotConfig(botName: string) {
   return BOT_CONFIG[botName] || { 
     name: botName, 
     icon: Bot, 
-    color: 'text-slate-500 bg-slate-500/10 border-slate-500/30',
-    gradient: 'from-slate-500 to-slate-600',
+    color: 'text-[--gh-fg-muted] bg-[--gh-canvas-subtle] border-[--gh-border]',
+    gradient: 'from-[--gh-fg-muted] to-[--gh-border]',
     description: 'Unknown bot'
   };
 }
@@ -175,10 +176,12 @@ function ItemLink({ itemType, itemId, className }: { itemType: string; itemId: s
   }
   
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="xs"
       onClick={() => setLocation(link)}
       className={cn(
-        "inline-flex items-center gap-1 px-1.5 py-0.5 bg-primary/10 hover:bg-primary/20 text-primary rounded text-xs font-mono transition-colors",
+        "inline-flex items-center gap-1 font-mono",
         className
       )}
       title={`View ${itemType}: ${itemId}`}
@@ -186,7 +189,7 @@ function ItemLink({ itemType, itemId, className }: { itemType: string; itemId: s
       {getItemTypeIcon(itemType)}
       <span className="truncate max-w-[120px]">{itemId}</span>
       <ExternalLink className="w-2.5 h-2.5 opacity-60" />
-    </button>
+    </Button>
   );
 }
 
@@ -198,18 +201,16 @@ function Tab({ active, onClick, children, icon: Icon }: {
   icon: typeof Bot;
 }) {
   return (
-    <button
+    <Button
+      variant={active ? "primary" : "ghost"}
+      size="md"
       onClick={onClick}
-      className={cn(
-        "flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all",
-        active 
-          ? "bg-primary text-primary-foreground" 
-          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-      )}
+      icon={<Icon className="w-4 h-4" />}
+      iconPosition="left"
+      className="gap-2"
     >
-      <Icon className="w-4 h-4" />
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -304,24 +305,26 @@ export default function BotActivity() {
               <Bot className="w-5 h-5 text-primary" />
               Bot Monitor
             </h1>
-            <button 
+            <IconButton
+              icon={<RefreshCw className={cn(refreshing && "animate-spin")} />}
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-2 hover:bg-muted rounded-lg disabled:opacity-50 transition-colors"
-            >
-              <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
-            </button>
+              variant="ghost"
+              size="sm"
+              aria-label="Refresh"
+            />
           </header>
           
           {/* Mobile refresh button */}
           <div className="lg:hidden flex justify-end mb-4">
-            <button 
+            <IconButton
+              icon={<RefreshCw className={cn(refreshing && "animate-spin")} />}
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-2 hover:bg-muted rounded-lg disabled:opacity-50 transition-colors"
-            >
-              <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
-            </button>
+              variant="ghost"
+              size="sm"
+              aria-label="Refresh"
+            />
           </div>
 
           {/* Bot Cards */}
@@ -363,7 +366,7 @@ export default function BotActivity() {
                         <div className="text-[10px] text-muted-foreground uppercase">Runs</div>
                       </div>
                       <div>
-                        <div className="text-lg font-bold text-emerald-500">
+                        <div className="text-lg font-bold text-[--gh-success-fg]">
                           {stats?.successfulRuns || 0}
                         </div>
                         <div className="text-[10px] text-muted-foreground uppercase">Success</div>
@@ -486,9 +489,9 @@ export default function BotActivity() {
                                 <span className="font-medium text-sm">{config.name}</span>
                                 <span className={cn(
                                   "text-xs px-2 py-0.5 rounded-full",
-                                  run.status === 'completed' ? "bg-emerald-500/10 text-emerald-500" :
-                                  run.status === 'running' ? "bg-blue-500/10 text-blue-500" :
-                                  "bg-red-500/10 text-red-500"
+                                  run.status === 'completed' ? "bg-[--gh-success-subtle] text-[--gh-success-fg]" :
+                                  run.status === 'running' ? "bg-[--gh-accent-subtle] text-[--gh-accent-fg]" :
+                                  "bg-[--gh-danger-subtle] text-[--gh-danger-fg]"
                                 )}>
                                   {run.status}
                                 </span>
@@ -524,25 +527,21 @@ export default function BotActivity() {
                   </h3>
                   <div className="flex gap-2">
                     {['all', 'pending', 'processing', 'completed'].map(status => (
-                      <button
+                      <Button
                         key={status}
+                        variant={selectedBot === status ? "primary" : "outline"}
+                        size="sm"
                         onClick={() => setSelectedBot(status)}
-                        className={cn(
-                          "text-xs px-2 py-1 rounded-full transition-colors",
-                          selectedBot === status 
-                            ? "bg-primary text-primary-foreground" 
-                            : "bg-muted text-muted-foreground hover:text-foreground"
-                        )}
                       >
                         {status}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
                 {workQueue.length === 0 ? (
                   <div className="flex items-center justify-center min-h-[30vh]">
                     <div className="text-center">
-                      <CheckCircle className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
+                      <CheckCircle className="w-8 h-8 mx-auto text-[--gh-success-fg] mb-2" />
                       <p className="text-sm text-muted-foreground">Queue is empty</p>
                     </div>
                   </div>
@@ -556,9 +555,9 @@ export default function BotActivity() {
                           <div className="flex items-center gap-3">
                             <div className={cn(
                               "w-8 h-8 rounded-lg flex items-center justify-center",
-                              item.action === 'delete' ? "bg-red-500/10 text-red-500" :
-                              item.action === 'improve' ? "bg-violet-500/10 text-violet-500" :
-                              "bg-amber-500/10 text-amber-500"
+                              item.action === 'delete' ? "bg-[--gh-danger-subtle] text-[--gh-danger-fg]" :
+                              item.action === 'improve' ? "bg-[--gh-accent-subtle] text-[--gh-accent-fg]" :
+                              "bg-[--gh-attention-subtle] text-[--gh-attention-fg]"
                             )}>
                               {item.action === 'delete' ? <Trash2 className="w-4 h-4" /> :
                                item.action === 'improve' ? <Zap className="w-4 h-4" /> :
@@ -571,10 +570,10 @@ export default function BotActivity() {
                                 <ItemLink itemType={item.itemType} itemId={item.itemId} />
                                 <span className={cn(
                                   "text-xs px-2 py-0.5 rounded-full",
-                                  item.status === 'pending' ? "bg-amber-500/10 text-amber-500" :
-                                  item.status === 'processing' ? "bg-blue-500/10 text-blue-500" :
-                                  item.status === 'completed' ? "bg-emerald-500/10 text-emerald-500" :
-                                  "bg-red-500/10 text-red-500"
+                                  item.status === 'pending' ? "bg-[--gh-attention-subtle] text-[--gh-attention-fg]" :
+                                  item.status === 'processing' ? "bg-[--gh-accent-subtle] text-[--gh-accent-fg]" :
+                                  item.status === 'completed' ? "bg-[--gh-success-subtle] text-[--gh-success-fg]" :
+                                  "bg-[--gh-danger-subtle] text-[--gh-danger-fg]"
                                 )}>
                                   {item.status}
                                 </span>
@@ -632,11 +631,11 @@ export default function BotActivity() {
                                 <span className="font-medium text-sm">{config.name}</span>
                                 <span className={cn(
                                   "text-xs px-2 py-0.5 rounded-full",
-                                  entry.action === 'create' ? "bg-cyan-500/10 text-cyan-500" :
-                                  entry.action === 'update' ? "bg-violet-500/10 text-violet-500" :
-                                  entry.action === 'delete' ? "bg-red-500/10 text-red-500" :
-                                  entry.action === 'verify' ? "bg-emerald-500/10 text-emerald-500" :
-                                  "bg-amber-500/10 text-amber-500"
+                                  entry.action === 'create' ? "bg-[--gh-accent-subtle] text-[--gh-accent-fg]" :
+                                  entry.action === 'update' ? "bg-[--gh-accent-subtle] text-[--gh-accent-fg]" :
+                                  entry.action === 'delete' ? "bg-[--gh-danger-subtle] text-[--gh-danger-fg]" :
+                                  entry.action === 'verify' ? "bg-[--gh-success-subtle] text-[--gh-success-fg]" :
+                                  "bg-[--gh-attention-subtle] text-[--gh-attention-fg]"
                                 )}>
                                   {entry.action}
                                 </span>
@@ -673,15 +672,15 @@ export default function BotActivity() {
             </h4>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-cyan-500" /> Creator
+                <Sparkles className="w-3 h-3 text-[--gh-success-fg]" /> Creator
               </span>
               <span>→</span>
               <span className="flex items-center gap-1">
-                <Eye className="w-3 h-3 text-amber-500" /> Verifier
+                <Eye className="w-3 h-3 text-[--gh-attention-fg]" /> Verifier
               </span>
               <span>→</span>
               <span className="flex items-center gap-1">
-                <Wrench className="w-3 h-3 text-purple-500" /> Processor
+                <Wrench className="w-3 h-3 text-[--gh-accent-fg]" /> Processor
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-2">

@@ -189,7 +189,12 @@ export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
 
       {/* ─── MOBILE DRAWER ──────────────────────────────── */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-[60] flex">
+        <div 
+          className="lg:hidden fixed inset-0 z-[60] flex"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+        >
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50"
@@ -200,6 +205,7 @@ export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
           <div
             className="relative flex flex-col w-64 border-r shadow-xl"
             style={{ background: "var(--sidebar-bg)", borderColor: "var(--sidebar-border)" }}
+            role="document"
           >
             <div
               className="flex items-center justify-between px-4 h-[56px] border-b shrink-0"
@@ -218,6 +224,7 @@ export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
                 onClick={() => setMobileOpen(false)}
                 className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Close menu"
+                aria-expanded="true"
                 data-testid="button-close-mobile-menu"
               >
                 <X className="w-4 h-4" />

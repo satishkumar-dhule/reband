@@ -7,8 +7,8 @@
 import 'dotenv/config';
 import { createClient } from '@libsql/client';
 
-const url = process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN;
+const url = 'file:local.db';
+const authToken = undefined;
 const postId = process.env.POST_ID;
 
 if (!url || !postId) {

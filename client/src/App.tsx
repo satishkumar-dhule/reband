@@ -22,21 +22,27 @@ import { SkeletonLoader } from "@/components/mobile/SkeletonLoader";
 function preloadHeavyModules() {
   if (typeof window !== 'undefined') {
     // Preload mermaid (2.9MB) in background after app loads
+    // Only on user interaction or when user navigates to diagram-heavy pages
+    // DO NOT use webpackPrefetch as it blocks initial FCP
     setTimeout(() => {
-      import(/* webpackPrefetch: true */ 'mermaid/dist/mermaid.esm.mjs')
+      import('mermaid/dist/mermaid.esm.mjs')
         .then(() => console.log('Mermaid preloaded'))
         .catch(() => {});
-    }, 2000);
+    }, 3000);
     
-    // Preload syntax highlighter
-    import(/* webpackPrefetch: true */ 'react-syntax-highlighter')
-      .then(() => console.log('Syntax highlighter preloaded'))
-      .catch(() => {});
+    // Preload syntax highlighter only after initial paint
+    setTimeout(() => {
+      import('react-syntax-highlighter')
+        .then(() => console.log('Syntax highlighter preloaded'))
+        .catch(() => {});
+    }, 4000);
     
-    // Preload markdown processors for SRS Review pages
-    import(/* webpackPrefetch: true */ 'react-markdown')
-      .then(() => console.log('React markdown preloaded'))
-      .catch(() => {});
+    // Preload markdown processors for SRS Review pages - low priority
+    setTimeout(() => {
+      import('react-markdown')
+        .then(() => console.log('React markdown preloaded'))
+        .catch(() => {});
+    }, 5000);
   }
 }
 

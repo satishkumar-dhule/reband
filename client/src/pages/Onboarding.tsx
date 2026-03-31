@@ -14,7 +14,7 @@ import {
   ArrowRight, ArrowLeft, Check, Code, Server, Layout, Database,
   Cloud, Brain, Target, Rocket, BookOpen, Zap, ChevronRight, Trophy, Sparkles, Star
 } from 'lucide-react';
-import { Button } from "../components/ui/button";
+import { Button } from '@/components/unified/Button';
 
 interface Role {
   id: string;
@@ -228,16 +228,17 @@ export default function OnboardingPage() {
                         const Icon = role.icon;
                         const isSelected = selectedRole === role.id;
                         return (
-                          <button
+                          <Button
                             key={role.id}
+                            variant={isSelected ? 'outline' : 'ghost'}
                             onClick={() => {
                               setSelectedRole(role.id);
                               setValidationError(null);
                             }}
-                            className={`flex flex-col items-start p-6 rounded-md border text-left transition-all ${
+                            className={`flex flex-col items-start p-6 rounded-md border text-left transition-all h-auto ${
                               isSelected 
                                 ? 'bg-[var(--gh-canvas-subtle)] border-[var(--gh-accent-fg)] ring-1 ring-[var(--gh-accent-fg)]' 
-                                : 'bg-[var(--gh-canvas)] border-[var(--gh-border)] hover:border-[var(--gh-border-strong)]'
+                                : 'bg-[var(--gh-canvas)] border-[var(--gh-border)] hover:border-[var(--gh-border-strong)] hover:bg-muted/30'
                             }`}
                           >
                             <div className={`p-2 rounded-md mb-4 ${isSelected ? 'bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)]' : 'bg-[var(--gh-canvas-inset)] text-[var(--gh-fg-muted)]'}`}>
@@ -251,7 +252,7 @@ export default function OnboardingPage() {
                                 SELECTED
                               </div>
                             )}
-                          </button>
+                          </Button>
                         );
                       })}
                     </div>
@@ -274,18 +275,19 @@ export default function OnboardingPage() {
                       {recommendedChannels.slice(0, 12).map((channel) => {
                         const isSelected = selectedChannels.includes(channel.id);
                         return (
-                          <button
+                          <Button
                             key={channel.id}
+                            variant={isSelected ? 'outline' : 'ghost'}
                             onClick={() => toggleChannel(channel.id)}
-                            className={`flex items-center justify-between px-4 py-3 rounded-md border text-sm transition-all ${
+                            className={`flex items-center justify-between px-4 py-3 rounded-md border text-sm transition-all h-auto justify-start font-normal ${
                               isSelected 
                                 ? 'bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-fg)] text-[var(--gh-accent-fg)] font-semibold' 
-                                : 'bg-[var(--gh-canvas)] border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:border-[var(--gh-border-strong)]'
+                                : 'bg-[var(--gh-canvas)] border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:border-[var(--gh-border-strong)] hover:bg-muted/30'
                             }`}
                           >
                             <span className="truncate mr-2">{channel.name}</span>
                             {isSelected && <Check className="w-4 h-4 shrink-0" />}
-                          </button>
+                          </Button>
                         );
                       })}
                     </div>
@@ -357,16 +359,16 @@ export default function OnboardingPage() {
 
                   {currentStep < 4 ? (
                     <Button 
+                      variant="primary"
                       onClick={handleContinue}
                       disabled={currentStep === 2 && !selectedRole || currentStep === 3 && selectedChannels.length === 0}
-                      className="bg-[var(--gh-accent-emphasis)] text-white hover:bg-blue-700 disabled:opacity-50"
                     >
                       Continue <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   ) : (
                     <Button 
+                      variant="success"
                       onClick={handleComplete}
-                      className="bg-[var(--gh-success-emphasis)] text-white hover:bg-[var(--gh-success-hover)]"
                     >
                       Start Your Journey <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>

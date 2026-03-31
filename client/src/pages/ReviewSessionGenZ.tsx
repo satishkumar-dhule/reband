@@ -219,6 +219,7 @@ function DiagramSection({ diagram }: { diagram: string }) {
         <EnhancedMermaid 
           chart={diagram} 
           onRenderResult={(success) => setRenderSuccess(success)}
+          caption="Visual explanation"
         />
       </div>
     </div>
@@ -349,13 +350,14 @@ export default function ReviewSessionGenZ() {
           {/* Header */}
           <div className="flex flex-col gap-4 mb-6">
             <div className="flex items-center justify-between">
-              <button
+              <Button
                 onClick={() => setLocation('/')}
-                className="flex items-center gap-1 text-sm text-[var(--gh-accent-fg)] hover:underline"
+                variant="ghost"
+                size="sm"
+                icon={<ChevronLeft className="w-4 h-4" />}
               >
-                <ChevronLeft className="w-4 h-4" />
                 Back to Dashboard
-              </button>
+              </Button>
 
               <div className="flex items-center gap-4 text-sm font-medium">
                 <div className="flex items-center gap-1.5 text-[var(--gh-attention-fg)]">

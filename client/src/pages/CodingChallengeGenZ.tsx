@@ -16,10 +16,12 @@ import {
   getCodingStats, getSolvedChallengeIds, ComplexityAnalysis,
 } from '../lib/coding-challenges';
 import { Badge } from '../components/ui/badge';
-import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { Separator } from '../components/ui/separator';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../components/ui/select';
+import { Button, IconButton } from '../components/unified/Button';
+import { Input } from '../components/ui/input';
 
 type ViewState = 'list' | 'challenge';
 
@@ -265,19 +267,20 @@ export default function CodingChallengeGenZ() {
             </div>
 
             <div className="flex items-center gap-3">
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as Language)}
-                className="bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-fg)]"
-              >
-                <option value="javascript">JavaScript</option>
-                <option value="python">Python</option>
-              </select>
+              <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
+                <SelectTrigger className="h-8 w-[120px] bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)] text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="javascript">JavaScript</SelectItem>
+                  <SelectItem value="python">Python</SelectItem>
+                </SelectContent>
+              </Select>
 
               <Button
-                variant="default"
+                variant="success"
                 size="sm"
-                className="bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-emphasis)]/80 text-white gap-2 h-8"
+                className="gap-2 h-8"
                 onClick={runCode}
                 disabled={isRunning}
               >
@@ -291,18 +294,22 @@ export default function CodingChallengeGenZ() {
           <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
             {/* Mobile Tab Switcher */}
             <div className="lg:hidden flex border-b bg-[var(--gh-canvas)]">
-              <button
+              <Button
+                variant={resultsExpanded ? 'secondary' : 'ghost'}
+                size="sm"
                 onClick={() => setResultsExpanded(true)}
-                className={`flex-1 py-2 px-4 text-xs font-medium ${resultsExpanded ? 'bg-[var(--gh-canvas-subtle)] border-b-2 border-[var(--gh-accent-fg)]' : ''}`}
+                className={`flex-1 rounded-none ${resultsExpanded ? 'border-b-2 border-[var(--gh-accent-fg)]' : ''}`}
               >
                 Description
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={!resultsExpanded ? 'secondary' : 'ghost'}
+                size="sm"
                 onClick={() => setResultsExpanded(false)}
-                className={`flex-1 py-2 px-4 text-xs font-medium ${!resultsExpanded ? 'bg-[var(--gh-canvas-subtle)] border-b-2 border-[var(--gh-accent-fg)]' : ''}`}
+                className={`flex-1 rounded-none ${!resultsExpanded ? 'border-b-2 border-[var(--gh-accent-fg)]' : ''}`}
               >
                 Code Editor
-              </button>
+              </Button>
             </div>
 
             {/* Left Pane - Problem Description (full-width on mobile, 1/3 on desktop) */}
@@ -566,29 +573,31 @@ export default function CodingChallengeGenZ() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row gap-4 mb-8">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--gh-fg-subtle)]" />
-              <input
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
                 type="text"
                 placeholder="Search challenges..."
-                className="w-full bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-fg)]"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4"
               />
             </div>
             <div className="flex items-center gap-2">
               <div className="flex p-1 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md">
                 {(['all', 'easy', 'medium'] as const).map((diff) => (
-                  <button
+                  <Button
                     key={diff}
+                    variant={difficultyFilter === diff ? 'secondary' : 'ghost'}
+                    size="sm"
                     onClick={() => setDifficultyFilter(diff)}
-                    className={`px-4 py-1.5 text-xs font-semibold rounded-sm capitalize transition-all ${
+                    className={`px-4 py-1.5 text-xs font-semibold capitalize ${
                       difficultyFilter === diff 
-                        ? 'bg-[var(--gh-accent-fg)] text-white' 
-                        : 'text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]'
+                        ? 'bg-[var(--gh-accent-fg)] text-white border-transparent' 
+                        : 'text-[var(--gh-fg-muted)]'
                     }`}
                   >
                     {diff}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

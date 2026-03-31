@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MessageCircle, ChevronDown, Loader2 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { Button } from '@/components/unified/Button';
 
 const GISCUS_REPO = import.meta.env.VITE_GISCUS_REPO || 'open-interview/open-interview.github.io';
 const GISCUS_REPO_ID = import.meta.env.VITE_GISCUS_REPO_ID || 'R_kgDOQuSz7g';
@@ -82,7 +83,8 @@ export function GiscusComments({ questionId }: GiscusCommentsProps) {
 
   return (
     <div className="w-full mt-2 pb-16">
-      <button
+      <Button
+        variant="outline"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between gap-2 px-2.5 py-2 bg-gradient-to-r from-muted/40 to-muted/20 hover:from-muted/60 hover:to-muted/40 rounded-lg border border-border/50 transition-all duration-200 group"
       >
@@ -96,7 +98,7 @@ export function GiscusComments({ questionId }: GiscusCommentsProps) {
           </div>
         </div>
         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-      </button>
+      </Button>
 
       {isOpen && (
         <div className="mt-2">

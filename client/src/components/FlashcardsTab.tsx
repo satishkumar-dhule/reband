@@ -160,12 +160,15 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
                   <span className="text-xs uppercase tracking-wider text-[var(--gh-fg-muted)] mb-3">Question</span>
                   <p className="text-lg font-medium flex-1">{currentCard.front}</p>
                   {currentCard.hint && !showHint && (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={(e) => { e.stopPropagation(); setShowHint(true); }}
-                      className="mt-4 flex items-center gap-2 text-sm text-[var(--gh-accent-fg)] hover:underline"
+                      className="mt-4 flex items-center gap-2 text-sm text-[var(--gh-accent-fg)]"
+                      icon={<Eye className="w-4 h-4" />}
                     >
-                      <Eye className="w-4 h-4" /> Show hint
-                    </button>
+                      Show hint
+                    </Button>
                   )}
                 </div>
               </div>

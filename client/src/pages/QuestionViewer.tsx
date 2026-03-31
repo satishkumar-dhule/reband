@@ -28,6 +28,7 @@ import {
   Zap, Target, Flame, Building2
 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { Button, IconButton } from '@/components/unified/Button';
 
 export default function QuestionViewer() {
   const [location, setLocation] = useLocation();
@@ -337,12 +338,13 @@ export default function QuestionViewer() {
         <div className="text-center">
           <h2 className="text-xl font-bold mb-2">Channel not found</h2>
           <p className="text-muted-foreground mb-4">The channel "{channelId}" doesn't exist.</p>
-          <button
+          <Button
             onClick={() => setLocation('/')}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
+            variant="primary"
+            size="md"
           >
             Go Home
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -384,16 +386,17 @@ export default function QuestionViewer() {
           <div className="text-center">
             <h2 className="text-xl font-bold mb-2">No questions found</h2>
             <p className="text-muted-foreground mb-4">Try adjusting your filters.</p>
-            <button
+            <Button
               onClick={() => {
                 setSelectedSubChannel('all');
                 setSelectedDifficulty('all');
                 setSelectedCompany('all');
               }}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
+              variant="primary"
+              size="md"
             >
               Reset Filters
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -461,26 +464,22 @@ export default function QuestionViewer() {
           <div className="flex-1 flex flex-col lg:hidden overflow-hidden">
             {/* Mobile Tabs */}
             <div className="flex border-b border-border bg-background relative z-10">
-              <button
+              <Button
                 onClick={() => setMobileView('question')}
-                className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                  mobileView === 'question'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-muted-foreground'
-                }`}
+                variant={mobileView === 'question' ? 'primary' : 'ghost'}
+                size="md"
+                className="flex-1 rounded-none border-b-2"
               >
                 Question
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setMobileView('answer')}
-                className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                  mobileView === 'answer'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-muted-foreground'
-                }`}
+                variant={mobileView === 'answer' ? 'primary' : 'ghost'}
+                size="md"
+                className="flex-1 rounded-none border-b-2"
               >
                 Answer
-              </button>
+              </Button>
             </div>
             {/* Mobile Content - Swipeable */}
             <div 
@@ -540,9 +539,7 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
     <header className="bg-card/95 backdrop-blur-md border-b border-border shrink-0">
       {/* Main header row */}
       <div className="h-14 flex items-center px-3 sm:px-4 gap-2 sm:gap-3">
-        <button onClick={onBack} className="p-2 hover:bg-muted rounded-lg transition-colors shrink-0">
-          <ChevronLeft className="w-5 h-5" />
-        </button>
+        <IconButton onClick={onBack} variant="ghost" size="sm" aria-label="Go back" icon={<ChevronLeft className="w-5 h-5" />} />
         
         <div className="shrink-0 min-w-0 max-w-[200px] sm:max-w-none">
           <h1 className="font-semibold text-sm sm:text-base leading-tight">{channel.name}</h1>
@@ -571,9 +568,9 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
               label={selectedDifficulty === 'all' ? 'Difficulty' : selectedDifficulty}
               options={[
                 { id: 'all', label: 'All Levels', icon: <Target className="w-3 h-3" /> },
-                { id: 'beginner', label: 'Easy', icon: <Zap className="w-3 h-3 text-emerald-500" /> },
-                { id: 'intermediate', label: 'Medium', icon: <Target className="w-3 h-3 text-amber-500" /> },
-                { id: 'advanced', label: 'Hard', icon: <Flame className="w-3 h-3 text-rose-500" /> },
+                { id: 'beginner', label: 'Easy', icon: <Zap className="w-3 h-3 text-[var(--gh-success-fg)]" /> },
+                { id: 'intermediate', label: 'Medium', icon: <Target className="w-3 h-3 text-[var(--gh-accent-emphasis)]" /> },
+                { id: 'advanced', label: 'Hard', icon: <Flame className="w-3 h-3 text-[var(--gh-danger-fg)]" /> },
               ]}
               selected={selectedDifficulty}
               onSelect={(v) => onFilterChange('diff', v)}
@@ -594,19 +591,16 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
 
         {/* Mobile filter toggle button */}
         {filters && (
-          <button 
+          <IconButton
             onClick={() => setShowMobileFilters(!showMobileFilters)}
-            className={`sm:hidden p-2 rounded-lg transition-colors ${
-              showMobileFilters || hasActiveFilter ? 'bg-primary/15 text-primary' : 'hover:bg-muted'
-            }`}
-          >
-            <ChevronDown className={`w-4 h-4 transition-transform ${showMobileFilters ? 'rotate-180' : ''}`} />
-          </button>
+            variant={showMobileFilters || hasActiveFilter ? 'primary' : 'ghost'}
+            size="sm"
+            aria-label="Toggle filters"
+            icon={<ChevronDown className={`w-4 h-4 transition-transform ${showMobileFilters ? 'rotate-180' : ''}`} />}
+          />
         )}
 
-        <button onClick={onSearch} className="p-2 hover:bg-muted rounded-lg transition-colors shrink-0">
-          <Search className="w-5 h-5" />
-        </button>
+        <IconButton onClick={onSearch} variant="ghost" size="sm" aria-label="Search" icon={<Search className="w-5 h-5" />} />
       </div>
       
       {/* Mobile filters row - collapsible */}
@@ -624,9 +618,9 @@ function Header({ channel, onBack, onSearch, currentIndex, totalQuestions, progr
             label={selectedDifficulty === 'all' ? 'Level' : selectedDifficulty.slice(0, 4)}
             options={[
               { id: 'all', label: 'All Levels', icon: <Target className="w-3 h-3" /> },
-            { id: 'beginner', label: 'Easy', icon: <Zap className="w-3 h-3 text-emerald-500" /> },
-            { id: 'intermediate', label: 'Medium', icon: <Target className="w-3 h-3 text-amber-500" /> },
-            { id: 'advanced', label: 'Hard', icon: <Flame className="w-3 h-3 text-rose-500" /> },
+              { id: 'beginner', label: 'Easy', icon: <Zap className="w-3 h-3 text-[var(--gh-success-fg)]" /> },
+            { id: 'intermediate', label: 'Medium', icon: <Target className="w-3 h-3 text-[var(--gh-accent-emphasis)]" /> },
+            { id: 'advanced', label: 'Hard', icon: <Flame className="w-3 h-3 text-[var(--gh-danger-fg)]" /> },
             ]}
             selected={selectedDifficulty}
             onSelect={(v) => onFilterChange('diff', v)}
@@ -668,30 +662,28 @@ function FilterDropdown({ label, options, selected, onSelect }: FilterDropdownPr
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button 
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-            isActive 
-              ? 'bg-primary/15 text-primary border border-primary/30' 
-              : 'bg-muted/50 hover:bg-muted border border-transparent'
-          }`}
+        <Button
+          variant={isActive ? 'secondary' : 'ghost'}
+          size="sm"
+          className="whitespace-nowrap"
+          icon={<ChevronDown className="w-3 h-3" />}
         >
           {label}
-          <ChevronDown className="w-3 h-3 opacity-60" />
-        </button>
+        </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="min-w-[180px] max-h-[300px] overflow-y-auto bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 p-1.5 z-50"
+          className="min-w-[180px] max-h-[300px] overflow-y-auto bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-lg shadow-lg p-1 z-50"
           sideOffset={6}
         >
           {options.map((opt: any) => (
             <DropdownMenu.Item
               key={opt.id}
               onClick={() => onSelect(opt.id)}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer outline-none text-sm transition-colors ${
+              className={`flex items-center gap-2 px-3 py-2 rounded cursor-pointer outline-none text-sm transition-colors ${
                 selected === opt.id 
-                  ? 'bg-primary/20 text-primary' 
-                  : 'text-white/80 hover:bg-white/10 hover:text-white'
+                  ? 'bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)]' 
+                  : 'text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)]'
               }`}
             >
               {opt.icon}
@@ -713,92 +705,97 @@ function NavigationFooter({ currentIndex, totalQuestions, onPrev, onNext, onShar
     <>
       {/* Mobile: Minimal horizontal pill at bottom center */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none lg:hidden">
-        <div className="pointer-events-auto flex items-center gap-0.5 p-1 bg-black/80 backdrop-blur-xl border border-white/15 rounded-xl shadow-2xl shadow-black/50">
+        <div className="pointer-events-auto flex items-center gap-1 p-1.5 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-xl shadow-lg">
           {/* Previous button */}
-          <button
+          <IconButton
             onClick={onPrev}
             disabled={currentIndex === 0}
-            className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-white/10 transition-all disabled:opacity-20 active:scale-90"
-          >
-            <ChevronLeft className="w-5 h-5 text-white/70" />
-          </button>
+            variant="ghost"
+            size="sm"
+            aria-label="Previous question"
+            icon={<ChevronLeft className="w-5 h-5" />}
+          />
 
           {/* Progress indicator */}
           <div className="flex items-center gap-2 px-3 py-1.5">
-            <div className="relative w-10 h-1 bg-white/15 rounded-full overflow-hidden">
+            <div className="relative w-10 h-1 bg-[var(--gh-border)] rounded-full overflow-hidden">
               <div 
                 className="absolute inset-y-0 left-0 bg-primary rounded-full transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <span className="text-[11px] text-white/50 tabular-nums font-medium min-w-[36px]">
+            <span className="text-[11px] text-[var(--gh-fg-muted)] tabular-nums font-medium min-w-[36px]">
               {currentIndex + 1}/{totalQuestions}
             </span>
           </div>
 
           {/* Next button */}
-          <button
+          <IconButton
             onClick={onNext}
             disabled={currentIndex === totalQuestions - 1}
-            className="w-11 h-11 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-primary/80 transition-all disabled:opacity-20 active:scale-90"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+            variant="primary"
+            size="sm"
+            aria-label="Next question"
+            icon={<ChevronRight className="w-5 h-5" />}
+          />
         </div>
       </div>
 
       {/* Desktop: Horizontal pill at bottom center */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none hidden lg:block">
-        <div className="pointer-events-auto flex items-center gap-1 px-1.5 py-1 bg-black/80 backdrop-blur-xl border border-white/15 rounded-xl shadow-2xl shadow-black/50">
+        <div className="pointer-events-auto flex items-center gap-1 px-1.5 py-1 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-xl shadow-lg">
           {/* Previous button */}
-          <button
+          <IconButton
             onClick={onPrev}
             disabled={currentIndex === 0}
-            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition-all disabled:opacity-20 active:scale-95"
-          >
-            <ChevronLeft className="w-5 h-5 text-white/70" />
-          </button>
+            variant="ghost"
+            size="sm"
+            aria-label="Previous question"
+            icon={<ChevronLeft className="w-5 h-5" />}
+          />
 
           {/* Progress indicator */}
           <div className="flex items-center gap-2 px-3 py-1.5">
-            <div className="relative w-14 h-1 bg-white/15 rounded-full overflow-hidden">
+            <div className="relative w-14 h-1 bg-[var(--gh-border)] rounded-full overflow-hidden">
               <div 
                 className="absolute inset-y-0 left-0 bg-primary rounded-full transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <span className="text-xs text-white/50 tabular-nums font-medium">
+            <span className="text-xs text-[var(--gh-fg-muted)] tabular-nums font-medium">
               {currentIndex + 1}/{totalQuestions}
             </span>
           </div>
 
           {/* Bookmark */}
-          <button
+          <IconButton
             onClick={onToggleMark}
-            className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all active:scale-95 ${
-              isMarked ? 'bg-primary/20 text-primary' : 'hover:bg-white/10 text-white/50'
-            }`}
-          >
-            <Bookmark className={`w-4 h-4 ${isMarked ? 'fill-current' : ''}`} />
-          </button>
+            variant={isMarked ? 'secondary' : 'ghost'}
+            size="sm"
+            aria-label={isMarked ? 'Remove bookmark' : 'Add bookmark'}
+            icon={<Bookmark className={`w-4 h-4 ${isMarked ? 'fill-current' : ''}`} />}
+          />
 
           {/* Share */}
-          <button 
-            onClick={onShare} 
-            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/50 transition-all active:scale-95"
-          >
-            <Share2 className="w-4 h-4" />
-          </button>
+          <IconButton
+            onClick={onShare}
+            variant="ghost"
+            size="sm"
+            aria-label="Share question"
+            icon={<Share2 className="w-4 h-4" />}
+          />
 
           {/* Next button */}
-          <button
+          <Button
             onClick={onNext}
             disabled={currentIndex === totalQuestions - 1}
-            className="flex items-center gap-1.5 h-10 pl-4 pr-3 bg-primary text-white rounded-lg hover:bg-primary/80 transition-all disabled:opacity-20 active:scale-95 text-sm font-medium"
+            variant="primary"
+            size="md"
+            icon={<ChevronRight className="w-4 h-4" />}
+            iconPosition="right"
           >
             Next
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
     </>

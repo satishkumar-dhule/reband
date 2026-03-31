@@ -21,8 +21,8 @@ const PAGES_REPO_OWNER = process.env.PAGES_REPO_OWNER || 'open-interview';
 const PAGES_REPO_NAME = process.env.PAGES_REPO_NAME || 'open-interview.github.io';
 
 const db = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
+  url: 'file:local.db',
+  authToken: undefined,
 });
 
 async function initializeTable() {

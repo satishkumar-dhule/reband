@@ -8,6 +8,7 @@ import { Prism as SyntaxHighlighter, type SyntaxHighlighterProps } from 'react-s
 import { useCodeTheme } from '../hooks/useCodeTheme';
 import { InlineCodeThemeSelector } from './CodeThemeSelector';
 import { Code2, Copy, Check } from 'lucide-react';
+import { Button } from '@/components/unified/Button';
 
 // Language display names
 const LANGUAGE_NAMES: Record<string, string> = {
@@ -124,10 +125,12 @@ export function CodeBlock({
         <div className="flex items-center gap-1">
           {showThemeSelector && <InlineCodeThemeSelector />}
 
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleCopy}
             aria-label={copied ? 'Copied!' : 'Copy code'}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-md transition-all"
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs"
           >
             {copied ? (
               <>
@@ -140,7 +143,7 @@ export function CodeBlock({
                 <span>Copy</span>
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -204,16 +207,18 @@ export function InlineCodeBlock({ code, language = 'text', maxHeight = '400px' }
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
           {displayLanguage}
         </span>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={handleCopy}
-          className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-foreground rounded transition-colors"
+          className="flex items-center gap-1 px-1.5 py-0.5 text-[10px]"
         >
           {copied ? (
             <Check className="w-3 h-3 text-emerald-500" />
           ) : (
             <Copy className="w-3 h-3" />
           )}
-        </button>
+        </Button>
       </div>
       <div className="overflow-auto" style={{ maxHeight }}>
         <SyntaxHighlighter
@@ -269,7 +274,9 @@ export function MinimalCodeBlock({ code, language = 'text' }: MinimalCodeBlockPr
       >
         {code}
       </SyntaxHighlighter>
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={handleCopy}
         className="absolute top-2 right-2 p-1.5 rounded-md bg-background/80 backdrop-blur-sm border border-border/50 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
         aria-label="Copy code"
@@ -279,7 +286,7 @@ export function MinimalCodeBlock({ code, language = 'text' }: MinimalCodeBlockPr
         ) : (
           <Copy className="w-3.5 h-3.5" />
         )}
-      </button>
+      </Button>
     </div>
   );
 }

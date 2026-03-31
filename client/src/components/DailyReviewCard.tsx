@@ -16,6 +16,7 @@ import {
   type SRSStats, type ReviewCard 
 } from '../lib/spaced-repetition';
 import { ProgressRing } from './ProgressRing';
+import { Button } from './unified/Button';
 
 // Event emitter for SRS updates
 const srsUpdateListeners = new Set<() => void>();
@@ -61,22 +62,22 @@ export function DailyReviewCard() {
         animate={{ opacity: 1, y: 0 }}
         className={`rounded-xl border overflow-hidden ${
           hasDueCards 
-            ? 'bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-cyan-500/10 border-purple-500/20' 
+            ? 'bg-gradient-to-br from-[var(--gh-accent-emphasis)]/10 via-blue-500/5 to-cyan-500/10 border-[var(--gh-accent-emphasis)]/20' 
             : 'bg-gradient-to-br from-green-500/10 to-emerald-500/5 border-green-500/20'
         }`}
       >
         {/* Header with Level & Streak - Compact */}
         <div className="px-3 py-2 flex items-center justify-between border-b border-border/30">
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-purple-500/20 rounded-full">
-              <Zap className="w-2.5 h-2.5 text-purple-400" />
-              <span className="text-[10px] font-bold text-purple-400">Lv.{userXP.level}</span>
+            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-[var(--gh-accent-emphasis)]/20 rounded-full">
+              <Zap className="w-2.5 h-2.5 text-[var(--gh-accent-emphasis)]" />
+              <span className="text-[10px] font-bold text-[var(--gh-accent-emphasis)]">Lv.{userXP.level}</span>
             </div>
             <span className="text-[10px] text-muted-foreground">{userXP.totalXP} XP</span>
           </div>
           {stats.reviewStreak > 0 && (
             <motion.div 
-              className="flex items-center gap-1 text-orange-500 motion-reduce:animate-none"
+              className="flex items-center gap-1 text-[var(--gh-danger-fg)] motion-reduce:animate-none"
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
             >
@@ -87,9 +88,10 @@ export function DailyReviewCard() {
         </div>
 
         {/* Main Content - Compact */}
-        <button
+        <Button
+          variant="ghost"
           onClick={() => setLocation('/review')}
-          className="w-full p-3 text-left hover:bg-white/5 transition-colors"
+          className="w-full justify-start h-auto p-3 text-left font-normal"
         >
           <div className="flex items-center gap-3">
             {/* Progress Ring - Smaller */}
@@ -97,12 +99,12 @@ export function DailyReviewCard() {
               progress={hasDueCards ? todayProgress : 100} 
               size={56}
               strokeWidth={5}
-              color={hasDueCards ? '#a855f7' : '#22c55e'}
-              bgColor={hasDueCards ? 'rgba(168, 85, 247, 0.15)' : 'rgba(34, 197, 94, 0.15)'}
+              color={hasDueCards ? 'var(--gh-accent-emphasis)' : 'var(--gh-success-fg, #22c55e)'}
+              bgColor={hasDueCards ? 'color-mix(in srgb, var(--gh-accent-emphasis) 15%, transparent)' : 'rgba(34, 197, 94, 0.15)'}
             >
               {hasDueCards ? (
                 <div className="text-center">
-                  <div className="text-lg font-bold text-purple-500">{stats.dueToday}</div>
+                  <div className="text-lg font-bold text-[var(--gh-accent-emphasis)]">{stats.dueToday}</div>
                   <div className="text-[8px] text-muted-foreground">due</div>
                 </div>
               ) : (
@@ -113,8 +115,8 @@ export function DailyReviewCard() {
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <Brain className={`w-3.5 h-3.5 ${hasDueCards ? 'text-purple-500' : 'text-green-500'}`} />
-                <span className={`text-xs font-semibold ${hasDueCards ? 'text-purple-500' : 'text-green-500'}`}>
+                <Brain className={`w-3.5 h-3.5 ${hasDueCards ? 'text-[var(--gh-accent-emphasis)]' : 'text-green-500'}`} />
+                <span className={`text-xs font-semibold ${hasDueCards ? 'text-[var(--gh-accent-emphasis)]' : 'text-green-500'}`}>
                   {hasDueCards ? 'Ready to Review' : 'All Caught Up!'}
                 </span>
               </div>
@@ -145,9 +147,9 @@ export function DailyReviewCard() {
               )}
             </div>
 
-            <ChevronRight className={`w-4 h-4 ${hasDueCards ? 'text-purple-500' : 'text-green-500'}`} />
+            <ChevronRight className={`w-4 h-4 ${hasDueCards ? 'text-[var(--gh-accent-emphasis)]' : 'text-green-500'}`} />
           </div>
-        </button>
+        </Button>
 
         {/* Stats Footer - Compact 2x2 grid */}
         <div className="px-3 py-2 border-t border-border/30 grid grid-cols-4 gap-1 text-center">

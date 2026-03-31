@@ -8,8 +8,8 @@ import path from 'path';
 
 const OUTPUT_DIR = 'public/data';
 
-const url = process.env.TURSO_DATABASE_URL_RO || process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN_RO || process.env.TURSO_AUTH_TOKEN;
+const url = 'file:local.db';
+const authToken = undefined;
 
 if (!url) {
   console.error('❌ Missing TURSO_DATABASE_URL environment variable');

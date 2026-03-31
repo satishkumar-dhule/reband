@@ -25,7 +25,7 @@ export function TopBar({ onMenuClick, onSearchClick, title, showBackButton }: To
           <button
             onClick={onMenuClick}
             aria-label="Menu"
-            className="p-2 hover:bg-muted rounded-lg transition-colors lg:hidden"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center p-2 hover:bg-muted rounded-lg transition-colors lg:hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <Menu className="w-5 h-5" />
           </button>

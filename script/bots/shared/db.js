@@ -9,12 +9,8 @@ let dbClient = null;
 
 export function getDb() {
   if (!dbClient) {
-    const url = process.env.TURSO_DATABASE_URL || process.env.TURSO_DATABASE_URL_RO;
-    const authToken = process.env.TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN_RO;
-    
-    if (!url) {
-      throw new Error('TURSO_DATABASE_URL is required (set TURSO_DATABASE_URL or TURSO_DATABASE_URL_RO)');
-    }
+    const url = 'file:local.db';
+    const authToken = undefined;
     
     dbClient = createClient({
       url,

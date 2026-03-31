@@ -22,20 +22,33 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/setup-bot
 
+      - name: Validate Input
+        run: |
+          QUESTION="${{ inputs.question }}"
+          if [ -z "$QUESTION" ]; then
+            echo "❌ Question cannot be empty"
+            exit 1
+          fi
+          if [ ${#QUESTION} -lt 10 ]; then
+            echo "❌ Question must be at least 10 characters"
+            exit 1
+          fi
+          if [ ${#QUESTION} -gt 5000 ]; then
+            echo "❌ Question must be less than 5000 characters"
+            exit 1
+          fi
+          echo "✅ Input validated"
+
       - name: Process and add question
         run: node script/add-random-question.js
         env:
           INPUT_QUESTION: ${{ inputs.question }}
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           CI: 'true'
 
       - name: Regenerate RSS feed
         run: node script/generate-rss.js
         env:
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
 
       - name: Trigger deploy
         uses: actions/github-script@v7

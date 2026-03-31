@@ -6,6 +6,7 @@
 import { Coins } from 'lucide-react';
 import { useCredits } from '../context/CreditsContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button, MotionButton } from './unified/Button';
 
 interface CreditsDisplayProps {
   compact?: boolean;
@@ -17,31 +18,36 @@ export function CreditsDisplay({ compact = false, onClick }: CreditsDisplayProps
 
   if (compact) {
     return (
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={onClick}
-        className="flex items-center gap-1 px-2 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full hover:bg-amber-500/20 transition-colors"
+        className="flex items-center gap-1 px-2 py-1 border rounded-full"
+        style={{ backgroundColor: 'color-mix(in srgb, var(--gh-accent-emphasis) 10%, transparent)', borderColor: 'color-mix(in srgb, var(--gh-accent-emphasis) 20%, transparent)' }}
       >
-        <Coins className="w-3.5 h-3.5 text-amber-500" />
-        <span className="text-xs font-bold text-amber-500">{formatCredits(balance)}</span>
-      </button>
+        <Coins className="w-3.5 h-3.5" style={{ color: 'var(--gh-accent-emphasis)' }} />
+        <span className="text-xs font-bold" style={{ color: 'var(--gh-accent-emphasis)' }}>{formatCredits(balance)}</span>
+      </Button>
     );
   }
 
   return (
-    <motion.button
+    <MotionButton
+      variant="ghost"
       onClick={onClick}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-lg hover:from-amber-500/20 hover:to-yellow-500/20 transition-colors"
+      className="flex items-center gap-2 px-3 py-1.5 border rounded-lg"
+      style={{ backgroundColor: 'color-mix(in srgb, var(--gh-accent-emphasis) 10%, transparent)', borderColor: 'color-mix(in srgb, var(--gh-accent-emphasis) 20%, transparent)' }}
     >
-      <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center">
-        <Coins className="w-3.5 h-3.5 text-amber-500" />
+      <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'color-mix(in srgb, var(--gh-accent-emphasis) 20%, transparent)' }}>
+        <Coins className="w-3.5 h-3.5" style={{ color: 'var(--gh-accent-emphasis)' }} />
       </div>
       <div className="text-left">
-        <div className="text-xs text-muted-foreground">Credits</div>
-        <div className="text-sm font-bold text-amber-500">{formatCredits(balance)}</div>
+        <div className="text-xs" style={{ color: 'var(--gh-fg-muted)' }}>Credits</div>
+        <div className="text-sm font-bold" style={{ color: 'var(--gh-accent-emphasis)' }}>{formatCredits(balance)}</div>
       </div>
-    </motion.button>
+    </MotionButton>
   );
 }
 

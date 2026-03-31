@@ -14,6 +14,9 @@ import {
 import { SEOHead } from '../components/SEOHead';
 import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrapper';
 import { allChannelsConfig } from '../lib/channels-config';
+import { Button } from '@/components/unified/Button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 
 interface HistoryEntry {
   questionId: string;
@@ -170,7 +173,7 @@ export default function AnswerHistory() {
             className="mb-8"
           >
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--gh-accent-emphasis)] to-[var(--gh-success-emphasis)] flex items-center justify-center">
                 <History className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -223,51 +226,50 @@ export default function AnswerHistory() {
               {/* Search */}
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <Input
                     type="text"
                     placeholder="Search by question ID or channel..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="pl-10"
                   />
                 </div>
               </div>
 
               {/* Channel Filter */}
-              <select
-                value={selectedChannel}
-                onChange={(e) => setSelectedChannel(e.target.value)}
-                className="px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="all">All Channels ({history.length})</option>
-                {channels.map(channel => (
-                  <option key={channel.id} value={channel.id}>
-                    {channel.name} ({channel.count})
-                  </option>
-                ))}
-              </select>
+              <Select value={selectedChannel} onValueChange={setSelectedChannel}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="All Channels" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Channels ({history.length})</SelectItem>
+                  {channels.map(channel => (
+                    <SelectItem key={channel.id} value={channel.id}>
+                      {channel.name} ({channel.count})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               {/* Date Range Filter */}
-              <select
-                value={dateRange}
-                onChange={(e) => setDateRange(e.target.value as any)}
-                className="px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="all">All Time</option>
-                <option value="today">Today</option>
-                <option value="week">Last 7 Days</option>
-                <option value="month">Last 30 Days</option>
-              </select>
+              <Select value={dateRange} onValueChange={(v) => setDateRange(v as typeof dateRange)}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="All Time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Time</SelectItem>
+                  <SelectItem value="today">Today</SelectItem>
+                  <SelectItem value="week">Last 7 Days</SelectItem>
+                  <SelectItem value="month">Last 30 Days</SelectItem>
+                </SelectContent>
+              </Select>
 
               {/* Export Button */}
-              <button
-                onClick={exportHistory}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
-              >
+              <Button variant="outline" onClick={exportHistory}>
                 <Download className="w-4 h-4" />
                 Export
-              </button>
+              </Button>
             </div>
           </motion.div>
 

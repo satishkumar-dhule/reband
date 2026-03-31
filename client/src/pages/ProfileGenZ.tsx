@@ -12,6 +12,9 @@ import {
   ChevronLeft, Home, Coins, Gift, History, Mic
 } from 'lucide-react';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { Button, IconButton } from '@/components/unified/Button';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 
 const achievements = [
   { id: 1, name: 'First Steps', desc: 'Complete your first question', icon: '🌟', achieved: true },
@@ -154,9 +157,13 @@ export default function ProfileGenZ() {
                   <div className="w-full aspect-square rounded-full border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-center overflow-hidden">
                     <User className="w-1/2 h-1/2 text-[var(--gh-fg-muted)]" />
                   </div>
-                  <button className="absolute bottom-4 right-4 p-2 rounded-full border border-[var(--gh-border)] bg-[var(--gh-canvas)] shadow-sm hover:bg-[var(--gh-canvas-subtle)] transition-colors">
-                    <Settings className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                  </button>
+                  <IconButton
+                    icon={<Settings className="w-4 h-4 text-[var(--gh-fg-muted)]" />}
+                    aria-label="Settings"
+                    size="sm"
+                    rounded="full"
+                    className="absolute bottom-4 right-4"
+                  />
                 </div>
 
                 <div className="mb-6">
@@ -164,9 +171,9 @@ export default function ProfileGenZ() {
                   <p className="text-xl text-[var(--gh-fg-muted)] font-light">Dev Enthusiast</p>
                 </div>
 
-                <button className="w-full gh-btn gh-btn-secondary justify-center mb-6">
+                <Button variant="secondary" className="w-full mb-6">
                   Edit profile
-                </button>
+                </Button>
 
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center gap-2 text-sm text-[var(--gh-fg)]">
@@ -222,21 +229,22 @@ export default function ProfileGenZ() {
                     </h4>
                     <div className="flex gap-1">
                       <label htmlFor="coupon-code" className="sr-only">Coupon code</label>
-                      <input
+                      <Input
                         id="coupon-code"
                         type="text"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                         placeholder="Enter code"
-                        className="flex-1 px-2 py-1.5 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md text-xs placeholder:text-[var(--gh-fg-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--gh-accent-fg)]"
+                        className="flex-1 text-xs"
                       />
-                      <button
+                      <Button
                         type="submit"
-                        disabled={isSubmitting}
-                        className="px-3 py-1.5 bg-[var(--gh-accent-fg)] text-white text-xs font-semibold rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
+                        variant="primary"
+                        size="sm"
+                        loading={isSubmitting}
                       >
                         Apply
-                      </button>
+                      </Button>
                     </div>
                     {couponMessage && (
                       <p className={`text-xs mt-1 ${couponMessage.type === 'success' ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
@@ -288,16 +296,16 @@ export default function ProfileGenZ() {
               {/* Main Content */}
               <div className="flex-1 min-w-0">
                 <nav className="flex gap-4 border-b border-[var(--gh-border)] mb-6 overflow-x-auto">
-                  <button className="px-4 py-2 text-sm font-semibold border-b-2 border-[var(--gh-accent-fg)] text-[var(--gh-fg)] whitespace-nowrap">
+                  <Button variant="primary" size="sm" className="border-b-2 border-[var(--gh-accent-fg)] rounded-none bg-transparent text-[var(--gh-fg)] hover:bg-transparent">
                     Overview
-                  </button>
-                  <button className="px-4 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] whitespace-nowrap">
+                  </Button>
+                  <Button variant="ghost" size="sm" className="rounded-none text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]">
                     Learning Paths
-                  </button>
-                  <button className="px-4 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] whitespace-nowrap flex items-center gap-2">
+                  </Button>
+                  <Button variant="ghost" size="sm" className="rounded-none text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]">
                     Achievements
                     <span className="bg-[var(--gh-neutral-subtle)] text-[var(--gh-fg-muted)] text-xs px-2 py-0.5 rounded-full">{achievedCount}</span>
-                  </button>
+                  </Button>
                 </nav>
 
                 <div className="space-y-8">
@@ -363,12 +371,11 @@ export default function ProfileGenZ() {
                           <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Shuffle Questions</h3>
                           <p className="text-xs text-[var(--gh-fg-muted)]">Randomize question order</p>
                         </div>
-                        <button 
-                          onClick={toggleShuffleQuestions}
-                          className={`w-10 h-5 rounded-full transition-colors relative ${preferences.shuffleQuestions ? 'bg-[var(--gh-success-emphasis)]' : 'bg-[var(--gh-border)]'}`}
-                        >
-                          <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${preferences.shuffleQuestions ? 'left-6' : 'left-1'}`} />
-                        </button>
+                        <Switch
+                          checked={preferences.shuffleQuestions}
+                          onCheckedChange={toggleShuffleQuestions}
+                          aria-label="Toggle shuffle questions"
+                        />
                       </div>
 
                       <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
@@ -376,12 +383,11 @@ export default function ProfileGenZ() {
                           <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Prioritize Unvisited</h3>
                           <p className="text-xs text-[var(--gh-fg-muted)]">Show new questions first</p>
                         </div>
-                        <button 
-                          onClick={togglePrioritizeUnvisited}
-                          className={`w-10 h-5 rounded-full transition-colors relative ${preferences.prioritizeUnvisited ? 'bg-[var(--gh-success-emphasis)]' : 'bg-[var(--gh-border)]'}`}
-                        >
-                          <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${preferences.prioritizeUnvisited ? 'left-6' : 'left-1'}`} />
-                        </button>
+                        <Switch
+                          checked={preferences.prioritizeUnvisited}
+                          onCheckedChange={togglePrioritizeUnvisited}
+                          aria-label="Toggle prioritize unvisited"
+                        />
                       </div>
 
                       <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
@@ -389,12 +395,11 @@ export default function ProfileGenZ() {
                           <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Hide Certifications</h3>
                           <p className="text-xs text-[var(--gh-fg-muted)]">Hide certification paths</p>
                         </div>
-                        <button 
-                          onClick={toggleHideCertifications}
-                          className={`w-10 h-5 rounded-full transition-colors relative ${preferences.hideCertifications ? 'bg-[var(--gh-success-emphasis)]' : 'bg-[var(--gh-border)]'}`}
-                        >
-                          <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${preferences.hideCertifications ? 'left-6' : 'left-1'}`} />
-                        </button>
+                        <Switch
+                          checked={preferences.hideCertifications}
+                          onCheckedChange={toggleHideCertifications}
+                          aria-label="Toggle hide certifications"
+                        />
                       </div>
                     </div>
                   </section>

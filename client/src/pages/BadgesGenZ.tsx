@@ -5,22 +5,22 @@ import { SEOHead } from '../components/SEOHead';
 import { useAchievements } from '../hooks/use-achievements';
 import { Trophy, Lock, Award, Home } from 'lucide-react';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
-import { Button } from "../components/ui/button";
+import { Button } from '@/components/unified/Button';
 
 const tierColors: Record<string, string> = {
-  bronze: 'text-orange-600',
-  silver: 'text-slate-400',
-  gold: 'text-yellow-500',
-  platinum: 'text-violet-400',
-  diamond: 'text-cyan-400',
+  bronze: 'text-[var(--gh-tier-bronze)]',
+  silver: 'text-[var(--gh-tier-silver)]',
+  gold: 'text-[var(--gh-tier-gold)]',
+  platinum: 'text-[var(--gh-tier-platinum)]',
+  diamond: 'text-[var(--gh-tier-diamond)]',
 };
 
 const tierBg: Record<string, string> = {
-  bronze: 'bg-orange-500/10',
-  silver: 'bg-slate-500/10',
-  gold: 'bg-yellow-500/10',
-  platinum: 'bg-violet-500/10',
-  diamond: 'bg-cyan-500/10',
+  bronze: 'bg-[var(--gh-tier-bronze-subtle)]',
+  silver: 'bg-[var(--gh-tier-silver-subtle)]',
+  gold: 'bg-[var(--gh-tier-gold-subtle)]',
+  platinum: 'bg-[var(--gh-tier-platinum-subtle)]',
+  diamond: 'bg-[var(--gh-tier-diamond-subtle)]',
 };
 
 export default function BadgesGenZ() {
@@ -115,28 +115,24 @@ export default function BadgesGenZ() {
 
             {/* Filter Tabs */}
             <div className="flex border-b border-[var(--gh-border)] mb-6 overflow-x-auto gap-2">
-              <button
+              <Button
+                variant={!selectedCategory ? 'primary' : 'ghost'}
+                size="sm"
                 onClick={() => setSelectedCategory(null)}
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                  !selectedCategory
-                    ? 'border-[var(--gh-accent-fg)] text-[var(--gh-fg)]'
-                    : 'border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]'
-                }`}
+                className="border-b-2 rounded-none px-4 py-2 h-auto"
               >
                 All Badges
-              </button>
+              </Button>
               {categories.map(cat => (
-                <button
+                <Button
                   key={cat}
+                  variant={selectedCategory === cat ? 'primary' : 'ghost'}
+                  size="sm"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap capitalize ${
-                    selectedCategory === cat
-                      ? 'border-[var(--gh-accent-fg)] text-[var(--gh-fg)]'
-                      : 'border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]'
-                  }`}
+                  className="border-b-2 rounded-none px-4 py-2 h-auto capitalize"
                 >
                   {cat}
-                </button>
+                </Button>
               ))}
             </div>
 
@@ -206,7 +202,7 @@ export default function BadgesGenZ() {
                 <p className="text-[var(--gh-fg-muted)] mb-6">Start learning to unlock your first achievement!</p>
                 <Button 
                   onClick={() => setLocation('/channels')}
-                  className="bg-[var(--gh-success-emphasis)] text-white hover:bg-[var(--gh-success-hover)]"
+                  variant="success"
                 >
                   Browse Channels
                 </Button>

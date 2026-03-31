@@ -43,6 +43,8 @@ type WebLLMMessageParamType = WebLLMMessageParam;
 import { useUnifiedToast } from '../hooks/use-unified-toast';
 import { SITEMAP_RAG, searchRoutes, findRoutesByKeywords, getRouteByPath } from '../data/sitemap-rag';
 import { useSpeechRecognitionPTT, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
+import { Button } from './unified/Button';
+import { Input } from './ui/input';
 
 interface AICompanionProps {
   pageContent?: {
@@ -1758,23 +1760,28 @@ Assistant (in ${languageName}):`;
                 </div>
                 <div className="flex items-center gap-2">
                   {(isGenerating || isSpeaking) && (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={interruptGeneration}
-                      className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors"
+                      className="p-2 bg-red-500/20 hover:bg-red-500/30"
                       title="Interrupt"
-                    >
-                      <X className="w-4 h-4 text-red-500" />
-                    </button>
+                      icon={<X className="w-4 h-4 text-red-500" />}
+                    />
                   )}
                   {isSpeaking && (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={stopSpeaking}
-                      className="p-2 hover:bg-muted rounded-lg transition-colors"
-                    >
-                      <VolumeX className="w-4 h-4" />
-                    </button>
+                      className="p-2"
+                      title="Stop speaking"
+                      icon={<VolumeX className="w-4 h-4" />}
+                    />
                   )}
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={toggleVoiceMode}
                     className={`p-2 rounded-lg transition-colors ${
                       voiceMode
@@ -1782,27 +1789,32 @@ Assistant (in ${languageName}):`;
                         : 'hover:bg-muted'
                     }`}
                     title={voiceMode ? 'Exit Voice Mode' : 'Enter Voice Mode'}
-                  >
-                    {voiceMode ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-                  </button>
-                  <button
+                    icon={voiceMode ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setShowSettings(!showSettings)}
-                    className="p-2 hover:bg-muted rounded-lg transition-colors"
-                  >
-                    <Settings className="w-4 h-4" />
-                  </button>
-                  <button
+                    className="p-2"
+                    title="Settings"
+                    icon={<Settings className="w-4 h-4" />}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setIsMinimized(!isMinimized)}
-                    className="p-2 hover:bg-muted rounded-lg transition-colors"
-                  >
-                    {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
-                  </button>
-                  <button
+                    className="p-2"
+                    title={isMinimized ? "Expand" : "Minimize"}
+                    icon={isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setIsOpen(false)}
-                    className="p-2 hover:bg-muted rounded-lg transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                    className="p-2"
+                    title="Close"
+                    icon={<X className="w-4 h-4" />}
+                  />
                 </div>
               </div>
             </div>
@@ -1824,17 +1836,15 @@ Assistant (in ${languageName}):`;
                           <label className="text-xs font-semibold mb-1 block">AI Provider</label>
                           <div className="grid grid-cols-4 gap-1">
                             {(['browser', 'groq', 'gemini', 'openai'] as AIProvider[]).map(p => (
-                              <button
+                              <Button
                                 key={p}
+                                variant={provider === p ? "primary" : "outline"}
+                                size="xs"
                                 onClick={() => setProvider(p)}
-                                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                                  provider === p
-                                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                                    : 'bg-muted hover:bg-muted/80'
-                                }`}
+                                className="px-2 py-1"
                               >
                                 {p === 'browser' ? '🌐 Browser' : p.charAt(0).toUpperCase() + p.slice(1)}
-                              </button>
+                              </Button>
                             ))}
                           </div>
                           <p className="text-xs text-muted-foreground mt-1">
@@ -1849,7 +1859,7 @@ Assistant (in ${languageName}):`;
                         {provider !== 'browser' && (
                           <div>
                             <label className="text-xs font-semibold mb-1 block">API Key</label>
-                            <input
+                            <Input
                               type="password"
                               value={provider === 'gemini' ? geminiKey : 
                                      provider === 'openai' ? openaiKey :
@@ -1864,7 +1874,6 @@ Assistant (in ${languageName}):`;
                                 else setHuggingfaceKey(e.target.value);
                               }}
                               placeholder="Enter API key"
-                              className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-primary"
                             />
                           </div>
                         )}
@@ -1890,17 +1899,15 @@ Assistant (in ${languageName}):`;
                           <label className="text-xs font-semibold mb-1 block">Voice Provider (TTS)</label>
                           <div className="grid grid-cols-3 gap-1">
                             {(['webspeech', 'elevenlabs', 'openai'] as TTSProvider[]).map(p => (
-                              <button
+                              <Button
                                 key={p}
+                                variant={ttsProvider === p ? "primary" : "outline"}
+                                size="xs"
                                 onClick={() => setTTSProvider(p)}
-                                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-                                  ttsProvider === p
-                                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
-                                    : 'bg-muted hover:bg-muted/80'
-                                }`}
+                                className="px-2 py-1"
                               >
                                 {p === 'webspeech' ? 'Browser' : p.charAt(0).toUpperCase() + p.slice(1)}
-                              </button>
+                              </Button>
                             ))}
                           </div>
                           <p className="text-xs text-muted-foreground mt-1">
@@ -1989,12 +1996,14 @@ Assistant (in ${languageName}):`;
                           </label>
                         </div>
 
-                        <button
+                        <Button
+                          variant="primary"
+                          size="sm"
                           onClick={saveSettings}
-                          className="w-full px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                          className="w-full"
                         >
                           Save Settings
-                        </button>
+                        </Button>
                       </div>
                     </motion.div>
                   )}
@@ -2045,16 +2054,18 @@ Assistant (in ${languageName}):`;
                       )}
                       <div className="grid grid-cols-2 gap-2">
                         {quickActions.map((action) => (
-                          <button
+                          <Button
                             key={action.label}
+                            variant="outline"
+                            size="sm"
                             onClick={() => {
                               setInputMessage(action.prompt);
                               inputRef.current?.focus();
                             }}
-                            className="px-3 py-2 bg-muted hover:bg-muted/80 rounded-lg text-xs font-medium transition-colors"
+                            className="px-3 py-2"
                           >
                             {action.label}
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     </div>
@@ -2080,20 +2091,22 @@ Assistant (in ${languageName}):`;
                             <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                             {message.role === 'assistant' && (
                               <div className="flex items-center gap-2 mt-2">
-                                <button
+                                <Button
+                                  variant="ghost"
+                                  size="xs"
                                   onClick={() => speakMessageWithTTS(message.content)}
-                                  className="p-1 hover:bg-background/50 rounded transition-colors"
+                                  className="p-1"
                                   title="Speak"
-                                >
-                                  <Volume2 className="w-3 h-3" />
-                                </button>
-                                <button
+                                  icon={<Volume2 className="w-3 h-3" />}
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="xs"
                                   onClick={() => copyMessage(message.content, message.id)}
-                                  className="p-1 hover:bg-background/50 rounded transition-colors"
+                                  className="p-1"
                                   title="Copy"
-                                >
-                                  {copied === message.id ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                                </button>
+                                  icon={copied === message.id ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                                />
                               </div>
                             )}
                           </div>
@@ -2147,16 +2160,18 @@ Assistant (in ${languageName}):`;
                     </div>
                   )}
                   {messages.length > 0 && (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={clearConversation}
-                      className="w-full mb-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-2"
+                      className="w-full mb-2 flex items-center justify-center gap-2"
+                      icon={<Trash2 className="w-3 h-3" />}
                     >
-                      <Trash2 className="w-3 h-3" />
                       Clear conversation
-                    </button>
+                    </Button>
                   )}
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       ref={inputRef}
                       type="text"
                       value={inputMessage}
@@ -2164,20 +2179,17 @@ Assistant (in ${languageName}):`;
                       onKeyPress={(e) => e.key === 'Enter' && !voiceMode && sendMessage()}
                       placeholder={voiceMode ? "Hold SPACEBAR to speak..." : "Ask me anything..."}
                       disabled={isGenerating || voiceMode}
-                      className="flex-1 px-4 py-2 bg-background border border-border rounded-full text-sm focus:outline-none focus:border-primary disabled:opacity-50"
+                      className="flex-1 rounded-full"
                     />
                     {!voiceMode && (
-                      <button
+                      <Button
+                        variant="primary"
+                        size="sm"
                         onClick={sendMessage}
                         disabled={!inputMessage.trim() || isGenerating}
-                        className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isGenerating ? (
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                          <Send className="w-5 h-5" />
-                        )}
-                      </button>
+                        className="p-2 rounded-full"
+                        icon={isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                      />
                     )}
                     {voiceMode && (
                       <div className={`p-2 rounded-full ${

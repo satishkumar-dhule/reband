@@ -14,6 +14,7 @@ import { channels, getQuestions, getAllQuestions, getQuestionDifficulty } from '
 import { SEOHead } from '../components/SEOHead';
 import { GitHubAnalytics } from '../components/GitHubAnalytics';
 import { AchievementGrid, LevelDisplay } from '../components/unified';
+import { Button } from '../components/unified/Button';
 import {
   Trophy, Flame, Zap, Target, Activity, TrendingUp, 
   ChevronRight, BarChart2, Calendar
@@ -210,13 +211,15 @@ export default function StatsRedesigned() {
                 <Trophy className="w-5 h-5 text-[var(--gh-accent-fg)]" />
                 Your Achievements
               </h3>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setLocation('/badges')}
-                className="text-sm text-[var(--gh-accent-fg)] hover:underline flex items-center gap-1"
+                icon={<ChevronRight className="w-4 h-4" />}
+                iconPosition="right"
               >
                 View All
-                <ChevronRight className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
             
             {/* Show unlocked achievements */}
@@ -301,17 +304,14 @@ export default function StatsRedesigned() {
               </h3>
               <div className="flex gap-1 bg-[var(--gh-canvas-inset)] p-1 rounded-lg">
                 {(['30', '90', '365'] as const).map((r) => (
-                  <button
+                  <Button
                     key={r}
+                    variant={timeRange === r ? 'primary' : 'ghost'}
+                    size="sm"
                     onClick={() => setTimeRange(r)}
-                    className={`px-3 py-1 text-xs rounded-md transition-colors ${
-                      timeRange === r 
-                        ? 'bg-[var(--gh-accent-emphasis)] text-[var(--gh-fg-on-emphasis)]' 
-                        : 'text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]'
-                    }`}
                   >
                     {r === '365' ? '1Y' : r + 'D'}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

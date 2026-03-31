@@ -15,6 +15,8 @@ import { useProgress } from '../hooks/use-progress';
 import { useIsMobile } from '../hooks/use-mobile';
 import { SEOHead } from '../components/SEOHead';
 import { loadTests } from '../lib/tests';
+import { Input } from '@/components/ui/input';
+import { Button, IconButton } from '@/components/unified/Button';
 import {
   Search, Check, Plus,
   Cpu, Terminal, Layout, Database, Activity, GitBranch, Server,
@@ -138,13 +140,13 @@ export default function AllChannelsRedesigned() {
 
             {/* Search - directly below title */}
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+              <Input
                 type="text"
                 placeholder="Search channels..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-muted/50 border border-border rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="pl-12"
               />
             </div>
           </div>
@@ -153,33 +155,24 @@ export default function AllChannelsRedesigned() {
           <div className="space-y-4">
             {/* Category Pills */}
             <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
-              <button
+              <Button
                 onClick={() => setSelectedCategory(null)}
-                className={`
-                  px-4 py-2 text-sm font-medium rounded-full whitespace-nowrap transition-all flex-shrink-0
-                  ${!selectedCategory 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }
-                `}
+                variant={!selectedCategory ? 'primary' : 'ghost'}
+                size="sm"
               >
                 All Channels
-              </button>
+              </Button>
               {categories.map(cat => (
-                <button
+                <Button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`
-                    px-4 py-2 text-sm font-medium rounded-full whitespace-nowrap transition-all flex items-center gap-2 flex-shrink-0
-                    ${selectedCategory === cat.id 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                    }
-                  `}
+                  variant={selectedCategory === cat.id ? 'primary' : 'ghost'}
+                  size="sm"
+                  className="flex items-center gap-2"
                 >
                   {iconMap[cat.icon]}
                   {cat.name}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -309,21 +302,16 @@ function ChannelCard({
         }`}>
           {iconMap[channel.icon] || <Cpu className="w-5 h-5" />}
         </div>
-        <button
+        <IconButton
           onClick={(e) => {
             e.stopPropagation();
             onToggle();
           }}
-          className={`
-            p-2 rounded-full transition-all
-            ${isSubscribed 
-              ? 'bg-primary text-primary-foreground' 
-              : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary'
-            }
-          `}
+          variant={isSubscribed ? 'primary' : 'ghost'}
+          size="sm"
         >
           {isSubscribed ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-        </button>
+        </IconButton>
       </div>
 
       <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">

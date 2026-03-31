@@ -14,6 +14,7 @@ export interface Question {
   answer: string;
   explanation: string;
   diagram?: string;
+  diagramCaption?: string; // Optional caption for diagram
   tags: string[];
   difficulty: Difficulty;
   channel: string;

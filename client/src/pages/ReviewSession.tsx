@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrapper';
+import { Button, IconButton } from '@/components/unified/Button';
 import { 
   getDueCards, recordReview, getSRSStats,
   getMasteryLabel, getMasteryColor, getMasteryEmoji, getNextReviewPreview,
@@ -146,6 +147,7 @@ function DiagramSection({ diagram }: { diagram: string }) {
         <EnhancedMermaid 
           chart={diagram} 
           onRenderResult={(success) => setRenderSuccess(success)}
+          caption="Visual explanation"
         />
       </div>
     </div>
@@ -329,12 +331,13 @@ export default function ReviewSession() {
       <div className="min-h-screen bg-background flex flex-col">
         {/* Header */}
         <header className="h-14 bg-card border-b border-border flex items-center px-4 gap-4 shrink-0">
-          <button 
-            onClick={() => setLocation('/')} 
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+          <IconButton 
+            icon={<ChevronLeft className="w-5 h-5" />}
+            onClick={() => setLocation('/')}
+            aria-label="Go back"
+            variant="ghost"
+            size="sm"
+          />
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
@@ -355,13 +358,13 @@ export default function ReviewSession() {
           </div>
 
           {sessionState !== 'completed' && (
-            <button
+            <IconButton
+              icon={<ChevronRight className="w-5 h-5" />}
               onClick={handleSkip}
-              className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground"
-              title="Skip this card"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+              aria-label="Skip this card"
+              variant="ghost"
+              size="sm"
+            />
           )}
         </header>
 
@@ -592,14 +595,16 @@ export default function ReviewSession() {
                 <div className="shrink-0 border-t border-border bg-card p-4">
                   <div className="max-w-3xl mx-auto">
                     {sessionState === 'reviewing' ? (
-                      <button
+                      <Button
                         onClick={handleReveal}
-                        className="w-full py-3 bg-[var(--gh-done-emphasis)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-colors"
+                        variant="primary"
+                        fullWidth
+                        size="lg"
+                        icon={<Eye className="w-5 h-5" />}
                       >
-                        <Eye className="w-5 h-5" />
                         Show Answer
                         <span className="text-xs opacity-70 ml-2">(Space)</span>
-                      </button>
+                      </Button>
                     ) : (
                       <RatingButtons card={currentCard} onRate={handleRate} />
                     )}
@@ -650,11 +655,11 @@ function RatingButtons({ card, onRate }: { card: ReviewCard; onRate: (rating: Co
   const previews = getNextReviewPreview(card);
   const { config } = useCredits();
 
-  const buttons: { rating: ConfidenceRating; label: string; preview: string; icon: React.ReactNode; color: string; key: string; credits: number }[] = [
-    { rating: 'again', label: 'Again', preview: previews.again, icon: <RotateCcw className="w-4 h-4" />, color: 'bg-[var(--gh-danger-emphasis)] hover:opacity-90', key: '1', credits: config.SRS_AGAIN },
-    { rating: 'hard', label: 'Hard', preview: previews.hard, icon: <Brain className="w-4 h-4" />, color: 'bg-[var(--gh-attention-emphasis)] hover:opacity-90', key: '2', credits: config.SRS_HARD },
-    { rating: 'good', label: 'Good', preview: previews.good, icon: <Check className="w-4 h-4" />, color: 'bg-[var(--gh-success-emphasis)] hover:opacity-90', key: '3', credits: config.SRS_GOOD },
-    { rating: 'easy', label: 'Easy', preview: previews.easy, icon: <Zap className="w-4 h-4" />, color: 'bg-[var(--gh-accent-emphasis)] hover:opacity-90', key: '4', credits: config.SRS_EASY },
+  const buttons: { rating: ConfidenceRating; label: string; preview: string; icon: React.ReactNode; variant: 'danger' | 'success' | 'primary' | 'outline'; key: string; credits: number }[] = [
+    { rating: 'again', label: 'Again', preview: previews.again, icon: <RotateCcw className="w-4 h-4" />, variant: 'danger', key: '1', credits: config.SRS_AGAIN },
+    { rating: 'hard', label: 'Hard', preview: previews.hard, icon: <Brain className="w-4 h-4" />, variant: 'outline', key: '2', credits: config.SRS_HARD },
+    { rating: 'good', label: 'Good', preview: previews.good, icon: <Check className="w-4 h-4" />, variant: 'success', key: '3', credits: config.SRS_GOOD },
+    { rating: 'easy', label: 'Easy', preview: previews.easy, icon: <Zap className="w-4 h-4" />, variant: 'primary', key: '4', credits: config.SRS_EASY },
   ];
 
   return (
@@ -664,21 +669,33 @@ function RatingButtons({ card, onRate }: { card: ReviewCard; onRate: (rating: Co
       </p>
       <div className="grid grid-cols-4 gap-2">
         {buttons.map((btn) => (
-          <button
+          <div
             key={btn.rating}
-            onClick={() => onRate(btn.rating)}
-            className={`flex flex-col items-center gap-1 py-3 rounded-xl text-white transition-colors ${btn.color}`}
+            className={`flex flex-col items-center gap-1 py-3 rounded-xl text-white bg-[var(--gh-danger-emphasis)]`}
+            style={{
+              backgroundColor: btn.rating === 'again' ? 'var(--gh-danger-emphasis)' : 
+                              btn.rating === 'hard' ? 'var(--gh-attention-emphasis)' : 
+                              btn.rating === 'good' ? 'var(--gh-success-emphasis)' : 
+                              'var(--gh-accent-emphasis)'
+            }}
           >
-            {btn.icon}
-            <span className="text-xs font-medium">{btn.label}</span>
-            <span className="text-[10px] opacity-70">{btn.preview}</span>
-            {btn.credits !== 0 && (
-              <span className={`text-[9px] font-bold ${btn.credits > 0 ? 'text-[var(--gh-attention-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
-                {btn.credits > 0 ? '+' : ''}{btn.credits} 💰
-              </span>
-            )}
-            <span className="text-[10px] opacity-50">({btn.key})</span>
-          </button>
+            <Button
+              onClick={() => onRate(btn.rating)}
+              variant={btn.variant}
+              className="h-full w-full flex flex-col gap-1 rounded-xl"
+              icon={btn.icon}
+              animated={false}
+            >
+              <span className="text-xs font-medium">{btn.label}</span>
+              <span className="text-[10px] opacity-70">{btn.preview}</span>
+              {btn.credits !== 0 && (
+                <span className={`text-[9px] font-bold ${btn.credits > 0 ? 'text-[var(--gh-attention-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
+                  {btn.credits > 0 ? '+' : ''}{btn.credits} 💰
+                </span>
+              )}
+              <span className="text-[10px] opacity-50">({btn.key})</span>
+            </Button>
+          </div>
         ))}
       </div>
     </div>
@@ -853,23 +870,23 @@ function CompletedScreen({
           className="space-y-2 sm:space-y-3"
         >
           {hasMoreDue && (
-            <button
+            <Button
               onClick={onContinue}
-              className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[var(--gh-done-emphasis)] to-[var(--gh-accent-emphasis)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-medium hover:opacity-90 transition-opacity text-sm sm:text-base"
+              variant="primary"
+              fullWidth
+              size="lg"
             >
               Continue Reviewing ({srsStats.dueToday} more)
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             onClick={onGoHome}
-            className={`w-full py-2.5 sm:py-3 rounded-xl font-medium transition-colors text-sm sm:text-base ${
-              hasMoreDue 
-                ? 'bg-muted text-foreground hover:bg-muted/80' 
-                : 'bg-gradient-to-r from-[var(--gh-success-emphasis)] to-[var(--gh-success-fg)] text-[var(--gh-fg-on-emphasis)] hover:opacity-90'
-            }`}
+            variant={hasMoreDue ? 'secondary' : 'success'}
+            fullWidth
+            size="lg"
           >
             Back to Home
-          </button>
+          </Button>
         </motion.div>
       </div>
     </motion.div>

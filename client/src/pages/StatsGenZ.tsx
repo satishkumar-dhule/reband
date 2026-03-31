@@ -20,8 +20,74 @@ import {
   Home,
   CheckCircle2,
   Clock,
-  BarChart2
+  BarChart2,
+  Boxes,
+  ChartLine,
+  GitBranch,
+  Binary,
+  Puzzle,
+  Calculator,
+  Cpu,
+  Terminal,
+  Layout,
+  Server,
+  Database,
+  Infinity,
+  Activity,
+  Box,
+  Cloud,
+  Layers,
+  Workflow,
+  Brain,
+  Sparkles,
+  MessageCircle,
+  Eye,
+  FileText,
+  Code,
+  Shield,
+  Network,
+  Smartphone,
+  CheckCircle,
+  Gauge,
+  Users,
+  Lock,
+  type LucideIcon
 } from 'lucide-react';
+
+// Icon mapping - convert string names to LucideIcon components
+const iconMap: Record<string, LucideIcon> = {
+  'boxes': Boxes,
+  'chart-line': ChartLine,
+  'git-branch': GitBranch,
+  'binary': Binary,
+  'puzzle': Puzzle,
+  'git-merge': GitBranch,
+  'calculator': Calculator,
+  'cpu': Cpu,
+  'terminal': Terminal,
+  'layout': Layout,
+  'server': Server,
+  'database': Database,
+  'infinity': Infinity,
+  'activity': Activity,
+  'box': Box,
+  'cloud': Cloud,
+  'layers': Layers,
+  'workflow': Workflow,
+  'brain': Brain,
+  'sparkles': Sparkles,
+  'message-circle': MessageCircle,
+  'eye': Eye,
+  'file-text': FileText,
+  'code': Code,
+  'shield': Shield,
+  'network': Network,
+  'smartphone': Smartphone,
+  'check-circle': CheckCircle,
+  'gauge': Gauge,
+  'users': Users,
+  'lock': Lock,
+};
 
 export default function StatsGenZ() {
   const { stats } = useGlobalStats();
@@ -174,7 +240,10 @@ export default function StatsGenZ() {
                       <tr key={mod.id} className="hover:bg-[var(--gh-canvas-subtle)] transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <span className="text-xl">{mod.icon}</span>
+                            {(() => {
+                              const ChannelIcon = iconMap[mod.icon] || Boxes;
+                              return <ChannelIcon className="w-5 h-5 text-[var(--gh-fg-muted)]" />;
+                            })()}
                             <span className="text-sm font-medium text-[var(--gh-fg)]">{mod.name}</span>
                           </div>
                         </td>

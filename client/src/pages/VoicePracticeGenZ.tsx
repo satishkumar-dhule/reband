@@ -13,6 +13,7 @@ import { getAllQuestionsAsync } from '../lib/questions-loader';
 import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import type { Question } from '../types';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { Button } from '@/components/unified/Button';
 
 type PracticeMode = 'training' | 'interview';
 type RecordingState = 'idle' | 'recording' | 'recorded';
@@ -186,12 +187,12 @@ export default function VoicePracticeGenZ() {
               <p className="text-[var(--gh-fg-muted)] mb-6">
                 Your browser does not support speech recognition. Please use a modern browser like Chrome, Edge, or Safari.
               </p>
-              <button 
+              <Button 
                 onClick={() => setLocation('/')}
-                className="gh-btn gh-btn-primary"
+                variant="primary"
               >
                 Return to Dashboard
-              </button>
+              </Button>
             </div>
           </GHCard>
         </div>
@@ -228,10 +229,14 @@ export default function VoicePracticeGenZ() {
               <div className="h-4 w-24 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
             </div>
             <div className="flex justify-center py-8">
-              {/* Start Recording button - actual button for test compatibility */}
-              <button className="gh-btn gh-btn-primary h-12 px-8 text-lg" disabled>
-                <Mic className="w-5 h-5 mr-2" /> Start Recording
-              </button>
+              <Button 
+                variant="primary" 
+                size="lg" 
+                icon={<Mic className="w-5 h-5" />}
+                disabled
+              >
+                Start Recording
+              </Button>
             </div>
           </div>
           
@@ -263,12 +268,12 @@ export default function VoicePracticeGenZ() {
               <p className="text-[var(--gh-fg-muted)] mb-6">
                 {error}
               </p>
-              <button 
+              <Button 
                 onClick={() => setLocation('/')}
-                className="gh-btn gh-btn-primary"
+                variant="primary"
               >
                 Return to Dashboard
-              </button>
+              </Button>
             </div>
           </GHCard>
         </div>
@@ -303,12 +308,13 @@ export default function VoicePracticeGenZ() {
             <p className="text-[var(--gh-fg-muted)]">Practice your technical communication skills</p>
           </div>
           <div className="flex items-center gap-2">
-            <button 
+            <Button 
               onClick={() => setLocation('/')}
-              className="gh-btn gh-btn-secondary"
+              variant="secondary"
+              icon={<ArrowLeft className="w-4 h-4" />}
             >
-              <ArrowLeft className="w-4 h-4 mr-1" /> Back
-            </button>
+              Back
+            </Button>
           </div>
         </div>
 
@@ -343,12 +349,14 @@ export default function VoicePracticeGenZ() {
               {/* Controls */}
               <div className="flex flex-col items-center py-6 border-y border-[var(--gh-border-muted)]">
                 {recordingState === 'idle' && (
-                  <button 
+                  <Button 
                     onClick={startRecording}
-                    className="gh-btn gh-btn-primary h-12 px-8 text-lg"
+                    variant="primary"
+                    size="lg"
+                    icon={<Mic className="w-5 h-5" />}
                   >
-                    <Mic className="w-5 h-5 mr-2" /> Start Recording
-                  </button>
+                    Start Recording
+                  </Button>
                 )}
 
                 {recordingState === 'recording' && (
@@ -360,42 +368,48 @@ export default function VoicePracticeGenZ() {
                     <div className="w-full bg-[var(--gh-canvas-inset)] rounded-md p-4 min-h-[100px] mb-4 border border-[var(--gh-border)] italic text-[var(--gh-fg)]">
                       {transcript || interimTranscript || "Start speaking..."}
                     </div>
-                    <button 
+                    <Button 
                       onClick={stopRecording}
-                      className="gh-btn gh-btn-danger h-12 px-8 text-lg"
+                      variant="danger"
+                      size="lg"
+                      icon={<Zap className="w-5 h-5" />}
                     >
-                      <Zap className="w-5 h-5 mr-2" /> Stop & Analyze
-                    </button>
+                      Stop & Analyze
+                    </Button>
                   </div>
                 )}
 
                 {recordingState === 'recorded' && (
                   <div className="flex gap-3">
-                    <button 
+                    <Button 
                       onClick={startRecording}
-                      className="gh-btn gh-btn-secondary"
+                      variant="secondary"
+                      icon={<RotateCcw className="w-4 h-4" />}
                     >
-                      <RotateCcw className="w-4 h-4 mr-2" /> Retry
-                    </button>
-                    <button 
+                      Retry
+                    </Button>
+                    <Button 
                       onClick={nextQuestion}
-                      className="gh-btn gh-btn-primary"
+                      variant="primary"
+                      icon={<ChevronRight className="w-4 h-4" />}
+                      iconPosition="right"
                     >
-                      Next Question <ChevronRight className="w-4 h-4 ml-2" />
-                    </button>
+                      Next Question
+                    </Button>
                   </div>
                 )}
               </div>
 
               {/* Ideal Answer Toggle */}
               <div className="mt-6">
-                <button 
+                <Button 
                   onClick={() => setShowAnswer(!showAnswer)}
-                  className="text-sm font-medium text-[var(--gh-accent-fg)] hover:underline flex items-center gap-1"
+                  variant="ghost"
+                  size="sm"
+                  icon={showAnswer ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 >
-                  {showAnswer ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   {showAnswer ? 'Hide Ideal Answer' : 'Show Ideal Answer'}
-                </button>
+                </Button>
                 {showAnswer && (
                   <div className="mt-3 p-4 bg-[var(--gh-canvas-inset)] border border-[var(--gh-border)] rounded-md text-sm text-[var(--gh-fg)] leading-relaxed whitespace-pre-wrap">
                     {currentQuestion?.answer}
@@ -495,8 +509,8 @@ export default function VoicePracticeGenZ() {
             <GHCard title="Recent Tips">
               <div className="space-y-3">
                 <div className="flex gap-2 p-2 rounded-md hover:bg-[var(--gh-canvas-subtle)] transition-colors cursor-pointer group">
-                  <div className="w-8 h-8 rounded-md bg-blue-100 flex items-center justify-center shrink-0">
-                    <Brain className="w-4 h-4 text-blue-600" />
+                  <div className="w-8 h-8 rounded-md bg-[var(--gh-accent-subtle)] flex items-center justify-center shrink-0">
+                    <Brain className="w-4 h-4 text-[var(--gh-accent-fg)]" />
                   </div>
                   <div>
                     <div className="text-sm font-semibold group-hover:text-[var(--gh-accent-fg)]">STAR Method</div>
@@ -504,8 +518,8 @@ export default function VoicePracticeGenZ() {
                   </div>
                 </div>
                 <div className="flex gap-2 p-2 rounded-md hover:bg-[var(--gh-canvas-subtle)] transition-colors cursor-pointer group">
-                  <div className="w-8 h-8 rounded-md bg-green-100 flex items-center justify-center shrink-0">
-                    <TrendingUp className="w-4 h-4 text-green-600" />
+                  <div className="w-8 h-8 rounded-md bg-[var(--gh-success-fg)]/20 flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-4 h-4 text-[var(--gh-success-fg)]" />
                   </div>
                   <div>
                     <div className="text-sm font-semibold group-hover:text-[var(--gh-accent-fg)]">Pacing Guide</div>

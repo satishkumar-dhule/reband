@@ -13,6 +13,8 @@ import {
   SkipForward, ExternalLink, Shuffle, ChevronLeft, MoreHorizontal, User,
   BarChart3, Brain, Lightbulb, Zap, Award
 } from 'lucide-react';
+import { Button, IconButton } from '@/components/unified/Button';
+import { Textarea } from '@/components/ui/textarea';
 import { SEOHead } from '../components/SEOHead';
 import { getAllQuestionsAsync } from '../lib/questions-loader';
 import { useCredits } from '../context/CreditsContext';
@@ -333,12 +335,9 @@ export default function VoiceInterview() {
           <p className="text-[var(--gh-fg-muted)] mb-6">
             Voice interview requires the Web Speech API. Please use Chrome, Edge, or Safari.
           </p>
-          <button
-            onClick={() => setLocation('/')}
-            className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-medium rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors"
-          >
+          <Button variant="success" size="lg" onClick={() => setLocation('/')}>
             Go Home
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -373,12 +372,9 @@ export default function VoiceInterview() {
           </div>
           <h1 className="text-2xl font-bold text-[var(--gh-fg)] mb-3">No questions available</h1>
           <p className="text-[var(--gh-fg-muted)] mb-6">We don't have any voice interview questions for this channel yet.</p>
-          <button
-            onClick={() => setLocation('/')}
-            className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-medium rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors"
-          >
+          <Button variant="success" size="lg" onClick={() => setLocation('/')}>
             Go Home
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -394,12 +390,9 @@ export default function VoiceInterview() {
           </div>
           <h1 className="text-2xl font-bold text-[var(--gh-fg)] mb-3">Error</h1>
           <p className="text-[var(--gh-fg-muted)] mb-6">{error}</p>
-          <button
-            onClick={() => setLocation('/')}
-            className="px-6 py-3 bg-[var(--gh-success-emphasis)] text-[var(--gh-fg-on-emphasis)] font-medium rounded-xl hover:bg-[var(--gh-success-fg)] transition-colors"
-          >
+          <Button variant="success" size="lg" onClick={() => setLocation('/')}>
             Go Home
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -422,13 +415,13 @@ export default function VoiceInterview() {
         <header className="sticky top-0 z-50 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]/95 backdrop-blur-md">
           <div className="max-w-4xl mx-auto px-3 h-14 flex items-center justify-between w-full" style={{ maxWidth: '100vw' }}>
             <div className="flex items-center gap-3">
-              <button
+              <IconButton
+                icon={<Home className="w-4 h-4" />}
                 onClick={exitInterview}
-                className="p-1.5 hover:bg-[var(--gh-canvas-subtle)] rounded-lg transition-colors"
-                title="Exit and save progress"
-              >
-                <Home className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-              </button>
+                aria-label="Exit and save progress"
+                variant="ghost"
+                size="sm"
+              />
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--gh-danger-emphasis)] to-[var(--gh-danger-fg)] flex items-center justify-center">
                   <Mic className="w-4 h-4 text-[var(--gh-fg-on-emphasis)]" />
@@ -443,13 +436,15 @@ export default function VoiceInterview() {
             </div>
             
             <div className="flex items-center gap-2">
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={<Target className="w-3.5 h-3.5" />}
                 onClick={() => setLocation('/voice-session')}
-                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-xs bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] rounded-lg border border-[var(--gh-border)] hover:border-[var(--gh-accent-fg)]/50 transition-all"
+                className="hidden sm:flex"
               >
-                <Target className="w-3.5 h-3.5" />
                 Sessions
-              </button>
+              </Button>
               <CreditsDisplay compact onClick={() => setLocation('/profile')} />
               <span className={`px-2 py-0.5 text-[10px] font-medium rounded-lg ${
                 currentQuestion?.difficulty === 'beginner' ? 'bg-[var(--gh-success-fg)]/20 text-[var(--gh-success-fg)]' :
@@ -498,13 +493,15 @@ export default function VoiceInterview() {
                   </div>
                   <h2 className="text-lg font-medium text-[var(--foreground)] leading-relaxed">{currentQuestion?.question}</h2>
                 </div>
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={<ExternalLink className="w-3.5 h-3.5" />}
                   onClick={goToOriginalQuestion}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[var(--muted-foreground)] hover:text-[var(--primary)] hover:bg-[var(--muted)] rounded-lg transition-colors flex-shrink-0"
+                  className="flex-shrink-0 hidden sm:inline-flex"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">View Details</span>
-                </button>
+                  View Details
+                </Button>
               </div>
               
               {/* Question Controls */}
@@ -514,12 +511,13 @@ export default function VoiceInterview() {
                   
                   {/* Actions Dropdown */}
                   <div className="relative">
-                    <button
+                    <IconButton
+                      icon={<MoreHorizontal className="w-4 h-4" />}
                       onClick={() => setShowActions(!showActions)}
-                      className="p-1.5 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] rounded-lg transition-colors"
-                    >
-                      <MoreHorizontal className="w-4 h-4" />
-                    </button>
+                      aria-label="More actions"
+                      variant="ghost"
+                      size="sm"
+                    />
                     
                     <AnimatePresence>
                       {showActions && (
@@ -529,37 +527,45 @@ export default function VoiceInterview() {
                           exit={{ opacity: 0, y: -5 }}
                           className="absolute left-0 top-full mt-1 bg-[var(--popover)] border border-[var(--border)] rounded-xl shadow-xl py-1 z-10 min-w-[160px]"
                         >
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            icon={<ChevronLeft className="w-4 h-4" />}
                             onClick={previousQuestion}
                             disabled={currentIndex === 0}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors disabled:opacity-30"
+                            className="w-full justify-start rounded-none"
                           >
-                            <ChevronLeft className="w-4 h-4" />
                             Previous
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            icon={<SkipForward className="w-4 h-4" />}
                             onClick={skipQuestion}
                             disabled={currentIndex >= questions.length - 1}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors disabled:opacity-30"
+                            className="w-full justify-start rounded-none"
                           >
-                            <SkipForward className="w-4 h-4" />
                             Skip Question
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            icon={<Shuffle className="w-4 h-4" />}
                             onClick={shuffleQuestions}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors"
+                            className="w-full justify-start rounded-none"
                           >
-                            <Shuffle className="w-4 h-4" />
                             Shuffle All
-                          </button>
+                          </Button>
                           <div className="border-t border-[var(--gh-border)] my-1" />
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            icon={<ExternalLink className="w-4 h-4" />}
                             onClick={goToOriginalQuestion}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-white hover:bg-[var(--gh-canvas-subtle)] transition-colors"
+                            className="w-full justify-start rounded-none"
                           >
-                            <ExternalLink className="w-4 h-4" />
                             View Full Question
-                          </button>
+                          </Button>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -637,11 +643,11 @@ export default function VoiceInterview() {
             {(state === 'recording' || state === 'editing' || transcript) && state !== 'evaluated' && (
               <div className="mb-6">
                 {state === 'editing' ? (
-                  <textarea
+                  <Textarea
                     value={transcript}
                     onChange={(e) => setTranscript(e.target.value)}
-                    className="w-full p-4 bg-[var(--gh-canvas)] border border-[var(--gh-attention-fg)]/30 rounded-xl min-h-[150px] max-h-[300px] text-sm text-[var(--gh-fg)] resize-y focus:outline-none focus:ring-2 focus:ring-[var(--gh-attention-fg)]/50 focus:border-[var(--gh-attention-fg)]"
                     placeholder="Edit your transcribed answer here..."
+                    className="min-h-[150px] max-h-[300px]"
                   />
                 ) : (
                   <div className="p-4 bg-[var(--gh-canvas)] rounded-xl min-h-[120px] max-h-[200px] overflow-y-auto border border-[var(--gh-border)]">
@@ -672,62 +678,70 @@ export default function VoiceInterview() {
             {/* Recording Controls */}
             <div className="flex items-center justify-center gap-4">
               {state === 'ready' && (
-                <button
+                <Button
+                  variant="primary"
+                  size="lg"
+                  icon={<Mic className="w-5 h-5" />}
                   onClick={startRecording}
-                  className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[var(--gh-danger-fg)] to-[var(--gh-danger-hover)] text-white font-semibold rounded-2xl hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[var(--gh-danger-fg)]/20"
+                  className="min-w-[200px]"
                 >
-                  <Mic className="w-5 h-5" />
                   Start Recording
-                </button>
+                </Button>
               )}
               
               {state === 'recording' && (
-                <button
+                <Button
+                  variant="danger"
+                  size="lg"
+                  icon={<Square className="w-5 h-5" />}
                   onClick={stopRecording}
-                  className="flex items-center gap-3 px-8 py-4 bg-[var(--gh-danger-fg)] text-white font-semibold rounded-2xl hover:bg-[var(--gh-danger-emphasis)] transition-all"
+                  className="min-w-[200px]"
                 >
-                  <Square className="w-5 h-5" />
                   Stop Recording
-                </button>
+                </Button>
               )}
               
               {state === 'editing' && (
                 <div className="flex gap-3">
-                  <button
+                  <Button
+                    variant="outline"
+                    size="md"
+                    icon={<RotateCcw className="w-4 h-4" />}
                     onClick={retryQuestion}
-                    className="flex items-center gap-2 px-5 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-white hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors"
                   >
-                    <RotateCcw className="w-4 h-4" />
                     Re-record
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="success"
+                    size="md"
+                    icon={<CheckCircle className="w-5 h-5" />}
                     onClick={submitAnswer}
                     disabled={!transcript.trim()}
-                    className="flex items-center gap-3 px-8 py-3 bg-[var(--gh-success-emphasis)] text-white font-semibold rounded-xl hover:bg-[var(--gh-success-hover)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <CheckCircle className="w-5 h-5" />
                     Submit Answer
-                  </button>
+                  </Button>
                 </div>
               )}
               
               {state === 'evaluated' && (
                 <div className="flex gap-3">
-                  <button
+                  <Button
+                    variant="outline"
+                    size="md"
+                    icon={<RotateCcw className="w-4 h-4" />}
                     onClick={retryQuestion}
-                    className="flex items-center gap-2 px-5 py-3 border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-white hover:border-[var(--gh-fg-muted)] rounded-xl transition-colors"
                   >
-                    <RotateCcw className="w-4 h-4" />
                     Try Again
-                  </button>
+                  </Button>
                   {currentIndex < questions.length - 1 && (
-                    <button
+                    <Button
+                      variant="success"
+                      size="md"
+                      icon={<ChevronRight className="w-4 h-4" />}
                       onClick={nextQuestion}
-                      className="flex items-center gap-2 px-6 py-3 bg-[var(--gh-success-emphasis)] text-white font-semibold rounded-xl hover:bg-[var(--gh-success-hover)] transition-colors"
                     >
                       Next Question
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+                    </Button>
                   )}
                 </div>
               )}

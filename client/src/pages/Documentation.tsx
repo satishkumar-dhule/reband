@@ -12,68 +12,76 @@ import {
 } from 'lucide-react';
 import { EnhancedMermaid } from '@/components/EnhancedMermaid';
 import { DesktopSidebarWrapper } from '@/components/layout/DesktopSidebarWrapper';
+import { Button, IconButton } from '@/components/unified/Button';
+import { Input } from '@/components/ui/input';
 
 // Documentation sections
 const sections = [
-  { id: 'overview', title: 'Architecture Overview', icon: Layers, color: '#58a6ff' },
-  { id: 'ai-pipeline', title: 'AI Pipeline', icon: Brain, color: '#a371f7' },
-  { id: 'database', title: 'Database & Storage', icon: Database, color: '#3fb950' },
-  { id: 'frontend', title: 'Frontend Patterns', icon: Code, color: '#f78166' },
-  { id: 'illustrations', title: 'Illustration System', icon: Palette, color: '#f778ba' },
-  { id: 'api', title: 'API Reference', icon: Server, color: '#39c5cf' },
-  { id: 'deployment', title: 'Deployment', icon: Globe, color: '#d29922' },
+  { id: 'overview', title: 'Architecture Overview', icon: Layers, accentVar: 'accent' },
+  { id: 'ai-pipeline', title: 'AI Pipeline', icon: Brain, accentVar: 'done' },
+  { id: 'database', title: 'Database & Storage', icon: Database, accentVar: 'success' },
+  { id: 'frontend', title: 'Frontend Patterns', icon: Code, accentVar: 'attention' },
+  { id: 'illustrations', title: 'Illustration System', icon: Palette, accentVar: 'done' },
+  { id: 'api', title: 'API Reference', icon: Server, accentVar: 'accent' },
+  { id: 'deployment', title: 'Deployment', icon: Globe, accentVar: 'attention' },
 ];
+
+const accentColors: Record<string, string> = {
+  accent: 'var(--gh-accent-fg)',
+  done: 'var(--gh-done-fg)',
+  success: 'var(--gh-success-fg)',
+  attention: 'var(--gh-attention-fg)',
+};
 
 export default function Documentation() {
   const [activeSection, setActiveSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Close sidebar on section change (mobile)
   useEffect(() => {
     setSidebarOpen(false);
   }, [activeSection]);
 
   return (
     <DesktopSidebarWrapper>
-    <div className="min-h-screen bg-[var(--gh-canvas) text-var(--gh-fg)">
+    <div className="min-h-screen bg-[var(--gh-canvas)] text-[var(--gh-fg)]">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-var(--gh-border) bg-[var(--gh-canvas)/95 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button 
+            <IconButton
+              icon={sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2.5 hover:bg-[var(--gh-canvas-subtle) rounded-lg transition-colors"
-            >
-              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+              className="lg:hidden"
+              aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+            />
             <Link href="/">
               <a className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--gh-blue)] to-[var(--gh-purple)] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--gh-accent-fg)] to-[var(--gh-done-fg)] flex items-center justify-center">
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
                 <div className="hidden sm:block">
-                  <div className="font-semibold text-white">Documentation</div>
-                  <div className="text-xs text-var(--gh-fg-muted)">Reel-LearnHub</div>
+                  <div className="font-semibold text-[var(--gh-fg)]">Documentation</div>
+                  <div className="text-xs text-[var(--gh-fg-muted)]">DevPrep</div>
                 </div>
               </a>
             </Link>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[var(--gh-canvas-subtle) rounded-lg border border-var(--gh-border)">
-              <Search className="w-4 h-4 text-var(--gh-fg-muted)" />
-              <input
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-[var(--gh-canvas-subtle)] rounded-lg border border-[var(--gh-border)]">
+              <Search className="w-4 h-4 text-[var(--gh-fg-muted)]" />
+              <Input
                 type="text"
                 placeholder="Search docs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-transparent text-sm w-40 focus:w-56 transition-all outline-none placeholder:text-var(--gh-fg-subtle)"
+                className="bg-transparent text-sm w-40 focus:w-56 transition-all outline-none placeholder:text-[var(--gh-fg-subtle)]"
               />
-              <kbd className="text-[10px] text-var(--gh-fg-subtle) bg-[var(--gh-canvas-overlay) px-1.5 py-0.5 rounded border border-var(--gh-border)">⌘K</kbd>
+              <kbd className="text-[10px] text-[var(--gh-fg-subtle)] bg-[var(--gh-canvas-overlay)] px-1.5 py-0.5 rounded border border-[var(--gh-border)]">⌘K</kbd>
             </div>
             <Link href="/">
-              <a className="flex items-center gap-2 px-3 py-1.5 text-sm text-var(--gh-fg-muted) hover:text-white hover:bg-[var(--gh-canvas-subtle) rounded-lg transition-colors">
+              <a className="flex items-center gap-2 px-3 py-1.5 text-sm text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] rounded-lg transition-colors">
                 <Home className="w-4 h-4" />
                 <span className="hidden sm:inline">Back to App</span>
               </a>
@@ -85,55 +93,49 @@ export default function Documentation() {
       <div className="max-w-7xl mx-auto flex">
         {/* Sidebar */}
         <aside className={`
-          fixed lg:sticky top-16 left-0 z-40 h-[calc(100vh-4rem) w-72 
-          bg-[var(--gh-canvas) lg:bg-transparent border-r border-var(--gh-border) lg:border-0
+          fixed lg:sticky top-16 left-0 z-40 h-[calc(100vh-4rem)] w-72 
+          bg-[var(--gh-canvas)] lg:bg-transparent border-r border-[var(--gh-border)] lg:border-0
           transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
           <nav className="p-4 space-y-1 overflow-y-auto h-full">
-            <div className="text-xs font-semibold text-var(--gh-fg-muted) uppercase tracking-wider px-3 mb-3">
+            <div className="text-xs font-semibold text-[var(--gh-fg-muted)] uppercase tracking-wider px-3 mb-3">
               Documentation
             </div>
             {sections.map((section) => {
               const Icon = section.icon;
               const isActive = activeSection === section.id;
               return (
-                <button
+                <Button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`
-                    w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all
-                    ${isActive 
-                      ? 'bg-[var(--gh-canvas-subtle) text-white' 
-                      : 'text-var(--gh-fg-muted) hover:text-white hover:bg-[var(--gh-canvas-overlay)'
-                    }
-                  `}
+                  variant={isActive ? 'secondary' : 'ghost'}
+                  className="w-full justify-start gap-3 px-3 py-2.5"
                 >
                   <div 
                     className={`p-1.5 rounded-md transition-colors ${isActive ? 'bg-[var(--gh-border)]' : ''}`}
-                    style={{ color: isActive ? section.color : undefined }}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-4 h-4" style={{ color: isActive ? accentColors[section.accentVar] : undefined }} />
                   </div>
                   <span className="text-sm font-medium">{section.title}</span>
-                  {isActive && <ChevronRight className="w-4 h-4 ml-auto text-var(--gh-fg-subtle)" />}
-                </button>
+                  {isActive && <ChevronRight className="w-4 h-4 ml-auto text-[var(--gh-fg-subtle)]" />}
+                </Button>
               );
             })}
             
             {/* Quick Links */}
             <div className="pt-6 mt-6 border-t border-[var(--gh-border)]">
-              <div className="text-xs font-semibold text-var(--gh-fg-muted) uppercase tracking-wider px-3 mb-3">
+              <div className="text-xs font-semibold text-[var(--gh-fg-muted)] uppercase tracking-wider px-3 mb-3">
                 Quick Links
               </div>
               <a href="https://github.com" target="_blank" rel="noopener" 
-                className="flex items-center gap-3 px-3 py-2 text-sm text-var(--gh-fg-muted) hover:text-white rounded-lg hover:bg-[var(--gh-canvas-overlay) transition-colors">
+                className="flex items-center gap-3 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] rounded-lg hover:bg-[var(--gh-canvas-overlay)] transition-colors">
                 <GitBranch className="w-4 h-4" />
                 <span>GitHub Repository</span>
                 <ExternalLink className="w-3 h-3 ml-auto" />
               </a>
               <a href="/whats-new"
-                className="flex items-center gap-3 px-3 py-2 text-sm text-var(--gh-fg-muted) hover:text-white rounded-lg hover:bg-[var(--gh-canvas-overlay) transition-colors">
+                className="flex items-center gap-3 px-3 py-2 text-sm text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] rounded-lg hover:bg-[var(--gh-canvas-overlay)] transition-colors">
                 <Sparkles className="w-4 h-4" />
                 <span>What's New</span>
               </a>
@@ -169,20 +171,21 @@ export default function Documentation() {
 
 // ============== SHARED COMPONENTS ==============
 
-function SectionHeader({ icon: Icon, title, description, color = '#58a6ff' }: { 
-  icon: any; title: string; description: string; color?: string 
+function SectionHeader({ icon: Icon, title, description, accentVar = 'accent' }: { 
+  icon: any; title: string; description: string; accentVar?: string 
 }) {
+  const accentColor = accentColors[accentVar];
   return (
     <div className="mb-10">
       <div className="flex items-center gap-4 mb-3">
-        <div className="p-3 rounded-xl" style={{ backgroundColor: `${color}15` }}>
-          <Icon className="w-7 h-7" style={{ color }} />
+        <div className="p-3 rounded-xl bg-[var(--gh-canvas-subtle)]">
+          <Icon className="w-7 h-7" style={{ color: accentColor }} />
         </div>
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-white">{title}</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold text-[var(--gh-fg)]">{title}</h1>
         </div>
       </div>
-      <p className="text-lg text-var(--gh-fg-muted) leading-relaxed">{description}</p>
+      <p className="text-lg text-[var(--gh-fg-muted)] leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -199,26 +202,26 @@ function CodeBlock({ code, language = 'typescript', title, copyable = true }: {
   };
 
   return (
-    <div className="rounded-xl overflow-hidden border border-var(--gh-border) my-6 group">
+    <div className="rounded-xl overflow-hidden border border-[var(--gh-border)] my-6 group">
       {title && (
-        <div className="bg-[var(--gh-canvas-overlay) px-4 py-2.5 border-b border-var(--gh-border) flex items-center justify-between">
+        <div className="bg-[var(--gh-canvas-overlay)] px-4 py-2.5 border-b border-[var(--gh-border)] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FileCode className="w-4 h-4 text-var(--gh-fg-muted)" />
-            <span className="text-sm text-var(--gh-fg-muted) font-mono">{title}</span>
+            <FileCode className="w-4 h-4 text-[var(--gh-fg-muted)]" />
+            <span className="text-sm text-[var(--gh-fg-muted)] font-mono">{title}</span>
           </div>
           {copyable && (
-            <button 
+            <IconButton
+              icon={copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               onClick={handleCopy}
-              className="p-1.5 hover:bg-[var(--gh-30363d] rounded transition-colors"
-              title="Copy code"
-            >
-              {copied ? <Check className="w-4 h-4 text-var(--gh-success-fg)" /> : <Copy className="w-4 h-4 text-var(--gh-fg-subtle)" />}
-            </button>
+              className={copied ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-fg-subtle)]'}
+              aria-label="Copy code"
+              size="sm"
+            />
           )}
         </div>
       )}
-      <pre className="bg-[var(--gh-canvas) p-4 overflow-x-auto">
-        <code className={`language-${language} text-sm text-var(--gh-fg) font-mono leading-relaxed`}>
+      <pre className="bg-[var(--gh-canvas)] p-4 overflow-x-auto">
+        <code className={`language-${language} text-sm text-[var(--gh-fg)] font-mono leading-relaxed`}>
           {code.trim()}
         </code>
       </pre>
@@ -230,23 +233,24 @@ function DiagramCard({ title, description, diagram }: { title: string; descripti
   const [expanded, setExpanded] = useState(true);
   
   return (
-    <div className="rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/50 overflow-hidden my-8">
-      <button 
+    <div className="rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/50 overflow-hidden my-8">
+      <Button
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-[var(--gh-canvas-subtle)/50 transition-colors"
+        variant="ghost"
+        className="w-full justify-between p-4 h-auto"
       >
         <div className="text-left">
-          <h3 className="font-semibold text-white flex items-center gap-2">
-            <Box className="w-4 h-4 text-var(--gh-accent-fg)" />
+          <h3 className="font-semibold text-[var(--gh-fg)] flex items-center gap-2">
+            <Box className="w-4 h-4 text-[var(--gh-accent-fg)]" />
             {title}
           </h3>
-          <p className="text-sm text-var(--gh-fg-muted) mt-1">{description}</p>
+          <p className="text-sm text-[var(--gh-fg-muted)] mt-1">{description}</p>
         </div>
-        <ChevronDown className={`w-5 h-5 text-var(--gh-fg-subtle) transition-transform ${expanded ? 'rotate-180' : ''}`} />
-      </button>
+        <ChevronDown className={`w-5 h-5 text-[var(--gh-fg-subtle)] transition-transform ${expanded ? 'rotate-180' : ''}`} />
+      </Button>
       {expanded && (
-        <div className="p-4 pt-0 border-t border-var(--gh-border)/50">
-          <div className="bg-[var(--gh-canvas) rounded-lg p-4 overflow-x-auto">
+        <div className="p-4 pt-0 border-t border-[var(--gh-border)]/50">
+          <div className="bg-[var(--gh-canvas)] rounded-lg p-4 overflow-x-auto">
             <EnhancedMermaid chart={diagram} />
           </div>
         </div>
@@ -259,16 +263,17 @@ function FeatureGrid({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">{children}</div>;
 }
 
-function FeatureCard({ icon: Icon, title, description, color = '#58a6ff' }: { 
-  icon: any; title: string; description: string; color?: string 
+function FeatureCard({ icon: Icon, title, description, accentVar = 'accent' }: { 
+  icon: any; title: string; description: string; accentVar?: string 
 }) {
+  const accentColor = accentColors[accentVar];
   return (
-    <div className="p-4 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30 hover:bg-[var(--gh-canvas-overlay) hover:border-var(--gh-58a6ff]/30 transition-all group">
-      <div className="p-2 rounded-lg w-fit mb-3" style={{ backgroundColor: `${color}15` }}>
-        <Icon className="w-5 h-5" style={{ color }} />
+    <div className="p-4 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30 hover:bg-[var(--gh-canvas-overlay)] hover:border-[var(--gh-accent-fg)]/30 transition-all group">
+      <div className="p-2 rounded-lg w-fit mb-3 bg-[var(--gh-canvas-subtle)]">
+        <Icon className="w-5 h-5" style={{ color: accentColor }} />
       </div>
-      <h4 className="font-semibold text-white mb-1 group-hover:text-var(--gh-accent-fg) transition-colors">{title}</h4>
-      <p className="text-sm text-var(--gh-fg-muted) leading-relaxed">{description}</p>
+      <h4 className="font-semibold text-[var(--gh-fg)] mb-1 group-hover:text-[var(--gh-accent-fg)] transition-colors">{title}</h4>
+      <p className="text-sm text-[var(--gh-fg-muted)] leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -287,7 +292,7 @@ function InfoBox({ type = 'info', title, children }: { type?: 'info' | 'warning'
       <div className={`font-semibold ${s.color} mb-2 flex items-center gap-2`}>
         <span>{s.icon}</span> {title}
       </div>
-      <div className="text-sm text-var(--gh-fg-muted) leading-relaxed">{children}</div>
+      <div className="text-sm text-[var(--gh-fg-muted)] leading-relaxed">{children}</div>
     </div>
   );
 }
@@ -314,8 +319,8 @@ graph TB
     end
     
     subgraph DB["Databases"]
-        Turso[(Turso SQLite)
-        Qdrant[(Qdrant Vectors)
+        Turso[(Turso SQLite)]
+        Qdrant[(Qdrant Vectors)]
     end
     
     subgraph AI["AI Pipeline - LangGraph"]
@@ -340,7 +345,7 @@ graph TB
         icon={Layers} 
         title="Architecture Overview" 
         description="A modern full-stack application built with React, Express, and AI-powered content generation using LangGraph pipelines."
-        color="#58a6ff"
+        accentVar="accent"
       />
       
       <DiagramCard
@@ -349,24 +354,24 @@ graph TB
         diagram={architectureDiagram}
       />
       
-      <h2 className="text-xl font-semibold text-white mt-10 mb-4 flex items-center gap-2">
-        <Zap className="w-5 h-5 text-yellow-500 dark:text-yellow-400" />
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mt-10 mb-4 flex items-center gap-2">
+        <Zap className="w-5 h-5 text-[var(--gh-attention-fg)]" />
         Tech Stack
       </h2>
       
       <FeatureGrid>
-        <FeatureCard icon={Code} title="React 18 + TypeScript" description="Modern frontend with hooks, suspense, and full type safety" color="#61dafb" />
-        <FeatureCard icon={Zap} title="Vite" description="Lightning-fast HMR and optimized production builds" color="#646cff" />
-        <FeatureCard icon={Server} title="Express.js" description="Robust REST API with middleware architecture" color="#68a063" />
-        <FeatureCard icon={Database} title="Turso (LibSQL)" description="Edge-ready SQLite with global replication" color="#00e5ff" />
-        <FeatureCard icon={Brain} title="LangGraph" description="Stateful AI pipelines with retry logic and validation" color="#a371f7" />
-        <FeatureCard icon={Palette} title="Tailwind CSS" description="Utility-first styling with custom dark theme" color="#38bdf8" />
+        <FeatureCard icon={Code} title="React 18 + TypeScript" description="Modern frontend with hooks, suspense, and full type safety" accentVar="accent" />
+        <FeatureCard icon={Zap} title="Vite" description="Lightning-fast HMR and optimized production builds" accentVar="done" />
+        <FeatureCard icon={Server} title="Express.js" description="Robust REST API with middleware architecture" accentVar="success" />
+        <FeatureCard icon={Database} title="Turso (LibSQL)" description="Edge-ready SQLite with global replication" accentVar="accent" />
+        <FeatureCard icon={Brain} title="LangGraph" description="Stateful AI pipelines with retry logic and validation" accentVar="done" />
+        <FeatureCard icon={Palette} title="Tailwind CSS" description="Utility-first styling with custom dark theme" accentVar="accent" />
       </FeatureGrid>
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-        <Shield className="w-5 h-5 text-var(--gh-success-fg)" />
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4 flex items-center gap-2">
+        <Shield className="w-5 h-5 text-[var(--gh-success-fg)]" />
         Design Principles
       </h2>
       
@@ -386,7 +391,7 @@ graph TB
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4">Project Structure</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4">Project Structure</h2>
       <CodeBlock
         title="Directory Layout"
         language="bash"
@@ -481,7 +486,7 @@ graph TB
         icon={Brain} 
         title="AI Pipeline (LangGraph)" 
         description="Stateful AI workflows with automatic retry, validation gates, and quality scoring. Built on LangGraph for reliable, observable AI operations."
-        color="#a371f7"
+        accentVar="done"
       />
       
       <InfoBox type="tip" title="Why LangGraph?">
@@ -494,31 +499,31 @@ graph TB
         diagram={blogGraphDiagram}
       />
       
-      <h2 className="text-xl font-semibold text-white mt-10 mb-4">Pipeline Nodes</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mt-10 mb-4">Pipeline Nodes</h2>
       
       <div className="space-y-4">
-        <div className="p-4 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
+        <div className="p-4 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-[var(--gh-accent-emphasis)/20 flex items-center justify-center text-var(--gh-accent-fg) font-mono text-sm">1</div>
-            <h4 className="font-semibold text-white">Find Real-World Case</h4>
+            <div className="w-8 h-8 rounded-lg bg-[var(--gh-accent-emphasis)]/20 flex items-center justify-center text-[var(--gh-accent-fg)] font-mono text-sm">1</div>
+            <h4 className="font-semibold text-[var(--gh-fg)]">Find Real-World Case</h4>
           </div>
-          <p className="text-sm text-var(--gh-fg-muted) ml-11">Searches for compelling case studies from major tech companies. Validates source URLs and scores relevance (minimum 6/10 to proceed).</p>
+          <p className="text-sm text-[var(--gh-fg-muted)] ml-11">Searches for compelling case studies from major tech companies. Validates source URLs and scores relevance (minimum 6/10 to proceed).</p>
         </div>
         
-        <div className="p-4 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
+        <div className="p-4 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-[var(--gh-success-emphasis)/20 flex items-center justify-center text-var(--gh-success-fg) font-mono text-sm">2</div>
-            <h4 className="font-semibold text-white">Generate Blog Content</h4>
+            <div className="w-8 h-8 rounded-lg bg-[var(--gh-success-emphasis)]/20 flex items-center justify-center text-[var(--gh-success-fg)] font-mono text-sm">2</div>
+            <h4 className="font-semibold text-[var(--gh-fg)]">Generate Blog Content</h4>
           </div>
-          <p className="text-sm text-var(--gh-fg-muted) ml-11">Creates structured blog with introduction, sections, code examples, and conclusion. Uses RAG to find related questions for enrichment.</p>
+          <p className="text-sm text-[var(--gh-fg-muted)] ml-11">Creates structured blog with introduction, sections, code examples, and conclusion. Uses RAG to find related questions for enrichment.</p>
         </div>
         
-        <div className="p-4 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
+        <div className="p-4 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-[#a371f7]/20 flex items-center justify-center text-var(--gh-done-fg) font-mono text-sm">3</div>
-            <h4 className="font-semibold text-white">Generate Pixel Art</h4>
+            <div className="w-8 h-8 rounded-lg bg-[var(--gh-done-fg)]/20 flex items-center justify-center text-[var(--gh-done-fg)] font-mono text-sm">3</div>
+            <h4 className="font-semibold text-[var(--gh-fg)]">Generate Pixel Art</h4>
           </div>
-          <p className="text-sm text-var(--gh-fg-muted) ml-11">Auto-detects scene type from content and generates 16-bit pixel art SVG illustrations with CSS animations.</p>
+          <p className="text-sm text-[var(--gh-fg-muted)] ml-11">Auto-detects scene type from content and generates 16-bit pixel art SVG illustrations with CSS animations.</p>
         </div>
       </div>
       
@@ -530,7 +535,7 @@ graph TB
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4">Available Graphs</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4">Available Graphs</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {[
@@ -541,11 +546,11 @@ graph TB
           { name: 'improvement-graph.js', desc: 'Content improvement suggestions' },
           { name: 'linkedin-graph.js', desc: 'LinkedIn post generation' },
         ].map(g => (
-          <div key={g.name} className="flex items-center gap-3 p-3 rounded-lg border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
-            <FileCode className="w-4 h-4 text-var(--gh-fg-muted) shrink-0" />
+          <div key={g.name} className="flex items-center gap-3 p-3 rounded-lg border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
+            <FileCode className="w-4 h-4 text-[var(--gh-fg-muted)] shrink-0" />
             <div className="min-w-0">
-              <div className="font-mono text-sm text-var(--gh-accent-fg) truncate">{g.name}</div>
-              <div className="text-xs text-var(--gh-fg-subtle) truncate">{g.desc}</div>
+              <div className="font-mono text-sm text-[var(--gh-accent-fg)] truncate">{g.name}</div>
+              <div className="text-xs text-[var(--gh-fg-subtle)] truncate">{g.desc}</div>
             </div>
           </div>
         ))}
@@ -553,7 +558,7 @@ graph TB
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4">State Management</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4">State Management</h2>
       <CodeBlock
         title="LangGraph State Definition"
         language="typescript"
@@ -631,7 +636,7 @@ graph LR
     end
     
     subgraph Store["Qdrant"]
-        D[(Collection)
+        D[(Collection)]
         E[HNSW Index]
     end
     
@@ -653,33 +658,33 @@ graph LR
         icon={Database} 
         title="Database & Storage" 
         description="Dual database architecture: Turso (LibSQL) for relational data and Qdrant for vector embeddings and semantic search."
-        color="#3fb950"
+        accentVar="success"
       />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="p-5 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
+        <div className="p-5 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
           <div className="flex items-center gap-3 mb-3">
-            <Database className="w-6 h-6 text-cyan-500 dark:text-cyan-400" />
-            <h3 className="font-semibold text-white">Turso (LibSQL)</h3>
+            <Database className="w-6 h-6 text-[var(--gh-accent-fg)]" />
+            <h3 className="font-semibold text-[var(--gh-fg)]">Turso (LibSQL)</h3>
           </div>
-          <ul className="text-sm text-var(--gh-fg-muted) space-y-2">
-            <li className="flex items-start gap-2"><span className="text-var(--gh-success-fg)">•</span> Edge-ready SQLite with global replication</li>
-            <li className="flex items-start gap-2"><span className="text-var(--gh-success-fg)">•</span> Drizzle ORM for type-safe queries</li>
-            <li className="flex items-start gap-2"><span className="text-var(--gh-success-fg)">•</span> Automatic schema migrations</li>
-            <li className="flex items-start gap-2"><span className="text-var(--gh-success-fg)">•</span> Read replicas for performance</li>
+          <ul className="text-sm text-[var(--gh-fg-muted)] space-y-2">
+            <li className="flex items-start gap-2"><span className="text-[var(--gh-success-fg)]">•</span> Edge-ready SQLite with global replication</li>
+            <li className="flex items-start gap-2"><span className="text-[var(--gh-success-fg)]">•</span> Drizzle ORM for type-safe queries</li>
+            <li className="flex items-start gap-2"><span className="text-[var(--gh-success-fg)]">•</span> Automatic schema migrations</li>
+            <li className="flex items-start gap-2"><span className="text-[var(--gh-success-fg)]">•</span> Read replicas for performance</li>
           </ul>
         </div>
         
-        <div className="p-5 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
+        <div className="p-5 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
           <div className="flex items-center gap-3 mb-3">
-            <Cpu className="w-6 h-6 text-var(--gh-done-fg)" />
-            <h3 className="font-semibold text-white">Qdrant Vector DB</h3>
+            <Cpu className="w-6 h-6 text-[var(--gh-done-fg)]" />
+            <h3 className="font-semibold text-[var(--gh-fg)]">Qdrant Vector DB</h3>
           </div>
-          <ul className="text-sm text-var(--gh-fg-muted) space-y-2">
-            <li className="flex items-start gap-2"><span className="text-var(--gh-done-fg)">•</span> Semantic similarity search</li>
-            <li className="flex items-start gap-2"><span className="text-var(--gh-done-fg)">•</span> Duplicate detection (85% threshold)</li>
-            <li className="flex items-start gap-2"><span className="text-var(--gh-done-fg)">•</span> Related content discovery</li>
-            <li className="flex items-start gap-2"><span className="text-var(--gh-done-fg)">•</span> HNSW indexing for fast queries</li>
+          <ul className="text-sm text-[var(--gh-fg-muted)] space-y-2">
+            <li className="flex items-start gap-2"><span className="text-[var(--gh-done-fg)]">•</span> Semantic similarity search</li>
+            <li className="flex items-start gap-2"><span className="text-[var(--gh-done-fg)]">•</span> Duplicate detection (85% threshold)</li>
+            <li className="flex items-start gap-2"><span className="text-[var(--gh-done-fg)]">•</span> Related content discovery</li>
+            <li className="flex items-start gap-2"><span className="text-[var(--gh-done-fg)]">•</span> HNSW indexing for fast queries</li>
           </ul>
         </div>
       </div>
@@ -698,7 +703,7 @@ graph LR
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4">Usage Examples</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4">Usage Examples</h2>
       
       <CodeBlock
         title="Vector DB Service"
@@ -799,7 +804,7 @@ graph TB
         icon={Code} 
         title="Frontend Patterns" 
         description="React component architecture with custom hooks, context providers, and a consistent design system built on Tailwind CSS."
-        color="#f78166"
+        accentVar="attention"
       />
       
       <DiagramCard
@@ -808,20 +813,20 @@ graph TB
         diagram={componentDiagram}
       />
       
-      <h2 className="text-xl font-semibold text-white mt-10 mb-4">Component Categories</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mt-10 mb-4">Component Categories</h2>
       
       <FeatureGrid>
-        <FeatureCard icon={Layers} title="Layout Components" description="Header, Sidebar, Footer - structural components that define page layout" color="#58a6ff" />
-        <FeatureCard icon={Code} title="Core Components" description="QuestionPanel, AnswerPanel, Mermaid - main feature components" color="#a371f7" />
-        <FeatureCard icon={Box} title="UI Primitives" description="Button, Card, Badge, Modal - reusable building blocks" color="#f1c40f" />
-        <FeatureCard icon={Zap} title="Custom Hooks" description="useQuestion, useProgress, useAchievements - shared logic" color="#3fb950" />
-        <FeatureCard icon={Database} title="Context Providers" description="Theme, User Preferences, Credits - global state" color="#f78166" />
-        <FeatureCard icon={Shield} title="Error Boundaries" description="Graceful error handling with fallback UI" color="#da3633" />
+        <FeatureCard icon={Layers} title="Layout Components" description="Header, Sidebar, Footer - structural components that define page layout" accentVar="accent" />
+        <FeatureCard icon={Code} title="Core Components" description="QuestionPanel, AnswerPanel, Mermaid - main feature components" accentVar="done" />
+        <FeatureCard icon={Box} title="UI Primitives" description="Button, Card, Badge, Modal - reusable building blocks" accentVar="attention" />
+        <FeatureCard icon={Zap} title="Custom Hooks" description="useQuestion, useProgress, useAchievements - shared logic" accentVar="success" />
+        <FeatureCard icon={Database} title="Context Providers" description="Theme, User Preferences, Credits - global state" accentVar="attention" />
+        <FeatureCard icon={Shield} title="Error Boundaries" description="Graceful error handling with fallback UI" accentVar="done" />
       </FeatureGrid>
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4">Custom Hook Pattern</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4">Custom Hook Pattern</h2>
       
       <CodeBlock
         title="useQuestion Hook"
@@ -857,7 +862,7 @@ export function useQuestion(id: string) {
 }`}
       />
       
-      <h2 className="text-xl font-semibold text-white mt-8 mb-4">Context Provider Pattern</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mt-8 mb-4">Context Provider Pattern</h2>
       
       <CodeBlock
         title="Achievement Context"
@@ -901,7 +906,7 @@ export const useAchievements = () => {
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4">Styling Approach</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4">Styling Approach</h2>
       
       <InfoBox type="info" title="Tailwind + CSS Variables">
         We use Tailwind for utility classes combined with CSS custom properties for theming. This allows easy theme switching while maintaining Tailwind's productivity benefits.
@@ -958,18 +963,18 @@ graph LR
 `;
 
   const sceneTypes = [
-    { name: 'collaboration', keywords: 'team, together, pair', color: '#58a6ff' },
-    { name: 'devops', keywords: 'deploy, ci/cd, docker', color: '#3fb950' },
-    { name: 'api', keywords: 'rest, graphql, endpoint', color: '#a371f7' },
-    { name: 'database', keywords: 'sql, nosql, postgres', color: '#bf8700' },
-    { name: 'security', keywords: 'auth, encrypt, ssl', color: '#f85149' },
-    { name: 'testing', keywords: 'test, qa, coverage', color: '#39c5cf' },
-    { name: 'debugging', keywords: 'bug, fix, error', color: '#d29922' },
-    { name: 'performance', keywords: 'speed, optimize, cache', color: '#f778ba' },
-    { name: 'mobile', keywords: 'ios, android, app', color: '#61dafb' },
-    { name: 'cloud', keywords: 'aws, azure, serverless', color: '#ff9900' },
-    { name: 'git', keywords: 'branch, merge, commit', color: '#f05032' },
-    { name: 'architecture', keywords: 'design, system, pattern', color: '#6366f1' },
+    { name: 'collaboration', keywords: 'team, together, pair', accentVar: 'accent' },
+    { name: 'devops', keywords: 'deploy, ci/cd, docker', accentVar: 'success' },
+    { name: 'api', keywords: 'rest, graphql, endpoint', accentVar: 'done' },
+    { name: 'database', keywords: 'sql, nosql, postgres', accentVar: 'attention' },
+    { name: 'security', keywords: 'auth, encrypt, ssl', accentVar: 'done' },
+    { name: 'testing', keywords: 'test, qa, coverage', accentVar: 'accent' },
+    { name: 'debugging', keywords: 'bug, fix, error', accentVar: 'attention' },
+    { name: 'performance', keywords: 'speed, optimize, cache', accentVar: 'done' },
+    { name: 'mobile', keywords: 'ios, android, app', accentVar: 'accent' },
+    { name: 'cloud', keywords: 'aws, azure, serverless', accentVar: 'attention' },
+    { name: 'git', keywords: 'branch, merge, commit', accentVar: 'attention' },
+    { name: 'architecture', keywords: 'design, system, pattern', accentVar: 'done' },
   ];
 
   return (
@@ -978,7 +983,7 @@ graph LR
         icon={Palette} 
         title="Illustration System" 
         description="16-bit pixel art SVG generator with 27 scene types, automatic content detection, and CSS animations for engaging blog illustrations."
-        color="#f778ba"
+        accentVar="done"
       />
       
       <InfoBox type="tip" title="Why Pixel Art?">
@@ -991,44 +996,44 @@ graph LR
         diagram={flowDiagram}
       />
       
-      <h2 className="text-xl font-semibold text-white mt-10 mb-4">Scene Types (27 Total)</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mt-10 mb-4">Scene Types (27 Total)</h2>
       
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-8">
         {sceneTypes.map((scene) => (
-          <div key={scene.name} className="p-3 rounded-lg bg-[var(--gh-canvas-overlay)/50 border border-var(--gh-border) hover:border-var(--gh-58a6ff]/50 transition-colors">
+          <div key={scene.name} className="p-3 rounded-lg bg-[var(--gh-canvas-overlay)]/50 border border-[var(--gh-border)] hover:border-[var(--gh-accent-fg)]/50 transition-colors">
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: scene.color }} />
-              <span className="font-medium text-white text-sm">{scene.name}</span>
+              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: accentColors[scene.accentVar] }} />
+              <span className="font-medium text-[var(--gh-fg)] text-sm">{scene.name}</span>
             </div>
-            <p className="text-xs text-var(--gh-fg-subtle)">{scene.keywords}</p>
+            <p className="text-xs text-[var(--gh-fg-subtle)]">{scene.keywords}</p>
           </div>
         ))}
-        <div className="p-3 rounded-lg bg-[var(--gh-canvas-subtle)/50 border border-dashed border-var(--gh-border) flex items-center justify-center">
-          <span className="text-xs text-var(--gh-fg-subtle)">+15 more scenes</span>
+        <div className="p-3 rounded-lg bg-[var(--gh-canvas-subtle)]/50 border border-dashed border-[var(--gh-border)] flex items-center justify-center">
+          <span className="text-xs text-[var(--gh-fg-subtle)]">+15 more scenes</span>
         </div>
       </div>
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4">Character System</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4">Character System</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="p-4 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
-          <h4 className="font-semibold text-white mb-2">Character Dimensions</h4>
-          <ul className="text-sm text-var(--gh-fg-muted) space-y-1">
+        <div className="p-4 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
+          <h4 className="font-semibold text-[var(--gh-fg)] mb-2">Character Dimensions</h4>
+          <ul className="text-sm text-[var(--gh-fg-muted)] space-y-1">
             <li>• Grid: 200×125 units (4px per unit)</li>
             <li>• Character: 12 units wide × 20 units tall</li>
             <li>• Minimum spacing: 30-40 units between characters</li>
             <li>• Floor position: y=100 (standing/sitting)</li>
           </ul>
         </div>
-        <div className="p-4 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
-          <h4 className="font-semibold text-white mb-2">Poses Available</h4>
-          <ul className="text-sm text-var(--gh-fg-muted) space-y-1">
-            <li>• <code className="text-var(--gh-accent-fg)">stand</code> - Default standing pose</li>
-            <li>• <code className="text-var(--gh-accent-fg)">sit</code> - Sitting at desk/chair</li>
-            <li>• <code className="text-var(--gh-accent-fg)">wave</code> - Waving hand</li>
-            <li>• <code className="text-var(--gh-accent-fg)">cheer</code> - Arms raised celebrating</li>
+        <div className="p-4 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
+          <h4 className="font-semibold text-[var(--gh-fg)] mb-2">Poses Available</h4>
+          <ul className="text-sm text-[var(--gh-fg-muted)] space-y-1">
+            <li>• <code className="text-[var(--gh-accent-fg)]">stand</code> - Default standing pose</li>
+            <li>• <code className="text-[var(--gh-accent-fg)]">sit</code> - Sitting at desk/chair</li>
+            <li>• <code className="text-[var(--gh-accent-fg)]">wave</code> - Waving hand</li>
+            <li>• <code className="text-[var(--gh-accent-fg)]">cheer</code> - Arms raised celebrating</li>
           </ul>
         </div>
       </div>
@@ -1063,7 +1068,7 @@ function person(cx, by, opts = {}) {
 }`}
       />
       
-      <h2 className="text-xl font-semibold text-white mt-8 mb-4">Scene Detection</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mt-8 mb-4">Scene Detection</h2>
       
       <CodeBlock
         title="Keyword Matching Algorithm"
@@ -1092,7 +1097,7 @@ function detectScene(title, content = '') {
 }`}
       />
       
-      <h2 className="text-xl font-semibold text-white mt-8 mb-4">CSS Animations</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mt-8 mb-4">CSS Animations</h2>
       
       <CodeBlock
         title="Character Animations"
@@ -1156,7 +1161,7 @@ sequenceDiagram
         icon={Server} 
         title="API Reference" 
         description="REST API endpoints for questions, progress tracking, achievements, and search. All responses are JSON with consistent error handling."
-        color="#39c5cf"
+        accentVar="accent"
       />
       
       <DiagramCard
@@ -1165,31 +1170,31 @@ sequenceDiagram
         diagram={flowDiagram}
       />
       
-      <h2 className="text-xl font-semibold text-white mt-10 mb-4">Endpoints</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mt-10 mb-4">Endpoints</h2>
       
-      <div className="rounded-xl border border-var(--gh-border) overflow-x-auto">
+      <div className="rounded-xl border border-[var(--gh-border)] overflow-x-auto">
         <table className="w-full border-collapse text-sm">
-          <thead className="bg-[var(--gh-canvas-overlay)">
+          <thead className="bg-[var(--gh-canvas-overlay)]">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted)">Method</th>
-              <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted)">Path</th>
-              <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted) hidden md:table-cell">Description</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)]">Method</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)]">Path</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)] hidden md:table-cell">Description</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-var(--gh-border-muted)">
+          <tbody className="divide-y divide-[var(--gh-border-muted)]">
             {endpoints.map((ep, i) => (
-              <tr key={i} className="hover:bg-[var(--gh-canvas-overlay)/50">
+              <tr key={i} className="hover:bg-[var(--gh-canvas-overlay)]/50">
                 <td className="px-4 py-3">
                   <span className={`px-2 py-1 rounded text-xs font-mono font-medium ${
-                    ep.method === 'GET' ? 'bg-[var(--gh-success-emphasis)/20 text-var(--gh-success-fg)' :
-                    ep.method === 'POST' ? 'bg-[var(--gh-accent-emphasis)/20 text-var(--gh-accent-fg)' :
-                    'bg-[var(--gh-attention-emphasis)/20 text-var(--gh-attention-fg)'
+                    ep.method === 'GET' ? 'bg-[var(--gh-success-emphasis)]/20 text-[var(--gh-success-fg)]' :
+                    ep.method === 'POST' ? 'bg-[var(--gh-accent-emphasis)]/20 text-[var(--gh-accent-fg)]' :
+                    'bg-[var(--gh-attention-emphasis)]/20 text-[var(--gh-attention-fg)]'
                   }`}>
                     {ep.method}
                   </span>
                 </td>
-                <td className="px-4 py-3 font-mono text-var(--gh-fg)">{ep.path}</td>
-                <td className="px-4 py-3 text-var(--gh-fg-muted) hidden md:table-cell">{ep.desc}</td>
+                <td className="px-4 py-3 font-mono text-[var(--gh-fg)]">{ep.path}</td>
+                <td className="px-4 py-3 text-[var(--gh-fg-muted)] hidden md:table-cell">{ep.desc}</td>
               </tr>
             ))}
           </tbody>
@@ -1198,7 +1203,7 @@ sequenceDiagram
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4">Request/Response Examples</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4">Request/Response Examples</h2>
       
       <CodeBlock
         title="GET /api/questions/:id - Response"
@@ -1241,7 +1246,7 @@ sequenceDiagram
 }`}
       />
       
-      <h2 className="text-xl font-semibold text-white mt-8 mb-4">Error Handling</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mt-8 mb-4">Error Handling</h2>
       
       <CodeBlock
         title="Error Response Format"
@@ -1288,11 +1293,10 @@ graph LR
 `;
 
   const envVars = [
-    { name: 'TURSO_DATABASE_URL', desc: 'Turso database connection URL', required: true },
-    { name: 'TURSO_AUTH_TOKEN', desc: 'Turso authentication token', required: true },
-    { name: 'QDRANT_URL', desc: 'Qdrant vector database URL', required: true },
-    { name: 'QDRANT_API_KEY', desc: 'Qdrant API key', required: true },
-    { name: 'OPENAI_API_KEY', desc: 'OpenAI API key for AI features', required: true },
+    { name: 'DATABASE_URL', desc: 'Local SQLite database path (file:local.db)', required: false },
+    { name: 'QDRANT_URL', desc: 'Qdrant vector database URL', required: false },
+    { name: 'QDRANT_API_KEY', desc: 'Qdrant API key', required: false },
+    { name: 'OPENAI_API_KEY', desc: 'OpenAI API key for AI features', required: false },
     { name: 'ANTHROPIC_API_KEY', desc: 'Anthropic API key (Claude)', required: false },
     { name: 'GA_MEASUREMENT_ID', desc: 'Google Analytics ID', required: false },
   ];
@@ -1303,7 +1307,7 @@ graph LR
         icon={Globe} 
         title="Deployment" 
         description="CI/CD pipeline with GitHub Actions, environment configuration, and production infrastructure on Vercel with edge databases."
-        color="#d29922"
+        accentVar="attention"
       />
       
       <DiagramCard
@@ -1312,27 +1316,27 @@ graph LR
         diagram={pipelineDiagram}
       />
       
-      <h2 className="text-xl font-semibold text-white mt-10 mb-4">Environment Variables</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mt-10 mb-4">Environment Variables</h2>
       
-      <div className="rounded-xl border border-var(--gh-border) overflow-x-auto">
+      <div className="rounded-xl border border-[var(--gh-border)] overflow-x-auto">
         <table className="w-full border-collapse text-sm">
-          <thead className="bg-[var(--gh-canvas-overlay)">
+          <thead className="bg-[var(--gh-canvas-overlay)]">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted)">Variable</th>
-              <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted) hidden sm:table-cell">Description</th>
-              <th className="px-4 py-3 text-left font-medium text-var(--gh-fg-muted)">Required</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)]">Variable</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)] hidden sm:table-cell">Description</th>
+              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)]">Required</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-var(--gh-border-muted)">
+          <tbody className="divide-y divide-[var(--gh-border-muted)]">
             {envVars.map((env, i) => (
-              <tr key={i} className="hover:bg-[var(--gh-canvas-overlay)/50">
-                <td className="px-4 py-3 font-mono text-var(--gh-accent-fg) text-xs">{env.name}</td>
-                <td className="px-4 py-3 text-var(--gh-fg-muted) hidden sm:table-cell">{env.desc}</td>
+              <tr key={i} className="hover:bg-[var(--gh-canvas-overlay)]/50">
+                <td className="px-4 py-3 font-mono text-[var(--gh-accent-fg)] text-xs">{env.name}</td>
+                <td className="px-4 py-3 text-[var(--gh-fg-muted)] hidden sm:table-cell">{env.desc}</td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-1 rounded text-xs ${
                     env.required 
-                      ? 'bg-[var(--gh-danger-emphasis)/20 text-var(--gh-danger-fg)' 
-                      : 'bg-[var(--gh-border) text-var(--gh-fg-muted)'
+                      ? 'bg-[var(--gh-danger-emphasis)]/20 text-[var(--gh-danger-fg)]' 
+                      : 'bg-[var(--gh-border)] text-[var(--gh-fg-muted)]'
                   }`}>
                     {env.required ? 'Required' : 'Optional'}
                   </span>
@@ -1345,27 +1349,27 @@ graph LR
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4">Quick Start</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4">Quick Start</h2>
       
       <div className="space-y-4">
-        <div className="p-4 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
+        <div className="p-4 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-[var(--gh-success-fg)/20 flex items-center justify-center text-var(--gh-success-fg) font-mono text-sm">1</div>
-            <h4 className="font-semibold text-white">Clone & Install</h4>
+            <div className="w-8 h-8 rounded-lg bg-[var(--gh-success-fg)]/20 flex items-center justify-center text-[var(--gh-success-fg)] font-mono text-sm">1</div>
+            <h4 className="font-semibold text-[var(--gh-fg)]">Clone & Install</h4>
           </div>
           <CodeBlock
             language="bash"
-            code={`git clone https://github.com/your-repo/reel-learnhub.git
-cd reel-learnhub
+            code={`git clone https://github.com/your-repo/devprep.git
+cd devprep
 pnpm install`}
             copyable
           />
         </div>
         
-        <div className="p-4 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
+        <div className="p-4 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-[var(--gh-success-fg)/20 flex items-center justify-center text-var(--gh-success-fg) font-mono text-sm">2</div>
-            <h4 className="font-semibold text-white">Configure Environment</h4>
+            <div className="w-8 h-8 rounded-lg bg-[var(--gh-success-fg)]/20 flex items-center justify-center text-[var(--gh-success-fg)] font-mono text-sm">2</div>
+            <h4 className="font-semibold text-[var(--gh-fg)]">Configure Environment</h4>
           </div>
           <CodeBlock
             language="bash"
@@ -1375,10 +1379,10 @@ pnpm install`}
           />
         </div>
         
-        <div className="p-4 rounded-xl border border-var(--gh-border) bg-[var(--gh-canvas-overlay)/30">
+        <div className="p-4 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas-overlay)]/30">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-[var(--gh-success-fg)/20 flex items-center justify-center text-var(--gh-success-fg) font-mono text-sm">3</div>
-            <h4 className="font-semibold text-white">Start Development</h4>
+            <div className="w-8 h-8 rounded-lg bg-[var(--gh-success-fg)]/20 flex items-center justify-center text-[var(--gh-success-fg)] font-mono text-sm">3</div>
+            <h4 className="font-semibold text-[var(--gh-fg)]">Start Development</h4>
           </div>
           <CodeBlock
             language="bash"
@@ -1391,7 +1395,7 @@ pnpm install`}
       
       <SectionDivider />
       
-      <h2 className="text-xl font-semibold text-white mb-4">Available Scripts</h2>
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-4">Available Scripts</h2>
       
       <CodeBlock
         title="package.json scripts"

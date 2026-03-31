@@ -132,11 +132,19 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
           throw new Error('Render returned no SVG');
         }
 
-        // Insert SVG
+        // Insert SVG with sanitization to prevent XSS
         if (containerRef.current) {
-          containerRef.current.innerHTML = result.svg;
+          // Sanitize SVG using DOMPurify to prevent XSS attacks
+          let sanitizedSvg = result.svg;
+          if (typeof window !== 'undefined' && (window as any).DOMPurify) {
+            sanitizedSvg = (window as any).DOMPurify.sanitize(result.svg, {
+              USE_PROFILES: { svg: true },
+              ADD_ATTR: ['class', 'style', 'id'],
+            });
+          }
+          containerRef.current.innerHTML = sanitizedSvg;
           console.log(`✅ [Attempt ${attemptId}] Diagram rendered successfully!`);
-          console.log(`📊 [Attempt ${attemptId}] SVG length: ${result.svg.length} chars`);
+          console.log(`📊 [Attempt ${attemptId}] SVG length: ${sanitizedSvg.length} chars`);
           setStatus('success');
         }
       } catch (err: any) {

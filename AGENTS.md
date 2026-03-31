@@ -14,7 +14,7 @@ This project uses a **supervisor-delegate pattern**. The main Replit agent acts 
 **Mission**: Free, GitHub-native technical interview prep — swipe learning, voice practice, SRS, coding challenges
 **Theme**: GitHub design system (Primer-inspired, GitHub color tokens, system font stack)
 **Stack**: React 19 + Vite 7 + TypeScript 5 + Tailwind CSS 4 + shadcn/ui
-**Database**: libSQL/Turso — `file:local.db` in dev, Turso cloud URL in prod via `TURSO_DATABASE_URL`
+**Database**: Local SQLite (`file:local.db`) - no external database required
 **Deployment**: **GitHub Pages (static SPA, zero backend servers in production)**
 **Data strategy**: DB is source of truth → build-time export to `public/data/*.json` → SPA fetches static JSON
 

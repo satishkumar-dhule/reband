@@ -326,6 +326,7 @@ function TabbedMediaPanel({
               <EnhancedMermaid 
                 chart={question.diagram!} 
                 onRenderResult={handleDiagramRenderResult}
+                caption={`${question.channel} / ${question.subChannel}`}
               />
             </motion.div>
           )}
@@ -518,7 +519,7 @@ export function GenZAnswerPanel({ question, isCompleted }: { question: Question;
               if (!isValidMermaidDiagram(codeContent)) return null;
               return (
                 <div className="my-4">
-                  <EnhancedMermaid chart={codeContent} />
+                  <EnhancedMermaid chart={codeContent} caption="Diagram from code block" />
                 </div>
               );
             }

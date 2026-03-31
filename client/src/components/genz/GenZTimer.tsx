@@ -56,15 +56,15 @@ export function GenZTimer({ duration, onComplete, showProgress = true }: GenZTim
         }}
         className={`flex items-center gap-2 px-4 py-2 rounded-[12px] border motion-reduce:animate-none ${
           isCritical
-            ? 'bg-red-500/20 border-red-500/50'
+            ? 'bg-[var(--gh-danger-subtle)] border-[var(--gh-danger-fg)]'
             : isLowTime
-            ? 'bg-orange-500/20 border-orange-500/50'
+            ? 'bg-[var(--gh-attention-subtle)] border-[var(--gh-attention-fg)]'
             : 'bg-muted/50 border-border'
         }`}
         aria-live="polite"
       >
-        <Clock className={`w-5 h-5 ${isCritical ? 'text-red-500' : isLowTime ? 'text-orange-500' : 'text-primary'}`} />
-        <span className={`font-mono text-xl font-bold ${isCritical ? 'text-red-500' : isLowTime ? 'text-orange-500' : 'text-foreground'}`}>
+        <Clock className={`w-5 h-5 ${isCritical ? 'text-[var(--gh-danger-fg)]' : isLowTime ? 'text-[var(--gh-attention-fg)]' : 'text-[var(--gh-accent-fg)]'}`} />
+        <span className={`font-mono text-xl font-bold ${isCritical ? 'text-[var(--gh-danger-fg)]' : isLowTime ? 'text-[var(--gh-attention-fg)]' : 'text-foreground'}`}>
           {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
         </span>
       </motion.div>
@@ -75,10 +75,10 @@ export function GenZTimer({ duration, onComplete, showProgress = true }: GenZTim
             animate={{ width: `${percentage}%` }}
             className={`h-full ${
               isCritical
-                ? 'bg-gradient-to-r from-red-500 to-pink-500'
+                ? 'bg-[var(--gh-danger-fg)]'
                 : isLowTime
-                ? 'bg-gradient-to-r from-orange-500 to-yellow-500'
-                : 'bg-gradient-to-r from-primary to-cyan-500'
+                ? 'bg-[var(--gh-attention-fg)]'
+                : 'bg-[var(--gh-accent-fg)]'
             }`}
           />
         </div>

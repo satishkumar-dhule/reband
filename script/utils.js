@@ -5,29 +5,22 @@ import https from 'https';
 import fs from 'fs';
 
 // ============================================
-// DATABASE CONNECTION
+// DATABASE CONNECTION (local SQLite)
 // ============================================
 
-const url = process.env.TURSO_DATABASE_URL || process.env.TURSO_DATABASE_URL_RO;
-const authToken = process.env.TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN_RO;
+const url = 'file:local.db';
+const authToken = undefined; // Local file doesn't need auth
 
-// Create database client lazily - only fail when actually used if URL is missing
 let _dbClient = null;
 export const dbClient = {
   get execute() {
     if (!_dbClient) {
-      if (!url) {
-        throw new Error('Missing TURSO_DATABASE_URL environment variable');
-      }
       _dbClient = createClient({ url, authToken });
     }
     return _dbClient.execute.bind(_dbClient);
   },
   get batch() {
     if (!_dbClient) {
-      if (!url) {
-        throw new Error('Missing TURSO_DATABASE_URL environment variable');
-      }
       _dbClient = createClient({ url, authToken });
     }
     return _dbClient.batch.bind(_dbClient);
@@ -45,7 +38,7 @@ export const TIMEOUT_MS = 300000; // 5 minutes
 
 /**
  * Retry wrapper for database operations with exponential backoff
- * Handles transient errors from Turso (HTTP 400, 500, 502, 503, timeouts)
+ * Handles transient errors from local SQLite
  */
 async function retryDatabaseOperation(operation, operationName = 'database operation', maxRetries = 3) {
   let lastError = null;

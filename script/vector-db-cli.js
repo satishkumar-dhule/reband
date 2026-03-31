@@ -20,8 +20,8 @@ import mlDecisions from './ai/services/ml-decisions.js';
 
 // Database connection
 const client = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN
+  url: 'file:local.db',
+  authToken: undefined
 });
 
 async function fetchQuestions(limit = null) {

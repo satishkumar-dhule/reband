@@ -95,7 +95,7 @@ export function BadgeRing({ progress, size = 'md', showProgress = true, onClick 
             cy={s.ring / 2}
             r={radius}
             fill="none"
-            stroke={isUnlocked ? tierColor : 'hsl(var(--muted-foreground))'}
+            stroke={isUnlocked ? tierColor : 'currentColor'}
             strokeWidth={s.stroke}
             strokeLinecap="round"
             strokeDasharray={circumference}

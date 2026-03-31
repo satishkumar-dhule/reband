@@ -90,11 +90,6 @@ jobs:
           
           echo "✅ All data fetching scripts completed successfully"
           echo "Logs available in logs/"
-        env:
-          TURSO_DATABASE_URL_RO: ${{ secrets.TURSO_DATABASE_URL_RO }}
-          TURSO_AUTH_TOKEN_RO: ${{ secrets.TURSO_AUTH_TOKEN_RO }}
-          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
-          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
 
       - name: Cache build output
         uses: actions/cache@v4

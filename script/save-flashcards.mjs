@@ -8,8 +8,8 @@ import { createClient } from '@libsql/client';
 import { readFileSync } from 'fs';
 
 // Get database connection
-const url = process.env.TURSO_DATABASE_URL || "file:local.db";
-const authToken = process.env.TURSO_AUTH_TOKEN;
+const url = 'file:local.db' || "file:local.db";
+const authToken = undefined;
 
 const db = createClient({
   url: url.startsWith("file:") ? url : url,

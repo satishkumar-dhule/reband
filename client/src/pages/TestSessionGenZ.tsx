@@ -13,6 +13,7 @@ import {
 import { SEOHead } from '../components/SEOHead';
 import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrapper';
 import { GenZCard, GenZButton, GenZProgress, GenZTimer } from '../components/genz';
+import { Button } from '@/components/unified/Button';
 import {
   Test, TestQuestion, getTestForChannel, getSessionQuestions,
   calculateScore, saveTestAttempt, TestAttempt, getTestProgress,
@@ -260,12 +261,13 @@ export default function TestSessionGenZ() {
           <div className="min-h-screen flex flex-col">
             <header className="border-b border-border p-2.5 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <button
+                <Button
+                  variant="ghost"
+                  size="xs"
                   onClick={() => setLocation('/')}
-                  className="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Home className="w-3.5 h-3.5" />
-                </button>
+                  icon={<Home className="w-3.5 h-3.5" />}
+                  aria-label="Go home"
+                />
                 <span className="text-xs text-muted-foreground">
                   {currentIndex + 1}/{questions.length}
                 </span>
@@ -318,11 +320,14 @@ export default function TestSessionGenZ() {
                         const isMultiple = currentQuestion.type === 'multiple';
                         
                         return (
-                          <button
+                          <Button
                             key={option.id}
                             onClick={() => handleOptionSelect(option.id)}
                             disabled={showFeedback !== null}
-                            className={`w-full p-3 md:p-4 text-left border rounded-lg transition-all min-h-[44px] ${
+                            variant={showCorrect ? 'success' : showWrong ? 'danger' : isSelected ? 'outline' : 'ghost'}
+                            size="md"
+                            fullWidth
+                            className={`justify-start p-3 md:p-4 h-auto text-left min-h-[44px] ${
                               showCorrect
                                 ? 'border-primary bg-primary/20'
                                 : showWrong
@@ -348,7 +353,7 @@ export default function TestSessionGenZ() {
                               </div>
                               <span className="text-sm">{option.text}</span>
                             </div>
-                          </button>
+                          </Button>
                         );
                       })}
                     </div>

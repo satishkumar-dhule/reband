@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { SEOHead } from '../components/SEOHead';
 import { UnifiedSearch } from '../components/UnifiedSearch';
+import { MotionButton, IconButton } from '@/components/unified/Button';
 import { 
   getDueCards, recordReview, getSRSStats,
   calculateXP, addXP,
@@ -191,13 +192,13 @@ export default function ReviewSessionOptimized() {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
-          <motion.button 
-            onClick={() => setLocation('/')} 
-            whileTap={{ scale: 0.92 }}
-            className="p-1.5 hover:bg-secondary rounded-lg transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </motion.button>
+          <IconButton
+            icon={<ChevronLeft className="w-5 h-5" />}
+            onClick={() => setLocation('/')}
+            aria-label="Go back"
+            variant="ghost"
+            size="sm"
+          />
           
           <Brain className="w-4 h-4 text-[var(--gh-success-fg)]" />
           <h1 className="font-bold text-sm">SRS Review</h1>
@@ -264,34 +265,37 @@ export default function ReviewSessionOptimized() {
                 <div className="max-w-2xl mx-auto space-y-3">
                   {/* Tags - COMPACT & CLICKABLE */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    <motion.button
+                    <MotionButton
                       onClick={() => handleTagClick(currentCard.channel)}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-2 py-0.5 bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)] text-xs font-semibold rounded-full border border-[var(--gh-accent-fg)]/30 hover:opacity-80 transition-colors cursor-pointer"
+                      variant="ghost"
+                      size="sm"
+                      className="px-2 py-0.5 bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)] text-xs font-semibold rounded-full border border-[var(--gh-accent-fg)]/30"
                     >
                       {currentCard.channel}
-                    </motion.button>
-                    <motion.button
+                    </MotionButton>
+                    <MotionButton
                       onClick={() => handleTagClick(currentCard.difficulty)}
-                      whileTap={{ scale: 0.95 }}
+                      variant="ghost"
+                      size="sm"
                       className={cn(
-                        "px-2 py-0.5 text-xs font-semibold rounded-full border hover:opacity-80 transition-opacity cursor-pointer",
+                        "px-2 py-0.5 text-xs font-semibold rounded-full border",
                         currentCard.difficulty === 'beginner' ? 'bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] border-[var(--gh-success-fg)]/30' :
                         currentCard.difficulty === 'intermediate' ? 'bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)] border-[var(--gh-attention-fg)]/30' :
                         'bg-[var(--gh-danger-subtle)] text-[var(--gh-danger-fg)] border-[var(--gh-danger-fg)]/30'
                       )}
                     >
                       {currentCard.difficulty}
-                    </motion.button>
+                    </MotionButton>
                     {currentQuestion.tags && currentQuestion.tags.slice(0, 3).map((tag, idx) => (
-                      <motion.button
+                      <MotionButton
                         key={idx}
                         onClick={() => handleTagClick(tag)}
-                        whileTap={{ scale: 0.95 }}
-                        className="px-2 py-0.5 bg-[var(--gh-done-subtle)] text-[var(--gh-done-fg)] text-xs font-semibold rounded-full border border-[var(--gh-done-fg)]/30 hover:opacity-80 transition-colors cursor-pointer"
+                        variant="ghost"
+                        size="sm"
+                        className="px-2 py-0.5 bg-[var(--gh-done-subtle)] text-[var(--gh-done-fg)] text-xs font-semibold rounded-full border border-[var(--gh-done-fg)]/30"
                       >
                         {tag}
-                      </motion.button>
+                      </MotionButton>
                     ))}
                   </div>
 
@@ -337,16 +341,14 @@ export default function ReviewSessionOptimized() {
                                 if (!inline && match) {
                                   return (
                                     <div className="relative group my-2">
-                                      <button
+                                      <IconButton
+                                        icon={copiedCode === codeId ? <Check className="w-3 h-3 text-[var(--gh-success-fg)]" /> : <Copy className="w-3 h-3" />}
                                         onClick={() => handleCopyCode(codeString, codeId)}
-                                        className="absolute top-1 right-1 p-1.5 rounded-lg bg-secondary/80 hover:bg-secondary transition-all opacity-0 group-hover:opacity-100 z-10"
-                                      >
-                                        {copiedCode === codeId ? (
-                                          <Check className="w-3 h-3 text-[var(--gh-success-fg)]" />
-                                        ) : (
-                                          <Copy className="w-3 h-3" />
-                                        )}
-                                      </button>
+                                        aria-label="Copy code"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="absolute top-1 right-1 p-1.5 opacity-0 group-hover:opacity-100 z-10"
+                                      />
                                       <SyntaxHighlighter
                                         style={vscDarkPlus}
                                         language={match[1]}
@@ -397,16 +399,14 @@ export default function ReviewSessionOptimized() {
                                   if (!inline && match) {
                                     return (
                                       <div className="relative group my-2">
-                                        <button
+                                        <IconButton
+                                          icon={copiedCode === codeId ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
                                           onClick={() => handleCopyCode(codeString, codeId)}
-                                          className="absolute top-1 right-1 p-1.5 rounded-lg bg-secondary/80 hover:bg-secondary transition-all opacity-0 group-hover:opacity-100 z-10"
-                                        >
-                                          {copiedCode === codeId ? (
-                                            <Check className="w-3 h-3 text-green-400" />
-                                          ) : (
-                                            <Copy className="w-3 h-3" />
-                                          )}
-                                        </button>
+                                          aria-label="Copy code"
+                                          variant="ghost"
+                                          size="sm"
+                                          className="absolute top-1 right-1 p-1.5 opacity-0 group-hover:opacity-100 z-10"
+                                        />
                                         <SyntaxHighlighter
                                           style={vscDarkPlus}
                                           language={match[1]}
@@ -446,19 +446,19 @@ export default function ReviewSessionOptimized() {
               <div className="shrink-0 pb-safe bg-card/90 backdrop-blur-xl border-t border-border/50">
                 {!showAnswer ? (
                   /* Step 1: Tap anywhere to reveal answer */
-                  <motion.button
+                  <MotionButton
                     onClick={() => {
                       setShowAnswer(true);
                       triggerHaptic('light');
                     }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full p-4 text-center"
+                    variant="ghost"
+                    size="lg"
+                    fullWidth
+                    icon={<Eye className="w-5 h-5" />}
+                    className="text-[var(--gh-success-fg)]"
                   >
-                    <div className="flex items-center justify-center gap-2 text-[var(--gh-success-fg)]">
-                      <Eye className="w-5 h-5" />
-                      <span className="font-semibold">Tap to reveal answer</span>
-                    </div>
-                  </motion.button>
+                    Tap to reveal answer
+                  </MotionButton>
                 ) : (
                   /* Step 2: Rate your confidence */
                   <div className="p-3 space-y-2">
@@ -467,26 +467,23 @@ export default function ReviewSessionOptimized() {
                     </p>
                     <div className="grid grid-cols-4 gap-2">
                       {[
-                        { rating: 'again' as ConfidenceRating, label: 'Again', color: 'from-[var(--gh-danger-emphasis)] to-[var(--gh-danger-fg)]', icon: X },
-                        { rating: 'hard' as ConfidenceRating, label: 'Hard', color: 'from-[var(--gh-attention-emphasis)] to-[var(--gh-attention-fg)]', icon: Brain },
-                        { rating: 'good' as ConfidenceRating, label: 'Good', color: 'from-[var(--gh-success-emphasis)] to-[var(--gh-success-fg)]', icon: Check },
-                        { rating: 'easy' as ConfidenceRating, label: 'Easy', color: 'from-[var(--gh-accent-emphasis)] to-[var(--gh-accent-fg)]', icon: Zap },
+                        { rating: 'again' as ConfidenceRating, label: 'Again', bgColor: 'var(--gh-danger-emphasis)', icon: X },
+                        { rating: 'hard' as ConfidenceRating, label: 'Hard', bgColor: 'var(--gh-attention-emphasis)', icon: Brain },
+                        { rating: 'good' as ConfidenceRating, label: 'Good', bgColor: 'var(--gh-success-emphasis)', icon: Check },
+                        { rating: 'easy' as ConfidenceRating, label: 'Easy', bgColor: 'var(--gh-accent-emphasis)', icon: Zap },
                       ].map((btn) => {
                         const Icon = btn.icon;
                         return (
-                          <motion.button
+                          <MotionButton
                             key={btn.rating}
                             onClick={() => handleRate(btn.rating)}
-                            whileTap={{ scale: 0.92 }}
-                            className={cn(
-                              'flex flex-col items-center gap-1 py-2.5 rounded-xl text-white',
-                              'bg-gradient-to-br shadow-lg hover:shadow-xl min-h-[44px]',
-                              btn.color
-                            )}
+                            variant="ghost"
+                            className="flex flex-col items-center gap-1 py-2.5 rounded-xl min-h-[44px] text-white"
+                            style={{ backgroundColor: btn.bgColor }}
+                            icon={<Icon className="w-4 h-4" />}
                           >
-                            <Icon className="w-4 h-4" />
                             <span className="text-xs font-semibold">{btn.label}</span>
-                          </motion.button>
+                          </MotionButton>
                         );
                       })}
                     </div>
@@ -651,16 +648,14 @@ function CheckpointTest({
                           if (!inline && match) {
                             return (
                               <div className="relative group my-2">
-                                <button
+                                <IconButton
+                                  icon={copiedCode === codeId ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
                                   onClick={() => handleCopyCode(codeString, codeId)}
-                                  className="absolute top-1 right-1 p-1.5 rounded-lg bg-secondary/80 hover:bg-secondary transition-all opacity-0 group-hover:opacity-100 z-10"
-                                >
-                                  {copiedCode === codeId ? (
-                                    <Check className="w-3 h-3 text-green-400" />
-                                  ) : (
-                                    <Copy className="w-3 h-3" />
-                                  )}
-                                </button>
+                                  aria-label="Copy code"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="absolute top-1 right-1 p-1.5 opacity-0 group-hover:opacity-100 z-10"
+                                />
                                 <SyntaxHighlighter
                                   style={vscDarkPlus}
                                   language={match[1]}
@@ -696,23 +691,27 @@ function CheckpointTest({
             {/* Answer Buttons */}
             {!showAnswer && (
               <div className="grid grid-cols-2 gap-2">
-                <motion.button
+                <MotionButton
                   onClick={() => handleAnswer(false)}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-gradient-to-br from-[var(--gh-danger-emphasis)] to-[var(--gh-danger-fg)] text-[var(--gh-fg-on-emphasis)] shadow-lg min-h-[56px]"
+                  variant="danger"
+                  size="lg"
+                  fullWidth
+                  icon={<X className="w-5 h-5" />}
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl shadow-lg min-h-[56px]"
                 >
-                  <X className="w-5 h-5" />
-                  <span className="text-sm font-semibold">Don't Remember</span>
-                </motion.button>
+                  Don't Remember
+                </MotionButton>
 
-                <motion.button
+                <MotionButton
                   onClick={() => handleAnswer(true)}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-gradient-to-br from-[var(--gh-success-emphasis)] to-[var(--gh-success-fg)] text-[var(--gh-fg-on-emphasis)] shadow-lg min-h-[56px]"
+                  variant="success"
+                  size="lg"
+                  fullWidth
+                  icon={<Check className="w-5 h-5" />}
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl shadow-lg min-h-[56px]"
                 >
-                  <Check className="w-5 h-5" />
-                  <span className="text-sm font-semibold">Remember</span>
-                </motion.button>
+                  Remember
+                </MotionButton>
               </div>
             )}
           </div>
@@ -743,13 +742,14 @@ function CheckpointTest({
               </p>
             </div>
 
-            <motion.button
+            <MotionButton
               onClick={() => onComplete(score)}
-              whileTap={{ scale: 0.95 }}
-              className="w-full py-3 bg-gradient-to-r from-[var(--gh-attention-emphasis)] to-[var(--gh-attention-fg)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-bold shadow-lg"
+              variant="primary"
+              size="lg"
+              fullWidth
             >
               Continue Reviewing
-            </motion.button>
+            </MotionButton>
           </div>
         </div>
       )}
@@ -836,13 +836,14 @@ function CompletedScreen({
           </div>
         )}
 
-        <motion.button
+        <MotionButton
           onClick={onGoHome}
-          whileTap={{ scale: 0.95 }}
-          className="w-full py-3 bg-gradient-to-r from-[var(--gh-success-emphasis)] to-[var(--gh-success-fg)] text-[var(--gh-fg-on-emphasis)] rounded-xl font-bold shadow-lg"
+          variant="success"
+          size="lg"
+          fullWidth
         >
           Back to Home
-        </motion.button>
+        </MotionButton>
       </div>
     </motion.div>
   );

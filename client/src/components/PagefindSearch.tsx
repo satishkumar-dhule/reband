@@ -7,15 +7,25 @@ import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useUnifiedToast } from '@/hooks/use-unified-toast';
 import { allChannelsConfig } from '../lib/channels-config';
 
-// Safe HTML component - strips script tags to prevent XSS
+// Safe HTML component - uses DOMPurify to prevent XSS
 function SafeHTML({ html }: { html: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (ref.current) {
-      // Strip script tags manually to prevent XSS
-      const stripped = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-      ref.current.innerHTML = stripped;
+      // Use DOMPurify for proper XSS sanitization
+      // DOMPurify is loaded via CDN in index.html
+      if (typeof window !== 'undefined' && (window as any).DOMPurify) {
+        const clean = (window as any).DOMPurify.sanitize(html, {
+          ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'b', 'i', 'code', 'span', 'a'],
+          ALLOWED_ATTR: ['href', 'class', 'style'],
+        });
+        ref.current.innerHTML = clean;
+      } else {
+        // Fallback: strip script tags (less secure but functional)
+        const stripped = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+        ref.current.innerHTML = stripped;
+      }
     }
   }, [html]);
 

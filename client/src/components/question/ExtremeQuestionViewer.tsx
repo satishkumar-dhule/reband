@@ -22,6 +22,7 @@ import { useUnifiedToast } from '../../hooks/use-unified-toast';
 import { useSwipe } from '../../hooks/use-swipe';
 import { loadTests, getSessionQuestions, TestQuestion, Test } from '../../lib/tests';
 import { spendCredits } from '../../lib/credits';
+import { Button, MotionButton, IconButton } from '@/components/unified/Button';
 import {
   ChevronLeft, ChevronRight, Search, ChevronDown, Check,
   Target, Zap, Flame, Building2,
@@ -550,12 +551,9 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
         <div className="text-center">
           <h2 className="text-xl font-bold mb-2">Channel not found</h2>
           <p className="text-muted-foreground mb-4">The channel "{channelId}" doesn't exist.</p>
-          <button
-            onClick={() => setLocation('/')}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
-          >
+          <Button onClick={() => setLocation('/')} variant="primary">
             Go Home
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -617,16 +615,16 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
           <div className="text-center">
             <h2 className="text-xl font-bold mb-2">No questions found</h2>
             <p className="text-muted-foreground mb-4">Try adjusting your filters.</p>
-            <button
+            <Button
               onClick={() => {
                 setSelectedSubChannel('all');
                 setSelectedDifficulty('all');
                 setSelectedCompany('all');
               }}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
+              variant="primary"
             >
               Reset Filters
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -686,26 +684,22 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
           <div className="flex-1 flex flex-col lg:hidden overflow-hidden">
             {/* Mobile Tabs */}
             <div className="flex border-b border-border bg-card backdrop-blur relative z-10">
-              <button
+              <Button
                 onClick={() => setMobileView('question')}
-                className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                  mobileView === 'question'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-muted-foreground'
-                }`}
+                variant={mobileView === 'question' ? 'primary' : 'ghost'}
+                size="sm"
+                className={`flex-1 rounded-none ${mobileView === 'question' ? 'border-b-2 border-primary' : ''}`}
               >
                 Question
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setMobileView('answer')}
-                className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                  mobileView === 'answer'
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-muted-foreground'
-                }`}
+                variant={mobileView === 'answer' ? 'primary' : 'ghost'}
+                size="sm"
+                className={`flex-1 rounded-none ${mobileView === 'answer' ? 'border-b-2 border-primary' : ''}`}
               >
                 Answer
-              </button>
+              </Button>
             </div>
             {/* Mobile Content - Swipeable */}
             <div 
@@ -794,14 +788,13 @@ function Header({
       <div className="h-12 flex items-center justify-between px-3 gap-2">
         {/* Left: Back + Channel */}
         <div className="flex items-center gap-2">
-          <motion.button 
-            onClick={onBack} 
-            className="p-1.5 hover:bg-muted rounded-lg transition-all"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <ChevronLeft className="w-5 h-5 text-foreground" />
-          </motion.button>
+          <IconButton
+            onClick={onBack}
+            icon={<ChevronLeft className="w-5 h-5" />}
+            aria-label="Go back"
+            size="sm"
+            variant="ghost"
+          />
           
           <div className="hidden sm:block">
             <h1 className="font-bold text-foreground text-sm">{channel.name}</h1>
@@ -832,45 +825,41 @@ function Header({
         <div className="flex items-center gap-1.5">
           {/* Filter Toggle */}
           {filters && (
-            <motion.button 
-              onClick={() => setShowFilters(!showFilters)}
-              className={`relative p-1.5 rounded-lg transition-all ${
-                showFilters || hasActiveFilter 
-                  ? 'bg-primary/10 text-primary border border-primary/30' 
-                  : 'hover:bg-muted text-muted-foreground'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Settings className="w-4 h-4" />
+            <div className="relative">
+              <IconButton
+                onClick={() => setShowFilters(!showFilters)}
+                icon={<Settings className="w-4 h-4" />}
+                aria-label="Toggle filters"
+                size="sm"
+                variant={showFilters || hasActiveFilter ? 'primary' : 'ghost'}
+              />
               {activeFilterCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-primary-foreground text-[9px] font-bold rounded-full flex items-center justify-center border border-background">
                   {activeFilterCount}
                 </span>
               )}
-            </motion.button>
+            </div>
           )}
 
           {/* Search */}
-          <motion.button 
-            onClick={onSearch} 
-            className="p-1.5 hover:bg-muted rounded-lg transition-all text-muted-foreground hover:text-foreground"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Search className="w-4 h-4" />
-          </motion.button>
+          <IconButton
+            onClick={onSearch}
+            icon={<Search className="w-4 h-4" />}
+            aria-label="Search"
+            size="sm"
+            variant="ghost"
+          />
 
           {/* Fullscreen */}
           {onFullscreen && (
-            <motion.button 
-              onClick={onFullscreen} 
-              className="hidden lg:block p-1.5 hover:bg-muted rounded-lg transition-all text-muted-foreground hover:text-foreground"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Maximize2 className="w-4 h-4" />
-            </motion.button>
+            <IconButton
+              onClick={onFullscreen}
+              icon={<Maximize2 className="w-4 h-4" />}
+              aria-label="Toggle fullscreen"
+              size="sm"
+              variant="ghost"
+              className="hidden lg:flex"
+            />
           )}
         </div>
       </div>
@@ -902,9 +891,9 @@ function Header({
                   label={selectedDifficulty === 'all' ? 'All Levels' : selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1)}
                   options={[
                     { id: 'all', label: 'All Levels', icon: <Target className="w-3 h-3" /> },
-                    { id: 'beginner', label: 'Easy', icon: <Zap className="w-3 h-3 text-emerald-500" /> },
-                    { id: 'intermediate', label: 'Medium', icon: <Target className="w-3 h-3 text-amber-500" /> },
-                    { id: 'advanced', label: 'Hard', icon: <Flame className="w-3 h-3 text-rose-500" /> },
+                    { id: 'beginner', label: 'Easy', icon: <Zap className="w-3 h-3 text-[var(--gh-success-fg)]" /> },
+                    { id: 'intermediate', label: 'Medium', icon: <Target className="w-3 h-3 text-[var(--gh-attention-fg)]" /> },
+                    { id: 'advanced', label: 'Hard', icon: <Flame className="w-3 h-3 text-[var(--gh-danger-fg)]" /> },
                   ]}
                   selected={selectedDifficulty}
                   onSelect={(v) => onFilterChange('diff', v)}
@@ -924,18 +913,18 @@ function Header({
 
                 {/* Clear Filters */}
                 {hasActiveFilter && (
-                  <motion.button
+                  <Button
                     onClick={() => {
                       onFilterChange('sub', 'all');
                       onFilterChange('diff', 'all');
                       onFilterChange('company', 'all');
                     }}
-                    className="ml-auto px-2.5 py-1 text-[10px] font-medium text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 rounded-lg transition-all"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    variant="secondary"
+                    size="xs"
+                    className="ml-auto"
                   >
                     Clear All
-                  </motion.button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -966,16 +955,14 @@ function FilterDropdown({ label, options, selected, onSelect }: FilterDropdownPr
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button 
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-            isActive 
-              ? 'bg-primary/10 text-primary border border-primary/30' 
-              : 'bg-card hover:bg-muted border border-border text-foreground'
-          }`}
+        <Button
+          variant={isActive ? 'primary' : 'outline'}
+          size="sm"
+          className="flex items-center gap-1.5 whitespace-nowrap"
         >
           {label}
           <ChevronDown className="w-3 h-3 opacity-60" />
-        </button>
+        </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
@@ -1023,63 +1010,49 @@ function NavigationFooter({
       <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-background/95 backdrop-blur-xl border-t border-border">
         <div className="flex items-center justify-between px-3 py-2">
           {/* Previous */}
-          <motion.button
+          <MotionButton
             onClick={onPrev}
             disabled={!canGoPrev}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium text-xs transition-all ${
-              canGoPrev
-                ? 'bg-card hover:bg-muted text-foreground border border-border'
-                : 'bg-muted/50 text-muted-foreground border border-border cursor-not-allowed opacity-50'
-            }`}
-            whileHover={canGoPrev ? { scale: 1.05 } : {}}
-            whileTap={canGoPrev ? { scale: 0.95 } : {}}
+            variant={canGoPrev ? 'outline' : 'ghost'}
+            size="sm"
+            className="gap-1.5"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             <span>Prev</span>
-          </motion.button>
+          </MotionButton>
 
           {/* Center Actions */}
           <div className="flex items-center gap-1.5">
             {/* Bookmark */}
-            <motion.button
+            <IconButton
               onClick={onToggleMark}
-              className={`p-2 rounded-lg transition-all ${
-                isMarked
-                  ? 'bg-primary/10 text-primary border border-primary/30'
-                  : 'bg-card text-muted-foreground hover:text-primary border border-border'
-              }`}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Bookmark className={`w-4 h-4 ${isMarked ? 'fill-current' : ''}`} />
-            </motion.button>
+              icon={<Bookmark className={`w-4 h-4 ${isMarked ? 'fill-current' : ''}`} />}
+              variant={isMarked ? 'primary' : 'ghost'}
+              size="sm"
+              aria-label={isMarked ? 'Remove bookmark' : 'Add bookmark'}
+            />
 
             {/* Share */}
-            <motion.button 
-              onClick={onShare} 
-              className="p-2 rounded-lg bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all border border-border"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Share2 className="w-4 h-4" />
-            </motion.button>
+            <IconButton
+              onClick={onShare}
+              icon={<Share2 className="w-4 h-4" />}
+              variant="ghost"
+              size="sm"
+              aria-label="Share question"
+            />
           </div>
 
           {/* Next */}
-          <motion.button
+          <MotionButton
             onClick={onNext}
             disabled={!canGoNext}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium text-xs transition-all ${
-              canGoNext
-                ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                : 'bg-muted/50 text-muted-foreground border border-border cursor-not-allowed opacity-50'
-            }`}
-            whileHover={canGoNext ? { scale: 1.05 } : {}}
-            whileTap={canGoNext ? { scale: 0.95 } : {}}
+            variant={canGoNext ? 'primary' : 'ghost'}
+            size="sm"
+            className="gap-1.5"
           >
             <span>Next</span>
             <ChevronRight className="w-3.5 h-3.5" />
-          </motion.button>
+          </MotionButton>
         </div>
       </div>
 
@@ -1093,20 +1066,16 @@ function NavigationFooter({
         >
           <div className="flex items-center gap-2 px-3 py-2 bg-card/95 backdrop-blur-xl border border-border rounded-xl shadow-xl">
             {/* Previous */}
-            <motion.button
+            <MotionButton
               onClick={onPrev}
               disabled={!canGoPrev}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium text-xs transition-all ${
-                canGoPrev
-                  ? 'bg-muted hover:bg-muted/80 text-foreground'
-                  : 'bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50'
-              }`}
-              whileHover={canGoPrev ? { scale: 1.05 } : {}}
-              whileTap={canGoPrev ? { scale: 0.95 } : {}}
+              variant={canGoPrev ? 'outline' : 'ghost'}
+              size="sm"
+              className="gap-1.5"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               <span>Prev</span>
-            </motion.button>
+            </MotionButton>
 
             {/* Divider */}
             <div className="w-px h-6 bg-border" />
@@ -1130,47 +1099,37 @@ function NavigationFooter({
             <div className="w-px h-6 bg-border" />
 
             {/* Bookmark */}
-            <motion.button
+            <IconButton
               onClick={onToggleMark}
-              className={`p-1.5 rounded-lg transition-all ${
-                isMarked 
-                  ? 'bg-primary/10 text-primary border border-primary/30' 
-                  : 'hover:bg-muted text-muted-foreground hover:text-primary'
-              }`}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Bookmark className={`w-3.5 h-3.5 ${isMarked ? 'fill-current' : ''}`} />
-            </motion.button>
+              icon={<Bookmark className={`w-3.5 h-3.5 ${isMarked ? 'fill-current' : ''}`} />}
+              variant={isMarked ? 'primary' : 'ghost'}
+              size="sm"
+              aria-label={isMarked ? 'Remove bookmark' : 'Add bookmark'}
+            />
 
             {/* Share */}
-            <motion.button 
-              onClick={onShare} 
-              className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Share2 className="w-3.5 h-3.5" />
-            </motion.button>
+            <IconButton
+              onClick={onShare}
+              icon={<Share2 className="w-3.5 h-3.5" />}
+              variant="ghost"
+              size="sm"
+              aria-label="Share question"
+            />
 
             {/* Divider */}
             <div className="w-px h-6 bg-border" />
 
             {/* Next */}
-            <motion.button
+            <MotionButton
               onClick={onNext}
               disabled={!canGoNext}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium text-xs transition-all ${
-                canGoNext
-                  ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                  : 'bg-muted/50 text-muted-foreground cursor-not-allowed opacity-50'
-              }`}
-              whileHover={canGoNext ? { scale: 1.05 } : {}}
-              whileTap={canGoNext ? { scale: 0.95 } : {}}
+              variant={canGoNext ? 'primary' : 'ghost'}
+              size="sm"
+              className="gap-1.5"
             >
               <span>Next</span>
               <ChevronRight className="w-3.5 h-3.5" />
-            </motion.button>
+            </MotionButton>
           </div>
         </motion.div>
       </div>

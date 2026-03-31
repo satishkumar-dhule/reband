@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, ZoomIn, ZoomOut, Maximize2, Move, Palette } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { mermaidThemeConfigs, type MermaidTheme } from './Mermaid';
+import { Button, IconButton } from './unified/Button';
 
 const appThemeToMermaid: Record<string, MermaidTheme> = {
   'premium-dark': 'dark',
@@ -70,6 +71,7 @@ interface EnhancedMermaidProps {
   chart: string;
   compact?: boolean;
   onRenderResult?: (success: boolean) => void;
+  caption?: string;
 }
 
 // Validate if content is a valid Mermaid diagram
@@ -115,7 +117,7 @@ function isValidMermaidSyntax(chart: string): boolean {
   return hasDiagramSyntax;
 }
 
-export function EnhancedMermaid({ chart, compact = false, onRenderResult }: EnhancedMermaidProps) {
+export function EnhancedMermaid({ chart, compact = false, onRenderResult, caption }: EnhancedMermaidProps) {
   const { theme: appTheme } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
@@ -386,33 +388,51 @@ export function EnhancedMermaid({ chart, compact = false, onRenderResult }: Enha
           
           <div className="flex items-center gap-1">
             <div className="relative">
-              <button onClick={() => setShowThemePicker(!showThemePicker)} className="p-2 hover:bg-white/10 rounded transition-colors flex items-center gap-1" title="Change theme">
-                <Palette className="w-4 h-4 text-white/70" />
-                <span className="text-[9px] text-white/50 hidden sm:inline">{effectiveMermaidTheme}</span>
-              </button>
+              <IconButton
+                icon={<Palette className="w-4 h-4" />}
+                onClick={() => setShowThemePicker(!showThemePicker)}
+                aria-label="Change theme"
+                size="sm"
+                variant="ghost"
+                className="flex items-center gap-1"
+                style={{ color: 'rgba(255,255,255,0.7)' }}
+              />
+              <span className="text-[9px] hidden sm:inline" style={{ color: 'rgba(255,255,255,0.5)' }}>{effectiveMermaidTheme}</span>
               {showThemePicker && (
-                <div className="absolute top-full right-0 mt-1 bg-black border border-white/20 rounded shadow-lg z-10 min-w-[120px]">
+                <div className="absolute top-full right-0 mt-1 border rounded shadow-lg z-10 min-w-[120px]" style={{ backgroundColor: 'black', borderColor: 'rgba(255,255,255,0.2)' }}>
                   {mermaidThemes.map((t) => (
-                    <button key={t.id} onClick={() => { handleThemeChange(t.id); setShowThemePicker(false); }}
-                      className={`w-full px-3 py-1.5 text-left text-[10px] hover:bg-white/10 flex items-center gap-2 ${effectiveMermaidTheme === t.id ? 'text-primary' : 'text-white/70'}`}>
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: t.color }} />
+                    <Button
+                      key={t.id}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => { handleThemeChange(t.id); setShowThemePicker(false); }}
+                      className="w-full px-3 py-1.5 justify-start text-[10px] h-auto"
+                      style={{ color: effectiveMermaidTheme === t.id ? 'var(--gh-accent-emphasis)' : 'rgba(255,255,255,0.7)' }}
+                    >
+                      <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: t.color }} />
                       {t.name}
-                    </button>
+                    </Button>
                   ))}
-                  <div className="border-t border-white/10 mt-1 pt-1">
-                    <button onClick={() => { handleThemeChange(null); setShowThemePicker(false); }} className="w-full px-3 py-1.5 text-left text-[10px] text-white/50 hover:bg-white/10">
+                  <div className="border-t mt-1 pt-1" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => { handleThemeChange(null); setShowThemePicker(false); }}
+                      className="w-full px-3 py-1.5 justify-start text-[10px] h-auto"
+                      style={{ color: 'rgba(255,255,255,0.5)' }}
+                    >
                       Auto (match app)
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
             </div>
-            <div className="w-px h-4 bg-white/20 mx-1" />
-            <button onClick={handleZoomOut} aria-label="Zoom out" className="p-2 hover:bg-white/10 rounded transition-colors"><ZoomOut className="w-4 h-4 text-white/70" /></button>
-            <button onClick={handleZoomIn} aria-label="Zoom in" className="p-2 hover:bg-white/10 rounded transition-colors"><ZoomIn className="w-4 h-4 text-white/70" /></button>
-            <button onClick={resetView} className="px-3 py-1 text-[10px] text-white/50 hover:text-white hover:bg-white/10 rounded uppercase" title="Reset">Reset</button>
-            <div className="w-px h-4 bg-white/20 mx-1" />
-            <button onClick={() => { setIsExpanded(false); resetView(); }} className="p-2 hover:bg-white/10 rounded transition-colors" title="Close"><X className="w-4 h-4 text-white/70" /></button>
+            <div className="w-px h-4 mx-1" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
+            <IconButton icon={<ZoomOut className="w-4 h-4" />} onClick={handleZoomOut} aria-label="Zoom out" size="sm" variant="ghost" style={{ color: 'rgba(255,255,255,0.7)' }} />
+            <IconButton icon={<ZoomIn className="w-4 h-4" />} onClick={handleZoomIn} aria-label="Zoom in" size="sm" variant="ghost" style={{ color: 'rgba(255,255,255,0.7)' }} />
+            <Button variant="ghost" size="sm" onClick={resetView} className="px-3 py-1 text-[10px] uppercase" style={{ color: 'rgba(255,255,255,0.5)' }}>Reset</Button>
+            <div className="w-px h-4 mx-1" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
+            <IconButton icon={<X className="w-4 h-4" />} onClick={() => { setIsExpanded(false); resetView(); }} aria-label="Close" size="sm" variant="ghost" style={{ color: 'rgba(255,255,255,0.7)' }} />
           </div>
         </div>
 
@@ -463,48 +483,64 @@ export function EnhancedMermaid({ chart, compact = false, onRenderResult }: Enha
         />
       </div>
       
+      {/* Caption */}
+      {caption && (
+        <div className="text-center text-xs text-muted-foreground mt-2 px-2">
+          {caption}
+        </div>
+      )}
+      
       {/* Zoom controls on mobile */}
       {isMobile && !compact && (
         <div className="absolute top-2 left-2 flex items-center gap-1">
-          <button 
+          <IconButton
+            icon={<ZoomOut className="w-3 h-3" />}
             onClick={(e) => { e.stopPropagation(); setInlineZoom(z => Math.max(0.5, z - 0.25)); }}
-            className="p-1.5 bg-black/80 rounded border border-white/20 text-white/70 hover:text-white"
             aria-label="Zoom out"
-          >
-            <ZoomOut className="w-3 h-3" />
-          </button>
-          <span className="px-2 py-1 bg-black/80 rounded text-[10px] text-white/70 min-w-[40px] text-center">
+            size="sm"
+            variant="ghost"
+            className="p-1.5"
+            style={{ backgroundColor: 'rgba(0,0,0,0.8)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)' }}
+          />
+          <span className="px-2 py-1 rounded text-[10px] min-w-[40px] text-center" style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: 'rgba(255,255,255,0.7)' }}>
             {Math.round(inlineZoom * 100)}%
           </span>
-          <button 
+          <IconButton
+            icon={<ZoomIn className="w-3 h-3" />}
             onClick={(e) => { e.stopPropagation(); setInlineZoom(z => Math.min(3, z + 0.25)); }}
-            className="p-1.5 bg-black/80 rounded border border-white/20 text-white/70 hover:text-white"
             aria-label="Zoom in"
-          >
-            <ZoomIn className="w-3 h-3" />
-          </button>
+            size="sm"
+            variant="ghost"
+            className="p-1.5"
+            style={{ backgroundColor: 'rgba(0,0,0,0.8)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)' }}
+          />
         </div>
       )}
       
       {/* Expand button - always visible on mobile, hover on desktop */}
       {!compact && (
-        <button 
+        <IconButton
+          icon={<Maximize2 className="w-3.5 h-3.5" />}
           onClick={(e) => { e.stopPropagation(); setIsExpanded(true); }}
-          className={`absolute top-2 right-2 p-2 bg-black/80 hover:bg-primary/90 rounded border border-white/20 transition-all ${isMobile ? 'opacity-80' : 'opacity-0 group-hover:opacity-100'}`}
-          title="Expand diagram"
-        >
-          <Maximize2 className="w-3.5 h-3.5 text-white" />
-        </button>
+          aria-label="Expand diagram"
+          size="sm"
+          variant="ghost"
+          className={`absolute top-2 right-2 p-2 transition-all ${isMobile ? 'opacity-80' : 'opacity-0 group-hover:opacity-100'}`}
+          style={{ backgroundColor: 'rgba(0,0,0,0.8)', borderColor: 'rgba(255,255,255,0.2)', color: 'white' }}
+        />
       )}
       
       {/* Reset zoom button when zoomed */}
       {isMobile && !compact && inlineZoom !== 1 && (
-        <button 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={(e) => { e.stopPropagation(); setInlineZoom(1); }}
-          className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 rounded border border-white/20 text-[9px] text-white/70 hover:text-white"
+          className="absolute bottom-2 right-2 px-2 py-1 text-[9px]"
+          style={{ backgroundColor: 'rgba(0,0,0,0.8)', borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)' }}
         >
           Reset
-        </button>
+        </Button>
       )}
     </div>
   );

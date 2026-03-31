@@ -10,8 +10,8 @@ import fs from 'fs';
 
 const BLOG_BASE_URL = 'https://openstackdaily.github.io';
 
-const url = process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN;
+const url = 'file:local.db';
+const authToken = undefined;
 const specificUrl = process.env.SPECIFIC_URL;
 
 if (!url) {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import quotesData from '../lib/quotes/daily-quotes.json';
+import { Button } from '@/components/unified/Button';
 
 const INTRO_SEEN_KEY = 'marvel-intro-seen';
 
@@ -267,23 +268,29 @@ export function MarvelIntro({ onComplete }: MarvelIntroProps) {
       {/* Skip button - Netflix style */}
       <AnimatePresence>
         {skipEnabled && phase !== 'done' && (
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0 }}
-            onClick={handleSkip}
-            className="absolute bottom-8 right-8 flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded text-sm text-white/80 hover:text-white transition-all group"
+            className="absolute bottom-8 right-8"
           >
-            Skip Intro
-            <svg 
-              className="w-4 h-4 group-hover:translate-x-1 transition-transform" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSkip}
+              className="flex items-center gap-2 text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] bg-[var(--gh-canvas)]"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-            </svg>
-          </motion.button>
+              Skip Intro
+              <svg 
+                className="w-4 h-4" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+              </svg>
+            </Button>
+          </motion.div>
         )}
       </AnimatePresence>
 

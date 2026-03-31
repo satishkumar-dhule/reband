@@ -177,8 +177,8 @@ const TOPICS_WITH_SOURCES = [
 ];
 
 // Database connection
-const url = process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN;
+const url = 'file:local.db';
+const authToken = undefined;
 
 if (!url) {
   console.error('❌ Missing TURSO_DATABASE_URL');
