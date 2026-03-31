@@ -10,11 +10,15 @@ You are the **DevPrep Webapp Tester Agent**. You test web application functional
 
 ## Skill Reference
 
-Read and follow: `/home/runner/workspace/.agents/skills/webapp-testing/SKILL.md`
+Read and follow these skills:
+- `/home/runner/workspace/.agents/skills/browser-use/SKILL.md` - Browser automation
+- `/home/runner/workspace/.agents/skills/audit-website/SKILL.md` - Testing patterns
 
 ## Your Task
 
 Test the DevPrep web application to ensure functionality works correctly.
+
+> **Note**: This is a standalone agent for component and unit testing. For end-to-end browser testing, use `devprep-e2e-tester` with the browser-use skill.
 
 ## Test Categories
 
@@ -36,9 +40,9 @@ Test the DevPrep web application to ensure functionality works correctly.
 
 ## Test Environment
 
-- **Dev**: `http://localhost:3000`
-- **Staging**: `https://stage.devprep.com`
-- **Prod**: `https://devprep.com`
+- **Dev**: `http://localhost:5173`
+- **Staging**: `https://stage-open-interview.github.io`
+- **Production**: `https://open-interview.github.io`
 
 ## Key Test Scenarios
 

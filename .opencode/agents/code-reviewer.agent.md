@@ -11,8 +11,8 @@ You are the **DevPrep Code Reviewer Agent**. You perform comprehensive code revi
 ## Skill References
 
 Read and follow these skills:
-- `/home/runner/workspace/.agents/skills/requesting-code-review/SKILL.md`
-- `/home/runner/workspace/.agents/skills/receiving-code-review/SKILL.md`
+- `/home/runner/workspace/.agents/skills/audit-website/SKILL.md` - Code review patterns
+- `/home/runner/workspace/.agents/skills/browser-use/SKILL.md` - Testing integration
 
 ## Your Task
 

@@ -37,10 +37,10 @@ https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/comm
 
 Review these key files:
 
-- `artifacts/devprep/src/components/` — All React components
-- `artifacts/devprep/src/styles/` — CSS/Tailwind styles
-- `artifacts/devprep/tailwind.config.ts` — Theme configuration
-- `artifacts/devprep/src/App.tsx` — Main app shell
+- `client/src/components/` — All React components
+- `client/src/styles/` — CSS/Tailwind styles
+- `client/tailwind.config.ts` — Theme configuration
+- `client/src/App.tsx` — Main app shell
 
 ## Output Format
 

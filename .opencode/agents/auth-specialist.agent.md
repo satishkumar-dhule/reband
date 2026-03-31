@@ -36,7 +36,6 @@ Read and follow the skill at: `/home/runner/workspace/.agents/skills/better-auth
 
 ## Project Context
 
-- **Server**: Express on port 3001 at `artifacts/devprep/server/src/index.ts`
-- **Database**: SQLite via `bun:sqlite`
-- **Redis**: InMemoryRedis (can use as secondaryStorage)
+- **Server**: Express on port 3001 at `server/index.ts`
+- **Database**: SQLite/Turso via `libsql`
 - **Frontend**: React 19 with Zustand + TanStack Query

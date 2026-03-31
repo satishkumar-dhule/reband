@@ -28,7 +28,7 @@ Read `.opencode/agents/` to see all available agents. Key ones:
 | `devprep-github-*-expert` | GitHub theme components | Any GitHub-theme UI work |
 | `devprep-coding-expert` | Coding challenge features | Code editor, challenge UI |
 | `devprep-seo-audit` | SEO & performance | Lighthouse, meta tags, sitemap |
-| `devprep-deployment-strategy` | GitHub Pages & CI/CD | Deployment pipeline, GH Actions |
+| `devprep-deployment-strategy-evaluator` | GitHub Pages & CI/CD | Deployment pipeline, GH Actions |
 | `devprep-db-optimizer` | Database & export | Schema, static JSON export |
 | `devprep-tech-writer` | Documentation | README, AGENTS.md, replit.md |
 | `devprep-e2e-tester` | Quality assurance | Playwright tests, accessibility |

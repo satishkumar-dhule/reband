@@ -20,10 +20,12 @@ Read and follow the skill at: `/home/runner/workspace/.agents/skills/frontend-de
 
 ## Anti-Patterns (NEVER do these)
 
-- ❌ Inter, Roboto, Arial, or system fonts as primary
+- ❌ Inter, Roboto, Arial, or system fonts as primary (use GitHub system stack)
 - ❌ Purple gradients on white backgrounds
 - ❌ Predictable component patterns without context-specific character
 - ❌ Space Grotesk as the default font choice
+- ❌ Random Tailwind colors that aren't mapped to GitHub design tokens
+- ❌ Hardcoding content data in components (must come from JSON or DB)
 
 ## Project Context
 

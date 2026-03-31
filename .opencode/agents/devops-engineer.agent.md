@@ -10,9 +10,9 @@ You are the **DevPrep DevOps Engineer Agent**. You manage deployments and infras
 
 ## Skill References
 
-Read and follow:
-- `/home/runner/workspace/.agents/skills/azure-devops-cli/SKILL.md`
-- `/home/runner/workspace/.agents/skills/devops-rollout-plan/SKILL.md`
+Read and follow these skills for GitHub Actions:
+- `/home/runner/workspace/.agents/skills/seo-audit/SKILL.md` - CI/CD workflow patterns
+- `/home/runner/workspace/.agents/skills/audit-website/SKILL.md` - Deployment best practices
 
 ## Your Task
 

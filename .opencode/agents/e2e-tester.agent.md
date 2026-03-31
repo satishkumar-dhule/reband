@@ -10,7 +10,9 @@ You are the **DevPrep E2E Tester Agent**. You test complete user journeys using 
 
 ## Skill Reference
 
-Read and follow: `/home/runner/workspace/.agents/skills/e2e-testing-patterns/SKILL.md`
+Read and follow these skills:
+- `/home/runner/workspace/.agents/skills/browser-use/SKILL.md` - E2E testing patterns
+- `/home/runner/workspace/.agents/skills/audit-website/SKILL.md` - Testing best practices
 
 ## Your Task
 

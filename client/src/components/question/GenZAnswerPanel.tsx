@@ -330,21 +330,36 @@ function TabbedMediaPanel({
             </motion.div>
           )}
           
-          {activeTab === 'eli5' && hasEli5 && (
+          {activeTab === 'eli5' && (
             <motion.div
               key="eli5"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
-              className="flex items-start gap-4"
             >
-              <span className="text-2xl flex-shrink-0">🧒</span>
-              <p className="text-sm sm:text-base text-foreground leading-relaxed">{renderWithInlineCode(question.eli5 || '')}</p>
+              {question.eli5 ? (
+                <div className="flex items-start gap-3">
+                  <Baby className="w-5 h-5 text-primary shrink-0 mt-1" />
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Explain Like I&apos;m 5</p>
+                    <p className="text-sm sm:text-base text-foreground leading-relaxed">{renderWithInlineCode(question.eli5)}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start gap-3">
+                  <Baby className="w-5 h-5 text-muted-foreground shrink-0 mt-1" />
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Simple Explanation</p>
+                    <p className="text-sm sm:text-base text-foreground leading-relaxed">{renderWithInlineCode(question.answer)}</p>
+                    <p className="text-xs text-muted-foreground mt-3 italic">A detailed ELI5 explanation will be added here soon.</p>
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
           
-          {activeTab === 'video' && hasVideo && (
+          {activeTab === 'video' && (
             <motion.div
               key="video"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -352,10 +367,29 @@ function TabbedMediaPanel({
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
             >
-              <YouTubePlayer 
-                shortVideo={question.videos?.shortVideo} 
-                longVideo={question.videos?.longVideo} 
-              />
+              {(question.videos?.shortVideo || question.videos?.longVideo) ? (
+                <YouTubePlayer 
+                  shortVideo={question.videos?.shortVideo} 
+                  longVideo={question.videos?.longVideo} 
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-4 py-6 text-center">
+                  <Play className="w-10 h-10 text-red-500/70" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground mb-1">No video saved yet</p>
+                    <p className="text-xs text-muted-foreground">Find a relevant explanation on YouTube</p>
+                  </div>
+                  <a
+                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent((question.question || '') + ' explained tutorial')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Search on YouTube
+                  </a>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -455,8 +489,8 @@ export function GenZAnswerPanel({ question, isCompleted }: { question: Question;
 
   const hasTldr = !!question.answer;
   const hasDiagram = !isMobileView && isValidMermaidDiagram(question.diagram);
-  const hasEli5 = !!question.eli5;
-  const hasVideo = !!(question.videos?.shortVideo || question.videos?.longVideo);
+  const hasEli5 = true; // Always show ELI5 tab — fallback to simplified answer
+  const hasVideo = true; // Always show video tab — fallback to YouTube search
   const hasMediaContent = hasTldr || hasDiagram || hasEli5 || hasVideo;
 
   const renderMarkdown = useCallback((text: string) => {

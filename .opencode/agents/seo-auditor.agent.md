@@ -39,6 +39,6 @@ DevPrep should rank for:
 ## Project Context
 
 - **Type**: SPA (React) — potential SEO challenges with client-side rendering
-- **Deployment**: Cloudflare Pages, GitHub Pages
+- **Deployment**: GitHub Pages
 - **Content**: 26MB SQLite DB with questions, flashcards, exams across 11 channels
-- **Key files**: `artifacts/devprep/vite.config.ts`, `artifacts/devprep/src/index.html`
+- **Key files**: `client/src/App.tsx`, `client/vite.config.ts`, `public/index.html`

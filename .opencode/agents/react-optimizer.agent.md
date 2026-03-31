@@ -32,5 +32,5 @@ Read and follow the skill at: `/home/runner/workspace/.agents/skills/vercel-reac
 
 - **React version**: 19.1.0 (supports `use`, `useOptimistic`, `useActionState`)
 - **State**: Zustand (client) + TanStack Query (server state)
-- **Routing**: Custom section-based rendering (V1) + wouter-style router (V2)
-- **Key files**: `artifacts/devprep/src/App.tsx`, `artifacts/devprep/src/stores/`, `artifacts/devprep/src/hooks/`
+- **Routing**: wouter-style router
+- **Key files**: `client/src/App.tsx`, `client/src/stores/`, `client/src/hooks/`

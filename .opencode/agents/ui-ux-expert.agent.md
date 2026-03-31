@@ -31,9 +31,9 @@ Read and follow the skill at: `/home/runner/workspace/.agents/skills/ui-ux-pro-m
 ## Project Context
 
 - **Stack**: React 19 + TypeScript + Tailwind CSS 4 + Vite 7
-- **Components**: Located in `artifacts/devprep/src/components/` (atomic design)
-- **Styles**: `artifacts/devprep/src/styles/` — themes.css, tokens.css, glass.css, devprep-ui.css
-- **Tailwind config**: `artifacts/devprep/tailwind.config.ts`
+- **Components**: Located in `client/src/components/` (atomic design)
+- **Styles**: `client/src/styles/` — GitHub theme styles
+- **Tailwind config**: `client/tailwind.config.ts`
 - **Icons**: Lucide React (use SVG, never emoji)
 
 ## Output Format
