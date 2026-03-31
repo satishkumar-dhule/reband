@@ -63,7 +63,9 @@ export class DatabaseUtils {
   }
 
   /**
-   * Update question progress using SRS algorithm
+   * Update question progress
+   * NOTE: SRS (Spaced Repetition) is handled CLIENT-SIDE only
+   * See: client/src/lib/spaced-repetition.ts
    */
   static async updateQuestionProgress(
     userId: string,
@@ -81,22 +83,12 @@ export class DatabaseUtils {
         bestScore: 0,
         averageScore: 0,
         lastScore: 0,
-        lastAttempt: new Date(),
-        nextReview: new Date(),
-        interval: 1,
-        easeFactor: 2.5,
-        repetitions: 0,
-        status: "new",
-        mastered: false,
-        weakKeyPoints: [],
-        needsVoicePractice: score < 70,
       });
     }
 
-    // Update score and SRS data
+    // Update score only - SRS is client-side
     const progressId = `${userId}-${questionId}`;
     await progressDAO.updateScore(progressId, score);
-    await progressDAO.updateSRS(progressId, score);
   }
 
   /**
@@ -337,7 +329,6 @@ export class DatabaseUtils {
     ]);
 
     const progressStats = await progressDAO.getStats(userId);
-    const dueForReview = await progressDAO.getDueForReview(userId);
 
     return {
       profile,
@@ -345,31 +336,23 @@ export class DatabaseUtils {
       progress,
       weeklyStats,
       progressStats,
-      dueForReview,
+      // SRS review is handled client-side - see client/src/lib/spaced-repetition.ts
       achievements,
       quests,
     };
   }
 
   /**
-   * Get questions for practice (due for review + new questions)
+   * Get questions for practice
+   * NOTE: SRS review scheduling is handled CLIENT-SIDE only
    */
   static async getPracticeQuestions(
     userId: string,
     limit: number = 10,
   ): Promise<string[]> {
-    const dueForReview = await progressDAO.getDueForReview(userId);
-
-    // Get question IDs that are due for review
-    const reviewIds = dueForReview.map((p) => p.id);
-
-    // Get some new questions (simplified - in real app would use question DB)
-    const newQuestionCount = Math.max(0, limit - reviewIds.length);
-    const newIds = Array.from({ length: newQuestionCount }, () =>
-      crypto.randomUUID(),
-    );
-
-    return [...reviewIds, ...newIds].slice(0, limit);
+    // In production, this would query the question database
+    // For now, return empty array - client-side SRS handles review queue
+    return [];
   }
 
   /**
@@ -503,8 +486,8 @@ export class DatabaseUtils {
           0,
         ),
         achievementsUnlocked: achievements.filter((a) => a.unlocked).length,
-        masteryRate:
-          (progress.filter((p) => p.mastered).length / progress.length) * 100,
+        // SRS mastery is tracked client-side - see client/src/lib/spaced-repetition.ts
+        masteryRate: 0,
       },
     };
   }

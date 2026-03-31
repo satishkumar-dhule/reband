@@ -88,6 +88,9 @@ export interface Conversation {
 
 // ============================================================
 // User Progress (Per Question)
+// NOTE: SRS (Spaced Repetition) is handled CLIENT-SIDE only via localStorage
+// See: client/src/lib/spaced-repetition.ts
+// This schema only tracks basic performance metrics
 // ============================================================
 export interface Progress {
   id: string; // questionId (PK)
@@ -98,21 +101,6 @@ export interface Progress {
   bestScore: number;
   averageScore: number;
   lastScore: number;
-
-  // SRS scheduling
-  lastAttempt: Date;
-  nextReview: Date;
-  interval: number; // days
-  easeFactor: number; // SM-2 algorithm
-  repetitions: number;
-
-  // Status
-  status: "new" | "learning" | "reviewing" | "mastered";
-  mastered: boolean;
-
-  // Weak points
-  weakKeyPoints: string[];
-  needsVoicePractice: boolean;
 
   // Metadata
   firstSeenAt: Date;

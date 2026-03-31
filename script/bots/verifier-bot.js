@@ -464,10 +464,21 @@ Return ONLY valid JSON:
       
       console.log(`   📊 Overall Score: ${currentAnalysis.overallScore}/100`);
       console.log(`      Technical: ${scores.technicalAccuracy?.score || 'N/A'} | Clarity: ${scores.clarity?.score || 'N/A'} | Complete: ${scores.completeness?.score || 'N/A'}`);
+    } else {
+      currentAnalysis.issues.push({
+        type: 'ai_response_invalid',
+        severity: 'medium',
+        message: 'Failed to parse AI scoring response - using default score'
+      });
     }
   } catch (error) {
     console.error('   ⚠️ AI scoring failed:', error.message);
     currentAnalysis.overallScore = 50;
+    currentAnalysis.issues.push({
+      type: 'ai_scoring_failed',
+      severity: 'medium',
+      message: 'AI scoring unavailable - using default score'
+    });
   }
   
   return { ...state, currentAnalysis };
@@ -825,7 +836,8 @@ function generateReport(stats, results) {
   
   console.log(`\n📈 SUMMARY`);
   console.log(`   Total Analyzed: ${stats.totalAnalyzed}`);
-  console.log(`   ✅ Passed: ${stats.passed} (${Math.round(stats.passed / stats.totalAnalyzed * 100)}%)`);
+    const passRate = stats.totalAnalyzed > 0 ? Math.round(stats.passed / stats.totalAnalyzed * 100) : 0;
+    console.log(`   ✅ Passed: ${stats.passed} (${passRate}%)`);
   console.log(`   🚩 Flagged: ${stats.flagged} (${Math.round(stats.flagged / stats.totalAnalyzed * 100)}%)`);
   
   console.log(`\n⚠️ ISSUES BY SEVERITY`);

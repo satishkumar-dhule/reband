@@ -7,22 +7,22 @@
  * - Confidence-based adjustments
  */
 
+import { SRS_CONFIG, SRS_STORAGE_KEYS, srsConfig, MasteryLevel, RatingAdjustment } from './srs-config';
+
 export type ConfidenceRating = 'again' | 'hard' | 'good' | 'easy';
 
 export interface ReviewCard {
   questionId: string;
   channel: string;
   difficulty: string;
-  // SRS state
-  interval: number;        // Days until next review
-  easeFactor: number;      // Multiplier for interval (2.5 default)
-  repetitions: number;     // Successful reviews in a row
-  nextReview: string;      // ISO date string
-  lastReview: string;      // ISO date string
-  // Stats
+  interval: number;
+  easeFactor: number;
+  repetitions: number;
+  nextReview: string;
+  lastReview: string;
   totalReviews: number;
   correctStreak: number;
-  masteryLevel: number;    // 0-5 (0=new, 5=mastered)
+  masteryLevel: number;
 }
 
 export interface SRSStats {
@@ -37,90 +37,73 @@ export interface SRSStats {
   lastReviewDate: string | null;
 }
 
-const STORAGE_KEY = 'code-reels-srs';
-const STATS_KEY = 'code-reels-srs-stats';
+const STORAGE_KEY = SRS_STORAGE_KEYS.CARDS;
+const STATS_KEY = SRS_STORAGE_KEYS.STATS;
 
-// SM-2 algorithm constants (tuned for interview prep)
-const MIN_EASE_FACTOR = 1.3;
-const DEFAULT_EASE_FACTOR = 2.5;
-const INITIAL_INTERVALS = [1, 3, 7]; // Days for first 3 reviews
-const MAX_INTERVAL = 180; // 6 months max
-
-/**
- * Calculate the next review interval based on confidence rating
- */
 function calculateNextInterval(
   card: ReviewCard,
   rating: ConfidenceRating
 ): { interval: number; easeFactor: number; repetitions: number } {
   let { interval, easeFactor, repetitions } = card;
+  const adjustment = SRS_CONFIG.ratings[rating] as RatingAdjustment;
 
   switch (rating) {
     case 'again':
-      // Reset - user forgot
       return {
         interval: 1,
-        easeFactor: Math.max(MIN_EASE_FACTOR, easeFactor - 0.2),
+        easeFactor: Math.max(SRS_CONFIG.easeFactor.min, easeFactor - (adjustment.easePenalty ?? 0)),
         repetitions: 0
       };
 
     case 'hard':
-      // Slight penalty, shorter interval
-      const hardInterval = Math.max(1, Math.round(interval * 1.2));
+      const hardInterval = Math.max(1, Math.round(interval * adjustment.intervalMultiplier));
       return {
         interval: hardInterval,
-        easeFactor: Math.max(MIN_EASE_FACTOR, easeFactor - 0.15),
+        easeFactor: Math.max(SRS_CONFIG.easeFactor.min, easeFactor - (adjustment.easePenalty ?? 0)),
         repetitions: repetitions + 1
       };
 
     case 'good':
-      // Standard progression
       let goodInterval: number;
-      if (repetitions < INITIAL_INTERVALS.length) {
-        goodInterval = INITIAL_INTERVALS[repetitions];
+      if (repetitions < SRS_CONFIG.initialIntervals.length) {
+        goodInterval = SRS_CONFIG.initialIntervals[repetitions];
       } else {
         goodInterval = Math.round(interval * easeFactor);
       }
       return {
-        interval: Math.min(MAX_INTERVAL, goodInterval),
+        interval: Math.min(SRS_CONFIG.maxInterval, goodInterval),
         easeFactor,
         repetitions: repetitions + 1
       };
 
     case 'easy':
-      // Bonus - user found it easy
       let easyInterval: number;
-      if (repetitions < INITIAL_INTERVALS.length) {
-        easyInterval = INITIAL_INTERVALS[Math.min(repetitions + 1, INITIAL_INTERVALS.length - 1)] * 1.5;
+      if (repetitions < SRS_CONFIG.initialIntervals.length) {
+        const nextIntervalIndex = Math.min(repetitions + 1, SRS_CONFIG.initialIntervals.length - 1);
+        easyInterval = SRS_CONFIG.initialIntervals[nextIntervalIndex] * (adjustment.firstIntervalBonus ?? 1);
       } else {
-        easyInterval = Math.round(interval * easeFactor * 1.3);
+        easyInterval = Math.round(interval * easeFactor * adjustment.intervalMultiplier);
       }
       return {
-        interval: Math.min(MAX_INTERVAL, Math.round(easyInterval)),
-        easeFactor: Math.min(3.0, easeFactor + 0.1),
+        interval: Math.min(SRS_CONFIG.maxInterval, Math.round(easyInterval)),
+        easeFactor: Math.min(SRS_CONFIG.easeFactor.max, easeFactor + (adjustment.easeBonus ?? 0)),
         repetitions: repetitions + 1
       };
   }
 }
 
-/**
- * Calculate mastery level (0-5) based on review history
- */
 function calculateMasteryLevel(card: ReviewCard): number {
   const { repetitions, interval, correctStreak } = card;
   
   if (repetitions === 0) return 0;
-  if (interval >= 90 && correctStreak >= 5) return 5; // Mastered
-  if (interval >= 30 && correctStreak >= 4) return 4; // Expert
-  if (interval >= 14 && correctStreak >= 3) return 3; // Proficient
-  if (interval >= 7 && correctStreak >= 2) return 2;  // Familiar
-  if (repetitions >= 1) return 1;                      // Learning
+  if (interval >= SRS_CONFIG.mastery.mastered.intervalDays && correctStreak >= SRS_CONFIG.mastery.mastered.streakRequired) return 5;
+  if (interval >= SRS_CONFIG.mastery.expert.intervalDays && correctStreak >= SRS_CONFIG.mastery.expert.streakRequired) return 4;
+  if (interval >= SRS_CONFIG.mastery.proficient.intervalDays && correctStreak >= SRS_CONFIG.mastery.proficient.streakRequired) return 3;
+  if (interval >= SRS_CONFIG.mastery.familiar.intervalDays && correctStreak >= SRS_CONFIG.mastery.familiar.streakRequired) return 2;
+  if (repetitions >= 1) return 1;
   return 0;
 }
 
-/**
- * Get all SRS cards from storage
- */
 export function getAllCards(): Map<string, ReviewCard> {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -132,30 +115,23 @@ export function getAllCards(): Map<string, ReviewCard> {
   }
 }
 
-/**
- * Save all cards to storage
- */
 function saveAllCards(cards: Map<string, ReviewCard>): void {
   const obj = Object.fromEntries(cards);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
 }
 
-/**
- * Get or create a card for a question
- */
 export function getCard(questionId: string, channel: string, difficulty: string): ReviewCard {
   const cards = getAllCards();
   const existing = cards.get(questionId);
   
   if (existing) return existing;
   
-  // Create new card
   const newCard: ReviewCard = {
     questionId,
     channel,
     difficulty,
     interval: 0,
-    easeFactor: DEFAULT_EASE_FACTOR,
+    easeFactor: SRS_CONFIG.easeFactor.default,
     repetitions: 0,
     nextReview: new Date().toISOString().split('T')[0],
     lastReview: '',
@@ -167,9 +143,6 @@ export function getCard(questionId: string, channel: string, difficulty: string)
   return newCard;
 }
 
-/**
- * Record a review and update the card
- */
 export function recordReview(
   questionId: string,
   channel: string,
@@ -179,10 +152,8 @@ export function recordReview(
   const cards = getAllCards();
   const card = getCard(questionId, channel, difficulty);
   
-  // Calculate new interval
   const { interval, easeFactor, repetitions } = calculateNextInterval(card, rating);
   
-  // Update card
   const today = new Date().toISOString().split('T')[0];
   const nextReviewDate = new Date();
   nextReviewDate.setDate(nextReviewDate.getDate() + interval);
@@ -196,24 +167,19 @@ export function recordReview(
     lastReview: today,
     totalReviews: card.totalReviews + 1,
     correctStreak: rating === 'again' ? 0 : card.correctStreak + 1,
-    masteryLevel: 0 // Will be calculated
+    masteryLevel: 0
   };
   
   updatedCard.masteryLevel = calculateMasteryLevel(updatedCard);
   
-  // Save
   cards.set(questionId, updatedCard);
   saveAllCards(cards);
   
-  // Update stats
   updateReviewStreak();
   
   return updatedCard;
 }
 
-/**
- * Get cards due for review today
- */
 export function getDueCards(): ReviewCard[] {
   const cards = getAllCards();
   const today = new Date().toISOString().split('T')[0];
@@ -221,7 +187,6 @@ export function getDueCards(): ReviewCard[] {
   return Array.from(cards.values())
     .filter(card => card.nextReview <= today)
     .sort((a, b) => {
-      // Priority: overdue first, then by mastery (lower first)
       if (a.nextReview !== b.nextReview) {
         return a.nextReview.localeCompare(b.nextReview);
       }
@@ -229,9 +194,6 @@ export function getDueCards(): ReviewCard[] {
     });
 }
 
-/**
- * Get cards due within a date range
- */
 export function getCardsDueInRange(days: number): ReviewCard[] {
   const cards = getAllCards();
   const endDate = new Date();
@@ -242,9 +204,6 @@ export function getCardsDueInRange(days: number): ReviewCard[] {
     .filter(card => card.nextReview <= endStr);
 }
 
-/**
- * Get SRS statistics
- */
 export function getSRSStats(): SRSStats {
   const cards = getAllCards();
   const today = new Date().toISOString().split('T')[0];
@@ -257,7 +216,6 @@ export function getSRSStats(): SRSStats {
   
   const allCards = Array.from(cards.values());
   
-  // Get review streak from stats
   const statsStr = localStorage.getItem(STATS_KEY);
   const stats = statsStr ? JSON.parse(statsStr) : { reviewStreak: 0, lastReviewDate: null };
   
@@ -274,16 +232,12 @@ export function getSRSStats(): SRSStats {
   };
 }
 
-/**
- * Update the review streak
- */
 function updateReviewStreak(): void {
   const today = new Date().toISOString().split('T')[0];
   const statsStr = localStorage.getItem(STATS_KEY);
   const stats = statsStr ? JSON.parse(statsStr) : { reviewStreak: 0, lastReviewDate: null };
   
   if (stats.lastReviewDate === today) {
-    // Already reviewed today, no change
     return;
   }
   
@@ -292,10 +246,8 @@ function updateReviewStreak(): void {
   const yesterdayStr = yesterday.toISOString().split('T')[0];
   
   if (stats.lastReviewDate === yesterdayStr) {
-    // Continuing streak
     stats.reviewStreak += 1;
   } else if (stats.lastReviewDate !== today) {
-    // Streak broken, start new
     stats.reviewStreak = 1;
   }
   
@@ -303,9 +255,6 @@ function updateReviewStreak(): void {
   localStorage.setItem(STATS_KEY, JSON.stringify(stats));
 }
 
-/**
- * Add a question to the SRS system (when user completes it)
- */
 export function addToSRS(questionId: string, channel: string, difficulty: string): ReviewCard {
   const cards = getAllCards();
   
@@ -318,7 +267,7 @@ export function addToSRS(questionId: string, channel: string, difficulty: string
     channel,
     difficulty,
     interval: 1,
-    easeFactor: DEFAULT_EASE_FACTOR,
+    easeFactor: SRS_CONFIG.easeFactor.default,
     repetitions: 0,
     nextReview: new Date().toISOString().split('T')[0],
     lastReview: '',
@@ -333,87 +282,52 @@ export function addToSRS(questionId: string, channel: string, difficulty: string
   return newCard;
 }
 
-/**
- * Check if a question is in the SRS system
- */
 export function isInSRS(questionId: string): boolean {
   return getAllCards().has(questionId);
 }
 
-/**
- * Get mastery level label
- */
 export function getMasteryLabel(level: number): string {
-  const labels = ['New', 'Learning', 'Familiar', 'Proficient', 'Expert', 'Mastered'];
-  return labels[Math.min(level, 5)];
+  const safeLevel = Math.min(Math.max(level, 0), 5) as 0 | 1 | 2 | 3 | 4 | 5;
+  return SRS_CONFIG.masteryDisplay[safeLevel].label;
 }
 
-/**
- * Get mastery level color
- */
 export function getMasteryColor(level: number): string {
-  const colors = [
-    'text-muted-foreground', // New
-    'text-blue-500',         // Learning
-    'text-cyan-500',         // Familiar
-    'text-green-500',        // Proficient
-    'text-purple-500',       // Expert
-    'text-yellow-500'        // Mastered
-  ];
-  return colors[Math.min(level, 5)];
+  const safeLevel = Math.min(Math.max(level, 0), 5) as 0 | 1 | 2 | 3 | 4 | 5;
+  return SRS_CONFIG.masteryDisplay[safeLevel].color;
 }
 
-/**
- * Get mastery level emoji/icon
- */
 export function getMasteryEmoji(level: number): string {
-  const emojis = ['🌱', '📚', '🌿', '🌳', '⭐', '👑'];
-  return emojis[Math.min(level, 5)];
+  const safeLevel = Math.min(Math.max(level, 0), 5) as 0 | 1 | 2 | 3 | 4 | 5;
+  return SRS_CONFIG.masteryDisplay[safeLevel].emoji;
 }
 
-/**
- * XP System - Calculate XP earned from a review
- */
 export function calculateXP(rating: ConfidenceRating, masteryLevel: number): number {
-  const baseXP: Record<ConfidenceRating, number> = {
-    again: 5,
-    hard: 10,
-    good: 15,
-    easy: 20
-  };
-  // Bonus XP for higher mastery cards
-  const masteryBonus = masteryLevel * 2;
-  return baseXP[rating] + masteryBonus;
+  const baseXP = SRS_CONFIG.xp[rating];
+  const masteryBonus = masteryLevel * SRS_CONFIG.masteryBonusXP;
+  return baseXP + masteryBonus;
 }
 
-/**
- * Get user's total XP and level
- */
 export function getUserXP(): { totalXP: number; level: number; xpToNext: number; progress: number } {
   const statsStr = localStorage.getItem(STATS_KEY);
   const stats = statsStr ? JSON.parse(statsStr) : { totalXP: 0 };
   const totalXP = stats.totalXP || 0;
   
-  // Level formula: level = floor(sqrt(totalXP / 100))
-  const level = Math.floor(Math.sqrt(totalXP / 100)) + 1;
-  const xpForCurrentLevel = Math.pow(level - 1, 2) * 100;
-  const xpForNextLevel = Math.pow(level, 2) * 100;
+  const level = srsConfig.calculateLevel(totalXP);
+  const xpForCurrentLevel = Math.pow(level - 1, 2) * SRS_CONFIG.levelFormula.xpDivisor;
+  const xpForNextLevel = Math.pow(level, 2) * SRS_CONFIG.levelFormula.xpDivisor;
   const xpToNext = xpForNextLevel - totalXP;
   const progress = ((totalXP - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100;
   
   return { totalXP, level, xpToNext, progress: Math.max(0, Math.min(100, progress)) };
 }
 
-/**
- * Add XP to user's total
- */
 export function addXP(amount: number): { totalXP: number; level: number; leveledUp: boolean } {
   const statsStr = localStorage.getItem(STATS_KEY);
   const stats = statsStr ? JSON.parse(statsStr) : { totalXP: 0, reviewStreak: 0, lastReviewDate: null };
   
-  const oldLevel = Math.floor(Math.sqrt((stats.totalXP || 0) / 100)) + 1;
+  const oldLevel = srsConfig.calculateLevel(stats.totalXP || 0);
   stats.totalXP = (stats.totalXP || 0) + amount;
-  const newLevel = Math.floor(Math.sqrt(stats.totalXP / 100)) + 1;
+  const newLevel = srsConfig.calculateLevel(stats.totalXP);
   
   localStorage.setItem(STATS_KEY, JSON.stringify(stats));
   
@@ -424,22 +338,10 @@ export function addXP(amount: number): { totalXP: number; level: number; leveled
   };
 }
 
-/**
- * Get confidence rating label
- */
 export function getRatingLabel(rating: ConfidenceRating): string {
-  const labels: Record<ConfidenceRating, string> = {
-    again: 'Again',
-    hard: 'Hard',
-    good: 'Good',
-    easy: 'Easy'
-  };
-  return labels[rating];
+  return SRS_CONFIG.ratingLabels[rating];
 }
 
-/**
- * Get next review preview for each rating
- */
 export function getNextReviewPreview(card: ReviewCard): Record<ConfidenceRating, string> {
   const ratings: ConfidenceRating[] = ['again', 'hard', 'good', 'easy'];
   const previews: Record<ConfidenceRating, string> = {} as any;

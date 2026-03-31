@@ -25,6 +25,17 @@ import { validateBeforeInsert, sanitizeQuestion } from './shared/validation.js';
 const BOT_NAME = 'processor';
 const db = getDb();
 
+// Safe JSON parse with fallback
+function safeJsonParse(value, fallback) {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    console.warn(`⚠️ JSON parse failed, using fallback: ${e.message}`);
+    return fallback;
+  }
+}
+
 // ============================================
 // ISSUE TYPE TO ACTION MAPPING
 // ============================================
@@ -1097,10 +1108,10 @@ async function fetchItem(type, id) {
       channel: row.channel,
       subChannel: row.sub_channel,
       difficulty: row.difficulty,
-      tags: row.tags ? JSON.parse(row.tags) : [],
-      videos: row.videos ? JSON.parse(row.videos) : null,
-      companies: row.companies ? JSON.parse(row.companies) : null,
-      voiceKeywords: row.voice_keywords ? JSON.parse(row.voice_keywords) : null,
+      tags: safeJsonParse(row.tags, []),
+      videos: safeJsonParse(row.videos, null),
+      companies: safeJsonParse(row.companies, null),
+      voiceKeywords: safeJsonParse(row.voice_keywords, null),
       voiceSuitable: row.voice_suitable === 1,
       status: row.status,
       lastUpdated: row.last_updated
@@ -1259,7 +1270,7 @@ async function processUserFeedback() {
     // Log results to ledger
     for (const r of result.results || []) {
       await logAction({
-        bot: BOT_NAME,
+        botName: BOT_NAME,
         action: r.success ? 'process_feedback_success' : 'process_feedback_failed',
         itemType: 'question',
         itemId: r.questionId || 'unknown',

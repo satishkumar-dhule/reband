@@ -7,6 +7,7 @@ import { BaseSkillAgent, type SkillContext, type SkillResult } from './SkillAgen
 import { browserDB } from '../../services/browser-db';
 import { storage } from '../../services/storage.service';
 import { fetchWithRetry } from '../../lib/api-client';
+import { SRS_CONFIG } from '../../../../shared/srs-config';
 
 interface QuestionDBRecord {
   id: string;
@@ -141,9 +142,9 @@ class SpacedRepetitionAgent extends BaseSkillAgent {
   }
 
   private calculateInterval(quality: number, easeFactor = 2.5, repetitions = 0): number {
-    if (quality < 3) return 1;
-    if (repetitions === 0) return 1;
-    if (repetitions === 1) return 6;
+    if (quality < SRS_CONFIG.scoreThreshold.minimum) return SRS_CONFIG.intervals.first;
+    if (repetitions === 0) return SRS_CONFIG.intervals.first;
+    if (repetitions === 1) return SRS_CONFIG.intervals.second;
     return Math.round(easeFactor * (repetitions - 1));
   }
 }

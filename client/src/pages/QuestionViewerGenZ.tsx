@@ -9,6 +9,7 @@ import { SEOHead } from '../components/SEOHead';
 import { UnifiedSearch } from '../components/UnifiedSearch';
 import { VoiceReminder } from '../components/VoiceReminder';
 import { GenZAnswerPanel } from '../components/question/GenZAnswerPanel';
+import { FlashcardsTab } from '../components/FlashcardsTab';
 import { Haptics } from '../lib/haptics';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
@@ -67,6 +68,12 @@ export default function QuestionViewerGenZ() {
   const [srsCard, setSrsCard] = useState<ReviewCard | null>(null);
   const [showRatingButtons, setShowRatingButtons] = useState(false);
   const [hasRated, setHasRated] = useState(false);
+
+  type MainViewTab = 'questions' | 'flashcards' | 'voice';
+  const [activeMainTab, setActiveMainTab] = useState<MainViewTab>('questions');
+
+  const [flashcards, setFlashcards] = useState<any[]>([]);
+  const [flashcardsLoading, setFlashcardsLoading] = useState(false);
   
   const { preferences, isSubscribed, subscribeChannel } = useUserPreferences();
   const shuffleEnabled = preferences.shuffleQuestions !== false;
@@ -217,6 +224,24 @@ export default function QuestionViewerGenZ() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showSearchModal, setLocation]);
+
+  useEffect(() => {
+    if (!channelId) return;
+    setFlashcardsLoading(true);
+    fetch(`/data/flashcards-${channelId}.json`)
+      .then(res => {
+        if (!res.ok) throw new Error('No flashcards');
+        return res.json();
+      })
+      .then(data => {
+        setFlashcards(data);
+        setFlashcardsLoading(false);
+      })
+      .catch(() => {
+        setFlashcards([]);
+        setFlashcardsLoading(false);
+      });
+  }, [channelId]);
 
   const toggleMark = () => {
     if (!currentQuestion) return;
@@ -370,9 +395,57 @@ export default function QuestionViewerGenZ() {
           </div>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]">
+          <div className="max-w-7xl mx-auto px-4">
+            <nav className="flex gap-1 -mb-px" aria-label="Main view">
+              <button
+                onClick={() => setActiveMainTab('questions')}
+                className={cn(
+                  "px-4 py-3 text-sm font-medium border-b-2 transition-colors",
+                  activeMainTab === 'questions'
+                    ? "border-[var(--gh-accent-emphasis)] text-[var(--gh-fg)]"
+                    : "border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]"
+                )}
+              >
+                Questions
+              </button>
+              <button
+                onClick={() => setActiveMainTab('flashcards')}
+                className={cn(
+                  "px-4 py-3 text-sm font-medium border-b-2 transition-colors",
+                  activeMainTab === 'flashcards'
+                    ? "border-[var(--gh-accent-emphasis)] text-[var(--gh-fg)]"
+                    : "border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]"
+                )}
+              >
+                Flashcards
+                {flashcards.length > 0 && (
+                  <span className="ml-2 px-1.5 py-0.5 text-xs bg-[var(--gh-accent-fg)]/10 rounded-full">
+                    {flashcards.length}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveMainTab('voice')}
+                className={cn(
+                  "px-4 py-3 text-sm font-medium border-b-2 transition-colors",
+                  activeMainTab === 'voice'
+                    ? "border-[var(--gh-accent-emphasis)] text-[var(--gh-fg)]"
+                    : "border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:border-[var(--gh-border)]"
+                )}
+              >
+                Voice
+              </button>
+            </nav>
+          </div>
+        </div>
+
         <div className="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6">
           {/* Main Content (Left) */}
           <div className="flex-1 min-w-0 space-y-6">
+            {activeMainTab === 'questions' && (
+              <>
             {/* Question Card */}
             <div className="gh-card p-6 shadow-sm">
               <div className="flex items-start justify-between gap-4 mb-4">
@@ -543,6 +616,37 @@ export default function QuestionViewerGenZ() {
                     Next Question
                   </Button>
                 </div>
+              </div>
+            )}
+            </>
+            )}
+
+            {activeMainTab === 'flashcards' && (
+              <div className="gh-card p-6">
+                {flashcardsLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <div className="w-8 h-8 border-4 border-[var(--gh-accent-emphasis)] border-t-transparent rounded-full animate-spin mb-4" />
+                    <p className="text-[var(--gh-fg-muted)]">Loading flashcards...</p>
+                  </div>
+                ) : flashcards.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <p className="text-[var(--gh-fg-muted)] mb-4">No flashcards available for this channel.</p>
+                    <Button variant="secondary" size="sm" onClick={() => setActiveMainTab('questions')}>
+                      Go to Questions
+                    </Button>
+                  </div>
+                ) : (
+                  <FlashcardsTab channelId={channelId || ''} flashcards={flashcards} />
+                )}
+              </div>
+            )}
+
+            {activeMainTab === 'voice' && (
+              <div className="gh-card p-6 text-center">
+                <p className="text-[var(--gh-fg-muted)] mb-4">Practice answering questions with voice recording.</p>
+                <Button variant="primary" onClick={() => window.location.href = '/voice-interview'}>
+                  Start Voice Practice
+                </Button>
               </div>
             )}
           </div>

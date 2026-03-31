@@ -11,6 +11,7 @@
 
 import { StateGraph, END, START } from '@langchain/langgraph';
 import { Annotation } from '@langchain/langgraph';
+import { SRS_CONFIG } from '../../../../shared/srs-config.js';
 import vectorDB from '../services/vector-db.js';
 
 // Define the state schema
@@ -46,16 +47,15 @@ const AdaptiveLearningState = Annotation.Root({
   error: Annotation({ reducer: (_, b) => b, default: () => null })
 });
 
-// Spaced repetition intervals (in hours)
 const SRS_INTERVALS = [
-  4,      // Level 0: 4 hours
-  24,     // Level 1: 1 day
-  72,     // Level 2: 3 days
-  168,    // Level 3: 1 week
-  336,    // Level 4: 2 weeks
-  720,    // Level 5: 1 month
-  2160,   // Level 6: 3 months
-  4320    // Level 7: 6 months (mastered)
+  SRS_CONFIG.hours.level0,  // 4 hours
+  SRS_CONFIG.hours.level1,  // 1 day
+  SRS_CONFIG.hours.level2,  // 3 days
+  SRS_CONFIG.hours.level3,  // 1 week
+  SRS_CONFIG.hours.level4,  // 2 weeks
+  SRS_CONFIG.hours.level5,  // 1 month
+  SRS_CONFIG.hours.level6,  // 3 months
+  SRS_CONFIG.hours.level7   // 6 months (mastered)
 ];
 
 // Topic difficulty weights (used in path generation scoring)

@@ -10,9 +10,10 @@ import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '../components/unified/Button';
-import {
+import { 
   Brain, ChevronLeft, Eye, Flame, Sparkles, Zap, Check, RotateCcw
 } from 'lucide-react';
+import { SRS_CONFIG } from '../lib/srs-config';
 
 // Mock SRS data - replace with actual implementation
 const mockReviewCards = [
@@ -196,10 +197,10 @@ In practice, partition tolerance is mandatory for distributed systems, so you ch
 ];
 
 const confidenceLevels = [
-  { id: 'again', label: 'Again', color: 'gh-label-red', interval: 1 },
-  { id: 'hard', label: 'Hard', color: 'gh-label-yellow', interval: 2 },
-  { id: 'good', label: 'Good', color: 'gh-label-blue', interval: 4 },
-  { id: 'easy', label: 'Easy', color: 'gh-label-green', interval: 7 }
+  { id: 'again', label: 'Again', color: 'gh-label-red', interval: SRS_CONFIG.previewIntervals.again },
+  { id: 'hard', label: 'Hard', color: 'gh-label-yellow', interval: SRS_CONFIG.previewIntervals.hard },
+  { id: 'good', label: 'Good', color: 'gh-label-blue', interval: SRS_CONFIG.previewIntervals.good },
+  { id: 'easy', label: 'Easy', color: 'gh-label-green', interval: SRS_CONFIG.previewIntervals.easy }
 ];
 
 // Diagram section

@@ -239,34 +239,6 @@ export class ProgressDAO {
     return await db.progress.where("userId").equals(userId).toArray();
   }
 
-  async getByStatus(
-    userId: string,
-    status: Progress["status"],
-  ): Promise<Progress[]> {
-    return await db.progress
-      .where("userId")
-      .equals(userId)
-      .and((prog) => prog.status === status)
-      .toArray();
-  }
-
-  async getDueForReview(userId: string): Promise<Progress[]> {
-    const now = new Date();
-    return await db.progress
-      .where("userId")
-      .equals(userId)
-      .and((prog) => prog.nextReview <= now && !prog.mastered)
-      .toArray();
-  }
-
-  async getMastered(userId: string): Promise<Progress[]> {
-    return await db.progress
-      .where("userId")
-      .equals(userId)
-      .and((prog) => prog.mastered)
-      .toArray();
-  }
-
   async update(id: string, updates: Partial<Progress>): Promise<number> {
     const updatedData = {
       ...updates,
@@ -288,59 +260,8 @@ export class ProgressDAO {
         bestScore: newBestScore,
         averageScore: newAverageScore,
         lastScore: score,
-        lastAttempt: new Date(),
       });
     }
-  }
-
-  async updateSRS(id: string, score: number): Promise<void> {
-    const progress = await this.getById(id);
-    if (progress) {
-      // Simple SM-2 algorithm implementation
-      let { easeFactor, interval, repetitions } = progress;
-
-      if (score >= 80) {
-        repetitions += 1;
-        if (repetitions === 1) {
-          interval = 1;
-        } else if (repetitions === 2) {
-          interval = 6;
-        } else {
-          interval = Math.round(interval * easeFactor);
-        }
-      } else {
-        repetitions = 0;
-        interval = 1;
-      }
-
-      easeFactor = Math.max(
-        1.3,
-        easeFactor +
-          (0.1 - (5 - score / 20) * (0.08 + (5 - score / 20) * 0.02)),
-      );
-
-      const nextReview = new Date(Date.now() + interval * 24 * 60 * 60 * 1000);
-      const status = this.calculateStatus(repetitions, score);
-
-      await this.update(id, {
-        easeFactor,
-        interval,
-        repetitions,
-        nextReview,
-        status,
-        mastered: status === "mastered",
-      });
-    }
-  }
-
-  private calculateStatus(
-    repetitions: number,
-    score: number,
-  ): Progress["status"] {
-    if (repetitions >= 3 && score >= 90) return "mastered";
-    if (repetitions >= 2) return "reviewing";
-    if (repetitions >= 1) return "learning";
-    return "new";
   }
 
   async delete(id: string): Promise<void> {
@@ -354,18 +275,14 @@ export class ProgressDAO {
   async getStats(userId: string): Promise<any> {
     const progress = await this.getByUserId(userId);
     const total = progress.length;
-    const mastered = progress.filter((p) => p.mastered).length;
-    const learning = progress.filter((p) => p.status === "learning").length;
-    const reviewing = progress.filter((p) => p.status === "reviewing").length;
-    const newCount = progress.filter((p) => p.status === "new").length;
+    const avgScore = total > 0 
+      ? progress.reduce((sum, p) => sum + p.averageScore, 0) / total 
+      : 0;
 
     return {
       total,
-      mastered,
-      learning,
-      reviewing,
-      new: newCount,
-      masteryRate: total > 0 ? (mastered / total) * 100 : 0,
+      avgScore: Math.round(avgScore),
+      masteryRate: 0, // SRS mastery is tracked client-side
     };
   }
 }

@@ -495,7 +495,7 @@ async function main() {
     console.log(`Questions analyzed: ${analyzed}`);
     console.log(`Issues found: ${issuesFound}`);
     console.log(`Work items created: ${workItemsCreated}`);
-    console.log(`Average issues per question: ${(issuesFound / analyzed).toFixed(2)}`);
+    console.log(`Average issues per question: ${analyzed > 0 ? (issuesFound / analyzed).toFixed(2) : 'N/A'}`);
     
   } catch (e) {
     console.error('Fatal error:', e);

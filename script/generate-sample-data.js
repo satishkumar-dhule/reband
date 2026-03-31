@@ -7,8 +7,17 @@
 
 import fs from 'fs';
 import path from 'path';
+import { createClient } from '@libsql/client';
+import { certificationDomains } from './ai/prompts/templates/certification-question.js';
+import { channelConfigs } from './ai/prompts/templates/generate.js';
 
 const OUTPUT_DIR = 'client/public/data';
+
+// Get all channels (regular + certifications)
+const allChannelIds = [
+  ...Object.keys(channelConfigs),
+  ...Object.keys(certificationDomains)
+];
 
 const channels = {
   algorithms: {
@@ -458,10 +467,10 @@ const channels = {
   }
 };
 
-function generateChannelsJson() {
+function generateChannelsJson(channelDataInput = channels) {
   const channelStats = [];
   
-  for (const [channelId, data] of Object.entries(channels)) {
+  for (const [channelId, data] of Object.entries(channelDataInput)) {
     const questions = data.questions;
     const stats = {
       total: questions.length,
@@ -484,10 +493,10 @@ function generateChannelsJson() {
   return channelStats;
 }
 
-function generateChannelFiles() {
+function generateChannelFiles(channelDataInput = channels) {
   const channelData = {};
   
-  for (const [channelId, data] of Object.entries(channels)) {
+  for (const [channelId, data] of Object.entries(channelDataInput)) {
     const questions = data.questions;
     const subChannels = [...new Set(questions.map(q => q.subChannel))];
     const companies = [...new Set(questions.flatMap(q => q.companies || []))];
@@ -515,18 +524,229 @@ function ensureDir(dir) {
   }
 }
 
-function main() {
+function safeJsonParse(value, fallback) {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    return fallback;
+  }
+}
+
+// ============================================
+// PARALLEL QUEUE WORKER SYSTEM
+// ============================================
+
+class WorkerPool {
+  constructor(maxWorkers = 30) {
+    this.maxWorkers = maxWorkers;
+    this.running = 0;
+    this.queue = [];
+    this.results = new Map();
+    this.activeTasks = new Map();
+  }
+
+  async addWork(channelId, task) {
+    return new Promise((resolve) => {
+      this.queue.push({ channelId, task, resolve });
+      this.processNext();
+    });
+  }
+
+  async processNext() {
+    if (this.running >= this.maxWorkers || this.queue.length === 0) return;
+    
+    this.running++;
+    const { channelId, task, resolve } = this.queue.shift();
+    const taskKey = `${channelId}-${Date.now()}`;
+    this.activeTasks.set(taskKey, { channelId, start: Date.now() });
+    
+    this.processChannel(channelId, task)
+      .then(questions => {
+        this.results.set(channelId, { questions });
+        resolve({ questions });
+      })
+      .catch(err => {
+        this.results.set(channelId, { error: err.message });
+        resolve({ error: err.message });
+      })
+      .finally(() => {
+        this.running--;
+        this.activeTasks.delete(taskKey);
+        this.processNext();
+      });
+  }
+
+  async processChannel(channelId, task) {
+    const { spawn } = await import('child_process');
+    
+    console.log(`   🔄 [${channelId}] Starting...`);
+    
+    const prompt = `Generate ${task.count} interview questions about ${channelId}.
+Return ONLY a JSON array (no markdown, no explanations) with objects containing:
+- question: The interview question
+- answer: The answer (50-200 words)
+- explanation: Detailed explanation
+- difficulty: beginner, intermediate, or advanced
+- subChannel: relevant sub-topic
+- tags: array of tags
+- companies: array of company names`;
+
+    try {
+      const result = await new Promise((resolve, reject) => {
+        const proc = spawn('opencode', ['run', prompt], {
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+        
+        let stdout = '', stderr = '';
+        proc.stdout.on('data', d => stdout += d);
+        proc.stderr.on('data', d => stderr += d);
+        proc.on('close', code => code === 0 ? resolve(stdout) : reject(new Error(stderr || `Exit ${code}`)));
+        proc.on('error', reject);
+        setTimeout(() => { proc.kill(); reject(new Error('Timeout')); }, 180000);
+      });
+      
+      const jsonMatch = result.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) throw new Error('No JSON in response');
+      
+      const questionsData = JSON.parse(jsonMatch[0]);
+      const difficulties = ['beginner', 'intermediate', 'advanced'];
+      
+      console.log(`   ✓ [${channelId}] Got ${questionsData.length} questions`);
+      
+      return questionsData.map((q, i) => ({
+        id: `${channelId}-${Date.now()}-${i}`,
+        question: q.question,
+        answer: q.answer,
+        explanation: q.explanation,
+        difficulty: q.difficulty || difficulties[Math.floor(Math.random() * difficulties.length)],
+        channel: channelId,
+        subChannel: q.subChannel || 'general',
+        tags: q.tags || [channelId],
+        companies: q.companies || [],
+        voiceSuitable: true,
+        voiceKeywords: [],
+        isNew: true
+      }));
+    } catch (e) {
+      console.error(`   ✗ [${channelId}] ${e.message}`);
+      throw e;
+    }
+  }
+
+  async waitUntilDone() {
+    while (this.queue.length > 0 || this.running > 0) {
+      const active = Array.from(this.activeTasks.values());
+      if (active.length > 0) {
+        const elapsed = ((Date.now() - active[0].start) / 1000).toFixed(0);
+        process.stdout.write(`\r   🔄 Running: ${this.running}, Queued: ${this.queue.length}, Time: ${elapsed}s`);
+      }
+      await new Promise(r => setTimeout(r, 500));
+    }
+    console.log('\n   ✅ All workers complete');
+  }
+}
+
+async function main() {
   console.log('Generating sample data for DevPrep...\n');
   
   ensureDir(OUTPUT_DIR);
   
-  console.log('Generating channels.json...');
-  const channelsJson = generateChannelsJson();
+  // Load questions from local.db if available
+  let localQuestions = [];
+  try {
+    const client = createClient({ url: 'file:local.db' });
+    const result = await client.execute({
+      sql: `SELECT id, question, answer, explanation, difficulty, channel, sub_channel, 
+            tags, companies, voice_keywords, voice_suitable, status
+            FROM questions WHERE status = 'active'`,
+      args: []
+    });
+    localQuestions = result.rows;
+    console.log(`Loaded ${localQuestions.length} questions from local.db`);
+  } catch (e) {
+    console.log('No local.db found, using embedded questions only');
+  }
+
+  // Merge embedded data with local questions
+  const allChannelData = { ...channels };
+  
+  // Merge local questions into channel data
+  for (const q of localQuestions) {
+    const ch = q.channel;
+    if (!allChannelData[ch]) {
+      allChannelData[ch] = { name: ch, questions: [] };
+    }
+    allChannelData[ch].questions.push({
+      id: q.id,
+      question: q.question,
+      answer: q.answer,
+      explanation: q.explanation,
+      difficulty: q.difficulty,
+      channel: q.channel,
+      subChannel: q.sub_channel,
+      tags: safeJsonParse(q.tags, []),
+      companies: safeJsonParse(q.companies, []),
+      voiceKeywords: safeJsonParse(q.voice_keywords, []),
+      voiceSuitable: q.voice_suitable === 1,
+      isNew: q.status === 'new'
+    });
+  }
+
+  // Ensure ALL channels are in the output (even if 0 questions)
+  for (const ch of allChannelIds) {
+    if (!allChannelData[ch]) {
+      allChannelData[ch] = { name: ch, questions: [] };
+    }
+  }
+
+  // Get channels that need questions (0 or <5)
+  const channelsNeedingQuestions = Object.keys(allChannelData).filter(ch => {
+    const cnt = allChannelData[ch]?.questions?.length || 0;
+    return cnt < 5;
+  });
+  
+  console.log(`\n📋 Channels needing questions (${channelsNeedingQuestions.length}):`);
+  channelsNeedingQuestions.slice(0, 20).forEach(ch => console.log(`   - ${ch}: ${allChannelData[ch]?.questions?.length || 0}`));
+
+  // Generate questions using worker pool with parallel execution
+  const BATCH_SIZE = 30;
+  const QUESTIONS_PER_CHANNEL = 5;
+  
+  console.log(`\n🚀 Generating questions using worker pool (max ${BATCH_SIZE} parallel)...`);
+  
+  // Create worker pool
+  const pool = new WorkerPool(BATCH_SIZE);
+  
+  // Add all channels to worker pool
+  for (const channelId of channelsNeedingQuestions) {
+    pool.addWork(channelId, { count: QUESTIONS_PER_CHANNEL });
+  }
+  
+  // Wait for all workers to complete
+  await pool.waitUntilDone();
+  
+  // Collect results
+  console.log('\n📊 Collecting results...');
+  for (const [channelId, result] of pool.results) {
+    if (result.questions && result.questions.length > 0) {
+      if (!allChannelData[channelId]) {
+        allChannelData[channelId] = { name: channelId, questions: [] };
+      }
+      allChannelData[channelId].questions.push(...result.questions);
+      console.log(`   ✓ ${channelId}: generated ${result.questions.length} questions`);
+    } else if (result.error) {
+      console.error(`   ✗ ${channelId}: ${result.error}`);
+    }
+  }
+  
+  console.log('\nGenerating channels.json...');
+  const channelsJson = generateChannelsJson(allChannelData);
   fs.writeFileSync(path.join(OUTPUT_DIR, 'channels.json'), JSON.stringify(channelsJson, null, 0));
   console.log(`  ✓ Created channels.json with ${channelsJson.length} channels`);
-  
+
   console.log('\nGenerating channel JSON files...');
-  const channelData = generateChannelFiles();
+  const channelData = generateChannelFiles(allChannelData);
   
   for (const [channelId, data] of Object.entries(channelData)) {
     const filePath = path.join(OUTPUT_DIR, `${channelId}.json`);

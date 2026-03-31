@@ -108,6 +108,11 @@ async function getPrioritizedSubChannel(channel, subChannelCounts) {
 // Prioritize channels with fewer questions using weighted selection
 // ALWAYS selects channels with 0 questions first before using weighted selection
 function selectChannelsWeighted(channelCounts, allChannels, limit) {
+  if (!allChannels || allChannels.length === 0) {
+    console.warn('No channels available for selection');
+    return [];
+  }
+  
   // Sort channels by question count
   const sortedByCount = [...allChannels].map(ch => ({
     channel: ch,
@@ -494,7 +499,7 @@ const scenarioHint = getScenarioHint(channel);
       if (hasCerts && result.regular) {
         const regularResult = result.regular;
         
-        if (!regularResult.success) {
+        if (!regularResult?.success) {
           console.log(`❌ Regular question generation failed: ${regularResult.error}`);
           failedAttempts.push({ channel, reason: regularResult.error || 'Generation failed' });
           continue;
@@ -557,7 +562,8 @@ const scenarioHint = getScenarioHint(channel);
           difficulty
         });
         
-        console.log(`📊 Job title relevance calculated for ${Object.keys(JSON.parse(enrichedData.jobTitleRelevance)).length} roles`);
+        const jobTitleObj = enrichedData?.jobTitleRelevance ? JSON.parse(enrichedData.jobTitleRelevance) : {};
+        console.log(`📊 Job title relevance calculated for ${Object.keys(jobTitleObj).length} roles`);
         
         await addUnifiedQuestion({
           id,

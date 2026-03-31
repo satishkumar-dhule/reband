@@ -134,6 +134,22 @@ export const certifications = sqliteTable("certifications", {
   lastUpdated: text("last_updated"),
 });
 
+// Flashcards table - SRS flashcards for spaced repetition learning
+export const flashcards = sqliteTable("flashcards", {
+  id: text("id").primaryKey(),
+  channel: text("channel").notNull(),
+  front: text("front").notNull(),
+  back: text("back").notNull(),
+  hint: text("hint"),
+  codeExample: text("code_example"),
+  mnemonic: text("mnemonic"),
+  difficulty: text("difficulty").notNull(),
+  tags: text("tags"),
+  category: text("category"),
+  status: text("status").default("active"),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
+});
+
 // Question history tracking - records all changes and events for each question
 export const questionHistory = sqliteTable("question_history", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -207,6 +223,7 @@ export const insertQuestionHistorySchema = createInsertSchema(questionHistory);
 export const insertCertificationSchema = createInsertSchema(certifications);
 export const insertUserSessionSchema = createInsertSchema(userSessions);
 export const insertLearningPathSchema = createInsertSchema(learningPaths);
+export const insertFlashcardSchema = createInsertSchema(flashcards);
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -220,3 +237,5 @@ export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
 export type UserSession = typeof userSessions.$inferSelect;
 export type InsertLearningPath = z.infer<typeof insertLearningPathSchema>;
 export type LearningPath = typeof learningPaths.$inferSelect;
+export type InsertFlashcard = z.infer<typeof insertFlashcardSchema>;
+export type Flashcard = typeof flashcards.$inferSelect;
