@@ -46,6 +46,16 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 ```
 
+## Accessibility & QA Best Practices
+- All interactive controls MUST have keyboard-accessible focus and visible focus rings.
+- All form controls MUST be associated with a label via htmlFor/id or aria-label when labeling visually is not feasible.
+- Use semantic HTML elements where possible (button, input, select, textarea, etc.). Avoid divs with role="button" for interactive elements.
+- Ensure color contrast meets WCAG 2.1 AA; avoid relying on color alone to convey meaning.
+- All modal/dialog components SHALL trap focus while open and return focus to the initiating control when closed.
+- Provide ARIA roles and properties for dynamic content updates (aria-live where appropriate).
+- For components that dynamically render states (loading, error, success), provide explicit ARIA attributes and screen-reader text equivalents.
+- All components exposed as part of the public API MUST include accessible tests in the QA suite.
+
 ## Button Usage Standards
 
 ```tsx
