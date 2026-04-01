@@ -9,6 +9,7 @@ import { useUnifiedToast } from '@/hooks/use-unified-toast';
 import { allChannelsConfig } from '../lib/channels-config';
 import { formatTag } from '../lib/utils';
 import { useFocusTrap } from '@/hooks/use-focus-trap';
+import { useScrollLock } from '@/hooks/use-scroll-lock';
 
 type FilterType = 'all' | 'tags' | 'company' | 'video' | 'diagram' | 'coding';
 
@@ -46,6 +47,9 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
   // Apply focus trapping to both mobile and desktop modals
   useFocusTrap(mobileContainerRef as RefObject<HTMLElement>, { enabled: isOpen, initialFocus: mobileInputRef as RefObject<HTMLElement>, returnFocus: true });
   useFocusTrap(desktopContainerRef as RefObject<HTMLElement>, { enabled: isOpen, initialFocus: inputRef as RefObject<HTMLElement>, returnFocus: true });
+
+  // Lock body scroll when search modal is open
+  useScrollLock(isOpen);
 
   // Set initial query when modal opens
   useEffect(() => {
@@ -323,6 +327,7 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
                   autoComplete="off"
                   spellCheck={false}
                   data-testid="search-input-mobile"
+                  aria-label="Search questions"
                 />
                 {query && (
                   <button onClick={() => setQuery('')} className="p-1.5 hover:bg-muted/80 rounded-full flex-shrink-0" aria-label="Clear search">
@@ -416,6 +421,7 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
                   autoComplete="off"
                   spellCheck={false}
                   data-testid="search-input-desktop"
+                  aria-label="Search questions, topics, tags"
                 />
                 {query && (
                   <button onClick={() => setQuery('')} className="p-1.5 hover:bg-muted rounded-full" aria-label="Clear search">

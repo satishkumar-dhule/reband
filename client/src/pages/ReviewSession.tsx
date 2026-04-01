@@ -171,7 +171,11 @@ export default function ReviewSession() {
   const { onSRSReview, config } = useCredits();
   const { trackEvent } = useAchievementContext();
   const dueCardsRef = useRef(dueCards);
+  const currentIndexRef = useRef(currentIndex);
+  const currentQuestionRef = useRef(currentQuestion);
   dueCardsRef.current = dueCards;
+  currentIndexRef.current = currentIndex;
+  currentQuestionRef.current = currentQuestion;
 
   // Load due cards
   useEffect(() => {
@@ -202,22 +206,20 @@ export default function ReviewSession() {
   };
 
   const handleRate = (rating: ConfidenceRating) => {
-    if (!currentCard || !currentQuestion) return;
-
-    // Capture current values at render time to avoid stale closure
-    const cardIndex = currentIndex;
-    const cards = dueCards;
+    const card = currentCard;
+    const question = currentQuestionRef.current;
+    if (!card || !question) return;
 
     // Record the review
     recordReview(
-      currentCard.questionId,
-      currentCard.channel,
-      currentCard.difficulty,
+      card.questionId,
+      card.channel,
+      card.difficulty,
       rating
     );
 
     // Calculate and add XP
-    const xpEarned = calculateXP(rating, currentCard.masteryLevel);
+    const xpEarned = calculateXP(rating, card.masteryLevel);
     addXP(xpEarned);
     setSessionXP(prev => prev + xpEarned);
     
@@ -240,8 +242,9 @@ export default function ReviewSession() {
     setSessionStats(prev => ({ ...prev, [rating]: prev[rating] + 1 }));
     setReviewedCount(prev => prev + 1);
 
-    // Move to next card
-    const nextIndex = cardIndex + 1;
+    // Move to next card - use refs to avoid stale closures
+    const nextIndex = currentIndexRef.current + 1;
+    const cards = dueCardsRef.current;
     if (nextIndex < cards.length) {
       setCurrentIndex(nextIndex);
       loadQuestion(cards[nextIndex]);
@@ -261,19 +264,24 @@ export default function ReviewSession() {
     }
   };
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts - use refs to avoid stale closures and unnecessary re-runs
+  const handleRevealRef = useRef(handleReveal);
+  const handleRateRef = useRef(handleRate);
+  handleRevealRef.current = handleReveal;
+  handleRateRef.current = handleRate;
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (sessionState === 'reviewing') {
         if (e.key === ' ' || e.key === 'Enter') {
           e.preventDefault();
-          handleReveal();
+          handleRevealRef.current();
         }
       } else if (sessionState === 'reveal') {
-        if (e.key === '1') handleRate('again');
-        else if (e.key === '2') handleRate('hard');
-        else if (e.key === '3') handleRate('good');
-        else if (e.key === '4') handleRate('easy');
+        if (e.key === '1') handleRateRef.current('again');
+        else if (e.key === '2') handleRateRef.current('hard');
+        else if (e.key === '3') handleRateRef.current('good');
+        else if (e.key === '4') handleRateRef.current('easy');
       }
       if (e.key === 'Escape') {
         setLocation('/');
@@ -282,7 +290,7 @@ export default function ReviewSession() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sessionState]);
+  }, [sessionState, setLocation]);
 
   const progress = dueCards.length > 0 ? Math.round((reviewedCount / dueCards.length) * 100) : 0;
 

@@ -8,7 +8,7 @@
  * MobileChannels, AllChannelsRedesigned, CertificationExam, and more
  */
 
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { Skeleton } from '../mobile/SkeletonLoader';
@@ -33,9 +33,9 @@ interface MetricCardProps {
 
 const variantClasses: Record<MetricCardVariant, { bg: string; text: string; iconBg: string }> = {
   default: {
-    bg: 'bg-card border-border',
+    bg: 'bg-card border border-border',
     text: 'text-foreground',
-    iconBg: 'bg-primary/10'
+    iconBg: 'bg-gh-accent-subtle'
   },
   success: {
     bg: 'bg-[var(--gh-success-fg)]/5 border-[var(--gh-success-fg)]/20',
@@ -61,26 +61,26 @@ const variantClasses: Record<MetricCardVariant, { bg: string; text: string; icon
 
 const sizeClasses: Record<MetricCardSize, { padding: string; value: string; label: string; icon: string }> = {
   sm: {
-    padding: 'p-3',
+    padding: 'p-2',
     value: 'text-xl',
     label: 'text-xs',
     icon: 'w-8 h-8'
   },
   md: {
-    padding: 'p-4',
+    padding: 'p-3',
     value: 'text-2xl',
     label: 'text-sm',
     icon: 'w-10 h-10'
   },
   lg: {
-    padding: 'p-6',
+    padding: 'p-4',
     value: 'text-3xl',
     label: 'text-base',
     icon: 'w-12 h-12'
   }
 };
 
-export function MetricCard({
+export const MetricCard = memo(function MetricCard({
   label,
   value,
   icon,
@@ -143,11 +143,13 @@ export function MetricCard({
   const content = (
     <div 
       className={`
-        ${variantConfig.bg} rounded-xl border ${sizeConfig.padding}
-        ${onClick ? 'cursor-pointer hover:border-primary/40 hover:shadow-md transition-all duration-200' : ''}
+        ${variantConfig.bg} rounded-md ${sizeConfig.padding}
+        ${onClick ? 'cursor-pointer hover:border-primary/40 hover:shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2' : ''}
         ${className}
       `}
       onClick={onClick}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? 'button' : undefined}
     >
       {/* Icon */}
       {icon && (
@@ -207,7 +209,7 @@ export function MetricCard({
   }
 
   return content;
-}
+});
 
 /**
  * Compact Metric Card - Horizontal layout for dense displays
@@ -221,7 +223,7 @@ interface CompactMetricCardProps {
   onClick?: () => void;
 }
 
-export function CompactMetricCard({
+export const CompactMetricCard = memo(function CompactMetricCard({
   label,
   value,
   icon,
@@ -234,12 +236,14 @@ export function CompactMetricCard({
   return (
     <div 
       className={`
-        ${variantConfig.bg} rounded-lg border p-3
+        ${variantConfig.bg} rounded-md p-2
         flex items-center gap-3
-        ${onClick ? 'cursor-pointer hover:border-primary/40 transition-all duration-200' : ''}
+        ${onClick ? 'cursor-pointer hover:border-primary/40 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2' : ''}
         ${className}
       `}
       onClick={onClick}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? 'button' : undefined}
     >
       {icon && (
         <div className={`w-8 h-8 rounded-md ${variantConfig.iconBg} flex items-center justify-center flex-shrink-0`}>
@@ -252,7 +256,7 @@ export function CompactMetricCard({
       </div>
     </div>
   );
-}
+});
 
 /**
  * Metric Grid - Layout helper for multiple metrics

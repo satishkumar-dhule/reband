@@ -3,7 +3,7 @@
  * Vibrant channel-based theming with pass expiration tracking
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
@@ -194,36 +194,49 @@ export default function TestSession() {
   const theme = test ? getChannelTheme(test.channelId) : getChannelTheme('default');
   const isExpired = test && progress ? checkTestExpiration(test, progress) : false;
 
+  // Refs to avoid stale closures in callbacks
+  const currentQuestionRef = useRef(currentQuestion);
+  const answersRef = useRef(answers);
+  const autoSubmitRef = useRef(autoSubmit);
+  const currentIndexRef = useRef(currentIndex);
+  const questionsLengthRef = useRef(questions.length);
+  currentQuestionRef.current = currentQuestion;
+  answersRef.current = answers;
+  autoSubmitRef.current = autoSubmit;
+  currentIndexRef.current = currentIndex;
+  questionsLengthRef.current = questions.length;
+
   const handleOptionSelect = (optionId: string) => {
-    if (!currentQuestion) return;
+    const question = currentQuestionRef.current;
+    if (!question) return;
     
-    const current = answers[currentQuestion.id] || [];
+    const current = answersRef.current[question.id] || [];
     
-    if (currentQuestion.type === 'single') {
-      const newAnswers = { ...answers, [currentQuestion.id]: [optionId] };
+    if (question.type === 'single') {
+      const newAnswers = { ...answersRef.current, [question.id]: [optionId] };
       setAnswers(newAnswers);
       
       // Auto-submit for single choice if enabled
-      if (autoSubmit) {
+      if (autoSubmitRef.current) {
         // Check if answer is correct for feedback
-        const correctOption = currentQuestion.options.find(o => o.isCorrect);
+        const correctOption = question.options.find(o => o.isCorrect);
         const isCorrect = correctOption?.id === optionId;
         setShowFeedback(isCorrect ? 'correct' : 'incorrect');
         
-        // Auto-advance after brief feedback
+        // Auto-advance after brief feedback - use refs for stale closure safety
         setTimeout(() => {
           setShowFeedback(null);
-          if (currentIndex < questions.length - 1) {
-            setCurrentIndex(currentIndex + 1);
+          if (currentIndexRef.current < questionsLengthRef.current - 1) {
+            setCurrentIndex(prev => prev + 1);
           }
         }, 600);
       }
     } else {
       // Multiple choice - toggle
       if (current.includes(optionId)) {
-        setAnswers({ ...answers, [currentQuestion.id]: current.filter(id => id !== optionId) });
+        setAnswers({ ...answersRef.current, [question.id]: current.filter(id => id !== optionId) });
       } else {
-        setAnswers({ ...answers, [currentQuestion.id]: [...current, optionId] });
+        setAnswers({ ...answersRef.current, [question.id]: [...current, optionId] });
       }
     }
   };
@@ -242,38 +255,39 @@ export default function TestSession() {
   };
 
   const goNext = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+    if (currentIndexRef.current < questionsLengthRef.current - 1) {
+      setCurrentIndex(prev => prev + 1);
     }
   };
 
   // Confirm answer for multiple choice questions (shows feedback then advances)
   const confirmMultipleChoice = () => {
-    if (!currentQuestion || currentQuestion.type !== 'multiple') return;
+    const question = currentQuestionRef.current;
+    if (!question || question.type !== 'multiple') return;
     
-    const userAnswers = answers[currentQuestion.id] || [];
+    const userAnswers = answersRef.current[question.id] || [];
     if (userAnswers.length === 0) return;
     
     // Check if all correct options are selected and no incorrect ones
-    const correctIds = currentQuestion.options.filter(o => o.isCorrect).map(o => o.id);
+    const correctIds = question.options.filter(o => o.isCorrect).map(o => o.id);
     const allCorrectSelected = correctIds.every(id => userAnswers.includes(id));
     const noIncorrectSelected = userAnswers.every(id => correctIds.includes(id));
     const isCorrect = allCorrectSelected && noIncorrectSelected;
     
     setShowFeedback(isCorrect ? 'correct' : 'incorrect');
     
-    // Auto-advance after brief feedback
+    // Auto-advance after brief feedback - use refs for stale closure safety
     setTimeout(() => {
       setShowFeedback(null);
-      if (currentIndex < questions.length - 1) {
-        setCurrentIndex(currentIndex + 1);
+      if (currentIndexRef.current < questionsLengthRef.current - 1) {
+        setCurrentIndex(prev => prev + 1);
       }
     }, 800);
   };
 
   const goPrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+    if (currentIndexRef.current > 0) {
+      setCurrentIndex(prev => prev - 1);
     }
   };
 

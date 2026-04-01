@@ -8,7 +8,7 @@ import {
   Briefcase, Bot, Award, Cpu, Database, Cloud, Shield,
   GitBranch, Layers, Monitor, Smartphone, Server, Lock
 } from 'lucide-react';
-import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate, useReducedMotion } from 'framer-motion';
 import { SEOHead } from '../components/SEOHead';
 import { AppLayout } from '../components/layout/AppLayout';
 import { trackEasterEggUnlocked } from '../hooks/use-analytics';
@@ -96,6 +96,29 @@ function CodeSnippet({ code, language = 'bash' }: { code: string; language?: str
 // Floating tech icons background
 function FloatingIcons() {
   const icons = [Code, Database, Cloud, Server, Shield, GitBranch, Cpu, Layers];
+  const shouldReduceMotion = useReducedMotion();
+  
+  // Animation config that respects reduced motion preference
+  const getAnimationConfig = () => {
+    if (shouldReduceMotion) {
+      return { opacity: 0.05 };
+    }
+    return {
+      y: ['0%', '-20%', '120%'],
+      rotate: [0, 360, 720]
+    };
+  };
+  
+  const getTransitionConfig = () => {
+    if (shouldReduceMotion) {
+      return { duration: 0 };
+    }
+    return {
+      duration: 20 + Math.random() * 10,
+      repeat: Infinity,
+      delay: Math.random() * 5
+    };
+  };
   
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -108,15 +131,8 @@ function FloatingIcons() {
             y: Math.random() * 100 + '%',
             rotate: Math.random() * 360 
           }}
-          animate={{ 
-            y: [null, '-20%', '120%'],
-            rotate: [null, 360, 720]
-          }}
-          transition={{ 
-            duration: 20 + Math.random() * 10,
-            repeat: Infinity,
-            delay: i * 2
-          }}
+          animate={getAnimationConfig()}
+          transition={getTransitionConfig()}
         >
           <Icon className="w-12 h-12 sm:w-16 sm:h-16" />
         </motion.div>
@@ -130,11 +146,14 @@ function GlitchText({ children, className }: { children: string; className?: str
   const [isGlitching, setIsGlitching] = useState(false);
   
   useEffect(() => {
-    const interval = setInterval(() => {
+    // Glitch effect every 5 seconds
+    const glitchInterval = setInterval(() => {
       setIsGlitching(true);
       setTimeout(() => setIsGlitching(false), 200);
     }, 5000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(glitchInterval);
+    };
   }, []);
 
   return (

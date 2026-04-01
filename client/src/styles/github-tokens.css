@@ -85,6 +85,13 @@
   /* Focus ring */
   --gh-focus-ring: rgba(9, 105, 218, 0.4);
   
+  /* Shadows */
+  --gh-shadow-xs: 0 1px 0 rgba(27, 31, 36, 0.04);
+  --gh-shadow-sm: 0 1px 2px rgba(27, 31, 36, 0.04);
+  --gh-shadow-md: 0 3px 6px rgba(140, 149, 159, 0.15);
+  --gh-shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.2);
+  --gh-shadow-xl: 0 12px 48px rgba(140, 149, 159, 0.3);
+  
   /* Common backgrounds for components */
   --gh-bg-elevated: #ffffff;
   --gh-bg-muted: #f6f8fa;
@@ -168,6 +175,13 @@
   
   /* Focus ring */
   --gh-focus-ring: rgba(88, 166, 255, 0.4);
+  
+  /* Shadows */
+  --gh-shadow-xs: 0 1px 0 rgba(0, 0, 0, 0);
+  --gh-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --gh-shadow-md: 0 3px 6px rgba(1, 4, 9, 0.4);
+  --gh-shadow-lg: 0 8px 24px rgba(1, 4, 9, 0.5);
+  --gh-shadow-xl: 0 12px 48px rgba(1, 4, 9, 0.6);
   
   /* Common backgrounds for components */
   --gh-bg-elevated: #161b22;
@@ -259,6 +273,23 @@
 .gh-focus:focus-visible {
   outline: 2px solid var(--gh-accent-fg);
   outline-offset: 2px;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+/* GitHub-style responsive breakpoints */
+:root {
+  /* Breakpoints (matching GitHub Primer design system) */
+  --breakpoint-sm: 544px;   /* Mobile landscape */
+  --breakpoint-md: 768px;   /* Tablet */
+  --breakpoint-lg: 1012px; /* Desktop */
+  --breakpoint-xl: 1280px; /* Large desktop */
+  
+  /* Container widths */
+  --container-sm: 544px;
+  --container-md: 768px;
+  --container-lg: 1012px;
+  --container-xl: 1280px;
+  --container-max: 1280px;
 }
 
 /* ===== MEDIA QUERY FOR PREFERENCES ===== */

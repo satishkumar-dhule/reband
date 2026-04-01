@@ -5,7 +5,27 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Prism as SyntaxHighlighter, type LineNumberProps } from 'react-syntax-highlighter';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+
+// Define types locally since they're not exported from react-syntax-highlighter
+interface LineNumberProps {
+  number: number;
+  style?: React.CSSProperties;
+}
+
+interface RendererNode {
+  type: 'element' | 'text';
+  value?: string | number;
+  tagName?: keyof React.JSX.IntrinsicElements | React.ComponentType<unknown>;
+  properties?: { className?: string[]; [key: string]: unknown };
+  children?: RendererNode[];
+}
+
+interface RendererProps {
+  rows: RendererNode[];
+  stylesheet: Record<string, React.CSSProperties>;
+  useInlineStyles: boolean;
+}
 import { 
   vscDarkPlus, 
   oneDark, 
@@ -96,11 +116,11 @@ const languageConfig: Record<string, { label: string; icon: React.ReactNode; col
 
 const getLanguageConfig = (lang: string) => {
   const lowerLang = lang.toLowerCase();
-  return languageConfig[lowerLang] || { 
-    label: lang, 
-    icon: <FileCode className="w-3.5 h-3.5" />, 
-    color: '#6b7280' 
-  };
+    return languageConfig[lowerLang] || { 
+      label: lang, 
+      icon: <FileCode className="w-3.5 h-3.5" />, 
+      color: 'var(--gh-fg-muted)' 
+    };
 };
 
 // ============================================
@@ -295,7 +315,7 @@ function CodeSnippetView({
                           style={highlighted ? highlightStyles[highlightColor] : {}}
                         >
                           {comment && <CommentMarker comment={comment} />}
-                          {row.content}
+                          {typeof row.value === 'string' ? row.value : String(row.value ?? '')}
                         </div>
                       );
                     })}
@@ -325,15 +345,21 @@ function CodeSnippetView({
                 <div className="flex items-center gap-2">
                   <Highlighter className="w-3.5 h-3.5 text-muted-foreground" />
                   <span className="text-muted-foreground">Highlights:</span>
-                  {snippet.highlights.map((h, i) => (
-                    <span
-                      key={i}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-white"
-                      style={{ backgroundColor: highlightStyles[h.color || 'default'].borderLeft?.replace('3px solid ', '') || '#3b82f6' }}
-                    >
-                      Lines {h.startLine}-{h.endLine}
-                    </span>
-                  ))}
+                  {snippet.highlights.map((h, i) => {
+                    const borderLeftValue = highlightStyles[h.color || 'default'].borderLeft;
+                    const bgColor = typeof borderLeftValue === 'string' 
+                      ? borderLeftValue.replace('3px solid ', '') 
+                      : '#3b82f6';
+                    return (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-white"
+                        style={{ backgroundColor: bgColor }}
+                      >
+                        Lines {h.startLine}-{h.endLine}
+                      </span>
+                    );
+                  })}
                 </div>
               )}
               {snippet.comments && snippet.comments.length > 0 && (
@@ -364,7 +390,7 @@ function CodeExampleSection({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [activeSnippet, setActiveSnippet] = useState(example.snippets[0]?.id || '');
 
-  const uniqueLanguages = [...new Set(example.snippets.map(s => s.language))];
+  const uniqueLanguages = Array.from(new Set(example.snippets.map(s => s.language)));
 
   return (
     <motion.div

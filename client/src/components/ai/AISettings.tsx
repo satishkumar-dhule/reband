@@ -146,7 +146,7 @@ export function AISettings({
               value={getApiKey()}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="Enter API key"
-              className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-primary"
+              className="w-full px-3 py-1.5 text-sm bg-transparent border border-[var(--gh-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-fg)] focus:border-[var(--gh-accent-fg)] text-[var(--gh-fg)] placeholder:text-[var(--gh-fg-muted)] transition-colors duration-150"
             />
           </div>
         )}
@@ -157,7 +157,7 @@ export function AISettings({
           <select
             value={language}
             onChange={(e) => onLanguageChange(e.target.value as Language)}
-            className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-primary"
+            className="w-full px-3 py-1.5 text-sm bg-transparent border border-[var(--gh-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-fg)] focus:border-[var(--gh-accent-fg)] text-[var(--gh-fg)] transition-colors duration-150"
           >
             {LANGUAGES.map((lang) => (
               <option key={lang.code} value={lang.code}>
@@ -206,7 +206,7 @@ export function AISettings({
                 else onOpenAIKeyChange(e.target.value);
               }}
               placeholder="Enter TTS API key"
-              className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-primary"
+              className="w-full px-3 py-1.5 text-sm bg-transparent border border-[var(--gh-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-fg)] focus:border-[var(--gh-accent-fg)] text-[var(--gh-fg)] placeholder:text-[var(--gh-fg-muted)] transition-colors duration-150"
             />
           </div>
         )}
@@ -218,7 +218,7 @@ export function AISettings({
             <select
               value={selectedVoice}
               onChange={(e) => onSelectedVoiceChange(e.target.value)}
-              className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-primary"
+              className="w-full px-3 py-1.5 text-sm bg-transparent border border-[var(--gh-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gh-accent-fg)] focus:border-[var(--gh-accent-fg)] text-[var(--gh-fg)] transition-colors duration-150"
             >
               <option value="">Default Voice</option>
               {availableVoices
@@ -264,9 +264,9 @@ export function AISettings({
             id="auto-speak"
             checked={autoSpeak}
             onChange={(e) => onAutoSpeakChange(e.target.checked)}
-            className="rounded"
+            className="h-[18px] w-[18px] rounded border-2 border-[var(--gh-border)] bg-[var(--gh-canvas)] checked:bg-[var(--gh-accent-emphasis)] checked:border-[var(--gh-accent-emphasis)] focus:outline-none focus:ring-2 focus:ring-[var(--gh-focus-ring)] focus:ring-offset-2 focus:ring-offset-[var(--gh-canvas)] cursor-pointer transition-colors duration-150"
           />
-          <label htmlFor="auto-speak" className="text-xs">
+          <label htmlFor="auto-speak" className="text-xs text-[var(--gh-fg)] cursor-pointer">
             Auto-speak responses (always on in voice mode)
           </label>
         </div>

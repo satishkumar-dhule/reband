@@ -210,9 +210,9 @@ export function GenZHomePage() {
       setActivePaths([]);
     }
   }, [curatedPaths]); // Re-run when curatedPaths loads
-  
-  // Calculate streak
-  const streak = (() => {
+   
+  // Calculate streak - memoized to avoid recomputation on every render
+  const streak = React.useMemo(() => {
     try {
       let s = 0;
       for (let i = 0; i < 365; i++) {
@@ -225,7 +225,7 @@ export function GenZHomePage() {
     } catch {
       return 0;
     }
-  })();
+  }, [activityStats]);
 
   // Calculate level (100 XP per level)
   const level = Math.floor(balance / 100);
@@ -426,7 +426,7 @@ export function GenZHomePage() {
                 </div>
                 <div className="text-left">
                   <p className="text-base text-foreground mb-2">
-                    "Landed my dream job at Google after 6 weeks of practice. The voice interview feature was a game-changer!"
+                    "Landed my dream job at Google after 6 weeks of practice. The voice interview feature helped me build confidence and communicate clearly!"
                   </p>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span className="font-semibold text-foreground">Sarah Chen</span>
@@ -632,7 +632,7 @@ export function GenZHomePage() {
                             icon: <Check className="w-5 h-5" />,
                             label: 'Continue',
                             color: 'bg-green-500',
-                            onAction: () => setLocation(`/channel/${path.channels[0]}`)
+                            onAction: () => path.channels[0] ? setLocation(`/channel/${path.channels[0]}`) : setLocation('/learning-paths')
                           }}
                           rightAction={{
                             icon: <X className="w-5 h-5" />,
@@ -727,7 +727,7 @@ export function GenZHomePage() {
                               <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={() => setLocation(`/channel/${path.channels[0]}`)}
+                                onClick={() => path.channels[0] ? setLocation(`/channel/${path.channels[0]}`) : setLocation('/learning-paths')}
                                 className={`w-full py-3 md:py-4 bg-gradient-to-r ${path.color} rounded-[12px] md:rounded-[16px] font-bold text-sm md:text-base text-foreground flex items-center justify-center gap-2`}
                               >
                                 Continue Learning

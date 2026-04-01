@@ -68,6 +68,7 @@ export default function ProfileGenZ() {
 
   const handleCouponSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!couponCode.trim()) {
       setCouponMessage({ type: 'error', text: 'Please enter a coupon code' });
       return;

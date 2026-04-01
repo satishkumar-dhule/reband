@@ -680,6 +680,8 @@ function calculateSimilarity(a: string, b: string): number {
     }
   }
   
+  // Prevent division by zero
+  if (longer.length === 0) return 0;
   return matches / longer.length;
 }
 

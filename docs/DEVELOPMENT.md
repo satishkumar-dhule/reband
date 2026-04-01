@@ -3,7 +3,7 @@
 ## Quick Start
 
 ```bash
-ppnpm install
+pnpm install
 pnpm dev          # http://localhost:5001
 ```
 
@@ -171,6 +171,29 @@ e2e/
 └── fixtures.ts        # Test utilities
 ```
 
+## 📋 Spec-Driven Development
+
+All development must align with our formal specifications. Review these documents before making changes:
+
+- **[Open-Interview Specification](../SPECIFICATIONS.md)** - Production-grade specifications for architecture, non-functional requirements, data model, and QA strategy.
+- **[Unified Control Specification](../UNIFIED_CONTROLS_SPEC.md)** - Standard controls, accessibility rules, and UI component standards.
+- **[Content Standards](../CONTENT_STANDARDS.md)** - Quality rules for all content types, difficulty taxonomies, and coverage targets.
+
+### QA Checklist
+
+Before submitting any change, ensure compliance with:
+
+- [ ] **Static-first architecture**: No backend servers in production; all data exported to `public/data/*.json`.
+- [ ] **GitHub theme compliance**: Use CSS variables (`--gh-*`), system font stack, and Primer-inspired components.
+- [ ] **Accessibility**: WCAG 2.1 AA conformance; keyboard navigation; ARIA labeling; focus management.
+- [ ] **Performance budgets**: TTFB < 2s; LCP < 2.5s; Lighthouse pass.
+- [ ] **Data integrity**: No hardcoded content in React; all data from DB exports.
+- [ ] **Content standards**: Follow CONTENT_STANDARDS.md for word counts, difficulty taxonomies, and coverage targets.
+- [ ] **Control consistency**: Use unified components from `@/components/unified/` and shadcn/ui; avoid prohibited patterns.
+- [ ] **Testing**: Run `pnpm test` for E2E tests; ensure no regressions.
+
+Refer to the [SPECIFICATIONS.md QA & Testing Strategy](../SPECIFICATIONS.md#qa--testing-strategy) for full details.
+
 ## Code Patterns
 
 ### Adding a New Page
@@ -269,7 +292,7 @@ lsof -ti:5001 | xargs kill -9
 ### Build errors
 ```bash
 rm -rf node_modules dist
-ppnpm install
+pnpm install
 pnpm build
 ```
 

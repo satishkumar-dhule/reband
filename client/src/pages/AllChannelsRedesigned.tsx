@@ -303,15 +303,15 @@ function ChannelCard({
           {iconMap[channel.icon] || <Cpu className="w-5 h-5" />}
         </div>
         <IconButton
+          icon={isSubscribed ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
           onClick={(e) => {
             e.stopPropagation();
             onToggle();
           }}
           variant={isSubscribed ? 'primary' : 'ghost'}
           size="sm"
-        >
-          {isSubscribed ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-        </IconButton>
+          aria-label={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+        />
       </div>
 
       <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">

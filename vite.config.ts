@@ -33,55 +33,151 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     // Optimize chunk loading for faster SPA navigation
-    chunkSizeWarningLimit: 2000,
+    chunkSizeWarningLimit: 1500,
     minify: 'esbuild',
     sourcemap: false,
     target: 'esnext',
     cssCodeSplit: true,
-    // Enable experimental features for better code splitting
+    // Enable manifest for asset tracking
+    manifest: true,
+    // Use Vite's built-in vendor chunk splitting
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+    // Better code splitting to avoid circular dependencies
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            // React core - load immediately
-            if (id.includes('react-dom') || id.includes('react/')) {
-              return 'vendor-react';
-            }
-            // MUI - separate chunk
-            if (id.includes('@mui/material') || id.includes('@mui/icons')) {
-              return 'vendor-mui';
-            }
-            // Framer Motion - separate for animations
-            if (id.includes('framer-motion')) {
-              return 'vendor-motion';
-            }
-            // React Query - load after initial render
-            if (id.includes('@tanstack')) {
-              return 'vendor-query';
-            }
-            // Charts - heavy, separate chunk
-            if (id.includes('recharts')) {
-              return 'vendor-charts';
-            }
-            // Mermaid - very heavy (2.9MB), lazy load
-            if (id.includes('mermaid')) {
-              return 'vendor-mermaid';
-            }
-            // AI/LangChain - very heavy
-            if (id.includes('@langchain') || id.includes('langgraph')) {
-              return 'vendor-ai';
-            }
-            // Syntax highlighter - separate for code blocks
-            if (id.includes('react-syntax-highlighter')) {
-              return 'vendor-syntax';
-            }
-            // Markdown processing - separate for review pages
-            if (id.includes('react-markdown') || id.includes('remark-')) {
-              return 'vendor-markdown';
-            }
-            // Framer Motion - already separated above, but ensure it's not bundled
-            return 'vendor-other';
+        // Content-hashed filenames for aggressive caching
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: (assetInfo) => {
+          const extType = assetInfo.name?.split('.').pop();
+          if (extType === 'css') {
+            return 'assets/css/[name]-[hash][extname]';
           }
+          if (/\.(png|jpe?g|gif|svg|webp|avif)$/i.test(assetInfo.name || '')) {
+            return 'assets/images/[name]-[hash][extname]';
+          }
+          if (/\.(woff|woff2|eot|ttf|otf)$/i.test(assetInfo.name || '')) {
+            return 'assets/fonts/[name]-[hash][extname]';
+          }
+          return 'assets/[name]-[hash][extname]';
+        },
+        // Use function form to avoid circular chunks
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return undefined;
+          }
+          
+          // Heavy libraries first - these need to be isolated
+          if (id.includes('mermaid')) {
+            return 'vendor-mermaid';
+          }
+          
+          if (id.includes('framer-motion')) {
+            return 'vendor-motion';
+          }
+          
+          if (id.includes('@monaco-editor/')) {
+            return 'vendor-editor';
+          }
+          
+          // Group React and its direct dependencies
+          if (id.includes('react-dom') || id.includes('/react/')) {
+            return 'vendor-react';
+          }
+          
+          if (id.includes('lucide-react')) {
+            return 'vendor-icons';
+          }
+          
+          if (id.includes('class-variance-authority')) {
+            return 'vendor-cva';
+          }
+          
+          if (id.includes('@radix-ui/')) {
+            return 'vendor-radix';
+          }
+          
+          if (id.includes('@floating-ui/')) {
+            return 'vendor-floating';
+          }
+          
+          if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query')) {
+            return 'vendor-query';
+          }
+          
+          if (id.includes('cmdk')) {
+            return 'vendor-cmdk';
+          }
+          
+          if (id.includes('react-markdown') || id.includes('remark-') || 
+              id.includes('rehype-') || id.includes('hast-') || 
+              id.includes('unist-') || id.includes('vfile-') ||
+              id.includes('mdast-') || id.includes('micromark') ||
+              id.includes('bail') || id.includes('ccount') ||
+              id.includes('character') || id.includes('fault') ||
+              id.includes('format')) {
+            return 'vendor-markdown';
+          }
+          
+          if (id.includes('react-syntax-highlighter')) {
+            return 'vendor-syntax';
+          }
+          
+          if (id.includes('@mui/')) {
+            return 'vendor-mui';
+          }
+          
+          if (id.includes('@langchain/') || id.includes('langgraph') || id.includes('@qdrant/')) {
+            return 'vendor-ai';
+          }
+          
+          if (id.includes('date-fns')) {
+            return 'vendor-date';
+          }
+          
+          if (id.includes('embla-carousel')) {
+            return 'vendor-carousel';
+          }
+          
+          if (id.includes('sonner')) {
+            return 'vendor-toast';
+          }
+          
+          if (id.includes('wouter')) {
+            return 'vendor-router';
+          }
+          
+          if (id.includes('vaul')) {
+            return 'vendor-vaul';
+          }
+          
+          if (id.includes('input-otp')) {
+            return 'vendor-otp';
+          }
+          
+          if (id.includes('react-resizable-panels')) {
+            return 'vendor-resizable';
+          }
+          
+          if (id.includes('react-hook-form') || id.includes('@hookform')) {
+            return 'vendor-forms';
+          }
+          
+          if (id.includes('next-themes')) {
+            return 'vendor-themes';
+          }
+          
+          if (id.includes('react-day-picker')) {
+            return 'vendor-daypicker';
+          }
+          
+          if (id.includes('recharts')) {
+            return 'vendor-charts';
+          }
+          
+          return 'vendor-libs';
         },
       },
     },
@@ -92,6 +188,14 @@ export default defineConfig({
       'react-dom',
       'wouter',
       '@tanstack/react-query',
+      'lucide-react',
+      'framer-motion',
+      'clsx',
+      'tailwind-merge',
+      'class-variance-authority',
+      'react-hook-form',
+      '@hookform/resolvers',
+      'zod',
     ],
     esbuildOptions: {
       target: 'esnext',
@@ -106,7 +210,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5173',
         changeOrigin: true,
       },
     },

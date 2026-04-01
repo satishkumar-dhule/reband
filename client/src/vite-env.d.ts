@@ -128,6 +128,13 @@ declare module 'mermaid/dist/mermaid.esm.mjs' {
   export default mermaid;
 }
 
+// react-syntax-highlighter Prism theme modules
+declare module 'react-syntax-highlighter/dist/esm/styles/prism/a11y-one-light' {
+  import type { Theme as PrismTheme } from 'react-syntax-highlighter';
+  const theme: PrismTheme;
+  export default theme;
+}
+
 // Global CSS custom properties
 declare namespace CSS {
   interface Property {

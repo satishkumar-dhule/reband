@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback, useState, useRef, useEffect } from 'react';
+import { createContext, useContext, useCallback, useState, useRef, useEffect, useMemo } from 'react';
 
 interface Achievement {
   id: string;
@@ -24,8 +24,13 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [pendingAchievements, setPendingAchievements] = useState<Achievement[]>([]);
 
-  const achievementsRef = useRef(achievements);
+  // Use refs to track state for callbacks to avoid stale closures
+  const achievementsRef = useRef<Achievement[]>([]);
+  const pendingRef = useRef<Achievement[]>([]);
+  
+  // Sync refs with state
   achievementsRef.current = achievements;
+  pendingRef.current = pendingAchievements;
 
   useEffect(() => {
     const saved = localStorage.getItem('devprep_achievements');
@@ -48,11 +53,26 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
     }
   }, [achievements]);
 
+  // unlockAchievement defined before trackEvent to avoid circular dependency
+  const unlockAchievement = useCallback((achievement: Achievement) => {
+    // Use functional update to avoid stale state issues
+    setAchievements(prev => {
+      if (prev.some(a => a.id === achievement.id)) {
+        return prev;
+      }
+      return [...prev, { ...achievement, unlockedAt: new Date() }];
+    });
+    setPendingAchievements(prev => [...prev, achievement]);
+  }, []);
+
   const trackEvent = useCallback((event: string, metadata?: Record<string, unknown>) => {
+    // Use ref to get current achievements to avoid stale closure
+    const currentAchievements = achievementsRef.current;
+    
     // Handle different achievement events
     const eventHandlers: Record<string, () => void> = {
       'question_answered': () => {
-        const count = achievementsRef.current.filter(a => a.type === 'question_answered').length;
+        const count = currentAchievements.filter(a => a.type === 'question_answered').length;
         if (count === 0) {
           unlockAchievement({
             id: 'first_question',
@@ -63,7 +83,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
         }
       },
       'test_completed': () => {
-        const count = achievementsRef.current.filter(a => a.type === 'test_completed').length;
+        const count = currentAchievements.filter(a => a.type === 'test_completed').length;
         if (count === 0) {
           unlockAchievement({
             id: 'first_test',
@@ -74,7 +94,7 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
         }
       },
       'voice_session': () => {
-        const count = achievementsRef.current.filter(a => a.type === 'voice_session').length;
+        const count = currentAchievements.filter(a => a.type === 'voice_session').length;
         if (count === 0) {
           unlockAchievement({
             id: 'first_voice',
@@ -124,38 +144,42 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
           description: 'Answered 100 questions'
         });
       },
+      // New event handlers using metadata
+      'question_completed': () => {
+        // Track progress towards question-based achievements
+        const completedCount = currentAchievements.filter(a => 
+          a.type === 'question_answered'
+        ).length + (metadata?.questionId ? 1 : 0);
+        
+        // This is handled by question_answered in the pages
+      },
     };
 
     if (eventHandlers[event]) {
       eventHandlers[event]();
     }
-  }, []);
-
-  const unlockAchievement = useCallback((achievement: Achievement) => {
-    setAchievements(prev => {
-      if (prev.some(a => a.id === achievement.id)) {
-        return prev;
-      }
-      return [...prev, { ...achievement, unlockedAt: new Date() }];
-    });
-    setPendingAchievements(prev => [...prev, achievement]);
-  }, []);
+  }, [unlockAchievement]);
 
   const consumePendingAchievement = useCallback(() => {
-    if (pendingAchievements.length === 0) return null;
-    const [next, ...rest] = pendingAchievements;
+    // Use ref to get current pending achievements
+    const currentPending = pendingRef.current;
+    if (currentPending.length === 0) return null;
+    const [next, ...rest] = currentPending;
     setPendingAchievements(rest);
     return next;
-  }, [pendingAchievements]);
+  }, []);
+
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    achievements,
+    pendingAchievements,
+    trackEvent,
+    unlockAchievement,
+    consumePendingAchievement
+  }), [achievements, pendingAchievements, trackEvent, unlockAchievement, consumePendingAchievement]);
 
   return (
-    <AchievementContext.Provider value={{
-      achievements,
-      pendingAchievements,
-      trackEvent,
-      unlockAchievement,
-      consumePendingAchievement
-    }}>
+    <AchievementContext.Provider value={contextValue}>
       {children}
     </AchievementContext.Provider>
   );

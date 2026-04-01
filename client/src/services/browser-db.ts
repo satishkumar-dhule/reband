@@ -73,9 +73,15 @@ class BrowserDB {
 
   constructor() {
     // Start init but don't block - lazy init pattern
-    this.dbReady = this.initDB().then(() => {
-      this.isDbReady = true;
-    });
+    this.dbReady = this.initDB()
+      .then(() => {
+        this.isDbReady = true;
+      })
+      .catch((err) => {
+        console.error('BrowserDB initialization failed:', err);
+        // Don't rethrow - allow app to continue without offline support
+        this.isDbReady = true; // Mark as ready so other code doesn't hang
+      });
     // Don't start sync in constructor - let db-storage-sync handle it
   }
 
@@ -175,7 +181,7 @@ class BrowserDB {
 
   async put<T>(storeName: keyof DBSchema, data: T & { id: string }): Promise<void> {
     // Non-blocking: fire-and-forget init, proceed with operation
-    this.ready().catch(() => {});
+    this.ready().catch((err) => console.warn('BrowserDB ready failed (put):', err));
     if (!this.db) return Promise.resolve(); // Skip if DB not ready
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName, 'readwrite');
@@ -186,7 +192,7 @@ class BrowserDB {
   }
 
   async get<T>(storeName: keyof DBSchema, id: string): Promise<T | undefined> {
-    this.ready().catch(() => {});
+    this.ready().catch((err) => console.warn('BrowserDB ready failed (get):', err));
     if (!this.db) return undefined;
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName);
@@ -197,7 +203,7 @@ class BrowserDB {
   }
 
   async getAll<T>(storeName: keyof DBSchema): Promise<T[]> {
-    this.ready().catch(() => {});
+    this.ready().catch((err) => console.warn('BrowserDB ready failed (getAll):', err));
     if (!this.db) return [];
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName);
@@ -212,7 +218,7 @@ class BrowserDB {
     indexName: string,
     value: IDBValidKey
   ): Promise<T[]> {
-    this.ready().catch(() => {});
+    this.ready().catch((err) => console.warn('BrowserDB ready failed (getByIndex):', err));
     if (!this.db) return [];
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName);
@@ -224,7 +230,7 @@ class BrowserDB {
   }
 
   async delete(storeName: keyof DBSchema, id: string): Promise<void> {
-    this.ready().catch(() => {});
+    this.ready().catch((err) => console.warn('BrowserDB ready failed (delete):', err));
     if (!this.db) return;
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName, 'readwrite');
@@ -235,7 +241,7 @@ class BrowserDB {
   }
 
   async clear(storeName: keyof DBSchema): Promise<void> {
-    this.ready().catch(() => {});
+    this.ready().catch((err) => console.warn('BrowserDB ready failed (clear):', err));
     if (!this.db) return;
     return new Promise((resolve, reject) => {
       const store = this.getStore(storeName, 'readwrite');
@@ -246,7 +252,7 @@ class BrowserDB {
   }
 
   async bulkPut<T extends { id: string }>(storeName: keyof DBSchema, data: T[]): Promise<void> {
-    this.ready().catch(() => {});
+    this.ready().catch((err) => console.warn('BrowserDB ready failed (bulkPut):', err));
     if (!this.db) return Promise.resolve();
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(storeName, 'readwrite');

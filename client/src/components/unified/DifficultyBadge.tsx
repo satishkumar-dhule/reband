@@ -9,6 +9,7 @@
  */
 
 import { Zap, Target, Flame } from 'lucide-react';
+import { memo } from 'react';
 
 export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
 export type DifficultyBadgeSize = 'xs' | 'sm' | 'md' | 'lg';
@@ -83,7 +84,7 @@ const sizeClasses = {
   }
 };
 
-export function DifficultyBadge({
+export const DifficultyBadge = memo(function DifficultyBadge({
   level,
   size = 'md',
   variant = 'soft',
@@ -113,7 +114,7 @@ export function DifficultyBadge({
       {showLabel && label}
     </span>
   );
-}
+});
 
 /**
  * Difficulty Indicator - Minimal dot indicator

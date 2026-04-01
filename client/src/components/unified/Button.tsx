@@ -29,19 +29,19 @@ interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'cla
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm focus-visible:ring-primary/50',
-  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border focus-visible:ring-secondary/50',
-  outline: 'border border-border bg-transparent hover:bg-muted/50 text-foreground focus-visible:ring-ring/50',
-  ghost: 'bg-transparent hover:bg-muted/50 text-foreground focus-visible:ring-ring/50',
-  danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm focus-visible:ring-destructive/50',
-  success: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm focus-visible:ring-emerald-500/50'
+  primary: 'bg-gh-accent text-gh-fg-on-emphasis border border-gh-border-muted hover:bg-gh-accent-hover shadow-sm focus-visible:ring-gh-accent/50',
+  secondary: 'bg-transparent text-gh-fg border border-gh-border hover:bg-gh-canvas-subtle focus-visible:ring-gh-accent/50',
+  outline: 'bg-transparent text-gh-fg border border-gh-border hover:bg-gh-canvas-subtle focus-visible:ring-gh-accent/50',
+  ghost: 'bg-transparent text-gh-fg hover:bg-gh-canvas-subtle focus-visible:ring-gh-accent/50',
+  danger: 'bg-gh-danger-emphasis text-gh-fg-on-emphasis border border-gh-border-muted hover:bg-gh-danger-hover shadow-sm focus-visible:ring-gh-danger/50',
+  success: 'bg-gh-success-emphasis text-gh-fg-on-emphasis border border-gh-border-muted hover:bg-gh-success-hover shadow-sm focus-visible:ring-gh-success/50'
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
   xs: 'px-2 py-1 text-xs',
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-sm',
-  lg: 'px-6 py-3 text-base',
+  sm: 'px-3 py-[3px] text-xs',
+  md: 'px-4 py-[5px] text-sm',
+  lg: 'px-5 py-[9px] text-base',
   xl: 'px-8 py-4 text-lg'
 };
 
@@ -69,7 +69,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseClasses = 'inline-flex items-center justify-center gap-2 font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed';
+    const baseClasses = 'inline-flex items-center justify-center gap-2 font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gh-accent/50 disabled:opacity-50 disabled:cursor-not-allowed';
     const variantClass = variantClasses[variant];
     const sizeClass = sizeClasses[size];
     const roundedClass = roundedClasses[rounded];
@@ -143,7 +143,7 @@ export const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
     },
     ref
   ) => {
-    const baseClasses = 'inline-flex items-center justify-center gap-2 font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed';
+    const baseClasses = 'inline-flex items-center justify-center gap-2 font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gh-accent/50 disabled:opacity-50 disabled:cursor-not-allowed';
     const variantClass = variantClasses[variant];
     const sizeClass = sizeClasses[size];
     const roundedClass = roundedClasses[rounded];

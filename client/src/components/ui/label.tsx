@@ -6,16 +6,30 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Label Component - GitHub-style labels for form fields and text
+ * 
+ * Variants:
+ * - default: Standard foreground color
+ * - muted: Muted/subtle text for secondary information
+ * - destructive: Danger color for error/warning labels
+ * - success: Success green for positive states
+ * 
+ * Sizes:
+ * - sm: Small text (text-xs)
+ * - default: Standard text (text-sm)
+ * - lg: Large text (text-base)
+ */
 const labelVariants = cva(
   // Base styles - GitHub design tokens with proper dark mode support
   "text-sm font-medium leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "text-[var(--gh-fg)] dark:text-[var(--gh-fg)]",
-        muted: "text-[var(--gh-fg-muted)] dark:text-[var(--gh-fg-muted)]",
-        destructive: "text-[var(--gh-danger-fg)] dark:text-[var(--gh-danger-fg)]",
-        success: "text-[var(--gh-success-fg)] dark:text-[var(--gh-success-fg)]",
+        default: "text-[var(--gh-fg)]",
+        muted: "text-[var(--gh-fg-muted)]",
+        destructive: "text-[var(--gh-danger-fg)]",
+        success: "text-[var(--gh-success-fg)]",
       },
       size: {
         sm: "text-xs",

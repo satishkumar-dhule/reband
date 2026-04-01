@@ -1123,5 +1123,35 @@ export async function registerRoutes(
     }
   });
 
+  // ============================================
+  // USER PROGRESS API (missing route)
+  // ============================================
+
+  // Get user progress across all channels
+  app.get("/api/progress/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      // For now, return empty array since we don't have a progress table
+      // This can be extended to store actual progress in IndexedDB
+      const result = await client.execute({
+        sql: "SELECT * FROM user_sessions WHERE session_key LIKE ? AND status = 'active'",
+        args: [`${userId}-%`]
+      });
+
+      const progress = result.rows.map((row: any) => ({
+        channelId: row.channel_id,
+        completedQuestions: row.completed_items ? JSON.parse(row.completed_items) : [],
+        markedQuestions: [],
+        lastVisitedIndex: 0,
+      }));
+
+      res.json(progress);
+    } catch (error) {
+      console.error("Error fetching progress:", error);
+      res.status(500).json({ error: "Failed to fetch progress" });
+    }
+  });
+
   return httpServer;
 }

@@ -206,20 +206,17 @@ export default function TrainingMode() {
   // Use unified voice recording hook
   const recording = useVoiceRecording({
     onRecordingStart: () => {
-      console.log('TrainingMode: Recording started');
       recordingStartTimeRef.current = Date.now();
       setShowFeedback(false);
       setCurrentFeedback(null);
     },
     onRecordingComplete: (_audioBlob, transcript) => {
-      console.log('TrainingMode: Recording completed', { transcript });
       // Calculate duration
       const duration = Math.round((Date.now() - recordingStartTimeRef.current) / 1000);
       const question = currentQuestionRef.current;
       
       // Use the transcript from the recording state if callback transcript is empty
       const finalTranscript = transcript || recording.state.transcript || recording.state.finalTranscript;
-      console.log('TrainingMode: Final transcript', { finalTranscript });
       
       // Calculate feedback
       if (question) {
@@ -229,7 +226,6 @@ export default function TrainingMode() {
         
         // In interview mode, reveal the answer after recording
         if (isInterviewMode) {
-          console.log('TrainingMode: Revealing answer in interview mode');
           setShowAnswer(true);
         }
         
@@ -237,12 +233,6 @@ export default function TrainingMode() {
         setCompletedQuestions(prev => new Set(prev).add(question.id));
       }
     }
-  });
-
-  console.log('TrainingMode: Recording object', { 
-    recording: !!recording, 
-    state: recording?.state,
-    isInterviewMode 
   });
 
   // Store resetRecording in ref to avoid stale closures

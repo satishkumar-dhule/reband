@@ -106,17 +106,21 @@ export function trackActivity() {
   const saved = localStorage.getItem(activityKey);
   const activity: { date: string; count: number }[] = saved ? JSON.parse(saved) : [];
   
-  const todayEntry = activity.find(a => a.date === today);
-  if (todayEntry) {
-    todayEntry.count += 1;
+  // Create new activity array with immutable update
+  const todayIndex = activity.findIndex(a => a.date === today);
+  let newActivity: { date: string; count: number }[];
+  if (todayIndex >= 0) {
+    newActivity = activity.map((a, i) => 
+      i === todayIndex ? { ...a, count: a.count + 1 } : a
+    );
   } else {
-    activity.push({ date: today, count: 1 });
+    newActivity = [...activity, { date: today, count: 1 }];
   }
   
   // Keep only last 90 days
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - 90);
-  const filtered = activity.filter(a => new Date(a.date) >= cutoff);
+  const filtered = newActivity.filter(a => new Date(a.date) >= cutoff);
   
   localStorage.setItem(activityKey, JSON.stringify(filtered));
 }

@@ -23,7 +23,7 @@ const Checkbox = React.forwardRef<
         // Border colors - light mode
         "border-[var(--gh-border)] bg-[var(--gh-canvas)]",
         // Focus state - GitHub focus ring
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gh-focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gh-canvas)]",
+        "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--gh-focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gh-canvas)]",
         // Checked state - light mode
         "data-[state=checked]:border-[var(--gh-accent-emphasis)] data-[state=checked]:bg-[var(--gh-accent-emphasis)] data-[state=checked]:text-[var(--gh-fg-on-emphasis)]",
         // Disabled state
@@ -32,7 +32,7 @@ const Checkbox = React.forwardRef<
         "dark:border-[var(--gh-border)] dark:bg-[var(--gh-canvas)]",
         "dark:data-[state=checked]:border-[var(--gh-accent-emphasis)] dark:data-[state=checked]:bg-[var(--gh-accent-emphasis)] dark:data-[state=checked]:text-[var(--gh-fg-on-emphasis)]",
         // Error/invalid state
-        ariaInvalid && "border-[var(--gh-danger-emphasis)] ring-2 ring-[var(--gh-danger-subtle)] dark:ring-[var(--gh-danger-subtle)]",
+        ariaInvalid && "border-[var(--gh-danger-fg)] ring-[3px] ring-[var(--gh-danger-fg)] dark:ring-[var(--gh-danger-fg)]",
         ariaInvalid && "data-[state=checked]:bg-[var(--gh-danger-emphasis)] data-[state=checked]:border-[var(--gh-danger-emphasis)]",
         className
       )}

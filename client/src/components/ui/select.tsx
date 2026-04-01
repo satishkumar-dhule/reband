@@ -30,7 +30,7 @@ const SelectTrigger = React.forwardRef<
       // Placeholder styling
       "data-[placeholder]:text-[var(--gh-fg-muted)]",
       // Focus styles with proper focus ring
-      "focus:outline-none focus:ring-2 focus:ring-[var(--gh-focus-ring)] focus:border-[var(--gh-accent-fg)]",
+      "focus:outline-none focus:ring-[3px] focus:ring-[var(--gh-focus-ring)] focus:border-[var(--gh-accent-fg)]",
       // Hover state
       "hover:border-[var(--gh-accent-fg)]",
       // Disabled state
@@ -38,7 +38,7 @@ const SelectTrigger = React.forwardRef<
       // Line clamp for text overflow
       "[&>span]:line-clamp-1",
       // Error/validation state
-      ariaInvalid && "border-[var(--gh-danger-emphasis)] focus:ring-[var(--gh-danger-fg)] focus:border-[var(--gh-danger-fg)]",
+      ariaInvalid && "border-[var(--gh-danger-fg)] focus:ring-[var(--gh-danger-fg)] focus:border-[var(--gh-danger-fg)]",
       className
     )}
     aria-invalid={ariaInvalid}

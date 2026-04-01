@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { DesktopSidebar } from './UnifiedNav';
+import { DesktopSidebar, MobileBottomNav } from './UnifiedNav';
 import { UnifiedSearch } from '../UnifiedSearch';
 import { useSidebar } from '../../context/SidebarContext';
 import { cn } from '../../lib/utils';
@@ -47,6 +47,9 @@ export function DesktopSidebarWrapper({ children }: DesktopSidebarWrapperProps) 
 
       {/* Search Modal */}
       <UnifiedSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </>
   );
 }

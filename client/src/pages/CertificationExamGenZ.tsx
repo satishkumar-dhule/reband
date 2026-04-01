@@ -83,9 +83,9 @@ export default function CertificationExam() {
 
 
 
-  const currentQuestion = questions[currentIndex];
-  const isAnswered = answers.some(a => a.questionId === currentQuestion?.id);
-  const currentAnswer = answers.find(a => a.questionId === currentQuestion?.id);
+  const currentQuestion = questions[currentIndex] ?? null;
+  const isAnswered = currentQuestion ? answers.some(a => a.questionId === currentQuestion.id) : false;
+  const currentAnswer = currentQuestion ? answers.find(a => a.questionId === currentQuestion.id) : undefined;
 
   // Start exam session
   const startSession = useCallback(() => {

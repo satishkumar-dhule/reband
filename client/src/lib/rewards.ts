@@ -87,21 +87,46 @@ const defaultProgress: UserProgressState = {
 
 class RewardStorage {
   getProgress(): UserProgressState {
-    const stored = localStorage.getItem('user-progress');
-    return stored ? JSON.parse(stored) : defaultProgress;
+    try {
+      const stored = localStorage.getItem('user-progress');
+      return stored ? JSON.parse(stored) : defaultProgress;
+    } catch (error) {
+      console.warn('Failed to read user progress from localStorage:', error);
+      return defaultProgress;
+    }
   }
 
   saveProgress(progress: UserProgressState): void {
-    localStorage.setItem('user-progress', JSON.stringify(progress));
+    try {
+      localStorage.setItem('user-progress', JSON.stringify(progress));
+    } catch (error) {
+      console.error('Failed to save user progress to localStorage:', error);
+      // Handle storage quota exceeded
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        console.warn('localStorage quota exceeded for user progress');
+      }
+    }
   }
 
   getNotifications(): RewardNotification[] {
-    const stored = localStorage.getItem('reward-notifications');
-    return stored ? JSON.parse(stored) : [];
+    try {
+      const stored = localStorage.getItem('reward-notifications');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.warn('Failed to read reward notifications from localStorage:', error);
+      return [];
+    }
   }
 
   saveNotifications(notifications: RewardNotification[]): void {
-    localStorage.setItem('reward-notifications', JSON.stringify(notifications));
+    try {
+      localStorage.setItem('reward-notifications', JSON.stringify(notifications));
+    } catch (error) {
+      console.error('Failed to save reward notifications to localStorage:', error);
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        console.warn('localStorage quota exceeded for notifications');
+      }
+    }
   }
 
   getCreditBalance(): number {
@@ -158,7 +183,7 @@ class RewardEngine {
         result.creditsEarned = 1;
         break;
       case 'quiz_answered':
-        const isCorrect = event.data?.isCorrect as boolean;
+        const isCorrect = event.data?.isCorrect === true;
         result.summary.xpEarned = isCorrect ? 5 : 1;
         result.summary.creditsEarned = isCorrect ? CREDIT_CONFIG.QUIZ_CORRECT : CREDIT_CONFIG.QUIZ_WRONG;
         result.creditsEarned = result.summary.creditsEarned;

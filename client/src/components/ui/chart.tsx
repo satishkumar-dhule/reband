@@ -69,6 +69,53 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+// SECURITY: Validate CSS content to prevent injection attacks
+// Even though we sanitize inputs, this adds defense-in-depth
+function validateCssContent(css: string): boolean {
+  // Block potentially dangerous CSS patterns
+  const dangerousPatterns = [
+    /url\s*\(/i,           // url() - could be used for CSS data exfiltration
+    /expression\s*\(/i,    // IE expression()
+    /javascript\s*:/i,      // javascript: URLs
+    /behavior\s*:/i,        // IE behaviors
+    /-moz-binding/i,        // IE bindings
+    /@import/i,            // @import could load external resources
+    /data\s*:/i,           // data: URLs
+    /unicode-range/i,      // Could be used for font-based fingerprinting
+    /background[^;]*url/i, // background with url
+    /content\s*:/i,        // content property - could inject HTML-like content
+  ];
+  
+  return !dangerousPatterns.some(pattern => pattern.test(css));
+}
+
+// SECURITY: Sanitize color values - only allow valid hex colors
+function sanitizeColor(color: string | undefined): string | null {
+  if (!color) return null;
+  
+  // Only allow hex colors (#RGB or #RRGGBB)
+  // Remove any non-hex characters
+  const sanitized = color.replace(/[^#a-fA-F0-9]/g, '');
+  
+  // Validate format: #RGB or #RRGGBB or #RRGGBBAA
+  if (/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/.test(color)) {
+    return color;
+  }
+  
+  // Also allow named colors that are safe (only letters)
+  if (/^[a-zA-Z]+$/.test(sanitized) && sanitized.length > 0) {
+    // Whitelist of safe named colors
+    const safeColors = ['black', 'white', 'red', 'green', 'blue', 'yellow', 'cyan', 'magenta', 
+                        'gray', 'grey', 'orange', 'purple', 'pink', 'brown', 'navy', 'teal',
+                        'lime', 'aqua', 'silver', 'maroon', 'olive', 'fuchsia', 'yellowgreen'];
+    if (safeColors.includes(sanitized.toLowerCase())) {
+      return sanitized.toLowerCase();
+    }
+  }
+  
+  return null;
+}
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -78,25 +125,44 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
+  // SECURITY: Sanitize the chart ID to prevent selector injection
   const styleId = id.replace(/[^a-zA-Z0-9-_]/g, '');
-
+  
+  // SECURITY: Build CSS content with strict sanitization
   const cssContent = Object.entries(THEMES)
     .map(
-      ([theme, prefix]) => `
-${prefix} [data-chart=${styleId}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    const safeKey = key.replace(/[^a-zA-Z0-9-_]/g, '');
-    return color ? `  --color-${safeKey}: ${color.replace(/[^#a-zA-Z0-9]/g, '')};` : null
-  })
-  .join("\n")}
-}
-`
+      ([theme, prefix]) => {
+        // Build CSS for this theme
+        const cssProps = colorConfig
+          .map(([key, itemConfig]) => {
+            const color =
+              itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
+              itemConfig.color;
+            
+            // SECURITY: Only use sanitized color values
+            const sanitizedColor = sanitizeColor(color);
+            if (!sanitizedColor) return null;
+            
+            // SECURITY: Sanitize the key for CSS custom property name
+            const safeKey = key.replace(/[^a-zA-Z0-9-_]/g, '');
+            if (!safeKey) return null;
+            
+            return `  --color-${safeKey}: ${sanitizedColor};`;
+          })
+          .filter(Boolean)
+          .join("\n");
+        
+        return cssProps ? `${prefix} [data-chart=${styleId}] {\n${cssProps}\n}` : '';
+      }
     )
+    .filter(Boolean)
     .join("\n");
+
+  // SECURITY: Final validation before injection
+  if (!validateCssContent(cssContent)) {
+    console.warn('ChartStyle: Potentially dangerous CSS detected, skipping');
+    return null;
+  }
 
   return (
     <style dangerouslySetInnerHTML={{ __html: cssContent }} />

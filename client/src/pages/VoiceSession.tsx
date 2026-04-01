@@ -590,9 +590,9 @@ export default function VoiceSession() {
 
 
   // Feedback after answering
-  if (pageState === 'feedback' && sessionState) {
-    const lastAnswer = sessionState.answers[sessionState.answers.length - 1];
-    const answeredQuestion = sessionState.questions[sessionState.currentQuestionIndex];
+  if (pageState === 'feedback' && sessionState && sessionState.answers.length > 0 && sessionState.questions.length > 0) {
+    const lastAnswer = sessionState.answers[sessionState.answers.length - 1] ?? null;
+    const answeredQuestion = sessionState.questions[sessionState.currentQuestionIndex] ?? null;
     const isLastQuestion = sessionState.currentQuestionIndex >= sessionState.questions.length - 1;
     
     const startPracticeMode = () => {
@@ -710,8 +710,8 @@ export default function VoiceSession() {
   }
 
   // Practice Mode
-  if (pageState === 'practice' && sessionState) {
-    const answeredQuestion = sessionState.questions[sessionState.currentQuestionIndex];
+  if (pageState === 'practice' && sessionState && sessionState.questions.length > 0) {
+    const answeredQuestion = sessionState.questions[sessionState.currentQuestionIndex] ?? null;
     const isLastQuestion = sessionState.currentQuestionIndex >= sessionState.questions.length - 1;
     
     const stopPractice = () => {

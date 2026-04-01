@@ -189,7 +189,7 @@ export default function Badges() {
   // Stats summary
   const unlockedCount = badgeProgress.filter(b => b.isUnlocked).length;
   const totalBadges = BADGES.length;
-  const overallProgress = Math.round((unlockedCount / totalBadges) * 100);
+  const overallProgress = totalBadges > 0 ? Math.round((unlockedCount / totalBadges) * 100) : 0;
 
   // Keyboard navigation
   useEffect(() => {

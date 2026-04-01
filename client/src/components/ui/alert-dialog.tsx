@@ -1,44 +1,11 @@
 import * as React from "react"
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
-
-function useFocusTrap(ref: React.RefObject<HTMLElement | null>, isActive: boolean) {
-  useEffect(() => {
-    if (!isActive || !ref.current) return;
-
-    const focusableElements = ref.current.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    
-    const firstElement = focusableElements[0] as HTMLElement;
-    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-
-    // Focus first element
-    firstElement?.focus();
-
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key !== 'Tab') return;
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          e.preventDefault();
-          lastElement?.focus();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement?.focus();
-        }
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isActive, ref]);
-}
+import { useFocusTrap } from "@/hooks/use-focus-trap"
+import { useScrollLock } from "@/hooks/use-scroll-lock"
 
 const AlertDialog = AlertDialogPrimitive.Root
 
@@ -52,7 +19,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-black/50 backdrop-blur-[4px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -66,7 +33,10 @@ const AlertDialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content> & { open?: boolean }
 >(({ className, open, ...props }, ref) => {
   const contentRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(contentRef, !!open);
+  useFocusTrap(contentRef as React.RefObject<HTMLElement>, { enabled: !!open, returnFocus: true });
+
+  // Lock body scroll when alert dialog is open
+  useScrollLock(!!open);
 
   return (
     <AlertDialogPortal>

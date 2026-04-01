@@ -89,11 +89,15 @@ export function selectNextQuestion(
     // Sort by relevance and pick from top 5 to add some randomness
     const topCandidates = candidatePool
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
-      .slice(0, 5);
+      .slice(0, Math.min(5, candidatePool.length));
     
+    // Handle edge case where candidatePool is empty
+    if (topCandidates.length === 0) return null;
     return topCandidates[Math.floor(Math.random() * topCandidates.length)];
   } else {
     // First question: random from candidate pool
+    // Handle edge case where candidatePool is empty
+    if (candidatePool.length === 0) return null;
     return candidatePool[Math.floor(Math.random() * candidatePool.length)];
   }
 }
@@ -258,7 +262,7 @@ export function generateProgressiveQuiz(
   tests: Test[],
   maxQuestions: number = 10
 ): TestQuestion[] {
-  const session = initializeQuizSession();
+  let session = initializeQuizSession();
   const questions: TestQuestion[] = [];
   let previousQuestion: TestQuestion | undefined;
 
@@ -272,7 +276,7 @@ export function generateProgressiveQuiz(
     // Simulate session update for next selection
     // In real usage, this would be based on actual user answers
     const mockCorrect = Math.random() > 0.5;
-    Object.assign(session, updateSession(session, next.question, mockCorrect));
+    session = updateSession(session, next.question, mockCorrect);
   }
 
   return questions;
@@ -350,7 +354,12 @@ export function generateProgressiveSequence<T extends {
       // Sort by relevance and pick from top 5 to add variety
       scored.sort((a, b) => b.score - a.score);
       const topCandidates = scored.slice(0, Math.min(5, scored.length));
-      nextQuestion = topCandidates[Math.floor(Math.random() * topCandidates.length)].question;
+      // Handle edge case where candidatePool is empty
+      if (topCandidates.length === 0) {
+        nextQuestion = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+      } else {
+        nextQuestion = topCandidates[Math.floor(Math.random() * topCandidates.length)].question;
+      }
     }
 
     // Add to selected and mark as used

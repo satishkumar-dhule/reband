@@ -44,19 +44,39 @@ const IS_DEV = import.meta.env.DEV;
 // ============================================
 // CACHE (used only in dev mode for API caching)
 // ============================================
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
 class CacheManager<T> {
-  private cache = new Map<string, T>();
+  private cache = new Map<string, CacheEntry<T>>();
+  // Default TTL: 5 minutes in development, 1 hour in production
+  private ttl: number;
+
+  constructor(ttl: number = 5 * 60 * 1000) {
+    this.ttl = ttl;
+  }
 
   get(key: string): T | undefined {
-    return this.cache.get(key);
+    const entry = this.cache.get(key);
+    if (!entry) return undefined;
+    
+    // Check if entry is stale
+    if (Date.now() - entry.timestamp > this.ttl) {
+      this.cache.delete(key);
+      return undefined;
+    }
+    
+    return entry.data;
   }
 
   set(key: string, value: T): void {
-    this.cache.set(key, value);
+    this.cache.set(key, { data: value, timestamp: Date.now() });
   }
 
   has(key: string): boolean {
-    return this.cache.has(key);
+    return this.get(key) !== undefined;
   }
 
   clear(): void {
@@ -66,11 +86,24 @@ class CacheManager<T> {
   delete(key: string): void {
     this.cache.delete(key);
   }
+
+  invalidate(key?: string): void {
+    if (key) {
+      this.cache.delete(key);
+    } else {
+      this.cache.clear();
+    }
+  }
+
+  setTTL(ttl: number): void {
+    this.ttl = ttl;
+  }
 }
 
-const channelDataCache = new CacheManager<ChannelData>();
-const statsCache = new CacheManager<ChannelDetailedStats[]>();
-const questionsCache = new CacheManager<Question>();
+// Cache with TTL: 5 minutes in dev mode
+const channelDataCache = new CacheManager<ChannelData>(5 * 60 * 1000);
+const statsCache = new CacheManager<ChannelDetailedStats[]>(5 * 60 * 1000);
+const questionsCache = new CacheManager<Question>(10 * 60 * 1000);
 
 // ============================================
 // HTTP UTILITIES (dev mode only)
@@ -133,9 +166,18 @@ export const ChannelService = {
       if (cached) return cached;
 
       const [questions, subChannels, companies] = await Promise.all([
-        fetchJson<Question[]>(`/api/questions/${channelId}`).catch(() => [] as Question[]),
-        fetchJson<string[]>(`/api/subchannels/${channelId}`).catch(() => [] as string[]),
-        fetchJson<string[]>(`/api/companies/${channelId}`).catch(() => [] as string[]),
+        fetchJson<Question[]>(`/api/questions/${channelId}`).catch((err) => {
+          console.warn(`Failed to fetch questions for channel ${channelId}:`, err);
+          return [] as Question[];
+        }),
+        fetchJson<string[]>(`/api/subchannels/${channelId}`).catch((err) => {
+          console.warn(`Failed to fetch subchannels for ${channelId}:`, err);
+          return [] as string[];
+        }),
+        fetchJson<string[]>(`/api/companies/${channelId}`).catch((err) => {
+          console.warn(`Failed to fetch companies for ${channelId}:`, err);
+          return [] as string[];
+        }),
       ]);
 
       const stats = {
@@ -195,6 +237,18 @@ export const ChannelService = {
     } else {
       return fetchCompanies(channelId);
     }
+  },
+
+  // Invalidate cache for a specific channel or all channels
+  invalidate(channelId?: string): void {
+    if (channelId) {
+      channelDataCache.delete(channelId);
+      statsCache.delete(`channel-${channelId}`);
+    } else {
+      channelDataCache.clear();
+      statsCache.clear();
+    }
+    questionsCache.clear();
   },
 };
 
@@ -422,11 +476,34 @@ export const CacheUtils = {
     clearApiClientCache();
   },
 
+  invalidateChannel(channelId: string): void {
+    if (IS_DEV) {
+      channelDataCache.delete(channelId);
+    }
+    // Also invalidate in static client
+    clearApiClientCache();
+  },
+
   async preloadAll(): Promise<void> {
     const channels = await ChannelService.getAll();
-    await Promise.all(
-      channels.map(ch => ChannelService.getData(ch.id).catch(() => null))
+    const results = await Promise.allSettled(
+      channels.map(ch => ChannelService.getData(ch.id))
     );
+    
+    const failedCount = results.filter(r => r.status === 'rejected').length;
+    if (failedCount > 0) {
+      console.warn(`Cache preload: ${failedCount}/${channels.length} channels failed to load`);
+    }
+  },
+
+  // Force refresh a specific channel
+  async refreshChannel(channelId: string): Promise<ChannelData | null> {
+    CacheUtils.invalidateChannel(channelId);
+    try {
+      return await ChannelService.getData(channelId);
+    } catch {
+      return null;
+    }
   },
 };
 

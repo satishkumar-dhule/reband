@@ -102,27 +102,71 @@ function clearOldStorageData(): void {
 
 function getBoolean(key: string, defaultValue: boolean = false): boolean {
   if (typeof window === 'undefined') return defaultValue;
-  const stored = localStorage.getItem(key);
-  if (stored === null) return defaultValue;
-  return stored === 'true';
+  
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored === null) return defaultValue;
+    return stored === 'true';
+  } catch (error) {
+    console.error(`Failed to read ${key} from localStorage:`, error);
+    return defaultValue;
+  }
 }
 
 function setBoolean(key: string, value: boolean): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(key, String(value));
+  
+  try {
+    localStorage.setItem(key, String(value));
+  } catch (error) {
+    console.error(`Failed to write ${key} to localStorage:`, error);
+    // Handle storage quota exceeded
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded, attempting to clear old data');
+      clearOldStorageData();
+      // Retry once
+      try {
+        localStorage.setItem(key, String(value));
+      } catch (retryError) {
+        console.error('Failed to write after cleanup:', retryError);
+      }
+    }
+  }
 }
 
 function getNumber(key: string, defaultValue: number = 0): number {
   if (typeof window === 'undefined') return defaultValue;
-  const stored = localStorage.getItem(key);
-  if (stored === null) return defaultValue;
-  const parsed = parseInt(stored, 10);
-  return isNaN(parsed) ? defaultValue : parsed;
+  
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored === null) return defaultValue;
+    const parsed = parseInt(stored, 10);
+    return isNaN(parsed) ? defaultValue : parsed;
+  } catch (error) {
+    console.error(`Failed to read ${key} from localStorage:`, error);
+    return defaultValue;
+  }
 }
 
 function setNumber(key: string, value: number): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(key, String(value));
+  
+  try {
+    localStorage.setItem(key, String(value));
+  } catch (error) {
+    console.error(`Failed to write ${key} to localStorage:`, error);
+    // Handle storage quota exceeded
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded, attempting to clear old data');
+      clearOldStorageData();
+      // Retry once
+      try {
+        localStorage.setItem(key, String(value));
+      } catch (retryError) {
+        console.error('Failed to write after cleanup:', retryError);
+      }
+    }
+  }
 }
 
 // ============================================
@@ -334,17 +378,21 @@ export const ActivityStorage = {
     const stats = this.getStats();
     const todayIndex = stats.findIndex(s => s.date === today);
     
+    // Create new stats array with immutable update
+    let newStats: ActivityStat[];
     if (todayIndex >= 0) {
-      stats[todayIndex].count++;
+      newStats = stats.map((s, i) => 
+        i === todayIndex ? { ...s, count: s.count + 1 } : s
+      );
     } else {
-      stats.push({ date: today, count: 1 });
+      newStats = [...stats, { date: today, count: 1 }];
     }
     
     // Keep only last 365 days
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 365);
     const cutoffStr = cutoff.toISOString().split('T')[0];
-    const filtered = stats.filter(s => s.date >= cutoffStr);
+    const filtered = newStats.filter(s => s.date >= cutoffStr);
     
     this.setStats(filtered);
   },

@@ -60,7 +60,15 @@ export const queryClient = new QueryClient({
 export function prefetchChannels() {
   return queryClient.prefetchQuery({
     queryKey: ["channels"],
-    queryFn: () => fetch("/api/channels").then(r => r.json()),
+    queryFn: () => fetch("/api/channels")
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .catch(error => {
+        console.error('Failed to prefetch channels:', error);
+        throw error;
+      }),
     staleTime: 120_000,
   });
 }

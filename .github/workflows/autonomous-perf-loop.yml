@@ -1,0 +1,30 @@
+name: Autonomous Perf Loop
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  auto-perf-loop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install
+      - name: Run autonomous perf loop (100 iterations)
+        run: ITERATIONS=100 node scripts/autonomous_perf_loop.js
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: autonomous-perf-artifacts
+          path: perf/**

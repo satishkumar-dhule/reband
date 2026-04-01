@@ -466,7 +466,7 @@ export default function UnifiedLearningPathsGenZ() {
                             variant="primary"
                             size="md"
                             className="flex-1"
-                            onClick={() => setLocation(`/channel/${path.channels[0]}`)}
+                            onClick={() => path.channels[0] ? setLocation(`/channel/${path.channels[0]}`) : setLocation('/learning-paths')}
                           >
                             Continue Learning
                           </Button>

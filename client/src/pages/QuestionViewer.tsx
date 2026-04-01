@@ -4,7 +4,7 @@
  * Mobile: Swipeable cards
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { getChannel } from '../lib/data';
 import { useQuestionsWithPrefetch, useSubChannels, useCompaniesWithCounts } from '../hooks/use-questions';
@@ -224,7 +224,30 @@ export default function QuestionViewer() {
     }
   }, [currentQuestion?.id]);
 
-  // Keyboard navigation
+  const nextQuestion = useCallback(() => {
+    if (currentIndex < totalQuestions - 1) {
+      setCurrentIndex(prev => prev + 1);
+      setMobileView('question');
+      // Track swipe for voice reminder
+      onQuestionSwipe();
+      // Deduct credits for viewing
+      onQuestionView();
+    }
+  }, [currentIndex, totalQuestions, onQuestionSwipe, onQuestionView]);
+
+  const prevQuestion = useCallback(() => {
+    if (currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+      setMobileView('question');
+    }
+  }, [currentIndex]);
+
+  // Keyboard navigation - use refs to avoid stale closures
+  const nextQuestionRef = useRef(nextQuestion);
+  const prevQuestionRef = useRef(prevQuestion);
+  nextQuestionRef.current = nextQuestion;
+  prevQuestionRef.current = prevQuestion;
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -236,35 +259,17 @@ export default function QuestionViewer() {
 
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         e.preventDefault();
-        nextQuestion();
+        nextQuestionRef.current();
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
         e.preventDefault();
-        prevQuestion();
+        prevQuestionRef.current();
       } else if (e.key === 'Escape') {
         setLocation('/');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, totalQuestions, showSearchModal]);
-
-  const nextQuestion = () => {
-    if (currentIndex < totalQuestions - 1) {
-      setCurrentIndex(prev => prev + 1);
-      setMobileView('question');
-      // Track swipe for voice reminder
-      onQuestionSwipe();
-      // Deduct credits for viewing
-      onQuestionView();
-    }
-  };
-
-  const prevQuestion = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
-      setMobileView('question');
-    }
-  };
+  }, [showSearchModal, setLocation]);
 
   const toggleMark = () => {
     if (!currentQuestion) return;

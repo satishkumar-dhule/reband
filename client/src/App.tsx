@@ -15,7 +15,14 @@ import { SidebarProvider } from "@/context/SidebarContext";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import NotFound from "@/pages/not-found";
-import { SkeletonLoader } from "@/components/mobile/SkeletonLoader";
+import { SkeletonLoader, SkeletonList } from "@/components/mobile/SkeletonLoader";
+
+// Import prefetch utilities
+import { 
+  registerRouteForPrefetch, 
+  prefetchCriticalRoutes, 
+  prefetchCriticalData 
+} from './lib/prefetch';
 
 // Preload heavy modules in background to speed up page navigation
 // This prevents the "SPA navigation took 3597ms" issue
@@ -27,42 +34,39 @@ function preloadHeavyModules() {
     setTimeout(() => {
       import('mermaid/dist/mermaid.esm.mjs')
         .then(() => console.log('Mermaid preloaded'))
-        .catch(() => {});
+        .catch((err) => console.warn('Mermaid preload failed:', err instanceof Error ? err.message : err));
     }, 3000);
     
     // Preload syntax highlighter only after initial paint
     setTimeout(() => {
       import('react-syntax-highlighter')
         .then(() => console.log('Syntax highlighter preloaded'))
-        .catch(() => {});
+        .catch((err) => console.warn('Syntax highlighter preload failed:', err instanceof Error ? err.message : err));
     }, 4000);
     
     // Preload markdown processors for SRS Review pages - low priority
     setTimeout(() => {
       import('react-markdown')
         .then(() => console.log('React markdown preloaded'))
-        .catch(() => {});
+        .catch((err) => console.warn('React markdown preload failed:', err instanceof Error ? err.message : err));
     }, 5000);
   }
 }
 
-// Preload critical route components on idle to speed up navigation
-function preloadCriticalRoutes() {
-  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-    // Preload voice interview page components after initial hydration
-    requestIdleCallback(() => {
-      import(/* webpackPrefetch: true */ '@/pages/VoicePracticeGenZ')
-        .catch(() => {});
-      import(/* webpackPrefetch: true */ '@/pages/VoiceSessionGenZ')
-        .catch(() => {});
-    }, { timeout: 3000 });
-    
-    // Preload review session after a delay
-    setTimeout(() => {
-      import(/* webpackPrefetch: true */ '@/pages/ReviewSessionGenZ')
-        .catch(() => {});
-    }, 3000);
-  }
+// Register routes for prefetching
+function registerRoutesForPrefetching() {
+  // Register critical routes for hover prefetching
+  registerRouteForPrefetch('/channels', () => import('@/pages/AllChannelsGenZ'));
+  registerRouteForPrefetch('/channel/:id', () => import('@/pages/QuestionViewerGenZ'));
+  registerRouteForPrefetch('/voice-interview', () => import('@/pages/VoicePracticeGenZ'));
+  registerRouteForPrefetch('/voice-session', () => import('@/pages/VoiceSessionGenZ'));
+  registerRouteForPrefetch('/coding', () => import('@/pages/CodingChallengeGenZ'));
+  registerRouteForPrefetch('/review', () => import('@/pages/ReviewSessionGenZ'));
+  registerRouteForPrefetch('/stats', () => import('@/pages/StatsGenZ'));
+  registerRouteForPrefetch('/learning-paths', () => import('@/pages/LearningPathsGenZ'));
+  registerRouteForPrefetch('/badges', () => import('@/pages/BadgesGenZ'));
+  registerRouteForPrefetch('/certifications', () => import('@/pages/CertificationsGenZ'));
+  registerRouteForPrefetch('/tests', () => import('@/pages/TestsGenZ'));
 }
 
 const Home = lazy(() => import("@/pages/Home"));
@@ -121,24 +125,24 @@ function OnboardingGuard({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-// Enhanced Suspense fallback with progress indication - more content for test compatibility
+// Enhanced Suspense fallback with comprehensive skeleton loading
 function EnhancedSuspenseFallback() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-[var(--gh-canvas-subtle)] p-4 page-content" id="main-content">
-      <div className="flex flex-col items-center gap-4 w-full max-w-md">
-        <div className="w-10 h-10 border-3 border-[var(--gh-accent-fg)] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-[var(--gh-fg-muted)]">Loading page content, please wait while we prepare your interview questions and practice session...</p>
-        {/* Add skeleton elements for visual appeal */}
-        <div className="w-full space-y-3 mt-4">
-          <div className="h-4 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded" style={{ width: '100%' }} />
-          <div className="h-4 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded" style={{ width: '85%' }} />
-          <div className="h-4 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded" style={{ width: '92%' }} />
-          <div className="h-4 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded" style={{ width: '78%' }} />
+      <div className="flex flex-col items-center gap-6 w-full max-w-2xl">
+        {/* Use the comprehensive SkeletonLoader for better UX */}
+        <div className="w-full">
+          <SkeletonLoader />
         </div>
-        {/* Fake button for test compatibility - visible during lazy loading */}
-        <button className="gh-btn gh-btn-primary h-12 px-8 text-lg mt-6" disabled aria-hidden="true">
-          <span className="w-5 h-5 mr-2 inline-block animate-pulse">🎤</span> Start Recording
-        </button>
+        {/* Keep the original fallback for test compatibility */}
+        <div className="flex flex-col items-center gap-4 w-full max-w-md">
+          <div className="w-10 h-10 border-3 border-[var(--gh-accent-fg)] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-[var(--gh-fg-muted)]">Loading page content, please wait while we prepare your interview questions and practice session...</p>
+          {/* Fake button for test compatibility - visible during lazy loading */}
+          <button className="gh-btn gh-btn-primary h-12 px-8 text-lg mt-6" disabled aria-hidden="true">
+            <span className="w-5 h-5 mr-2 inline-block animate-pulse">🎤</span> Start Recording
+          </button>
+        </div>
       </div>
     </main>
   );

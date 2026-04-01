@@ -8,16 +8,16 @@ interface SEOHeadProps {
   ogType?: string;
   canonical?: string;
   noindex?: boolean;
-  structuredData?: object;
+  structuredData?: object | object[];
 }
 
 // Default structured data for the site
 const defaultStructuredData = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Code Reels",
-  "alternateName": "CodeReels Interview Prep",
-  "description": "Free interactive platform for practicing technical interview questions across 30+ channels. Master system design, algorithms, frontend, backend, DevOps, and AI interview prep with voice practice, spaced repetition, and gamified learning.",
+  "name": "Open-Interview",
+  "alternateName": "DevPrep",
+  "description": "Free technical interview prep with 1000+ practice questions across 30+ channels. Master system design, algorithms, frontend, backend, DevOps, AI/ML, and more with voice practice, spaced repetition (SRS), coding challenges, and gamified learning.",
   "url": "https://open-interview.github.io/",
   "applicationCategory": "EducationalApplication",
   "operatingSystem": "Web Browser",
@@ -36,7 +36,7 @@ const defaultStructuredData = {
   },
   "publisher": {
     "@type": "Organization",
-    "name": "Code Reels",
+    "name": "Open-Interview",
     "logo": {
       "@type": "ImageObject",
       "url": "https://open-interview.github.io/favicon.svg"
@@ -63,8 +63,13 @@ const defaultStructuredData = {
     "Backend Interview Questions",
     "DevOps & SRE Questions",
     "AI/ML Interview Prep",
+    "Interactive Coding Challenges",
+    "In-Browser Code Editor",
+    "Instant Search with Pagefind",
     "Progress Tracking",
-    "Mobile-Friendly Interface"
+    "Gamified Badges",
+    "Mobile-Friendly Interface",
+    "Bot-Generated Content Pipeline"
   ]
 };
 
@@ -108,7 +113,7 @@ export function SEOHead({
     
     // Additional SEO meta tags
     updateMeta('author', 'Satishkumar Dhule');
-    updateMeta('generator', 'Code Reels v2.3.0');
+    updateMeta('generator', 'Open-Interview v2.3.0');
     updateMeta('rating', 'General');
     updateMeta('revisit-after', '1 days');
     updateMeta('language', 'English');
@@ -120,7 +125,7 @@ export function SEOHead({
     updateMeta('og:description', description, true);
     updateMeta('og:image', ogImage, true);
     updateMeta('og:type', ogType, true);
-    updateMeta('og:site_name', 'Code Reels', true);
+    updateMeta('og:site_name', 'Open-Interview', true);
     if (canonical) updateMeta('og:url', canonical, true);
 
     // Twitter Card
@@ -141,14 +146,34 @@ export function SEOHead({
     }
 
     // Structured Data (JSON-LD)
-    const jsonLdData = structuredData || defaultStructuredData;
-    let scriptElement = document.querySelector('script[type="application/ld+json"]');
-    if (!scriptElement) {
-      scriptElement = document.createElement('script');
-      scriptElement.setAttribute('type', 'application/ld+json');
-      document.head.appendChild(scriptElement);
+    // Default structured data (always include)
+    const defaultScriptId = 'structured-data-default';
+    let defaultScriptElement = document.getElementById(defaultScriptId);
+    if (!defaultScriptElement) {
+      defaultScriptElement = document.createElement('script');
+      defaultScriptElement.setAttribute('type', 'application/ld+json');
+      defaultScriptElement.id = defaultScriptId;
+      document.head.appendChild(defaultScriptElement);
     }
-    scriptElement.textContent = JSON.stringify(jsonLdData);
+    defaultScriptElement.textContent = JSON.stringify(defaultStructuredData);
+
+    // Page-specific structured data (if provided)
+    const pageScriptId = 'structured-data-page';
+    // Remove existing page-specific script if any
+    const existingPageScript = document.getElementById(pageScriptId);
+    if (existingPageScript) {
+      existingPageScript.remove();
+    }
+    if (structuredData) {
+      const pageScriptElement = document.createElement('script');
+      pageScriptElement.setAttribute('type', 'application/ld+json');
+      pageScriptElement.id = pageScriptId;
+      document.head.appendChild(pageScriptElement);
+      // If structuredData is array, wrap in array; else single object
+      const dataToWrite = Array.isArray(structuredData) ? structuredData : [structuredData];
+      // For simplicity, we'll stringify the array, but schema.org expects a single object or array of objects? JSON-LD can have multiple objects in array.
+      pageScriptElement.textContent = JSON.stringify(dataToWrite);
+    }
 
     // Cleanup function to remove dynamic elements when component unmounts
     return () => {

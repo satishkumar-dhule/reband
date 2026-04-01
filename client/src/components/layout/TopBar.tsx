@@ -39,6 +39,7 @@ export function TopBar({ onMenuClick, onSearchClick, title, showBackButton }: To
         <div className="flex-1 max-w-xl mx-4">
           <button
             onClick={onSearchClick}
+            aria-label="Search questions"
             className="w-full flex items-center gap-3 px-4 py-2.5 bg-muted/50 hover:bg-muted rounded-full transition-colors group"
           >
             <Search className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
@@ -63,6 +64,7 @@ export function TopBar({ onMenuClick, onSearchClick, title, showBackButton }: To
             href="https://github.com/open-interview/open-interview"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="View on GitHub"
             className="p-2 hover:bg-muted rounded-lg transition-colors hidden sm:flex items-center gap-2"
           >
             <Star className="w-5 h-5" />

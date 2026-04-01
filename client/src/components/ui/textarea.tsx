@@ -118,7 +118,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
               // Border styling - GitHub tokens
               "border-[var(--gh-border)]",
               // Focus states - GitHub focus ring
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gh-accent-fg)] focus-visible:border-[var(--gh-accent-fg)]",
+              "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--gh-focus-ring)] focus-visible:border-[var(--gh-accent-fg)]",
               // Transition for smooth interactions
               "transition-all duration-[var(--gh-duration-fast,150ms)]",
               // Disabled state

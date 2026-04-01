@@ -1,9 +1,13 @@
 /**
  * Custom hook for swipe gesture detection
  * Reusable across mobile components
+ * 
+ * Performance optimizations:
+ * - Uses refs instead of state for transient values to avoid re-renders
+ * - Callbacks are memoized with stable dependencies
  */
 
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback } from 'react';
 import { LIMITS } from '../lib/constants';
 
 interface SwipeHandlers {
@@ -64,8 +68,10 @@ export function useSwipe(
   const touchStartY = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
   const touchEndY = useRef<number | null>(null);
-  // Track if we've determined swipe direction to prevent conflicting preventDefault calls
-  const [swipeDirectionLocked, setSwipeDirectionLocked] = useState<'horizontal' | 'vertical' | null>(null);
+  
+  // Use ref instead of state for swipe direction to avoid re-renders
+  // This is a transient value that doesn't need to trigger re-renders
+  const swipeDirectionLocked = useRef<'horizontal' | 'vertical' | null>(null);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     if (e.targetTouches.length === 0) return;
@@ -73,7 +79,7 @@ export function useSwipe(
     touchEndY.current = null;
     touchStartX.current = e.targetTouches[0].clientX;
     touchStartY.current = e.targetTouches[0].clientY;
-    setSwipeDirectionLocked(null);
+    swipeDirectionLocked.current = null;
   }, []);
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
@@ -88,16 +94,17 @@ export function useSwipe(
       const distanceY = Math.abs(touchStartY.current - touchEndY.current);
       
       // Lock direction once we have a clear direction (prevents flickering)
-      if (swipeDirectionLocked === null && Math.max(distanceX, distanceY) > 20) {
-        setSwipeDirectionLocked(distanceX > distanceY ? 'horizontal' : 'vertical');
+      // Use ref.current instead of state to avoid re-renders
+      if (swipeDirectionLocked.current === null && Math.max(distanceX, distanceY) > 20) {
+        swipeDirectionLocked.current = distanceX > distanceY ? 'horizontal' : 'vertical';
       }
       
       // Only prevent default for horizontal swipes
-      if (swipeDirectionLocked === 'horizontal' || (swipeDirectionLocked === null && distanceX > distanceY)) {
+      if (swipeDirectionLocked.current === 'horizontal' || (swipeDirectionLocked.current === null && distanceX > distanceY)) {
         e.preventDefault();
       }
     }
-  }, [horizontalOnly, swipeDirectionLocked]);
+  }, [horizontalOnly]);
 
   const onTouchEnd = useCallback(() => {
     if (
@@ -106,7 +113,7 @@ export function useSwipe(
       touchEndX.current === null ||
       touchEndY.current === null
     ) {
-      setSwipeDirectionLocked(null);
+      swipeDirectionLocked.current = null;
       return;
     }
 
@@ -137,7 +144,7 @@ export function useSwipe(
     touchStartY.current = null;
     touchEndX.current = null;
     touchEndY.current = null;
-    setSwipeDirectionLocked(null);
+    swipeDirectionLocked.current = null;
   }, [callbacks, minDistance]);
 
   return { onTouchStart, onTouchMove, onTouchEnd };

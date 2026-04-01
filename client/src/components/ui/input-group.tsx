@@ -26,13 +26,11 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
         // Variants based on alignment - block end (bottom stacked)
         "has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3",
 
-        // Focus state using GitHub focus ring token
-        "has-[[data-slot=input-group-control]:focus-visible]:border-[var(--gh-accent-fg)] has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-[var(--gh-focus-ring)]",
+        // Focus state using GitHub accent color
+        "has-[[data-slot=input-group-control]:focus-visible]:border-[var(--gh-accent-fg)] has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-[var(--gh-accent-fg)]",
 
         // Error state using GitHub danger tokens
-        "has-[[data-slot][aria-invalid=true]]:border-[var(--gh-danger-emphasis)] has-[[data-slot][aria-invalid=true]]:ring-2 has-[[data-slot][aria-invalid=true]]:ring-[var(--gh-danger-subtle)]",
-        // Dark mode error state
-        "dark:has-[[data-slot][aria-invalid=true]]:border-[var(--gh-danger-fg)] dark:has-[[data-slot][aria-invalid=true]]:ring-[var(--gh-danger-subtle)]",
+        "has-[[data-slot][aria-invalid=true]]:border-[var(--gh-danger-emphasis)] has-[[data-slot][aria-invalid=true]]:ring-2 has-[[data-slot][aria-invalid=true]]:ring-[var(--gh-danger-fg)]",
 
         // Dark mode border
         "dark:border-[var(--gh-border)]",

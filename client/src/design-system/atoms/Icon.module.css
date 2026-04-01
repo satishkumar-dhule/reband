@@ -13,6 +13,8 @@
   flex-shrink: 0;
   vertical-align: middle;
   user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   transition: color var(--animation-duration-fast, 100ms) var(--animation-easing-ease-out, ease-out);
 }
 
@@ -34,43 +36,41 @@
 
 /* Color variants */
 .color-default {
-  color: var(--color-text-primary, #1f2328);
+  color: var(--gh-fg);
 }
 
 .color-muted {
-  /* WCAG AA compliant fallback - 65% lightness provides 5.6:1 contrast on dark */
-  color: var(--color-text-secondary, #8b949e);
+  color: var(--gh-fg-muted);
 }
 
 .color-accent {
-  color: var(--color-primary-500, #0969da);
+  color: var(--gh-accent-fg);
 }
 
 .color-error {
-  color: var(--color-semantic-error-main, #cf222e);
+  color: var(--gh-danger-fg);
 }
 
 .color-success {
-  color: var(--color-semantic-success-main, #2da44e);
+  color: var(--gh-success-fg);
 }
 
 .color-warning {
-  color: var(--color-semantic-warning-main, #d29922);
+  color: var(--gh-attention-fg);
 }
 
 .color-inherit {
   color: inherit;
 }
 
-/* Dark mode support */
+/* Dark mode support via data-theme attribute is handled by github-tokens.css */
 @media (prefers-color-scheme: dark) {
   .color-default {
-    color: var(--color-text-primary, #f0f6fc);
+    color: var(--gh-fg);
   }
 
   .color-muted {
-    /* WCAG AA compliant fallback - 65% lightness provides 5.6:1 contrast on dark */
-    color: var(--color-text-secondary, #8b949e);
+    color: var(--gh-fg-muted);
   }
 }
 

@@ -98,6 +98,7 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
   const playbackIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const finalTranscriptRef = useRef<string>('');
   const audioUrlRef = useRef<string | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const onTranscriptUpdateRef = useRef(onTranscriptUpdate);
 
@@ -177,6 +178,7 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
       const mediaRecorder = new MediaRecorder(stream);
       
       audioChunksRef.current = [];
@@ -193,6 +195,7 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
         const transcript = finalTranscriptRef.current;
         setState(prev => ({ ...prev, audioBlob, finalTranscript: transcript }));
         stream.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
 
         if (onRecordingCompleteRef.current) {
           onRecordingCompleteRef.current(audioBlob, transcript);

@@ -161,7 +161,7 @@ export default function VoiceInterview() {
         setError('Microphone access denied. Please allow microphone access and try again.');
         setState('ready');
       } else if (error === 'no-speech') {
-        console.log('No speech detected, continuing...');
+        // No speech detected, continue without error
       } else {
         setError(`Speech recognition error: ${error}`);
       }

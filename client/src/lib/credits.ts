@@ -85,7 +85,14 @@ export function getCreditsState(): CreditsState {
 
 // Save credits state
 function saveCreditsState(state: CreditsState): void {
-  localStorage.setItem(CREDITS_KEY, JSON.stringify(state));
+  try {
+    localStorage.setItem(CREDITS_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.error('Failed to save credits state:', e);
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded');
+    }
+  }
 }
 
 // Add a transaction to history
@@ -211,7 +218,11 @@ export function trackQuestionSwipe(): { shouldRemind: boolean; swipeCount: numbe
 
 // Reset swipe count (after voice interview)
 export function resetSwipeCount(): void {
-  localStorage.setItem(SWIPE_COUNT_KEY, '0');
+  try {
+    localStorage.setItem(SWIPE_COUNT_KEY, '0');
+  } catch (e) {
+    console.error('Failed to reset swipe count:', e);
+  }
 }
 
 // Check if should show voice reminder
@@ -234,8 +245,12 @@ export function shouldShowVoiceReminder(): boolean {
 
 // Mark voice reminder as shown
 export function markVoiceReminderShown(): void {
-  localStorage.setItem(LAST_VOICE_PROMPT_KEY, String(Date.now()));
-  localStorage.setItem(SWIPE_COUNT_KEY, '0');
+  try {
+    localStorage.setItem(LAST_VOICE_PROMPT_KEY, String(Date.now()));
+    localStorage.setItem(SWIPE_COUNT_KEY, '0');
+  } catch (e) {
+    console.error('Failed to mark voice reminder shown:', e);
+  }
 }
 
 // Award credits for voice interview

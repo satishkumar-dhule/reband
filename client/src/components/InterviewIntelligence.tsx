@@ -55,9 +55,11 @@ export function InterviewIntelligence() {
   }
 
 
-  // Find primary cognitive pattern
-  const primaryPattern = Object.entries(cognitiveProfile)
-    .sort((a, b) => b[1].score - a[1].score)[0];
+  // Find primary cognitive pattern - use nullish coalescing for safety
+  const entries = Object.entries(cognitiveProfile);
+  const primaryPattern = entries.length > 0 
+    ? entries.sort((a, b) => b[1].score - a[1].score)[0]
+    : null;
   
   const mockInterview = selectedCompany ? getMockInterview(selectedCompany) : null;
 
@@ -72,7 +74,7 @@ export function InterviewIntelligence() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {primaryPattern && (
+          {primaryPattern !== null && primaryPattern !== undefined && (
             <div className="p-3 rounded-lg bg-[var(--gh-accent-emphasis)]/10 border border-[var(--gh-accent-emphasis)]/20">
               <div className="flex items-center gap-2 mb-1">
                 <Sparkles className="w-4 h-4 text-[var(--gh-accent-emphasis)]" />

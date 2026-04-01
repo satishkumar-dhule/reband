@@ -8,10 +8,14 @@ export interface InputProps
    * If true, shows error state styling
    */
   isInvalid?: boolean
+  /**
+   * If true, shows success state styling
+   */
+  isValid?: boolean
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, autoComplete, isInvalid, ...props }, ref) => {
+  ({ className, type, autoComplete, isInvalid, isValid, ...props }, ref) => {
     return (
       <input
         type={type}
@@ -20,10 +24,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         className={cn(
           // Base input styling with GitHub tokens
           "flex min-h-[44px] w-full rounded-md border bg-transparent px-3 py-2 text-base transition-all duration-200",
-          // Use GitHub border tokens for borders
+          // Use GitHub border token for borders
           "border-[var(--gh-border)]",
           // Background - subtle inset in light, darker in dark mode
-          "dark:bg-[var(--gh-bg-inset)]",
+          "dark:bg-[var(--gh-canvas-inset)]",
           // File input styling
           "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-[var(--gh-fg)]",
           // Placeholder with GitHub muted text token
@@ -31,16 +35,20 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           // Desktop can use smaller text
           "sm:text-sm",
 
-          // Focus visible ring using GitHub focus token
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gh-focus-ring)] focus-visible:border-[var(--gh-accent-fg)]",
+          // Focus visible ring using GitHub accent color
+          "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--gh-focus-ring)] focus-visible:border-[var(--gh-accent-fg)]",
           // Focus within for nested inputs
-          "focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--gh-focus-ring)] focus-within:border-[var(--gh-accent-fg)]",
+          "focus-within:outline-none focus-within:ring-[3px] focus-within:ring-[var(--gh-focus-ring)] focus-within:border-[var(--gh-accent-fg)]",
 
-          // Error state - border color using GitHub danger token
-          isInvalid && "border-[var(--gh-danger-emphasis)]",
-          isInvalid && "focus-visible:ring-[var(--gh-danger-subtle)]",
-          // Dark mode error states
-          "dark:is-invalid:border-[var(--gh-danger-fg)]",
+          // Error state - use GitHub danger tokens
+          isInvalid && "border-[var(--gh-danger-fg)]",
+          isInvalid && "focus-visible:ring-[var(--gh-danger-fg)]",
+          isInvalid && "focus-within:ring-[var(--gh-danger-fg)]",
+
+          // Success state - use GitHub success tokens
+          isValid && "border-[var(--gh-success-fg)]",
+          isValid && "focus-visible:ring-[var(--gh-success-fg)]",
+          isValid && "focus-within:ring-[var(--gh-success-fg)]",
 
           // Disabled styles
           "disabled:cursor-not-allowed disabled:opacity-50",
@@ -50,10 +58,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           // Default border color
           className
         )}
-        style={{
-          // GitHub border token
-          '--tw-border-color': 'var(--gh-border)',
-        } as React.CSSProperties}
         ref={ref}
         {...props}
       />

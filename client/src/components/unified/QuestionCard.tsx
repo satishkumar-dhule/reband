@@ -4,11 +4,16 @@
  * Consistent question display across the entire application
  * Replaces 10+ duplicate implementations
  * 
+ * Performance optimizations:
+ * - Component is memoized to prevent unnecessary re-renders
+ * - renderWithInlineCode is moved outside component to avoid recreation
+ * - Static helper functions are defined outside component scope
+ * 
  * Used in: QuestionViewer, TestSession, CertificationPractice, CertificationExam,
  * ReviewSession, TrainingMode, VoiceSession, VoiceInterview, Bookmarks, and more
  */
 
-import { ReactNode } from 'react';
+import { ReactNode, memo, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { 
   Bookmark, Building2, Hash, Clock, Check, Sparkles
@@ -22,6 +27,17 @@ import { Button, IconButton } from './Button';
 
 export type QuestionCardVariant = 'default' | 'compact' | 'detailed' | 'minimal';
 export type QuestionCardSize = 'sm' | 'md' | 'lg';
+
+interface CompactQuestionCardProps {
+  question: Question;
+  onClick?: () => void;
+  isMarked?: boolean;
+  isCompleted?: boolean;
+  onToggleMark?: () => void;
+  showHistory?: boolean;
+  questionType?: QuestionType;
+  className?: string;
+}
 
 interface QuestionCardProps {
   question: Question;
@@ -87,6 +103,7 @@ const sizeClasses: Record<QuestionCardSize, { padding: string; title: string; me
 
 /**
  * Renders text with inline code (backticks) as styled code elements
+ * Moved outside component to avoid recreation on every render
  */
 function renderWithInlineCode(text: string): React.ReactNode {
   if (!text) return null;
@@ -167,7 +184,7 @@ function BackgroundMascot({ difficulty }: { difficulty: string }) {
   );
 }
 
-export function QuestionCard({
+export const QuestionCard = memo(function QuestionCard({
   question,
   variant = 'default',
   size = 'md',
@@ -199,14 +216,14 @@ export function QuestionCard({
   const shouldReduceMotion = useReducedMotion();
   const sizeConfig = sizeClasses[size];
   
-  // Determine title size based on question length
-  const getTitleSize = () => {
+  // Memoize title size calculation to avoid recalculation on every render
+  const titleSize = useMemo(() => {
     const length = question.question.length;
     if (variant === 'compact' || variant === 'minimal') return 'text-sm';
     if (length > 200) return 'text-sm sm:text-base lg:text-lg';
     if (length > 100) return 'text-base sm:text-lg lg:text-xl';
     return sizeConfig.title;
-  };
+  }, [question.question.length, variant, sizeConfig.title]);
 
   // Loading state - render skeleton content
   if (isLoading) {
@@ -296,6 +313,14 @@ export function QuestionCard({
         ${className}
       `}
       onClick={onTapQuestion}
+      onKeyDown={(e) => {
+        if (onTapQuestion && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onTapQuestion();
+        }
+      }}
+      tabIndex={onTapQuestion ? 0 : undefined}
+      role={onTapQuestion ? 'button' : undefined}
       data-testid="question-card"
     >
       {/* Background mascot - only for detailed variant */}
@@ -395,7 +420,7 @@ export function QuestionCard({
 
         {/* Question text */}
         <h1
-          className={`font-bold text-foreground leading-tight ${getTitleSize()}`}
+          className={`font-bold text-foreground leading-tight ${titleSize}`}
         >
           {renderWithInlineCode(question.question)}
         </h1>
@@ -457,22 +482,11 @@ export function QuestionCard({
   }
 
   return content;
-}
+});
 
 /**
  * Compact Question Card - For lists and grids
  */
-interface CompactQuestionCardProps {
-  question: Question;
-  onClick?: () => void;
-  isMarked?: boolean;
-  isCompleted?: boolean;
-  onToggleMark?: () => void;
-  showHistory?: boolean;
-  questionType?: QuestionType;
-  className?: string;
-}
-
 export function CompactQuestionCard({
   question,
   onClick,
@@ -484,11 +498,22 @@ export function CompactQuestionCard({
   className = ''
 }: CompactQuestionCardProps) {
   const shouldReduceMotion = useReducedMotion();
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+  
   return (
     <motion.div
       whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
       whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? 'button' : undefined}
       className={`
         p-4 bg-card border border-border rounded-xl cursor-pointer
         hover:border-primary/30 hover:shadow-lg transition-all
@@ -554,9 +579,19 @@ export function MinimalQuestionCard({
   onClick,
   className = ''
 }: MinimalQuestionCardProps) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+  
   return (
     <div
       onClick={onClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? 'button' : undefined}
       className={`
         flex items-center gap-3 p-2 rounded-lg
         ${onClick ? 'cursor-pointer hover:bg-muted/50' : ''}

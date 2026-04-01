@@ -213,7 +213,7 @@ export default function Profile() {
             />
             <MetricCard
               icon={<Target className="w-5 h-5" />}
-              value={`${Math.round((totalCompleted / totalQuestions) * 100) || 0}%`}
+              value={totalQuestions > 0 ? `${Math.round((totalCompleted / totalQuestions) * 100)}%` : '0%'}
               label="Progress"
               variant="success"
               size="md"
@@ -356,6 +356,7 @@ export default function Profile() {
               ref={couponFormRef}
               onSubmit={(e) => {
                 e.preventDefault();
+                if (isSubmitting) return;
                 if (!couponCode.trim()) {
                   toast({ title: 'Error', description: 'Please enter a coupon code', variant: 'destructive' });
                   return;
@@ -652,18 +653,22 @@ function VoiceSettings() {
             <SelectValue placeholder="Select a voice" />
           </SelectTrigger>
           <SelectContent>
-            {sortedLangs.map(lang => (
+            {sortedLangs.map(lang => {
+              const langVoices = groupedVoices[lang];
+              if (!langVoices || langVoices.length === 0) return null;
+              return (
               <SelectGroup key={lang}>
-                <SelectItem key={lang} value={groupedVoices[lang][0].name}>
+                <SelectItem key={lang} value={langVoices[0].name}>
                   {lang}
                 </SelectItem>
-                {groupedVoices[lang].slice(1).map(voice => (
+                {langVoices.slice(1).map(voice => (
                   <SelectItem key={voice.name} value={voice.name}>
                     {voice.name}
                   </SelectItem>
                 ))}
               </SelectGroup>
-            ))}
+              );
+            })}
           </SelectContent>
         </Select>
       </div>

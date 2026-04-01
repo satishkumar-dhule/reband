@@ -175,7 +175,7 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
       setSelectedIndex(0);
       setActiveFilter(null);
     }
-  }, [isOpen]);
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     async function performSearch() {
@@ -218,6 +218,9 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
     performSearch();
   }, [debouncedQuery, activeFilter]);
 
+  // Use useRef to store navigateToQuestion to avoid dependency ordering issues
+  const navigateToQuestionRef = useRef<(result: SearchResultItem) => void>(() => {});
+  
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -227,7 +230,7 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
       setSelectedIndex(i => Math.max(i - 1, 0));
     } else if (e.key === 'Enter' && results[selectedIndex]) {
       e.preventDefault();
-      navigateToQuestion(results[selectedIndex]);
+      navigateToQuestionRef.current(results[selectedIndex]);
     } else if (e.key === 'Escape') {
       onClose();
     }
@@ -246,6 +249,9 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
     
     onClose();
   };
+
+  // Keep ref in sync with the actual function
+  navigateToQuestionRef.current = navigateToQuestion;
 
   const getDifficultyIcon = (difficulty: string) => {
     switch (difficulty) {
@@ -359,7 +365,7 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
           {/* Mobile Header */}
           <div className="flex items-center justify-between px-4 h-14 border-b border-border bg-card flex-shrink-0 pt-safe">
             <h2 className="font-semibold text-lg">Search</h2>
-            <button onClick={onClose} className="p-2 -mr-2 hover:bg-muted rounded-full" data-testid="search-close-btn">
+            <button onClick={onClose} aria-label="Close search" className="p-2 -mr-2 hover:bg-muted rounded-full" data-testid="search-close-btn">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -385,14 +391,14 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
               data-testid="search-input"
             />
             {query && (
-              <button onClick={() => setQuery('')} className="p-1.5 hover:bg-muted rounded-full flex-shrink-0">
+              <button onClick={() => setQuery('')} aria-label="Clear search query" className="p-1.5 hover:bg-muted rounded-full flex-shrink-0">
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             )}
           </div>
 
           {error && (
-            <div className="px-4 py-2 bg-yellow-500/10 border-b border-yellow-500/20 text-yellow-600 dark:text-yellow-400 text-xs flex-shrink-0">
+            <div className="px-4 py-2 bg-yellow-500/10 border-b border-yellow-500/20 text-yellow-600 dark:text-yellow-400 text-xs flex-shrink-0" role="alert">
               {error}
             </div>
           )}
@@ -423,6 +429,9 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[200] bg-background/80 backdrop-blur-sm flex items-start justify-center pt-[10vh] px-4"
         onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search questions"
         data-testid="pagefind-search-desktop"
       >
         <motion.div
@@ -450,10 +459,11 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
               autoComplete="off"
               spellCheck={false}
               disabled={isLoading}
+              aria-label="Search input"
               data-testid="search-input"
             />
             {query && (
-              <button onClick={() => setQuery('')} className="p-1.5 hover:bg-muted rounded-full">
+              <button onClick={() => setQuery('')} aria-label="Clear search query" className="p-1.5 hover:bg-muted rounded-full">
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             )}
@@ -461,7 +471,7 @@ export function PagefindSearch({ isOpen, onClose }: PagefindSearchProps) {
           </div>
 
           {error && (
-            <div className="px-4 py-2 bg-yellow-500/10 border-b border-yellow-500/20 text-yellow-600 dark:text-yellow-400 text-xs">
+            <div className="px-4 py-2 bg-yellow-500/10 border-b border-yellow-500/20 text-yellow-600 dark:text-yellow-400 text-xs" role="alert">
               {error}
             </div>
           )}

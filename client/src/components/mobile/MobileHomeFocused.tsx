@@ -250,7 +250,7 @@ export function MobileHomeFocused() {
                     <div className="text-xs font-semibold text-violet-300 mb-1">Pro Tip</div>
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
                       Use Voice Interview mode to practice speaking your answers out loud. 
-                      It's the best way to prepare for real interviews!
+                      Build confidence and communicate clearly in real interviews.
                     </p>
                   </div>
                 </div>
@@ -305,7 +305,7 @@ function QuickQuizCard({
         
         if (relevantTests.length > 0) {
           // Initialize progressive quiz session
-          const newSession = initializeQuizSession();
+          let newSession = initializeQuizSession();
           setQuizSession(newSession);
           
           // Generate progressive questions with shuffled options
@@ -326,7 +326,7 @@ function QuickQuizCard({
             previousQuestion = next.question;
             
             // Update session for next selection (simulate average performance)
-            Object.assign(newSession, updateSession(newSession, next.question, true));
+            newSession = updateSession(newSession, next.question, true);
           }
           
           setQuestions(progressiveQuestions);
@@ -345,7 +345,7 @@ function QuickQuizCard({
   const handleRefresh = useCallback(() => {
     // Re-generate progressive questions
     if (tests.length > 0) {
-      const newSession = initializeQuizSession();
+      let newSession = initializeQuizSession();
       const progressiveQuestions: TestQuestion[] = [];
       let previousQuestion: TestQuestion | undefined;
       
@@ -363,7 +363,7 @@ function QuickQuizCard({
         previousQuestion = next.question;
         
         // Update session for next selection
-        Object.assign(newSession, updateSession(newSession, next.question, true));
+        newSession = updateSession(newSession, next.question, true);
       }
       
       // Reset state

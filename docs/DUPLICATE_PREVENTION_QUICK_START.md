@@ -18,19 +18,19 @@ if (check.isDuplicate) {
 
 ```bash
 # Check for duplicates
-ppnpm run check:duplicates
+pnpm run check:duplicates
 
 # Check specific channel
 node script/check-duplicates.js --channel=aws
 
 # Auto-fix duplicates
-ppnpm run check:duplicates:fix
+pnpm run check:duplicates:fix
 
 # Run reconciliation
-ppnpm run bot:reconcile
+pnpm run bot:reconcile
 
 # Sync vector DB
-ppnpm run vector:sync
+pnpm run vector:sync
 ```
 
 ## Integration Examples

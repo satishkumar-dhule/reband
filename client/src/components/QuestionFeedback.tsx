@@ -149,7 +149,18 @@ export function QuestionFeedback({ questionId, className = '' }: QuestionFeedbac
         {isOpen && (
           <>
             {/* Backdrop */}
-            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+            <div 
+              className="fixed inset-0 z-40" 
+              onClick={() => setIsOpen(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+                  setIsOpen(false);
+                }
+              }}
+              tabIndex={0}
+              role="button"
+              aria-label="Close feedback menu"
+            />
             
             {/* Popup */}
             <motion.div

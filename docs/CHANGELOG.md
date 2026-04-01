@@ -1,9 +1,50 @@
 # Changelog
 
-All notable changes to Learn_Reels will be documented in this file.
+All notable changes to DevPrep / Open-Interview will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.2.0] - 2026-04-01
+
+### Added
+- **Local SQLite Database** - Migrated from Turso remote to local SQLite (`file:local.db`)
+- **Static-First Architecture** - GitHub Pages static SPA deployment with build-time data export
+- **Flashcards System** - Complete SRS (Spaced Repetition) implementation with SM-2 algorithm
+- **Coding Challenges Pipeline** - LeetCode-style challenges with JavaScript, TypeScript, Python solutions
+- **GitHub Theme Integration** - Full GitHub design system (Primer-inspired, color tokens, system fonts)
+- **Unified Controls** - UnifiedControlsSpec for consistent UI controls across pages
+- **Testing Infrastructure Report** - Comprehensive testing review with recommendations
+
+### Changed
+- **Data Strategy**: DB is source of truth → build-time export to `public/data/*.json` → SPA fetches static JSON
+- **Build Pipeline**: Added `fetch-questions-for-build.js`, `generate-curated-paths.js`, `build-pagefind.js`
+- **Workflow Updates**: Enhanced content-generation, daily-maintenance, deploy-app workflows
+- **Deployment**: GitHub Pages static SPA (no backend servers in production)
+
+### Documentation
+- Added UNIFIED_CONTROLS_SPEC.md
+- Added TESTING_REPORT.md
+- Added docs/DUPLICATE_PREVENTION.md
+- Added docs/DUPLICATE_PREVENTION_QUICK_START.md
+- Added docs/E2E_TESTING_GUIDE.md
+- Added docs/E2E_TEST_SUMMARY.md
+- Added docs/SECURITY.md
+- Updated AGENTS.md with final agent system status
+- Updated replit.md with project metadata
+
+### Files Modified
+- 11 GitHub workflow files
+- 20+ page components (Home, Profile, Badges, Stats, QuestionViewer, TestSession, etc.)
+- 30+ UI components (unified/, question/, layout/, mobile/)
+- 15+ library files (spaced-repetition.ts, srs-config.ts, credits.ts, rewards.ts, etc.)
+- Database schema (shared/schema.ts)
+- Configuration files (.replit, drizzle.config.ts, vite.config.ts)
+
+### Known Issues
+- Schema.ts has Drizzle ORM type warnings (pre-existing, non-blocking)
+- Vitest needs setup.ts file for test utilities
+- Missing unit tests for critical libraries (documented in TESTING_REPORT.md)
 
 ## [2.1.0] - 2025-12-12
 

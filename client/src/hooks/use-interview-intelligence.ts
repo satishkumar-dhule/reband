@@ -100,54 +100,49 @@ const CACHE_DURATION = 1000 * 60 * 60; // 1 hour cache for JSON data
 let intelligenceCache: IntelligenceData | null = null;
 let cacheTimestamp = 0;
 
-async function fetchIntelligenceData(): Promise<IntelligenceData | null> {
+async function fetchIntelligenceData(signal?: AbortSignal): Promise<IntelligenceData> {
   // Return cached data if fresh
   if (intelligenceCache && Date.now() - cacheTimestamp < CACHE_DURATION) {
     return intelligenceCache;
   }
   
-  try {
-    const [cognitiveRes, weightsRes, profilesRes, dnaRes, interviewsRes] = await Promise.all([
-      fetch('/data/intelligence/cognitive-map.json'),
-      fetch('/data/intelligence/company-weights.json'),
-      fetch('/data/intelligence/company-profiles.json'),
-      fetch('/data/intelligence/knowledge-dna.json'),
-      fetch('/data/intelligence/mock-interviews.json')
-    ]);
-    
-    if (!cognitiveRes.ok || !weightsRes.ok || !profilesRes.ok) {
-      const errorDetails = [
-        !cognitiveRes.ok && `cognitive-map: ${cognitiveRes.status}`,
-        !weightsRes.ok && `company-weights: ${weightsRes.status}`,
-        !profilesRes.ok && `company-profiles: ${profilesRes.status}`
-      ].filter(Boolean).join(', ');
-      console.error(`Intelligence data fetch failed: ${errorDetails}`);
-      return null;
-    }
-    
-    const [cognitive, weights, profiles, dna, interviews] = await Promise.all([
-      cognitiveRes.json(),
-      weightsRes.json(),
-      profilesRes.json(),
-      dnaRes.json(),
-      interviewsRes.json()
-    ]);
-    
-    intelligenceCache = {
-      cognitiveMap: cognitive.data,
-      companyWeights: weights.data,
-      companyProfiles: profiles.data,
-      knowledgeDNA: dna.data,
-      mockInterviews: interviews.data
-    };
-    cacheTimestamp = Date.now();
-    
-    return intelligenceCache;
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error fetching intelligence data';
-    console.error('Failed to fetch intelligence data:', message);
-    return null;
+  const [cognitiveRes, weightsRes, profilesRes, dnaRes, interviewsRes] = await Promise.all([
+    fetch('/data/intelligence/cognitive-map.json', { signal }),
+    fetch('/data/intelligence/company-weights.json', { signal }),
+    fetch('/data/intelligence/company-profiles.json', { signal }),
+    fetch('/data/intelligence/knowledge-dna.json', { signal }),
+    fetch('/data/intelligence/mock-interviews.json', { signal })
+  ]);
+  
+  if (!cognitiveRes.ok || !weightsRes.ok || !profilesRes.ok || !dnaRes.ok || !interviewsRes.ok) {
+    const errorDetails = [
+      !cognitiveRes.ok && `cognitive-map: ${cognitiveRes.status}`,
+      !weightsRes.ok && `company-weights: ${weightsRes.status}`,
+      !profilesRes.ok && `company-profiles: ${profilesRes.status}`,
+      !dnaRes.ok && `knowledge-dna: ${dnaRes.status}`,
+      !interviewsRes.ok && `mock-interviews: ${interviewsRes.status}`
+    ].filter(Boolean).join(', ');
+    throw new Error(`Intelligence data fetch failed: ${errorDetails}`);
   }
+  
+  const [cognitive, weights, profiles, dna, interviews] = await Promise.all([
+    cognitiveRes.json(),
+    weightsRes.json(),
+    profilesRes.json(),
+    dnaRes.json(),
+    interviewsRes.json()
+  ]);
+  
+  intelligenceCache = {
+    cognitiveMap: cognitive.data,
+    companyWeights: weights.data,
+    companyProfiles: profiles.data,
+    knowledgeDNA: dna.data,
+    mockInterviews: interviews.data
+  };
+  cacheTimestamp = Date.now();
+  
+  return intelligenceCache;
 }
 
 
@@ -163,16 +158,32 @@ export function useInterviewIntelligence() {
   
   // Load intelligence data on mount
   useEffect(() => {
-    fetchIntelligenceData()
+    const controller = new AbortController();
+    let isMounted = true;
+    
+    fetchIntelligenceData(controller.signal)
       .then(data => {
-        setIntelligenceData(data);
-        setLoading(false);
+        if (isMounted) {
+          setIntelligenceData(data);
+          setLoading(false);
+        }
       })
       .catch(err => {
+        if (err.name === 'AbortError') {
+          // Request was cancelled, do nothing
+          return;
+        }
         console.error('Failed to fetch intelligence data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load intelligence data');
-        setLoading(false);
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : 'Failed to load intelligence data');
+          setLoading(false);
+        }
       });
+    
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, []);
   
   // Calculate user's cognitive profile based on answered questions

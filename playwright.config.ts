@@ -35,7 +35,8 @@ export default defineConfig({
   },
   
   use: {
-    baseURL: 'http://localhost:5001',
+    // Use dynamic port - the webServer will print the actual port
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5001',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -182,7 +183,8 @@ export default defineConfig({
   
   webServer: {
     command: 'npm run dev:vite',
-    url: 'http://localhost:5001',
+    // Use environment variable or default to first available port
+    url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5001',
     reuseExistingServer: !process.env.CI,
     timeout: 180000, // 3 minutes - allows for slow builds and heavy dependency loading
     stdout: 'pipe',

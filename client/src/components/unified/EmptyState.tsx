@@ -8,7 +8,7 @@
  * and various mobile components
  */
 
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 import { motion } from 'framer-motion';
 
 export type EmptyStateVariant = 'default' | 'info' | 'warning' | 'error' | 'success';
@@ -75,7 +75,7 @@ const sizeClasses: Record<EmptyStateSize, {
   }
 };
 
-export function EmptyState({
+export const EmptyState = memo(function EmptyState({
   icon,
   title,
   description,
@@ -139,7 +139,7 @@ export function EmptyState({
   }
 
   return content;
-}
+});
 
 /**
  * Compact Empty State - For inline/smaller spaces

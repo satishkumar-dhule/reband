@@ -230,9 +230,9 @@ export default function StatsGenZ() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border)]">
-                      <th className="px-4 py-2 text-sm font-semibold text-[var(--gh-fg-muted)]">Channel</th>
-                      <th className="px-4 py-2 text-sm font-semibold text-[var(--gh-fg-muted)]">Progress</th>
-                      <th className="px-4 py-2 text-sm font-semibold text-[var(--gh-fg-muted)] text-right">Completed</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--gh-fg-muted)]">Channel</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--gh-fg-muted)]">Progress</th>
+                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--gh-fg-muted)] text-right">Completed</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--gh-border)]">

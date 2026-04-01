@@ -225,17 +225,18 @@ export const insertUserSessionSchema = createInsertSchema(userSessions);
 export const insertLearningPathSchema = createInsertSchema(learningPaths);
 export const insertFlashcardSchema = createInsertSchema(flashcards);
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
+// Use Drizzle's built-in type inference instead of z.infer
+export type InsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
-export type InsertQuestion = z.infer<typeof insertQuestionSchema>;
+export type InsertQuestion = typeof questions.$inferInsert;
 export type Question = typeof questions.$inferSelect;
-export type InsertQuestionHistory = z.infer<typeof insertQuestionHistorySchema>;
+export type InsertQuestionHistory = typeof questionHistory.$inferInsert;
 export type QuestionHistory = typeof questionHistory.$inferSelect;
-export type InsertCertification = z.infer<typeof insertCertificationSchema>;
+export type InsertCertification = typeof certifications.$inferInsert;
 export type Certification = typeof certifications.$inferSelect;
-export type InsertUserSession = z.infer<typeof insertUserSessionSchema>;
+export type InsertUserSession = typeof userSessions.$inferInsert;
 export type UserSession = typeof userSessions.$inferSelect;
-export type InsertLearningPath = z.infer<typeof insertLearningPathSchema>;
+export type InsertLearningPath = typeof learningPaths.$inferInsert;
 export type LearningPath = typeof learningPaths.$inferSelect;
-export type InsertFlashcard = z.infer<typeof insertFlashcardSchema>;
+export type InsertFlashcard = typeof flashcards.$inferInsert;
 export type Flashcard = typeof flashcards.$inferSelect;

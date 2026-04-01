@@ -23,17 +23,16 @@ import { cn } from "@/lib/utils"
 // import { Button } from '@/components/unified/Button';
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0" +
-  " hover-elevate active-elevate-2",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:shadow-md active:scale-[0.98]",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground border border-border hover:bg-primary/90 focus-visible:ring-primary/50",
-        destructive: "bg-destructive text-destructive-foreground shadow-sm border-destructive-border hover:bg-destructive/90 focus-visible:ring-destructive/50",
-        outline: "border border-border bg-transparent shadow-xs hover:bg-muted/50 active:shadow-none text-foreground focus-visible:ring-ring/50",
-        secondary: "border bg-secondary text-secondary-foreground border-border hover:bg-secondary/80 focus-visible:ring-secondary/50",
-        ghost: "border border-transparent hover:bg-muted/50 text-foreground focus-visible:ring-ring/50",
-        link: "text-primary underline-offset-4 hover:underline focus-visible:ring-ring/50",
+        default: "bg-primary text-primary-foreground border border-border hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground border border-destructive-border hover:bg-destructive/90",
+        outline: "border border-border bg-transparent hover:bg-muted/50 active:bg-muted/80",
+        secondary: "bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80",
+        ghost: "border border-transparent hover:bg-muted/50 active:bg-muted/80",
+        link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
         default: "min-h-9 px-4 py-2",

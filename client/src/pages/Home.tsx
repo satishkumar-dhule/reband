@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import {
   Mic, Code, RotateCcw, BookOpen, ChevronRight,
   Flame, CheckCircle2, Layers, TrendingUp,
@@ -157,16 +157,27 @@ function ContributionGrid() {
 
 const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }: { channelId: string; questionCount: number }) {
   const [, setLocation] = useLocation();
-  const config = allChannelsConfig.find((c) => c.id === channelId);
+  
+  // Memoize config lookup to avoid re-computation on every render
+  const config = useMemo(() => 
+    allChannelsConfig.find((c) => c.id === channelId),
+    [channelId]
+  );
+  
+  // Memoize progress calculation
+  const progress = useMemo(() => 
+    getProgress(channelId, questionCount),
+    [channelId, questionCount]
+  );
+  
   if (!config) return null;
-  const { completed, pct } = getProgress(channelId, questionCount);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       setLocation(`/channel/${channelId}`);
     }
-  };
+  }, [setLocation, channelId]);
 
   return (
     <Button
@@ -175,7 +186,7 @@ const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }
       onKeyDown={handleKeyDown}
       className="flex flex-col gap-3 p-4 rounded-md border border-[var(--gh-border)] hover:border-[var(--gh-accent-fg)] cursor-pointer bg-[var(--gh-canvas)] transition-colors group text-left w-full"
       data-testid={`card-channel-${channelId}`}
-      aria-label={`${config.name}: ${completed} of ${questionCount} questions completed, ${pct}% progress`}
+      aria-label={`${config.name}: ${progress.completed} of ${questionCount} questions completed, ${progress.pct}% progress`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
@@ -190,13 +201,13 @@ const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }
 
       <div className="mt-auto space-y-1.5">
         <div className="flex items-center justify-between text-xs text-[var(--gh-fg-muted)]">
-          <span>{completed}/{questionCount} done</span>
-          <span>{pct}%</span>
+          <span>{progress.completed}/{questionCount} done</span>
+          <span>{progress.pct}%</span>
         </div>
-        <div className="gh-progress" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Progress">
+        <div className="gh-progress" role="progressbar" aria-valuenow={progress.pct} aria-valuemin={0} aria-valuemax={100} aria-label="Progress">
           <div
             className="gh-progress-bar"
-            style={{ width: `${pct}%` }}
+            style={{ width: `${progress.pct}%` }}
           />
         </div>
       </div>
@@ -212,7 +223,7 @@ const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }
         </span>
         <span className="flex items-center gap-1">
           <GitFork className="w-3 h-3" aria-hidden="true" />
-          {pct}%
+          {progress.pct}%
         </span>
       </div>
     </Button>

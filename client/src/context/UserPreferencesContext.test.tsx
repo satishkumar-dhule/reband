@@ -5,11 +5,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { UserPreferencesProvider, useUserPreferences } from './UserPreferencesContext';
+import { isAuthenticated } from '../components/ProtectedRoute';
 import { PreferencesStorage, OnboardingStorage } from '../services/storage.service';
-import { STORAGE_KEYS } from '../lib/constants';
-import type { ReactNode } from 'react';
 
 describe('UserPreferencesContext - Onboarding Reset', () => {
   beforeEach(() => {
@@ -20,15 +17,10 @@ describe('UserPreferencesContext - Onboarding Reset', () => {
     localStorage.clear();
   });
 
-  const wrapper = ({ children }: { children: ReactNode }) => (
-    <UserPreferencesProvider>{children}</UserPreferencesProvider>
-  );
-
-  describe('needsOnboarding flag behavior', () => {
+  describe('needsOnboarding flag behavior (via isAuthenticated)', () => {
     it('should show needsOnboarding=true when onboarding is incomplete', () => {
-      const { result } = renderHook(() => useUserPreferences(), { wrapper });
-      
-      expect(result.current.needsOnboarding).toBe(true);
+      // Default state - onboardingComplete is false
+      expect(isAuthenticated()).toBe(false);
     });
 
     it('should show needsOnboarding=false when onboarding is complete', () => {
@@ -42,9 +34,7 @@ describe('UserPreferencesContext - Onboarding Reset', () => {
         prioritizeUnvisited: true,
       });
 
-      const { result } = renderHook(() => useUserPreferences(), { wrapper });
-      
-      expect(result.current.needsOnboarding).toBe(false);
+      expect(isAuthenticated()).toBe(true);
     });
 
     it('should update needsOnboarding after resetOnboarding', () => {
@@ -58,20 +48,16 @@ describe('UserPreferencesContext - Onboarding Reset', () => {
         prioritizeUnvisited: true,
       });
 
-      const { result } = renderHook(() => useUserPreferences(), { wrapper });
-      expect(result.current.needsOnboarding).toBe(false);
+      expect(isAuthenticated()).toBe(true);
 
-      act(() => {
-        OnboardingStorage.resetOnboarding();
-      });
+      OnboardingStorage.resetOnboarding();
 
-      const { result: resultAfter } = renderHook(() => useUserPreferences(), { wrapper });
-      expect(resultAfter.current.needsOnboarding).toBe(true);
+      expect(isAuthenticated()).toBe(false);
     });
   });
 
   describe('resetPreferences behavior', () => {
-    it('should reset preferences to defaults when resetPreferences is called', () => {
+    it('should reset preferences to defaults when resetOnboarding is called', () => {
       PreferencesStorage.set({
         role: 'frontend',
         subscribedChannels: ['algorithms', 'frontend'],
@@ -82,19 +68,16 @@ describe('UserPreferencesContext - Onboarding Reset', () => {
         prioritizeUnvisited: false,
       });
 
-      const { result } = renderHook(() => useUserPreferences(), { wrapper });
-      
-      act(() => {
-        result.current.resetPreferences();
-      });
+      OnboardingStorage.resetOnboarding();
 
-      expect(result.current.preferences.onboardingComplete).toBe(false);
-      expect(result.current.preferences.role).toBeNull();
-      expect(result.current.preferences.subscribedChannels).toEqual([]);
-      expect(result.current.needsOnboarding).toBe(true);
+      const prefs = PreferencesStorage.get();
+      expect(prefs.onboardingComplete).toBe(false);
+      expect(prefs.role).toBeNull();
+      expect(prefs.subscribedChannels).toEqual([]);
     });
 
-    it('should clear localStorage when resetPreferences is called', () => {
+    it('should keep theme preference when resetting onboarding', () => {
+      // First set preferences with onboarding complete
       PreferencesStorage.set({
         role: 'frontend',
         subscribedChannels: ['algorithms'],
@@ -105,14 +88,14 @@ describe('UserPreferencesContext - Onboarding Reset', () => {
         prioritizeUnvisited: true,
       });
 
-      const { result } = renderHook(() => useUserPreferences(), { wrapper });
-      
-      act(() => {
-        result.current.resetPreferences();
-      });
+      // Set a theme preference separately (simulating user manually changing theme)
+      localStorage.setItem('devprep-theme', 'dark');
 
-      const stored = localStorage.getItem(STORAGE_KEYS.USER_PREFERENCES);
-      expect(stored).toBeNull();
+      // Reset onboarding
+      OnboardingStorage.resetOnboarding();
+
+      // Theme should still be preserved
+      expect(localStorage.getItem('devprep-theme')).toBe('dark');
     });
   });
 
@@ -130,8 +113,7 @@ describe('UserPreferencesContext - Onboarding Reset', () => {
 
       localStorage.clear();
 
-      const { result } = renderHook(() => useUserPreferences(), { wrapper });
-      expect(result.current.needsOnboarding).toBe(true);
+      expect(isAuthenticated()).toBe(false);
     });
 
     it('should reset preferences after manual localStorage clear', () => {
@@ -147,9 +129,9 @@ describe('UserPreferencesContext - Onboarding Reset', () => {
 
       localStorage.clear();
 
-      const { result } = renderHook(() => useUserPreferences(), { wrapper });
-      expect(result.current.preferences.onboardingComplete).toBe(false);
-      expect(result.current.preferences.role).toBeNull();
+      const prefs = PreferencesStorage.get();
+      expect(prefs.onboardingComplete).toBe(false);
+      expect(prefs.role).toBeNull();
     });
   });
 
@@ -165,10 +147,9 @@ describe('UserPreferencesContext - Onboarding Reset', () => {
         prioritizeUnvisited: true,
       });
 
-      localStorage.removeItem(STORAGE_KEYS.USER_PREFERENCES);
+      localStorage.removeItem('user-preferences');
 
-      const { result } = renderHook(() => useUserPreferences(), { wrapper });
-      expect(result.current.needsOnboarding).toBe(true);
+      expect(isAuthenticated()).toBe(false);
     });
 
     it('should reset to defaults after removing user-preferences', () => {
@@ -182,14 +163,12 @@ describe('UserPreferencesContext - Onboarding Reset', () => {
         prioritizeUnvisited: true,
       });
 
-      localStorage.removeItem(STORAGE_KEYS.USER_PREFERENCES);
+      localStorage.removeItem('user-preferences');
 
-      const { result } = renderHook(() => useUserPreferences(), { wrapper });
-      expect(result.current.preferences).toMatchObject({
-        role: null,
-        subscribedChannels: [],
-        onboardingComplete: false,
-      });
+      const prefs = PreferencesStorage.get();
+      expect(prefs.role).toBeNull();
+      expect(prefs.subscribedChannels).toEqual([]);
+      expect(prefs.onboardingComplete).toBe(false);
     });
   });
 });

@@ -26,8 +26,8 @@ const Switch = React.forwardRef<
       "bg-[var(--gh-neutral-muted)] dark:bg-[var(--gh-neutral-emphasis)]",
       // Checked state - uses GitHub accent
       "data-[state=checked]:bg-[var(--gh-accent-emphasis)] data-[state=checked]:border-[var(--gh-accent-emphasis)]",
-      // Focus styles - GitHub focus ring
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gh-focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gh-canvas)]",
+      // Focus styles - GitHub accent color
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gh-accent-fg)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gh-canvas)]",
       // Disabled state
       "disabled:cursor-not-allowed disabled:opacity-50",
       // Smooth transitions with proper duration (150-300ms per UX guidelines)

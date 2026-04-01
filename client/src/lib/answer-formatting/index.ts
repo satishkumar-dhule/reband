@@ -19,5 +19,3 @@ export { FormatValidator } from './format-validator';
 export { ConfigurationManager, configurationManager } from './configuration-manager';
 export * from './override-utils';
 export { MetricsCollector, metricsCollector } from './metrics-collector';
-// export * from './auto-formatter';
-// export * from './utils';

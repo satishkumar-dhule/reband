@@ -133,9 +133,24 @@ export function AICompanion({ pageContent, onNavigate, onAction, availableAction
 
   // Initialize WebLLM engine
   useEffect(() => {
-    if (provider === 'browser' && !webLLMEngine) {
-      initializeWebLLM();
+    let cancelled = false;
+    
+    async function init() {
+      if (provider === 'browser' && !webLLMEngine) {
+        try {
+          await initializeWebLLM();
+        } catch (error) {
+          // Error already handled in initializeWebLLM
+          console.error('WebLLM initialization failed:', error);
+        }
+      }
     }
+    
+    init();
+    
+    return () => {
+      cancelled = true;
+    };
   }, [provider]);
 
   const initializeWebLLM = async () => {
@@ -1680,7 +1695,7 @@ Assistant (in ${languageName}):`;
           border-radius: 8px;
           transition: all 0.3s ease;
           position: relative;
-          z-index: 10;
+          z-index: var(--z-tooltip, 1600);
         }
         
         .ai-agent-highlight::before {
@@ -1697,7 +1712,7 @@ Assistant (in ${languageName}):`;
           font-weight: 600;
           white-space: nowrap;
           box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
-          z-index: 1000;
+          z-index: var(--z-tooltip, 1600);
           animation: fadeIn 0.3s ease-in;
         }
         

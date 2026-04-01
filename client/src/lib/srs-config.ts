@@ -228,7 +228,7 @@ export const srsConfig = {
 /** Mastery level to config key mapping */
 const MasteryLabels: Record<MasteryLevel, string> = {
   0: 'new',
-  1: 'learning',
+  1: 'familiar',  // Level 1 maps to familiar (learning is pre-mastery state)
   2: 'familiar',
   3: 'proficient',
   4: 'expert',

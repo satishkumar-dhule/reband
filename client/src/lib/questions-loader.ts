@@ -13,14 +13,73 @@ export type { Question };
 // Base path for static data files
 const DATA_BASE = import.meta.env.BASE_URL.replace(/\/$/, '') + '/data';
 
-// In-memory cache for questions
-const questionsCache = new Map<string, Question>();
-const channelQuestionsCache = new Map<string, Question[]>();
-let statsCache: ChannelDetailedStats[] | null = null;
+// In-memory cache for questions with TTL support
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+// Default TTL: 5 minutes
+const DEFAULT_TTL = 5 * 60 * 1000;
+
+function createTimedCache<T>() {
+  const cache = new Map<string, CacheEntry<T>>();
+  
+  return {
+    get(key: string, ttl: number = DEFAULT_TTL): T | undefined {
+      const entry = cache.get(key);
+      if (!entry) return undefined;
+      
+      // Check if entry is stale
+      if (Date.now() - entry.timestamp > ttl) {
+        cache.delete(key);
+        return undefined;
+      }
+      
+      return entry.data;
+    },
+    
+    set(key: string, value: T): void {
+      cache.set(key, { data: value, timestamp: Date.now() });
+    },
+    
+    has(key: string, ttl: number = DEFAULT_TTL): boolean {
+      return this.get(key, ttl) !== undefined;
+    },
+    
+    delete(key: string): void {
+      cache.delete(key);
+    },
+    
+    clear(): void {
+      cache.clear();
+    },
+    
+    getAll(): Map<string, T> {
+      const result = new Map<string, T>();
+      for (const [key, entry] of Array.from(cache.entries())) {
+        if (Date.now() - entry.timestamp <= DEFAULT_TTL) {
+          result.set(key, entry.data);
+        }
+      }
+      return result;
+    },
+  };
+}
+
+const questionsCache = createTimedCache<Question>();
+const channelQuestionsCache = createTimedCache<Question[]>();
+const statsCacheEntry: { data: ChannelDetailedStats[] | null; timestamp: number | null } = { data: null, timestamp: null };
 let initialized = false;
 
 // Track prefetched channels to avoid duplicate prefetches
 const prefetchedChannels = new Set<string>();
+
+// Helper to check if stats cache is valid
+function isStatsCacheValid(): boolean {
+  if (!statsCacheEntry.data || statsCacheEntry.timestamp === null) return false;
+  return Date.now() - statsCacheEntry.timestamp < DEFAULT_TTL;
+}
 
 // Related channels mapping for smart prefetching
 const RELATED_CHANNELS: Record<string, string[]> = {
@@ -71,7 +130,7 @@ export async function loadChannelQuestions(channelId: string): Promise<Question[
 
 // Get all questions (sync - from cache)
 export function getAllQuestions(): Question[] {
-  return Array.from(questionsCache.values());
+  return Array.from(questionsCache.getAll().values());
 }
 
 // Get questions for a channel with optional filters
@@ -94,7 +153,7 @@ export function getQuestions(
   if (company && company !== 'all') {
     const normalizedCompany = normalizeCompanyName(company);
     questions = questions.filter(q => 
-      q.companies?.some(c => normalizeCompanyName(c) === normalizedCompany)
+      q.companies?.some((c: string) => normalizeCompanyName(c) === normalizedCompany)
     );
   }
 
@@ -127,14 +186,14 @@ export function getQuestionIds(
   subChannel?: string,
   difficulty?: string
 ): string[] {
-  return getQuestions(channelId, subChannel, difficulty).map(q => q.id);
+  return getQuestions(channelId, subChannel, difficulty).map((q: Question) => q.id);
 }
 
 // Get subchannels for a channel
 export function getSubChannels(channelId: string): string[] {
   const questions = channelQuestionsCache.get(channelId) || [];
   const subChannels = new Set<string>();
-  questions.forEach(q => {
+  questions.forEach((q: Question) => {
     if (q.subChannel) {
       subChannels.add(q.subChannel);
     }
@@ -144,22 +203,22 @@ export function getSubChannels(channelId: string): string[] {
 
 // Get channel statistics
 export function getChannelStats(): { id: string; total: number; beginner: number; intermediate: number; advanced: number }[] {
-  if (statsCache) {
-    return statsCache;
+  if (isStatsCacheValid()) {
+    return statsCacheEntry.data!;
   }
   
-  return Array.from(channelQuestionsCache.entries()).map(([channelId, questions]) => ({
+  return Array.from(channelQuestionsCache.getAll().entries()).map(([channelId, questions]: [string, Question[]]) => ({
     id: channelId,
     total: questions.length,
-    beginner: questions.filter(q => q.difficulty === 'beginner').length,
-    intermediate: questions.filter(q => q.difficulty === 'intermediate').length,
+    beginner: questions.filter((q: Question) => q.difficulty === 'beginner').length,
+    intermediate: questions.filter((q: Question) => q.difficulty === 'intermediate').length,
     advanced: questions.filter(q => q.difficulty === 'advanced').length
   }));
 }
 
 // Get available channel IDs
 export function getAvailableChannelIds(): string[] {
-  return Array.from(channelQuestionsCache.keys());
+  return Array.from(channelQuestionsCache.getAll().keys());
 }
 
 // Check if a channel has questions
@@ -177,9 +236,9 @@ function normalizeCompanyName(name: string): string {
 // Get all unique companies across all questions
 export function getAllCompanies(): string[] {
   const companies = new Set<string>();
-  questionsCache.forEach(q => {
+  Array.from(questionsCache.getAll().values()).forEach((q: Question) => {
     if (q.companies) {
-      q.companies.forEach(c => companies.add(normalizeCompanyName(c)));
+      q.companies.forEach((c: string) => companies.add(normalizeCompanyName(c)));
     }
   });
   return Array.from(companies).sort();
@@ -189,9 +248,9 @@ export function getAllCompanies(): string[] {
 export function getCompaniesForChannel(channelId: string): string[] {
   const questions = channelQuestionsCache.get(channelId) || [];
   const companies = new Set<string>();
-  questions.forEach(q => {
+  questions.forEach((q: Question) => {
     if (q.companies) {
-      q.companies.forEach(c => companies.add(normalizeCompanyName(c)));
+      q.companies.forEach((c: string) => companies.add(normalizeCompanyName(c)));
     }
   });
   return Array.from(companies).sort();
@@ -206,16 +265,16 @@ export function getCompaniesWithCounts(
   let questions = channelQuestionsCache.get(channelId) || [];
   
   if (subChannel && subChannel !== 'all') {
-    questions = questions.filter(q => q.subChannel === subChannel);
+    questions = questions.filter((q: Question) => q.subChannel === subChannel);
   }
   if (difficulty && difficulty !== 'all') {
-    questions = questions.filter(q => q.difficulty === difficulty);
+    questions = questions.filter((q: Question) => q.difficulty === difficulty);
   }
   
   const companyCounts = new Map<string, number>();
-  questions.forEach(q => {
+  questions.forEach((q: Question) => {
     if (q.companies) {
-      q.companies.forEach(c => {
+      q.companies.forEach((c: string) => {
         const normalized = normalizeCompanyName(c);
         companyCounts.set(normalized, (companyCounts.get(normalized) || 0) + 1);
       });
@@ -241,7 +300,7 @@ export function prefetchRelatedChannels(currentChannel: string): void {
   const related = RELATED_CHANNELS[currentChannel] || [];
   
   // Also get channels from stats if available
-  const allChannels = statsCache?.map(s => s.id) || [];
+  const allChannels = statsCacheEntry.data?.map((s: ChannelDetailedStats) => s.id) || [];
   
   // Combine related + nearby channels (limit to 3)
   const uniqueChannels = new Set([...related, ...allChannels]);
@@ -283,11 +342,12 @@ export async function preloadQuestions(): Promise<void> {
   
   try {
     const stats = await StatsService.getAll();
-    statsCache = stats;
+    statsCacheEntry.data = stats;
+    statsCacheEntry.timestamp = Date.now();
     
     // Load all channels in parallel
     await Promise.all(
-      stats.map(stat => loadChannelQuestions(stat.id))
+      stats.map((stat: ChannelDetailedStats) => loadChannelQuestions(stat.id))
     );
     
     initialized = true;
@@ -302,6 +362,39 @@ export async function getAllQuestionsAsync(): Promise<Question[]> {
     await preloadQuestions();
   }
   return getAllQuestions();
+}
+
+// ============================================
+// CACHE INVALIDATION
+// ============================================
+
+/**
+ * Invalidate all caches - use when data needs to be refreshed
+ */
+export function invalidateAllCaches(): void {
+  questionsCache.clear();
+  channelQuestionsCache.clear();
+  statsCacheEntry.data = null;
+  statsCacheEntry.timestamp = null;
+  initialized = false;
+  prefetchedChannels.clear();
+}
+
+/**
+ * Invalidate cache for a specific channel
+ */
+export function invalidateChannelCache(channelId: string): void {
+  questionsCache.clear();
+  channelQuestionsCache.delete(channelId);
+  prefetchedChannels.delete(channelId);
+}
+
+/**
+ * Force refresh a channel's questions
+ */
+export async function refreshChannel(channelId: string): Promise<Question[]> {
+  invalidateChannelCache(channelId);
+  return loadChannelQuestions(channelId);
 }
 
 // Export API service for direct use

@@ -349,7 +349,14 @@ export async function checkAndExpireTests(): Promise<string[]> {
   }
   
   if (expiredChannels.length > 0) {
-    localStorage.setItem(TEST_PROGRESS_KEY, JSON.stringify(progress));
+    try {
+      localStorage.setItem(TEST_PROGRESS_KEY, JSON.stringify(progress));
+    } catch (error) {
+      console.error('Failed to save test progress to localStorage:', error);
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        console.warn('localStorage quota exceeded');
+      }
+    }
   }
   
   return expiredChannels;
@@ -384,7 +391,14 @@ export function saveTestAttempt(testId: string, channelId: string, attempt: Test
     }
   }
   
-  localStorage.setItem(TEST_PROGRESS_KEY, JSON.stringify(all));
+  try {
+    localStorage.setItem(TEST_PROGRESS_KEY, JSON.stringify(all));
+  } catch (error) {
+    console.error('Failed to save test attempt to localStorage:', error);
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded');
+    }
+  }
 }
 
 // Calculate score for an attempt
@@ -572,7 +586,12 @@ export function getSessionQuestions(test: Test, count: number = 20): TestQuestio
       // Sort by relevance and pick from top 5 to add variety
       scored.sort((a, b) => b.score - a.score);
       const topCandidates = scored.slice(0, Math.min(5, scored.length));
-      nextQuestion = topCandidates[Math.floor(Math.random() * topCandidates.length)].question;
+      // Handle edge case where candidatePool is empty
+      if (topCandidates.length === 0) {
+        nextQuestion = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+      } else {
+        nextQuestion = topCandidates[Math.floor(Math.random() * topCandidates.length)].question;
+      }
     }
 
     // Add to selected and mark as used
@@ -608,8 +627,11 @@ export function dismissTestPrompt(channelId: string): void {
     const dismissed = stored ? JSON.parse(stored) : {};
     dismissed[channelId] = Date.now();
     localStorage.setItem(TEST_PROMPT_DISMISSED_KEY, JSON.stringify(dismissed));
-  } catch {
-    // Ignore
+  } catch (error) {
+    console.error('Failed to dismiss test prompt:', error);
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded');
+    }
   }
 }
 

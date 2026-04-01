@@ -580,15 +580,22 @@ export async function getUnderservedChannels(minQuestions = 10) {
 
 // Generate unique ID - optimized to only fetch max ID
 export async function generateUnifiedId(prefix = 'q') {
+  // SECURITY: Validate and sanitize prefix to prevent SQL injection
+  // Only allow alphanumeric characters, max 10 chars
+  const safePrefix = String(prefix)
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .substring(0, 10) || 'q';
+  
   // Get the max numeric ID to avoid fetching all IDs
-  const result = await dbClient.execute(`
-    SELECT MAX(CAST(SUBSTR(id, 3) AS INTEGER)) as max_num 
-    FROM questions 
-    WHERE id LIKE '${prefix}-%'
-  `);
+  const result = await dbClient.execute({
+    sql: `SELECT MAX(CAST(SUBSTR(id, ?) AS INTEGER)) as max_num 
+          FROM questions 
+          WHERE id LIKE ?`,
+    args: [safePrefix.length + 1, `${safePrefix}-%`]
+  });
   
   const maxNum = result.rows[0]?.max_num || 0;
-  return `${prefix}-${maxNum + 1}`;
+  return `${safePrefix}-${maxNum + 1}`;
 }
 
 // Check if question is duplicate - optimized to use SQL LIKE for initial filter

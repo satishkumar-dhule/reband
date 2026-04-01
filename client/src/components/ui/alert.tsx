@@ -8,9 +8,12 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-background text-foreground",
+        default: "bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-fg)] text-[var(--gh-fg)]",
+        info: "bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-fg)] text-[var(--gh-fg)]",
+        success: "bg-[var(--gh-success-subtle)] border-[var(--gh-success-fg)] text-[var(--gh-fg)]",
+        warning: "bg-[var(--gh-attention-subtle)] border-[var(--gh-attention-fg)] text-[var(--gh-fg)]",
         destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+          "bg-[var(--gh-danger-subtle)] border-[var(--gh-danger-fg)] text-[var(--gh-danger-fg)] dark:border-[var(--gh-danger-fg)]",
       },
     },
     defaultVariants: {
@@ -19,10 +22,18 @@ const alertVariants = cva(
   }
 )
 
+const alertIconVariants = {
+  default: "text-[var(--gh-accent-fg)]",
+  info: "text-[var(--gh-accent-fg)]",
+  success: "text-[var(--gh-success-fg)]",
+  warning: "text-[var(--gh-attention-fg)]",
+  destructive: "text-[var(--gh-danger-fg)]",
+}
+
 const Alert = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
+>(({ className, variant = "default", ...props }, ref) => (
   <div
     ref={ref}
     role="alert"
@@ -32,13 +43,25 @@ const Alert = React.forwardRef<
 ))
 Alert.displayName = "Alert"
 
+const AlertIcon = React.forwardRef<
+  HTMLSpanElement,
+  React.HTMLAttributes<HTMLSpanElement> & { variant?: VariantProps<typeof alertVariants>['variant'] }
+>(({ className, variant = "default", ...props }, ref) => (
+  <span
+    ref={ref}
+    className={cn("flex-shrink-0", alertIconVariants[variant || "default"], className)}
+    {...props}
+  />
+))
+AlertIcon.displayName = "AlertIcon"
+
 const AlertTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
   <h5
     ref={ref}
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    className={cn("mb-1 font-semibold leading-none tracking-tight text-[var(--gh-fg)]", className)}
     {...props}
   />
 ))
@@ -50,10 +73,10 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    className={cn("text-sm text-[var(--gh-fg-muted)] [&_p]:leading-relaxed", className)}
     {...props}
   />
 ))
 AlertDescription.displayName = "AlertDescription"
 
-export { Alert, AlertTitle, AlertDescription }
+export { Alert, AlertIcon, AlertTitle, AlertDescription }

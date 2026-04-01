@@ -1174,14 +1174,14 @@ sequenceDiagram
       
       <div className="rounded-xl border border-[var(--gh-border)] overflow-x-auto">
         <table className="w-full border-collapse text-sm">
-          <thead className="bg-[var(--gh-canvas-overlay)]">
+          <thead className="bg-[var(--gh-canvas-subtle)]">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)]">Method</th>
-              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)]">Path</th>
-              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)] hidden md:table-cell">Description</th>
+              <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide text-[var(--gh-fg-muted)]">Method</th>
+              <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide text-[var(--gh-fg-muted)]">Path</th>
+              <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide text-[var(--gh-fg-muted)] hidden md:table-cell">Description</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--gh-border-muted)]">
+          <tbody className="divide-y divide-[var(--gh-border)]">
             {endpoints.map((ep, i) => (
               <tr key={i} className="hover:bg-[var(--gh-canvas-overlay)]/50">
                 <td className="px-4 py-3">
@@ -1320,14 +1320,14 @@ graph LR
       
       <div className="rounded-xl border border-[var(--gh-border)] overflow-x-auto">
         <table className="w-full border-collapse text-sm">
-          <thead className="bg-[var(--gh-canvas-overlay)]">
+          <thead className="bg-[var(--gh-canvas-subtle)]">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)]">Variable</th>
-              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)] hidden sm:table-cell">Description</th>
-              <th className="px-4 py-3 text-left font-medium text-[var(--gh-fg-muted)]">Required</th>
+              <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide text-[var(--gh-fg-muted)]">Variable</th>
+              <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide text-[var(--gh-fg-muted)] hidden sm:table-cell">Description</th>
+              <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide text-[var(--gh-fg-muted)]">Required</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--gh-border-muted)]">
+          <tbody className="divide-y divide-[var(--gh-border)]">
             {envVars.map((env, i) => (
               <tr key={i} className="hover:bg-[var(--gh-canvas-overlay)]/50">
                 <td className="px-4 py-3 font-mono text-[var(--gh-accent-fg)] text-xs">{env.name}</td>

@@ -27,7 +27,7 @@ export function UnifiedProgressBar({
   mode,
   className 
 }: UnifiedProgressBarProps) {
-  const progress = (current / total) * 100;
+  const progress = total > 0 ? (current / total) * 100 : 0;
   const gradientClass = modeColors[mode];
 
   return (

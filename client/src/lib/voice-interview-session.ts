@@ -647,6 +647,9 @@ export function saveSessionState(state: SessionState): void {
     localStorage.setItem(SESSION_STATE_KEY, JSON.stringify(stateWithTimestamp));
   } catch (e) {
     console.error('Failed to save session state:', e);
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded');
+    }
   }
 }
 
@@ -689,6 +692,9 @@ export function saveSessionToHistory(result: SessionResult): void {
     localStorage.setItem(SESSION_HISTORY_KEY, JSON.stringify(trimmed));
   } catch (e) {
     console.error('Failed to save session to history:', e);
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded');
+    }
   }
 }
 

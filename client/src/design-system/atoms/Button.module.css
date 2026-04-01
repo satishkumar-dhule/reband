@@ -20,9 +20,15 @@
   vertical-align: middle;
   cursor: pointer;
   user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   border: 1px solid transparent;
   border-radius: var(--spacing-1, 0.25rem);
-  transition: all var(--animation-duration-normal, 200ms) var(--animation-easing-ease-out, ease-out);
+  /* Specific transitions for better performance - avoid transition: all */
+  transition: background-color var(--animation-duration-normal, 200ms) var(--animation-easing-ease-out, ease-out),
+              color var(--animation-duration-normal, 200ms) var(--animation-easing-ease-out, ease-out),
+              border-color var(--animation-duration-normal, 200ms) var(--animation-easing-ease-out, ease-out),
+              box-shadow var(--animation-duration-normal, 200ms) var(--animation-easing-ease-out, ease-out);
   position: relative;
   overflow: hidden;
   min-height: var(--touch-target-minimum, 44px);
@@ -32,7 +38,7 @@
 
 /* Focus styles for accessibility */
 .button:focus-visible {
-  outline: 2px solid var(--color-primary-500, #0969da);
+  outline: 2px solid var(--gh-accent-fg);
   outline-offset: 2px;
 }
 
@@ -43,89 +49,78 @@
 
 /* Variant styles */
 .variant-primary {
-  background-color: var(--color-primary-500, #0969da);
-  color: var(--color-primary-contrastText, #FFFFFF);
-  border-color: var(--color-primary-500, #0969da);
+  background-color: var(--gh-accent-fg);
+  color: var(--gh-fg-on-emphasis);
+  border-color: var(--gh-accent-fg);
 }
 
 .variant-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-600, #0550ae);
-  border-color: var(--color-primary-600, #0550ae);
+  background-color: var(--gh-accent-hover);
+  border-color: var(--gh-accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(9, 105, 218, 0.2);
+  box-shadow: 0 4px 8px var(--gh-focus-ring);
 }
 
 .variant-primary:active:not(:disabled) {
-  background-color: var(--color-primary-700, #033d8b);
-  border-color: var(--color-primary-700, #033d8b);
+  background-color: var(--gh-accent-emphasis);
+  border-color: var(--gh-accent-emphasis);
   transform: translateY(0);
   box-shadow: none;
 }
 
 .variant-secondary {
   background-color: transparent;
-  color: var(--color-primary-500, #0969da);
-  border-color: var(--color-primary-500, #0969da);
+  color: var(--gh-accent-fg);
+  border-color: var(--gh-accent-fg);
 }
 
 .variant-secondary:hover:not(:disabled) {
-  background-color: var(--color-primary-50, #ddf4ff);
-  border-color: var(--color-primary-600, #0550ae);
+  background-color: var(--gh-accent-subtle);
+  border-color: var(--gh-accent-hover);
 }
 
 .variant-secondary:active:not(:disabled) {
-  background-color: var(--color-primary-100, #b6e3ff);
+  background-color: var(--gh-accent-subtle);
 }
 
 .variant-ghost {
   background-color: transparent;
-  color: var(--color-text-primary, rgba(0, 0, 0, 0.87));
+  color: var(--gh-fg);
   border-color: transparent;
 }
 
 .variant-ghost:hover:not(:disabled) {
-  background-color: var(--color-neutral-100, #F5F5F5);
+  background-color: var(--gh-neutral-subtle);
 }
 
 .variant-ghost:active:not(:disabled) {
-  background-color: var(--color-neutral-200, #EEEEEE);
+  background-color: var(--gh-border-muted);
 }
 
 .variant-rating {
-  background-color: var(--rating-color, var(--color-primary-500, #2196F3));
-  color: var(--color-srs-contrastText, #FFFFFF);
-  border-color: var(--rating-color, var(--color-primary-500, #2196F3));
+  background-color: var(--gh-accent-fg);
+  color: var(--gh-fg-on-emphasis);
+  border-color: var(--gh-accent-fg);
   font-weight: var(--font-semibold);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
 }
 
-.variant-rating:hover:not(:disabled) {
-  filter: brightness(1.1);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.variant-rating:active:not(:disabled) {
-  transform: translateY(0);
-  filter: brightness(0.95);
-}
-
 /* Rating type specific styles */
 .rating-again {
-  --rating-color: var(--color-srs-again, #cf222e);
+  --rating-color: var(--gh-danger-fg);
 }
 
 .rating-hard {
-  --rating-color: var(--color-srs-hard, #d29922);
+  --rating-color: var(--gh-attention-fg);
 }
 
 .rating-good {
-  --rating-color: var(--color-srs-good, #2da44e);
+  --rating-color: var(--gh-success-fg);
 }
 
 .rating-easy {
-  --rating-color: var(--color-srs-easy, #0969da);
+  --rating-color: var(--gh-accent-fg);
 }
 
 /* Size variants */
@@ -213,39 +208,54 @@
   height: 1em;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .button {
-    background-color: var(--color-neutral-800, #32383f);
-    color: var(--color-text-inverse, #FFFFFF);
-  }
+/* Dark mode support - using data-theme selectors for app theme system consistency */
+/* Note: These dark mode styles are handled by CSS custom properties in github-tokens.css
+   via the [data-theme="dark"] selector. The styles below provide additional dark-mode
+   specific adjustments for button variants. */
+:root,
+[data-theme="dark"],
+.dark {
+  --button-dark-bg: var(--gh-canvas);
+  --button-dark-text: var(--gh-fg);
+}
 
-  .variant-primary {
-    background-color: var(--color-primary-500, #0969da);
-    color: var(--color-primary-contrastText, #FFFFFF);
-  }
+[data-theme="dark"] .button,
+.dark .button {
+  background-color: var(--gh-canvas-subtle);
+  color: var(--gh-fg);
+}
 
-  .variant-primary:hover:not(:disabled) {
-    background-color: var(--color-primary-400, #218bff);
-  }
+[data-theme="dark"] .variant-primary,
+.dark .variant-primary {
+  background-color: var(--gh-accent-emphasis);
+  color: var(--gh-fg-on-emphasis);
+}
 
-  .variant-secondary {
-    background-color: transparent;
-    color: var(--color-primary-300, #54aeff);
-    border-color: var(--color-primary-300, #54aeff);
-  }
+[data-theme="dark"] .variant-primary:hover:not(:disabled),
+.dark .variant-primary:hover:not(:disabled) {
+  background-color: var(--gh-accent-hover);
+}
 
-  .variant-secondary:hover:not(:disabled) {
-    background-color: var(--color-primary-900, rgba(9, 105, 218, 0.1));
-  }
+[data-theme="dark"] .variant-secondary,
+.dark .variant-secondary {
+  background-color: transparent;
+  color: var(--gh-accent-fg);
+  border-color: var(--gh-accent-fg);
+}
 
-  .variant-ghost:hover:not(:disabled) {
-    background-color: var(--color-neutral-700, #424a53);
-  }
+[data-theme="dark"] .variant-secondary:hover:not(:disabled),
+.dark .variant-secondary:hover:not(:disabled) {
+  background-color: var(--gh-accent-subtle);
+}
 
-  .variant-ghost:active:not(:disabled) {
-    background-color: var(--color-neutral-600, #57606a);
-  }
+[data-theme="dark"] .variant-ghost:hover:not(:disabled),
+.dark .variant-ghost:hover:not(:disabled) {
+  background-color: var(--gh-neutral-subtle);
+}
+
+[data-theme="dark"] .variant-ghost:active:not(:disabled),
+.dark .variant-ghost:active:not(:disabled) {
+  background-color: var(--gh-border);
 }
 
 /* Reduced motion */

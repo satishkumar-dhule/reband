@@ -66,10 +66,66 @@ interface ChannelData {
   };
 }
 
-// Cache for loaded data
-const channelCache = new Map<string, ChannelData>();
-const statsCache: { data: ChannelDetailedStats[] | null } = { data: null };
+// Cache for loaded data with TTL support
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+// Default TTL: 5 minutes
+const DEFAULT_TTL = 5 * 60 * 1000;
+
+function createTimedCache<T>() {
+  const cache = new Map<string, CacheEntry<T>>();
+  
+  return {
+    get(key: string, ttl: number = DEFAULT_TTL): T | undefined {
+      const entry = cache.get(key);
+      if (!entry) return undefined;
+      
+      // Check if entry is stale
+      if (Date.now() - entry.timestamp > ttl) {
+        cache.delete(key);
+        return undefined;
+      }
+      
+      return entry.data;
+    },
+    
+    set(key: string, value: T): void {
+      cache.set(key, { data: value, timestamp: Date.now() });
+    },
+    
+    has(key: string, ttl: number = DEFAULT_TTL): boolean {
+      return this.get(key, ttl) !== undefined;
+    },
+    
+    delete(key: string): void {
+      cache.delete(key);
+    },
+    
+    clear(): void {
+      cache.clear();
+    },
+  };
+}
+
+const channelCache = createTimedCache<ChannelData>();
+// Internal map for iteration (channelCache doesn't support entries())
+const channelDataMap = new Map<string, ChannelData>();
+const statsCacheEntry: { data: ChannelDetailedStats[] | null; timestamp: number | null } = { data: null, timestamp: null };
 const questionIdToChannel = new Map<string, string>();
+
+// Get the internal map for iteration operations
+function getChannelDataMap(): Map<string, ChannelData> {
+  return channelDataMap;
+}
+
+// Helper to check if stats cache is valid
+function isStatsCacheValid(): boolean {
+  if (!statsCacheEntry.data || statsCacheEntry.timestamp === null) return false;
+  return Date.now() - statsCacheEntry.timestamp < DEFAULT_TTL;
+}
 
 /**
  * Fetch with retry logic and exponential backoff
@@ -100,17 +156,25 @@ export async function fetchWithRetry<T>(
   throw new Error('Max retries exceeded');
 }
 
-async function fetchJson<T>(url: string): Promise<T> {
-  // Simple cache busting - add build timestamp
-  const cacheBuster = `v=${BUILD_VERSION}`;
-  const urlWithCache = url.includes('?') ? `${url}&${cacheBuster}` : `${url}?${cacheBuster}`;
-  
-  const response = await fetch(urlWithCache);
-  
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}: ${response.status}`);
+async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<T> {
+  try {
+    // Simple cache busting - add build timestamp
+    const cacheBuster = `v=${BUILD_VERSION}`;
+    const urlWithCache = url.includes('?') ? `${url}&${cacheBuster}` : `${url}?${cacheBuster}`;
+    
+    const response = await fetch(urlWithCache, { signal });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${url}: ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    // Handle network errors gracefully
+    if (error instanceof TypeError && error.message.includes('network')) {
+      throw new Error('Network error: Please check your internet connection');
+    }
+    throw error;
   }
-  return response.json();
 }
 
 // Build version for cache busting - use timestamp to ensure fresh data on rebuild
@@ -158,7 +222,9 @@ async function loadChannelData(channelId: string): Promise<ChannelData> {
     questionIdToChannel.set(q.id, channelId);
   }
   
+  // Store in both caches
   channelCache.set(channelId, data);
+  channelDataMap.set(channelId, data); // For iteration support
   return data;
 }
 
@@ -203,8 +269,9 @@ export async function fetchQuestion(questionId: string): Promise<Question> {
     if (question) return question;
   }
   
-  // Slow path: search through all loaded channels
-  for (const [channelId, data] of Array.from(channelCache.entries())) {
+  // Slow path: search through all loaded channels (use the internal map for iteration)
+  const dataMap = getChannelDataMap();
+  for (const [channelId, data] of Array.from(dataMap.entries())) {
     const question = data.questions.find((q: Question) => q.id === questionId);
     if (question) {
       questionIdToChannel.set(questionId, channelId);
@@ -267,8 +334,9 @@ export async function fetchRandomQuestion(
 
 // Get channel statistics
 export async function fetchStats(): Promise<ChannelDetailedStats[]> {
-  if (statsCache.data) {
-    return statsCache.data;
+  // Check if stats cache is valid (within TTL)
+  if (isStatsCacheValid()) {
+    return statsCacheEntry.data!;
   }
   
   const channels = await fetchChannels();
@@ -292,7 +360,8 @@ export async function fetchStats(): Promise<ChannelDetailedStats[]> {
   );
   
   const stats = results.filter((s): s is ChannelDetailedStats => s !== null);
-  statsCache.data = stats;
+  statsCacheEntry.data = stats;
+  statsCacheEntry.timestamp = Date.now();
   return stats;
 }
 
@@ -311,7 +380,15 @@ export async function fetchCompanies(channelId: string): Promise<string[]> {
 // Clear cache (useful for forcing refresh)
 export function clearCache(): void {
   channelCache.clear();
-  statsCache.data = null;
+  channelDataMap.clear();
+  statsCacheEntry.data = null;
+  statsCacheEntry.timestamp = null;
+}
+
+// Invalidate a specific channel's cache
+export function invalidateChannel(channelId: string): void {
+  channelCache.delete(channelId);
+  channelDataMap.delete(channelId);
 }
 
 // Get all questions for a channel (full data)

@@ -393,27 +393,31 @@ export function useAdaptiveLearning(channelId?: string) {
   }, []);
 
   // Get similar questions from pre-computed data (static JSON)
-  const getSimilarQuestions = useCallback(async (questionId: string): Promise<SimilarQuestion[]> => {
+  const getSimilarQuestions = useCallback(async (questionId: string, signal?: AbortSignal): Promise<SimilarQuestion[]> => {
     try {
       // Fetch the pre-computed similar questions data
-      const response = await fetch('/data/similar-questions.json');
+      const response = await fetch('/data/similar-questions.json', { signal });
       if (!response.ok) return [];
       
       const data: SimilarQuestionsData = await response.json();
       return data.similarities[questionId] || [];
-    } catch {
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        // Request was cancelled, return empty array
+        return [];
+      }
       // File might not exist yet
       return [];
     }
   }, []);
 
   // Get recommended questions based on learning path and similar questions
-  const getSmartRecommendations = useCallback(async (currentQuestionId?: string): Promise<string[]> => {
+  const getSmartRecommendations = useCallback(async (currentQuestionId?: string, signal?: AbortSignal): Promise<string[]> => {
     const recommendations: string[] = [];
     
     // 1. Get similar questions if we have a current question
     if (currentQuestionId) {
-      const similar = await getSimilarQuestions(currentQuestionId);
+      const similar = await getSimilarQuestions(currentQuestionId, signal);
       // Filter out already answered questions
       const answeredIds = new Set(filteredHistory.map(a => a.questionId));
       const newSimilar = similar.filter(s => !answeredIds.has(s.id));

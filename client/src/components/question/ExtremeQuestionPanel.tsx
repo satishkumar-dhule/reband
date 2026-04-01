@@ -3,7 +3,7 @@
  * Immersive, cinematic experience with bold visuals
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Zap, Target, Flame, Bookmark, Check, Building2, 
@@ -28,6 +28,10 @@ interface ExtremeQuestionPanelProps {
   onTapQuestion?: () => void;
 }
 
+/**
+ * Renders text with inline code (backticks) as styled code elements
+ * Moved outside component to avoid recreation on every render
+ */
 function renderWithInlineCode(text: string): React.ReactNode {
   if (!text) return null;
   
@@ -99,7 +103,7 @@ export function ExtremeQuestionPanel({
     setShowRatingButtons(true);
   };
 
-  const getDifficultyConfig = () => {
+  const difficultyConfig = useMemo(() => {
     switch (question.difficulty) {
       case 'beginner':
         return { 
@@ -142,9 +146,7 @@ export function ExtremeQuestionPanel({
           gradient: 'from-muted/10 to-muted/10'
         };
     }
-  };
-
-  const difficultyConfig = getDifficultyConfig();
+  }, [question.difficulty]);
   const DifficultyIcon = difficultyConfig.icon;
 
   return (

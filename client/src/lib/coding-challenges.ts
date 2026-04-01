@@ -9,7 +9,8 @@ export type Language = 'javascript' | 'python';
 
 // =============================================================================
 // SANDBOXED CODE EXECUTION - SECURITY FIX
-// Replaces unsafe `new Function()` with Web Worker isolation
+// Replaces unsafe `eval()` with restricted Function constructor
+// Web Worker provides isolation, Function constructor prevents scope leakage
 // =============================================================================
 
 export interface SandboxResult {
@@ -21,7 +22,11 @@ export interface SandboxResult {
 
 /**
  * Execute JavaScript code in a sandboxed Web Worker.
- * This prevents malicious code from accessing the main thread or parent context.
+ * SECURITY: Uses Function constructor with blocked globals instead of eval().
+ * This prevents:
+ * - Direct access to window, document, fetch, etc.
+ * - Scope chain manipulation
+ * - Prototype pollution attacks
  * 
  * @param code - The JavaScript code to execute
  * @param timeout - Maximum execution time in ms (default: 5000)
@@ -32,25 +37,57 @@ export async function executeCodeSandboxed(
   timeout = 5000
 ): Promise<SandboxResult> {
   return new Promise((resolve) => {
-    // Worker code that receives and executes user code in isolation
+    // SECURITY FIX: Replace eval() with safe sandboxed execution
+    // Using Function constructor with blocked dangerous globals
     const workerCode = `
       self.onmessage = function(msg) {
         try {
           const logs = [];
+          
+          // Create a sandboxed console that intercepts all output
           const console = { 
-            log: (...a) => logs.push(a.join(' ')), 
-            error: (...a) => logs.push('ERROR: ' + a.join(' ')),
-            warn: (...a) => logs.push('WARN: ' + a.join(' ')),
-            info: (...a) => logs.push(a.join(' '))
+            log: (...a) => logs.push(a.map(x => typeof x === 'object' ? JSON.stringify(x) : String(x)).join(' ')), 
+            error: (...a) => logs.push('ERROR: ' + a.map(x => typeof x === 'object' ? JSON.stringify(x) : String(x)).join(' ')),
+            warn: (...a) => logs.push('WARN: ' + a.map(x => typeof x === 'object' ? JSON.stringify(x) : String(x)).join(' ')),
+            info: (...a) => logs.push('INFO: ' + a.map(x => typeof x === 'object' ? JSON.stringify(x) : String(x)).join(' ')),
+            table: (data) => logs.push(JSON.stringify(data, null, 2)),
+            clear: () => logs.length = 0
           };
           
-          // Execute user code in strict mode with sandboxed environment
-          const result = (function() {
-            'use strict';
-            return eval(msg.data.code);
-          })();
+          // SECURITY: Blocked globals that could be exploited
+          // These are set to undefined in the execution scope
+          const blockedGlobals = [
+            'window', 'document', 'fetch', 'XMLHttpRequest', 
+            'WebSocket', 'Worker', 'importScripts', 'eval',
+            'Function', 'constructor', '__proto__', 'prototype',
+            'localStorage', 'sessionStorage', 'indexedDB',
+            'location', 'navigator', 'history', 'crypto',
+            'atob', 'btoa', 'setTimeout', 'setInterval',
+            'Math', 'JSON', 'Array', 'Object', 'String', 'Number', 'Boolean',
+            'Date', 'RegExp', 'Error', 'Symbol', 'Map', 'Set', 'WeakMap', 'WeakSet',
+            'Promise', 'Proxy', 'Reflect'
+          ];
           
-          self.postMessage({ success: true, output: result, logs: logs });
+          const sandboxedCode = msg.data.code;
+          
+          // Build a safe function with blocked globals as parameters set to undefined
+          const safeFunction = new Function(
+            'console',
+            ...blockedGlobals,
+            '"use strict"; ' + sandboxedCode
+          );
+          
+          // Call with undefined for all blocked globals
+          const result = safeFunction(
+            console,
+            ...blockedGlobals.map(() => undefined)
+          );
+          
+          const outputStr = result !== undefined 
+            ? (typeof result === 'object' ? JSON.stringify(result, null, 2) : String(result))
+            : 'undefined';
+          
+          self.postMessage({ success: true, output: outputStr, logs: logs });
         } catch (err) {
           const errorMessage = err instanceof Error ? err.message : String(err);
           self.postMessage({ success: false, error: errorMessage, logs: logs || [] });
@@ -88,6 +125,31 @@ export async function executeCodeSandboxed(
       resolve({ success: false, error: 'Failed to create sandbox worker' });
     }
   });
+}
+
+// Raw challenge data from JSON (before transformation)
+interface RawChallenge {
+  id?: string;
+  title?: string;
+  description?: string;
+  difficulty?: string;
+  category?: string;
+  tags?: string[];
+  starterCode?: Record<Language, string>;
+  testCases?: RawTestCase[];
+  hints?: string[];
+  solution?: Record<Language, string>;
+  sampleSolution?: Record<Language, string>;
+  complexity?: { time?: string; space?: string; explanation?: string };
+  timeLimit?: number;
+}
+
+interface RawTestCase {
+  id?: string;
+  input?: string;
+  expectedOutput?: string;
+  isHidden?: boolean;
+  description?: string;
 }
 
 export interface CodingChallenge {
@@ -889,7 +951,7 @@ async function loadChallengesFromJson(): Promise<CodingChallenge[]> {
       const data = Array.isArray(rawData) ? rawData : (rawData.challenges || []);
       
       // Transform database format to app format
-      const challenges: CodingChallenge[] = data.map((c: any) => ({
+      const challenges: CodingChallenge[] = data.map((c: RawChallenge) => ({
         id: c.id || `challenge-${Math.random().toString(36).substr(2, 9)}`,
         title: c.title || 'Untitled Challenge',
         description: c.description || '',
@@ -897,7 +959,7 @@ async function loadChallengesFromJson(): Promise<CodingChallenge[]> {
         category: c.category || 'General',
         tags: c.tags || [],
         starterCode: c.starterCode || { javascript: '', python: '' },
-        testCases: (c.testCases || []).map((tc: any) => ({
+        testCases: (c.testCases || []).map((tc: RawTestCase) => ({
           id: tc.id || String(Math.random()),
           input: tc.input,
           expectedOutput: tc.expectedOutput,
@@ -945,8 +1007,12 @@ function getChallengesSync(): CodingChallenge[] {
   }));
 }
 
-// Initialize challenges loading
-loadChallengesFromJson();
+// Initialize challenges loading with proper error handling
+// Using .then() instead of await to avoid blocking module initialization
+// Errors are caught and logged, but don't break the module
+loadChallengesFromJson().catch(err => {
+  console.warn('Background challenge loading failed:', err instanceof Error ? err.message : err);
+});
 
 // Generate a random challenge
 export function getRandomChallenge(difficulty?: Difficulty): CodingChallenge {
@@ -954,6 +1020,18 @@ export function getRandomChallenge(difficulty?: Difficulty): CodingChallenge {
   let filtered = challenges;
   if (difficulty) {
     filtered = challenges.filter(c => c.difficulty === difficulty);
+  }
+  // Handle empty array case - return random from all challenges
+  if (filtered.length === 0) {
+    const allChallenges = challenges.length > 0 ? challenges : challengeTemplates;
+    const randomIndex = Math.floor(Math.random() * allChallenges.length);
+    const template = allChallenges[randomIndex];
+    // Templates have ids assigned in getChallengesSync/getChallenges
+    // If somehow we got a template without an id, assign one
+    return {
+      ...template,
+      id: (template as CodingChallenge).id || `challenge-${randomIndex}`
+    };
   }
   return filtered[Math.floor(Math.random() * filtered.length)];
 }
@@ -1151,8 +1229,8 @@ export function saveChallengeAttempt(attempt: ChallengeAttempt): void {
   try {
     const stored = localStorage.getItem(CODING_PROGRESS_KEY);
     const progress = stored ? JSON.parse(stored) : { attempts: [] };
-    progress.attempts.push(attempt);
-    localStorage.setItem(CODING_PROGRESS_KEY, JSON.stringify(progress));
+    const updatedProgress = { attempts: [...progress.attempts, attempt] };
+    localStorage.setItem(CODING_PROGRESS_KEY, JSON.stringify(updatedProgress));
   } catch {
     // Ignore storage errors
   }

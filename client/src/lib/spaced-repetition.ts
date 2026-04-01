@@ -116,8 +116,15 @@ export function getAllCards(): Map<string, ReviewCard> {
 }
 
 function saveAllCards(cards: Map<string, ReviewCard>): void {
-  const obj = Object.fromEntries(cards);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+  try {
+    const obj = Object.fromEntries(cards);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+  } catch (e) {
+    console.error('Failed to save review cards:', e);
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded');
+    }
+  }
 }
 
 export function getCard(questionId: string, channel: string, difficulty: string): ReviewCard {
@@ -216,8 +223,13 @@ export function getSRSStats(): SRSStats {
   
   const allCards = Array.from(cards.values());
   
-  const statsStr = localStorage.getItem(STATS_KEY);
-  const stats = statsStr ? JSON.parse(statsStr) : { reviewStreak: 0, lastReviewDate: null };
+  let stats = { reviewStreak: 0, lastReviewDate: null as string | null };
+  try {
+    const statsStr = localStorage.getItem(STATS_KEY);
+    stats = statsStr ? JSON.parse(statsStr) : { reviewStreak: 0, lastReviewDate: null };
+  } catch {
+    // Ignore parse errors
+  }
   
   return {
     totalCards: allCards.length,
@@ -234,8 +246,13 @@ export function getSRSStats(): SRSStats {
 
 function updateReviewStreak(): void {
   const today = new Date().toISOString().split('T')[0];
-  const statsStr = localStorage.getItem(STATS_KEY);
-  const stats = statsStr ? JSON.parse(statsStr) : { reviewStreak: 0, lastReviewDate: null };
+  let stats = { reviewStreak: 0, lastReviewDate: null as string | null };
+  try {
+    const statsStr = localStorage.getItem(STATS_KEY);
+    stats = statsStr ? JSON.parse(statsStr) : { reviewStreak: 0, lastReviewDate: null };
+  } catch {
+    // Ignore parse errors
+  }
   
   if (stats.lastReviewDate === today) {
     return;
@@ -252,7 +269,14 @@ function updateReviewStreak(): void {
   }
   
   stats.lastReviewDate = today;
-  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  try {
+    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  } catch (e) {
+    console.error('Failed to save review streak:', e);
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded');
+    }
+  }
 }
 
 export function addToSRS(questionId: string, channel: string, difficulty: string): ReviewCard {
@@ -308,8 +332,13 @@ export function calculateXP(rating: ConfidenceRating, masteryLevel: number): num
 }
 
 export function getUserXP(): { totalXP: number; level: number; xpToNext: number; progress: number } {
-  const statsStr = localStorage.getItem(STATS_KEY);
-  const stats = statsStr ? JSON.parse(statsStr) : { totalXP: 0 };
+  let stats = { totalXP: 0 };
+  try {
+    const statsStr = localStorage.getItem(STATS_KEY);
+    stats = statsStr ? JSON.parse(statsStr) : { totalXP: 0 };
+  } catch {
+    // Ignore parse errors
+  }
   const totalXP = stats.totalXP || 0;
   
   const level = srsConfig.calculateLevel(totalXP);
@@ -322,14 +351,26 @@ export function getUserXP(): { totalXP: number; level: number; xpToNext: number;
 }
 
 export function addXP(amount: number): { totalXP: number; level: number; leveledUp: boolean } {
-  const statsStr = localStorage.getItem(STATS_KEY);
-  const stats = statsStr ? JSON.parse(statsStr) : { totalXP: 0, reviewStreak: 0, lastReviewDate: null };
+  let stats = { totalXP: 0, reviewStreak: 0, lastReviewDate: null as string | null };
+  try {
+    const statsStr = localStorage.getItem(STATS_KEY);
+    stats = statsStr ? JSON.parse(statsStr) : { totalXP: 0, reviewStreak: 0, lastReviewDate: null };
+  } catch {
+    // Ignore parse errors
+  }
   
   const oldLevel = srsConfig.calculateLevel(stats.totalXP || 0);
   stats.totalXP = (stats.totalXP || 0) + amount;
   const newLevel = srsConfig.calculateLevel(stats.totalXP);
   
-  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  try {
+    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  } catch (e) {
+    console.error('Failed to save XP:', e);
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      console.warn('localStorage quota exceeded');
+    }
+  }
   
   return { 
     totalXP: stats.totalXP, 

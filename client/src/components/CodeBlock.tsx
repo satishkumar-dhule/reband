@@ -156,9 +156,9 @@ export function CodeBlock({
             margin: 0,
             padding: '0.875rem',
             background: 'transparent',
-            fontSize: '0.8125rem',
-            lineHeight: '1.6',
-            fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Monaco, 'Courier New', monospace",
+            fontSize: 'var(--text-sm)',
+            lineHeight: 'var(--leading-mono)',
+            fontFamily: "var(--font-mono)",
           }}
           showLineNumbers={showLineNumbers}
           lineNumberStyle={{
@@ -171,7 +171,7 @@ export function CodeBlock({
           wrapLongLines={wrapLongLines}
           codeTagProps={{
             style: {
-              fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Monaco, 'Courier New', monospace",
+              fontFamily: "var(--font-mono)",
             }
           }}
         >
@@ -228,8 +228,8 @@ export function InlineCodeBlock({ code, language = 'text', maxHeight = '400px' }
             margin: 0,
             padding: '0.75rem',
             background: 'transparent',
-            fontSize: '0.75rem',
-            lineHeight: '1.5',
+            fontSize: 'var(--text-xs)',
+            lineHeight: 'var(--leading-normal)',
           }}
           wrapLines={true}
           wrapLongLines={true}
@@ -266,8 +266,8 @@ export function MinimalCodeBlock({ code, language = 'text' }: MinimalCodeBlockPr
           margin: 0,
           padding: '0.75rem',
           background: 'transparent',
-          fontSize: '0.8125rem',
-          lineHeight: '1.5',
+          fontSize: 'var(--text-sm)',
+          lineHeight: 'var(--leading-normal)',
         }}
         wrapLines={true}
         wrapLongLines={true}

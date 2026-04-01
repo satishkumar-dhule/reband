@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Learn_Reels, please email us at [security contact] instead of using the issue tracker. This allows us to address the issue before it becomes public.
+If you discover a security vulnerability in DevPrep / Open-Interview, please email us at [security contact] instead of using the issue tracker. This allows us to address the issue before it becomes public.
 
 Please include:
 - Description of the vulnerability
@@ -55,7 +55,7 @@ We use the following security tools:
 
 ## Compliance
 
-Learn_Reels follows these security standards:
+DevPrep follows these security standards:
 
 - OWASP Top 10 guidelines
 - NIST Cybersecurity Framework
@@ -65,4 +65,4 @@ Learn_Reels follows these security standards:
 
 For security concerns, please contact: [security contact]
 
-Thank you for helping keep Learn_Reels secure!
+Thank you for helping keep DevPrep secure!

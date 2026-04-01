@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useLocation, useRoute, Link } from 'wouter';
 import { getChannel } from '../lib/data';
 import { useQuestionsWithPrefetch, useSubChannels, useCompaniesWithCounts } from '../hooks/use-questions';
@@ -188,17 +188,17 @@ export default function QuestionViewerGenZ() {
     }
   }, [currentQuestion, trackEvent, markCompleted]);
 
-  const nextQuestion = () => {
+  const nextQuestion = useCallback(() => {
     if (currentIndex < totalQuestions - 1) {
       setCurrentIndex(prev => prev + 1);
     }
-  };
+  }, [currentIndex, totalQuestions]);
 
-  const prevQuestion = () => {
+  const prevQuestion = useCallback(() => {
     if (currentIndex > 0) {
       setCurrentIndex(prev => prev - 1);
     }
-  };
+  }, [currentIndex]);
 
   // Use refs to avoid stale closure issues with keyboard navigation
   useEffect(() => {
@@ -346,11 +346,11 @@ export default function QuestionViewerGenZ() {
     );
   }
 
-  const difficultyColor = {
+  const difficultyColor = useMemo(() => ({
     beginner: 'gh-label-green',
     intermediate: 'gh-label-yellow',
     advanced: 'gh-label-red'
-  }[currentQuestion?.difficulty || 'beginner'];
+  })[currentQuestion?.difficulty || 'beginner'], [currentQuestion?.difficulty]);
 
   return (
     <AppLayout>

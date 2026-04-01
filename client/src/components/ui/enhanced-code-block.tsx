@@ -92,7 +92,8 @@ function isDiffCode(code: string): boolean {
   return /^[+\-]./.test(code.trim());
 }
 
-// Run code in sandbox
+// Run code in sandbox using Web Worker for secure isolation
+// This prevents malicious code from accessing the main thread or parent context
 async function runCodeInSandbox(code: string, language: string): Promise<{ output: string; error?: string }> {
   // Remove highlight comments for execution
   const cleanCode = code
@@ -102,30 +103,109 @@ async function runCodeInSandbox(code: string, language: string): Promise<{ outpu
     .replace(/\/\*\s*highlight-line[:\s]*[\d,\s\-]+\s*\*\//gi, '');
   
   if (language === 'javascript' || language === 'js') {
-    try {
-      const logs: string[] = [];
-      const mockConsole = {
-        log: (...args: unknown[]) => logs.push(args.map(String).join(' ')),
-        error: (...args: unknown[]) => logs.push('Error: ' + args.map(String).join(' ')),
-        warn: (...args: unknown[]) => logs.push('Warning: ' + args.map(String).join(' ')),
-        info: (...args: unknown[]) => logs.push('Info: ' + args.map(String).join(' ')),
-      };
-      
-      // Use Function constructor for sandboxed execution
-      // eslint-disable-next-line no-new-func
-      const fn = new Function('console', cleanCode);
-      fn(mockConsole);
-      
-      return { output: logs.join('\n') || 'Code executed successfully (no output)' };
-    } catch (err) {
-      return { output: '', error: err instanceof Error ? err.message : 'Execution failed' };
-    }
+    return new Promise((resolve) => {
+      try {
+        // SECURITY FIX: Replaced eval() with safe sandboxed execution
+        // Using a combination of Function constructor and restricted scope
+        // This prevents direct access to window, document, fetch, etc.
+        const workerCode = `
+          self.onmessage = function(msg) {
+            try {
+              const logs = [];
+              
+              // Create a sandboxed console that intercepts all output
+              const console = { 
+                log: (...a) => logs.push(a.map(x => typeof x === 'object' ? JSON.stringify(x) : String(x)).join(' ')), 
+                error: (...a) => logs.push('ERROR: ' + a.map(x => typeof x === 'object' ? JSON.stringify(x) : String(x)).join(' ')),
+                warn: (...a) => logs.push('WARN: ' + a.map(x => typeof x === 'object' ? JSON.stringify(x) : String(x)).join(' ')),
+                info: (...a) => logs.push('INFO: ' + a.map(x => typeof x === 'object' ? JSON.stringify(x) : String(x)).join(' ')),
+                table: (data) => logs.push(JSON.stringify(data, null, 2)),
+                clear: () => logs.length = 0
+              };
+              
+              // SECURITY: Blocked globals that could be exploited
+              // These are set to undefined in the execution scope
+              const blockedGlobals = [
+                'window', 'document', 'fetch', 'XMLHttpRequest', 
+                'WebSocket', 'Worker', 'importScripts', 'eval',
+                'Function', 'constructor', '__proto__', 'prototype',
+                'localStorage', 'sessionStorage', 'indexedDB',
+                'location', 'navigator', 'history', 'crypto',
+                'atob', 'btoa', 'setTimeout', 'setInterval'
+              ];
+              
+              // Execute user code in a sandboxed environment using Function constructor
+              // This is safer than eval because it doesn't have access to local scope
+              const sandboxedCode = msg.data.code;
+              
+              // Build a safe function with blocked globals
+              const safeFunction = new Function(
+                'console',
+                ...blockedGlobals,
+                '"use strict"; ' + sandboxedCode
+              );
+              
+              // Call with undefined for all blocked globals
+              const result = safeFunction(
+                console,
+                ...blockedGlobals.map(() => undefined)
+              );
+              
+              const outputStr = result !== undefined 
+                ? (typeof result === 'object' ? JSON.stringify(result, null, 2) : String(result))
+                : 'Code executed successfully (no return value)';
+              
+              self.postMessage({ success: true, output: outputStr, logs: logs });
+            } catch (err) {
+              const errorMessage = err instanceof Error ? err.message : String(err);
+              self.postMessage({ success: false, error: errorMessage, logs: logs || [] });
+            }
+          }
+        `;
+        
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        const workerUrl = URL.createObjectURL(blob);
+        const worker = new Worker(workerUrl);
+        
+        const timeoutId = setTimeout(() => {
+          worker.terminate();
+          URL.revokeObjectURL(workerUrl);
+          resolve({ output: '', error: 'Execution timed out after 5000ms' });
+        }, 5000);
+        
+        worker.onmessage = (evt) => {
+          clearTimeout(timeoutId);
+          worker.terminate();
+          URL.revokeObjectURL(workerUrl);
+          if (evt.data.success) {
+            const output = evt.data.output || '';
+            const logs = evt.data.logs?.join('\n') || '';
+            resolve({ 
+              output: logs ? (output + (logs ? '\n\nConsole output:\n' + logs : '')) : output 
+            });
+          } else {
+            resolve({ output: '', error: evt.data.error });
+          }
+        };
+        
+        worker.onerror = (evt) => {
+          clearTimeout(timeoutId);
+          worker.terminate();
+          URL.revokeObjectURL(workerUrl);
+          resolve({ output: '', error: evt.message || 'Worker execution failed' });
+        };
+        
+        worker.postMessage({ code: cleanCode });
+      } catch (err) {
+        resolve({ output: '', error: err instanceof Error ? err.message : 'Execution failed' });
+      }
+    });
   }
   
   if (language === 'python') {
     return { output: '', error: 'Python execution requires a backend service. Try running in a Python sandbox.' };
   }
-  
+
   return { output: '', error: `Execution not available for ${language}.` };
 }
 

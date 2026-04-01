@@ -6,6 +6,11 @@ This project uses a **supervisor-delegate pattern**. The main Replit agent acts 
 
 **The supervisor never writes code directly.** It only orchestrates, reviews, and corrects.
 
+### Performance instrumentation
+- Perf-measure tooling added to milestone 1: perf:measure script, scripts/measure-perf.js, and CI workflow perf-measure.yml for loading baselines on staging and PRs.
+- Baseline pages: landing, channel-browser, login, algorithms channel, and interview start.
+- Outputs: perf-results.json and perf/screenshots for loaded-state analysis.
+- This section will be used to drive regression QA and performance improvements.
 ---
 
 ## Project Context (All Agents Must Follow)
@@ -14,9 +19,12 @@ This project uses a **supervisor-delegate pattern**. The main Replit agent acts 
 **Mission**: Free, GitHub-native technical interview prep — swipe learning, voice practice, SRS, coding challenges
 **Theme**: GitHub design system (Primer-inspired, GitHub color tokens, system font stack)
 **Stack**: React 19 + Vite 7 + TypeScript 5 + Tailwind CSS 4 + shadcn/ui
-**Database**: Local SQLite (`file:local.db`) - no external database required
+**Database**: Local SQLite (`file:local.db`) — Turso sync for remote backup
 **Deployment**: **GitHub Pages (static SPA, zero backend servers in production)**
+- Staging: `https://stage-open-interview.github.io`
+- Production: `https://open-interview.github.io`
 **Data strategy**: DB is source of truth → build-time export to `public/data/*.json` → SPA fetches static JSON
+**Package**: `code-reels`
 
 ---
 
@@ -40,6 +48,11 @@ This project uses a **supervisor-delegate pattern**. The main Replit agent acts 
 - Components: shadcn/ui + Primer-inspired styles from `.agents/skills/github-theme-migration/`
 - No random Tailwind colors that aren't mapped to GitHub tokens
 - Dark/light mode follows GitHub's theme system
+
+### 4. Vector Search (Qdrant)
+- Qdrant for semantic similarity search
+- Duplicate detection using vector embeddings
+- RAG-powered interview intelligence
 
 ---
 
@@ -109,7 +122,7 @@ npm script: `npm run build:static`
 | `devprep-react-optimizer` | `react-optimizer.agent.md` | React performance optimization |
 | `devprep-web-reviewer` | `web-reviewer.agent.md` | Web interface guidelines |
 
-### GitHub Theme Agents (20+)
+### GitHub Theme Agents (15)
 | Agent Group | Description |
 |-------------|-------------|
 | `devprep-github-colors-expert` | GitHub color palette migration |
@@ -126,7 +139,25 @@ npm script: `npm run build:static`
 | `devprep-github-inputs-expert` | GitHub input components |
 | `devprep-github-icons-expert` | GitHub iconography |
 | `devprep-github-alerts-expert` | GitHub alert notices |
-| `devprep-theme-*` (10+) | Full theme component agents |
+| `devprep-theme-*` (15) | Full theme component agents |
+
+### Bug Category Agents (15)
+| Agent | Description |
+|-------|-------------|
+| `devprep-bug-a11y` | Accessibility issues |
+| `devprep-bug-animations` | Animation/transition bugs |
+| `devprep-bug-api` | API integration bugs |
+| `devprep-bug-async` | Async/timing issues |
+| `devprep-bug-build` | Build configuration bugs |
+| `devprep-bug-css` | CSS/styling bugs |
+| `devprep-bug-database` | Database/query bugs |
+| `devprep-bug-events` | Event handling bugs |
+| `devprep-bug-logic` | Business logic bugs |
+| `devprep-bug-performance` | Performance issues |
+| `devprep-bug-security` | Security vulnerabilities |
+| `devprep-bug-seo` | SEO issues |
+| `devprep-bug-sync` | Data synchronization bugs |
+| `devprep-bug-state` | State management bugs |
 
 ### Content Generation
 | Agent | Description |
@@ -139,6 +170,16 @@ npm script: `npm run build:static`
 | `devprep-blog-generator` | SEO-optimized blog posts |
 | `devprep-study-guide-generator` | PDF study materials |
 | `devprep-presentation-generator` | PowerPoint slides |
+
+### Pipeline (via unified-content-bot)
+| Script | Purpose |
+|--------|---------|
+| `unified-content-bot.js` | Unified pipeline orchestrator |
+| `creator-bot.js` | Question/challenge creation |
+| `verifier-bot.js` | Content validation |
+| `processor-bot.js` | Content formatting & publishing |
+| `session-builder-bot.js` | Voice session generation |
+| `reconciliation-bot.js` | Data consistency checks |
 
 ### Data & Database
 | Agent | Description |
@@ -157,6 +198,31 @@ npm script: `npm run build:static`
 | `devprep-site-auditor` | Comprehensive site auditing |
 | `devprep-code-reviewer` | Code review |
 | `devprep-action-composite-reviewer` | GH Action composite review |
+
+### Performance Optimization Swarm (10 agents)
+When optimizing page load performance, spawn these 10 agents in parallel:
+
+| Agent | Role in Swarm | Key Deliverable |
+|-------|---------------|-----------------|
+| `devprep-coordinator` | Orchestration & planning | Performance optimization plan |
+| `devprep-frontend-designer` | Critical CSS & lazy loading | Code-splitting implementation |
+| `devprep-bug-performance` | Bottleneck analysis | Bundle optimization report |
+| `devprep-bug-css` | CSS extraction | Critical CSS inlining |
+| `devprep-static-deployment` | Build configuration | Asset hashing & caching |
+| `devprep-db-optimizer` | Data optimization | Chunked JSON loading |
+| `devprep-e2e-tester` | Instrumentation | Telemetry hooks |
+| `devprep-web-reviewer` | UI/UX performance | Layout stability improvements |
+| `devprep-seo-audit` | Lighthouse readiness | Performance score optimization |
+| `devprep-coordinator` (2nd) | Content pipeline adaptation | Prerendered paths |
+
+**Swarm Protocol:**
+```bash
+# Spawn all 10 agents in parallel for performance optimization
+task("devprep-coordinator", "Create performance optimization plan...")
+task("devprep-frontend-designer", "Implement critical CSS and lazy loading...")
+task("devprep-bug-performance", "Analyze bundle sizes and render paths...")
+# ... etc for all 10 agents
+```
 
 ### Strategy & Documentation
 | Agent | Description |
@@ -198,6 +264,12 @@ npm script: `npm run build:static`
 
 ### Creative & Strategy (4)
 `copywriting`, `brainstorming`, `find-skills`, `swarm-coordination`
+
+---
+
+## Unified Controls
+
+See `UNIFIED_CONTROLS_SPEC.md` for the unified controls specification used across pages.
 
 ---
 
@@ -252,17 +324,85 @@ CONTENT_STANDARDS.md      Content quality rules (all content agents must read th
 
 ---
 
+## Static Data Files (Generated at Build Time)
+
+```
+public/data/
+├── channels.json            # [{id, label, questionCount, ...}]
+├── questions-index.json     # lightweight index (id, channel, difficulty, question)
+├── channel-algorithms.json  # full questions for algorithms channel
+├── channel-frontend.json    # full questions for frontend channel
+├── channel-*.json           # one file per channel
+├── learning-paths.json      # curated learning path definitions
+├── coding-challenges.json   # coding challenges with solutions
+├── stats.json               # aggregate statistics
+└── search-index/            # pagefind static search
+    ├── pagefind.js
+    └── *.idx
+```
+
+---
+
+## Key Project Files
+
+```
+server/index.ts           Express entry (dev only — not used in prod static build)
+server/routes.ts          API routes (dev only)
+server/db.ts              Turso/libSQL client
+shared/schema.ts          Drizzle ORM schema (source of truth for DB structure)
+client/src/App.tsx        React app with routing (wouter)
+client/src/lib/           Core business logic
+client/src/pages/          All pages
+client/src/components/    All UI components
+script/                   Build & data scripts (100+ utility scripts)
+.github/workflows/        GitHub Actions CI/CD
+.opencode/agents/         All opencode agent definitions
+.agents/skills/           All agent skills
+CONTENT_STANDARDS.md      Content quality rules (all content agents must read this)
+UNIFIED_CONTROLS_SPEC.md  Unified controls specification
+```
+
+---
+
 ## GitHub Actions Workflows (`.github/workflows/`)
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `deploy-app.yml` | Push to main | Deploy static SPA to GitHub Pages |
+| `deploy-app.yml` | Push to main | Deploy static SPA to GitHub Pages (with staging) |
+| `deploy-blog.yml` | Push to main | Deploy blog to GitHub Pages |
 | `content-generation.yml` | Scheduled | Generate new content via coordinator |
 | `daily-maintenance.yml` | Daily | DB cleanup, duplicate check |
 | `duplicate-check.yml` | On push | Detect duplicate questions |
 | `manual-intake.yml` | Manual | Add content manually |
+| `generate-learning-paths.yml` | Scheduled | Generate learning paths |
+| `social-media.yml` | Scheduled | Social media posting |
+| `issue-processing.yml` | On issue | Auto-process GitHub issues |
+| `scheduled-deploy.yml` | Scheduled | Automated deployment scheduling |
 
 ---
 
-Last Updated: 2026-03-29
+## Last Session Summary (April 1, 2026)
+
+### Key Changes Applied
+- **Architecture**: Migrated to local SQLite (`file:local.db`), implemented static-first GitHub Pages deployment
+- **Features Added**: Flashcards system with SRS (spaced repetition), Coding challenges pipeline
+- **GitHub Theme**: Full GitHub design system integration with CSS variables and dark/light mode
+- **Documentation**: Added UNIFIED_CONTROLS_SPEC.md, TESTING_REPORT.md, multiple doc files
+- **Testing**: E2E tests with Playwright (70+ tests), reviewed Vitest infrastructure
+
+### Files Modified
+- 11 GitHub workflow files
+- 20+ page components
+- 30+ UI components
+- 15+ library files
+- Database schema and configuration
+
+### Known Issues
+- Schema.ts has Drizzle ORM type warnings (pre-existing, non-blocking)
+- Vitest needs setup.ts file for test utilities
+- Missing unit tests for critical libraries
+
+---
+
+Last Updated: 2026-04-01
 Maintained by: devprep-tech-writer agent + supervisor

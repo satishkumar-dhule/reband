@@ -340,7 +340,11 @@ export function updateUserProfile(updates: Partial<UserProfile>): UserProfile | 
  * Clear user profile
  */
 export function clearUserProfile(): void {
-  localStorage.removeItem(PROFILE_KEY);
+  try {
+    localStorage.removeItem(PROFILE_KEY);
+  } catch (e) {
+    console.error('Error clearing user profile:', e);
+  }
 }
 
 /**

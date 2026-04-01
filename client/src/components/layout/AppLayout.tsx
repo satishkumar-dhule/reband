@@ -8,6 +8,7 @@ import { ThemeToggle } from "../ThemeToggle";
 import { UnifiedSearch } from "../UnifiedSearch";
 import { useCredits } from "@/context/CreditsContext";
 import { cn } from "@/lib/utils";
+import { MobileBottomNav } from "./UnifiedNav";
 
 const NAV_ITEMS = [
   { icon: Home,      label: "Home",     path: "/" },
@@ -68,7 +69,7 @@ interface AppLayoutProps {
   showBackOnMobile?: boolean;
 }
 
-export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
+export function AppLayout({ children, hideNav = false, fullWidth = false }: AppLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [, setLocation] = useLocation();
@@ -182,7 +183,7 @@ export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
         </aside>
 
         {/* ─── MAIN CONTENT ─────────────────────────────── */}
-        <main className="flex-1 min-w-0">
+        <main className={fullWidth ? "flex-1 min-w-0" : "flex-1 min-w-0 max-w-[--container-max] mx-auto"}>
           {children}
         </main>
       </div>
@@ -239,6 +240,9 @@ export function AppLayout({ children, hideNav = false }: AppLayoutProps) {
 
       {/* ─── SEARCH MODAL ───────────────────────────────── */}
       <UnifiedSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+
+      {/* ─── MOBILE BOTTOM NAVIGATION ────────────────────── */}
+      <MobileBottomNav />
     </div>
   );
 }

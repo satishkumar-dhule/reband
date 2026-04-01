@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
   getQuestions,
   getQuestionById,
@@ -29,13 +29,18 @@ function shuffleArray<T>(array: T[], seed: number): T[] {
 // Get or create a stable session seed for a channel
 function getSessionSeed(channelId: string): number {
   const key = `shuffle-seed-${channelId}`;
-  const stored = sessionStorage.getItem(key);
-  if (stored) {
-    return parseInt(stored, 10);
+  try {
+    const stored = sessionStorage.getItem(key);
+    if (stored) {
+      return parseInt(stored, 10);
+    }
+    const seed = Date.now();
+    sessionStorage.setItem(key, seed.toString());
+    return seed;
+  } catch (error) {
+    console.warn('Failed to access sessionStorage:', error);
+    return Date.now();
   }
-  const seed = Date.now();
-  sessionStorage.setItem(key, seed.toString());
-  return seed;
 }
 
 // Get completed question IDs for a channel
@@ -61,6 +66,12 @@ export function useQuestions(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Track the current request ID to detect stale responses
+  const requestIdRef = useRef(0);
+  
+  // Use refs for values accessed in async callbacks to avoid stale closures
+  const filtersRef = useRef({ channelId, subChannel, difficulty, company, shuffle, prioritizeUnvisited });
+
   // Get stable session seed for this channel
   const sessionSeed = useMemo(() => channelId ? getSessionSeed(channelId) : 0, [channelId]);
 
@@ -71,30 +82,52 @@ export function useQuestions(
       return;
     }
 
+    // Increment request ID to track this specific request
+    const currentRequestId = ++requestIdRef.current;
     setLoading(true);
     setError(null);
+
+    // Update ref with current filter values
+    filtersRef.current = { channelId, subChannel, difficulty, company, shuffle, prioritizeUnvisited };
 
     // Try to get from cache first
     let cached = getQuestions(channelId, subChannel, difficulty, company);
     if (cached.length > 0) {
       const processed = processQuestions(cached, channelId, shuffle, prioritizeUnvisited, sessionSeed);
-      setQuestions(processed);
-      setLoading(false);
+      // Check if this response is still relevant (not superseded by a newer request)
+      if (currentRequestId === requestIdRef.current) {
+        setQuestions(processed);
+        setLoading(false);
+      }
       return;
     }
 
     // Load from API
     loadChannelQuestions(channelId)
       .then(() => {
-        const filtered = getQuestions(channelId, subChannel, difficulty, company);
-        const processed = processQuestions(filtered, channelId, shuffle, prioritizeUnvisited, sessionSeed);
-        setQuestions(processed);
+        // Capture filter values at promise resolution time
+        const { channelId: cId, subChannel: sc, difficulty: diff, company: comp, shuffle: shuf, prioritizeUnvisited: prio } = filtersRef.current;
+        const filtered = getQuestions(cId, sc, diff, comp);
+        const processed = processQuestions(filtered, cId, shuf, prio, sessionSeed);
+        
+        // Check if this response is still relevant (not superseded by a newer request)
+        if (currentRequestId === requestIdRef.current) {
+          setQuestions(processed);
+        }
       })
       .catch((err: Error) => {
-        setError(err);
-        setQuestions([]);
+        // Only update state if this is still the current request
+        if (currentRequestId === requestIdRef.current) {
+          setError(err);
+          setQuestions([]);
+        }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        // Only update loading state if this is still the current request
+        if (currentRequestId === requestIdRef.current) {
+          setLoading(false);
+        }
+      });
   }, [channelId, subChannel, difficulty, company, shuffle, prioritizeUnvisited, sessionSeed]);
 
   const questionIds = useMemo(() => questions.map(q => q.id), [questions]);
@@ -188,11 +221,14 @@ export function useCompaniesWithCounts(
   };
 }
 
-// Hook to get a single question by ID
+// Hook to get a single question by ID with proper request cancellation
 export function useQuestion(questionId: string | undefined) {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+
+  // Track the current request ID to detect stale responses
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     if (!questionId) {
@@ -201,23 +237,54 @@ export function useQuestion(questionId: string | undefined) {
       return;
     }
 
-    // Try cache first
+    // Increment request ID to track this specific request
+    const currentRequestId = ++requestIdRef.current;
+
+    // Try cache first (synchronous, always safe)
     const cached = getQuestionById(questionId);
     if (cached) {
-      setQuestion(cached);
-      setLoading(false);
+      // Still use request ID check in case cache was populated by a newer request
+      if (currentRequestId === requestIdRef.current) {
+        setQuestion(cached);
+        setLoading(false);
+      }
       return;
     }
 
-    // Load from API
+    // Load from API with abort controller for proper cancellation
+    const controller = new AbortController();
     setLoading(true);
+
     api.questions.getById(questionId)
-      .then(setQuestion)
-      .catch((err: Error) => {
-        setError(err);
-        setQuestion(null);
+      .then((result) => {
+        // Check if this response is still relevant
+        if (currentRequestId === requestIdRef.current) {
+          setQuestion(result);
+          setError(null);
+        }
       })
-      .finally(() => setLoading(false));
+      .catch((err: Error) => {
+        // Ignore abort errors - they're expected when component unmounts or request is superseded
+        if (err.name === 'AbortError') {
+          return;
+        }
+        // Only update state if this is still the current request
+        if (currentRequestId === requestIdRef.current) {
+          setError(err);
+          setQuestion(null);
+        }
+      })
+      .finally(() => {
+        // Only update loading state if this is still the current request
+        if (currentRequestId === requestIdRef.current) {
+          setLoading(false);
+        }
+      });
+
+    // Cleanup function - abort the request if component unmounts or dependencies change
+    return () => {
+      controller.abort();
+    };
   }, [questionId]);
 
   return { 
@@ -263,11 +330,14 @@ export function useQuestionsWithPrefetch(
   };
 }
 
-// Hook to get subchannels for a channel
+// Hook to get subchannels for a channel with proper request cancellation
 export function useSubChannels(channelId: string) {
   const [subChannels, setSubChannels] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+
+  // Track the current request ID to detect stale responses
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     if (!channelId) {
@@ -276,22 +346,45 @@ export function useSubChannels(channelId: string) {
       return;
     }
 
-    // Try cache first
+    // Increment request ID to track this specific request
+    const currentRequestId = ++requestIdRef.current;
+
+    // Try cache first (synchronous, always safe)
     const cached = getSubChannels(channelId);
     if (cached.length > 0) {
-      setSubChannels(cached);
-      setLoading(false);
+      if (currentRequestId === requestIdRef.current) {
+        setSubChannels(cached);
+        setLoading(false);
+      }
       return;
     }
 
-    // Load from API
+    // Load from API with abort controller
+    const controller = new AbortController();
+    
     api.channels.getSubChannels(channelId)
-      .then(setSubChannels)
-      .catch((err: Error) => {
-        setError(err);
-        setSubChannels([]);
+      .then((result) => {
+        if (currentRequestId === requestIdRef.current) {
+          setSubChannels(result);
+          setError(null);
+        }
       })
-      .finally(() => setLoading(false));
+      .catch((err: Error) => {
+        if (err.name === 'AbortError') return;
+        if (currentRequestId === requestIdRef.current) {
+          setError(err);
+          setSubChannels([]);
+        }
+      })
+      .finally(() => {
+        if (currentRequestId === requestIdRef.current) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      controller.abort();
+    };
   }, [channelId]);
 
   return { 

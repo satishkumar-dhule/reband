@@ -10,6 +10,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { memo } from 'react';
 
 export type ProgressBarSize = 'xs' | 'sm' | 'md' | 'lg';
 export type ProgressBarVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
@@ -41,7 +42,7 @@ const variantClasses: Record<ProgressBarVariant, string> = {
   info: 'bg-[var(--gh-accent-fg)]'
 };
 
-export function ProgressBar({
+export const ProgressBar = memo(function ProgressBar({
   current,
   max,
   size = 'md',
@@ -71,7 +72,7 @@ export function ProgressBar({
       <div className={`bg-muted ${roundedClass} overflow-hidden ${heightClass}`}>
         {animated ? (
           <motion.div
-            initial={{ width: 0 }}
+            initial={{ width: '2px' }}
             animate={{ width: `${percentage}%` }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className={`h-full ${colorClass} ${roundedClass}`}
@@ -85,7 +86,7 @@ export function ProgressBar({
       </div>
     </div>
   );
-}
+});
 
 /**
  * Segmented Progress Bar - for multi-step processes

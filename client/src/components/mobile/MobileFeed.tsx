@@ -1,9 +1,14 @@
 /**
  * Mobile Feed
  * Card-based feed with stories, posts, and engagement
+ * 
+ * Performance optimizations:
+ * - useMemo for expensive calculations (streak, questionCounts)
+ * - Stable callback references for child components
  */
 
 import { useLocation } from 'wouter';
+import { useMemo } from 'react';
 import { useChannelStats } from '../../hooks/use-stats';
 import { useUserPreferences } from '../../context/UserPreferencesContext';
 import { useProgress, useGlobalStats } from '../../hooks/use-progress';
@@ -54,11 +59,21 @@ export function MobileFeed() {
   const { stats: activityStats } = useGlobalStats();
   const subscribedChannels = getSubscribedChannels();
 
-  const questionCounts: Record<string, number> = {};
-  channelStats.forEach(s => { questionCounts[s.id] = s.total; });
+  // Memoize question counts to avoid recalculation on every render
+  const questionCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    channelStats.forEach(s => { counts[s.id] = s.total; });
+    return counts;
+  }, [channelStats]);
 
-  const totalQuestions = channelStats.reduce((sum, s) => sum + s.total, 0);
-  const streak = (() => {
+  // Memoize total questions calculation
+  const totalQuestions = useMemo(() => 
+    channelStats.reduce((sum, s) => sum + s.total, 0),
+    [channelStats]
+  );
+
+  // Memoize streak calculation to avoid expensive loop on every render
+  const streak = useMemo(() => {
     let s = 0;
     for (let i = 0; i < 365; i++) {
       const d = new Date();
@@ -67,7 +82,7 @@ export function MobileFeed() {
       else break;
     }
     return s;
-  })();
+  }, [activityStats]);
 
   // Memoize these checks to avoid re-running on every render
   // Check if user has started learning (visited any channel)

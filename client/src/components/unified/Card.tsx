@@ -9,7 +9,7 @@
  */
 
 import { motion, HTMLMotionProps } from 'framer-motion';
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 import { Skeleton, SkeletonText } from '../mobile/SkeletonLoader';
 
 export type CardVariant = 'default' | 'elevated' | 'outline' | 'ghost';
@@ -30,38 +30,38 @@ interface CardProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
 
 const variantClasses: Record<CardVariant, string> = {
   default: 'bg-card border border-border',
-  elevated: 'bg-card border border-border shadow-lg',
+  elevated: 'bg-card border border-border shadow-gh-md',
   outline: 'bg-transparent border border-border',
   ghost: 'bg-transparent'
 };
 
 const hoverVariantClasses: Record<CardVariant, string> = {
-  default: 'hover:border-primary/40 hover:shadow-md',
-  elevated: 'hover:border-primary/40 hover:shadow-lg',
+  default: 'hover:border-primary/40 hover:shadow-gh-sm',
+  elevated: 'hover:border-primary/40 hover:shadow-gh-md',
   outline: 'hover:border-primary/40',
   ghost: ''
 };
 
 const sizeClasses: Record<CardSize, string> = {
-  sm: 'p-3',
-  md: 'p-4',
-  lg: 'p-6',
-  xl: 'p-8'
+  sm: 'p-2',  // 8px - compact
+  md: 'p-3',  // 16px - standard
+  lg: 'p-4',  // 24px - spacious
+  xl: 'p-5'   // 32px - large
 };
 
 const roundedClasses: Record<CardRounded, string> = {
-  default: 'rounded-lg',
-  lg: 'rounded-lg',
-  xl: 'rounded-xl',
-  '2xl': 'rounded-2xl',
+  default: 'rounded-md', // GitHub standard: 6px border-radius
+  lg: 'rounded-md',
+  xl: 'rounded-lg',
+  '2xl': 'rounded-xl',
   full: 'rounded-full'
 };
 
-export function Card({
+export const Card = memo(function Card({
   children,
   variant = 'default',
   size = 'md',
-  rounded = 'xl',
+  rounded = 'default', // GitHub standard: rounded-md (6px)
   hoverable = false,
   clickable = false,
   gradient = false,
@@ -75,6 +75,10 @@ export function Card({
   
   const hoverClass = hoverable 
     ? `${hoverVariantClasses[variant]} transition-all duration-200` 
+    : '';
+  
+  const focusClass = hoverable || clickable
+    ? 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
     : '';
   
   const clickableClass = clickable 
@@ -113,7 +117,7 @@ export function Card({
     <motion.div
       className={`
         ${baseClasses} ${paddingClass} ${roundedClass}
-        ${hoverClass} ${clickableClass} ${gradientClass}
+        ${hoverClass} ${clickableClass} ${focusClass} ${gradientClass}
         ${className}
       `}
       {...motionProps}
@@ -121,7 +125,7 @@ export function Card({
       {children}
     </motion.div>
   );
-}
+});
 
 /**
  * Card Header - Consistent header section
@@ -282,13 +286,13 @@ export function StatCard({
           <p className="text-sm text-muted-foreground mb-1">{label}</p>
           <p className="text-2xl font-bold">{value}</p>
           {trend !== undefined && (
-            <p className={`text-xs mt-1 ${trend >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+            <p className={`text-xs mt-1 ${trend >= 0 ? 'text-gh-success' : 'text-gh-danger'}`}>
               {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
             </p>
           )}
         </div>
         {icon && (
-          <div className="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+          <div className="w-10 h-10 rounded-md bg-gh-accent-subtle flex items-center justify-center text-gh-accent flex-shrink-0">
             {icon}
           </div>
         )}

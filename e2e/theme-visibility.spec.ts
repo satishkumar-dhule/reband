@@ -11,11 +11,11 @@ test.describe('Theme Visibility Tests', () => {
   });
 
   test('Search modal text visible in light mode', async ({ page }) => {
-    // Switch to light mode
+    // Switch to light mode using actual theme values
     await page.evaluate(() => {
-      document.documentElement.setAttribute('data-theme', 'genz-light');
-      document.documentElement.classList.add('genz-light');
-      document.documentElement.classList.remove('genz-dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
     });
 
     // Open search modal
@@ -49,11 +49,11 @@ test.describe('Theme Visibility Tests', () => {
   });
 
   test('Search modal text visible in dark mode', async ({ page }) => {
-    // Switch to dark mode
+    // Switch to dark mode using actual theme values
     await page.evaluate(() => {
-      document.documentElement.setAttribute('data-theme', 'genz-dark');
-      document.documentElement.classList.add('genz-dark');
-      document.documentElement.classList.remove('genz-light');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
     });
 
     // Open search modal
@@ -81,11 +81,11 @@ test.describe('Theme Visibility Tests', () => {
       await page.waitForTimeout(1000);
     }
 
-    // Switch to light mode
+    // Switch to light mode using actual theme values
     await page.evaluate(() => {
-      document.documentElement.setAttribute('data-theme', 'genz-light');
-      document.documentElement.classList.add('genz-light');
-      document.documentElement.classList.remove('genz-dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
     });
     await page.waitForTimeout(500);
 
@@ -117,11 +117,11 @@ test.describe('Theme Visibility Tests', () => {
     await page.goto('/bookmarks');
     await page.waitForTimeout(1000);
 
-    // Switch to light mode
+    // Switch to light mode using actual theme values
     await page.evaluate(() => {
-      document.documentElement.setAttribute('data-theme', 'genz-light');
-      document.documentElement.classList.add('genz-light');
-      document.documentElement.classList.remove('genz-dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
     });
     await page.waitForTimeout(500);
 

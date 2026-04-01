@@ -628,7 +628,7 @@ input + input {
 
   /* Foreground / text */
   --gh-fg: #1f2328;
-  --gh-fg-muted: #636c76;
+  --gh-fg-muted: #59636e;
   --gh-fg-subtle: #6e7781;
   --gh-fg-on-emphasis: #ffffff;
 
@@ -769,10 +769,10 @@ input + input {
 .gh-btn-primary {
   background-color: var(--gh-success-emphasis);
   border-color: rgba(31,35,40,0.15);
-  color: #ffffff;
+  color: var(--gh-fg-on-emphasis);
 }
 .gh-btn-primary:hover {
-  background-color: #1a7f37;
+  background-color: var(--gh-success-fg);
 }
 .gh-btn-secondary {
   background-color: var(--gh-canvas-subtle);
@@ -785,10 +785,10 @@ input + input {
 .gh-btn-danger {
   background-color: var(--gh-danger-emphasis);
   border-color: rgba(31,35,40,0.15);
-  color: #ffffff;
+  color: var(--gh-fg-on-emphasis);
 }
 .gh-btn-danger:hover {
-  background-color: #b91c1c;
+  background-color: var(--gh-danger-fg);
 }
 .gh-btn-outline {
   background-color: transparent;
@@ -818,29 +818,29 @@ input + input {
   border: 1px solid transparent;
 }
 .gh-label-blue {
-  background-color: #ddf4ff;
-  color: #0550ae;
-  border-color: #80ccff;
+  background-color: var(--gh-accent-subtle);
+  color: var(--gh-accent-hover);
+  border-color: var(--gh-accent-fg);
 }
 .gh-label-green {
   background-color: var(--gh-success-subtle);
   color: var(--gh-success-fg);
-  border-color: #82cfaf;
+  border-color: var(--gh-success-subtle);
 }
 .gh-label-yellow {
   background-color: var(--gh-attention-subtle);
   color: var(--gh-attention-fg);
-  border-color: #eac54f;
+  border-color: var(--gh-attention-hover);
 }
 .gh-label-red {
   background-color: var(--gh-danger-subtle);
   color: var(--gh-danger-fg);
-  border-color: #ffa198;
+  border-color: var(--gh-danger-subtle);
 }
 .gh-label-purple {
   background-color: var(--gh-done-subtle);
   color: var(--gh-done-fg);
-  border-color: #d2b2ff;
+  border-color: var(--gh-done-subtle);
 }
 .gh-label-gray {
   background-color: var(--gh-neutral-subtle);
@@ -870,7 +870,7 @@ input + input {
 }
 .gh-tab.active {
   color: var(--gh-fg);
-  border-bottom-color: #fd8c73;
+  border-bottom-color: var(--gh-attention-hover);
 }
 
 /* Page header */

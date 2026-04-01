@@ -135,7 +135,6 @@ export default function ReviewSessionOptimized() {
         
         // Check for checkpoint AFTER updating count
         if (newCount % 5 === 0 && nextIndex < dueCards.length) {
-          console.log(`[Checkpoint] Triggering at question ${newCount}`);
           setSessionState('checkpoint');
           return nextIndex;
         }
@@ -155,7 +154,6 @@ export default function ReviewSessionOptimized() {
   }, [currentCard, currentQuestion, dueCards, onSRSReview, trackEvent, triggerHaptic, loadQuestion]);
 
   const handleCheckpointComplete = useCallback((checkpointScore: number) => {
-    console.log(`[Checkpoint] Completed with score: ${checkpointScore}`);
     triggerHaptic('heavy');
     if (currentIndex < dueCards.length) {
       loadQuestion(dueCards[currentIndex]);

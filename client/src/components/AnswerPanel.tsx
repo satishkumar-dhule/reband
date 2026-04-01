@@ -212,10 +212,10 @@ function ExpandableCard({
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
   const variantStyles = {
-    default: 'bg-card border-border',
-    highlight: 'bg-[var(--gh-accent-emphasis)]/5 border-[var(--gh-accent-emphasis)]/20',
-    success: 'bg-gh-success-subtle border-gh-success/20',
-    purple: 'bg-gh-done-subtle border-gh-done/20',
+    default: 'bg-card border border-border',
+    highlight: 'bg-[var(--gh-accent-emphasis)]/5 border border-[var(--gh-accent-emphasis)]/20',
+    success: 'bg-gh-success-subtle border border-gh-success/20',
+    purple: 'bg-gh-done-subtle border border-gh-done/20',
   };
 
   const iconStyles = {
@@ -226,7 +226,7 @@ function ExpandableCard({
   };
 
   return (
-    <div className={`rounded-lg border overflow-hidden ${variantStyles[variant]}`}>
+    <div className={`rounded-md border overflow-hidden ${variantStyles[variant]}`}>
       <Button
         variant="ghost"
         size="sm"
@@ -488,7 +488,17 @@ export function AnswerPanel({ question }: AnswerPanelProps) {
 
   // Fetch blog post info for this question
   useEffect(() => {
-    BlogService.getByQuestionId(question.id).then(setBlogPost);
+    const controller = new AbortController();
+    
+    BlogService.getByQuestionId(question.id)
+      .then(setBlogPost)
+      .catch((err) => {
+        if (err.name === 'AbortError') return;
+        console.error('Failed to fetch blog post:', err);
+        setBlogPost(null);
+      });
+    
+    return () => controller.abort();
   }, [question.id]);
 
   // On mobile, diagrams don't render, so don't show the tab
@@ -584,16 +594,16 @@ export function AnswerPanel({ question }: AnswerPanelProps) {
           },
           table({ children }) {
             return (
-              <div className="my-2 overflow-x-auto">
+              <div className="my-2 overflow-x-auto rounded border border-[var(--gh-border)]">
                 <table className="w-full border-collapse text-sm">{children}</table>
               </div>
             );
           },
           th({ children }) {
-            return <th className="px-2 py-1.5 text-left font-semibold bg-muted border border-border text-xs">{children}</th>;
+            return <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border)] text-[var(--gh-fg-muted)]">{children}</th>;
           },
           td({ children }) {
-            return <td className="px-2 py-1.5 border border-border text-sm">{children}</td>;
+            return <td className="px-4 py-3 border-b border-[var(--gh-border)] text-sm text-[var(--gh-fg)]">{children}</td>;
           },
         }}
       >

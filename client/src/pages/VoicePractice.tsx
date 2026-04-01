@@ -91,6 +91,16 @@ export default function VoicePractice() {
   
   const currentQuestion = questions[currentIndex];
   const targetWords = currentQuestion?.answer ? countWords(currentQuestion.answer) : 0;
+  
+  // Refs to avoid stale closures in callbacks - initialized after currentQuestion
+  const transcriptRef = useRef(transcript);
+  const currentQuestionRef = useRef(currentQuestion);
+  const durationRef = useRef(duration);
+  const modeRef = useRef(mode);
+  transcriptRef.current = transcript;
+  currentQuestionRef.current = currentQuestion;
+  durationRef.current = duration;
+  modeRef.current = mode;
 
   // Keep recording state ref in sync
   useEffect(() => {
@@ -185,7 +195,6 @@ export default function VoicePractice() {
       }
     },
     onStart: () => {
-      console.log('Speech recognition started');
       setRecognitionReady(true);
     }
   });
@@ -220,16 +229,10 @@ export default function VoicePractice() {
 
   // Start recording
   const startRecording = useCallback(() => {
-    console.log('=== START RECORDING CLICKED ===');
-    console.log('Timestamp:', new Date().toISOString());
-    
     // Check microphone permissions first
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      console.log('🎤 Checking microphone permissions...');
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
-          console.log('✅ Microphone access granted');
-          
           // Start MediaRecorder for audio playback
           try {
             audioChunksRef.current = [];
@@ -244,7 +247,6 @@ export default function VoicePractice() {
             mediaRecorder.onstop = () => {
               const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
               setAudioBlob(audioBlob);
-              console.log('✅ Audio recorded:', audioBlob.size, 'bytes');
               
               // Stop all tracks
               stream.getTracks().forEach(track => track.stop());
@@ -252,13 +254,11 @@ export default function VoicePractice() {
             
             mediaRecorder.start();
             mediaRecorderRef.current = mediaRecorder;
-            console.log('✅ MediaRecorder started');
           } catch (err) {
-            console.error('❌ MediaRecorder error:', err);
+            console.error('MediaRecorder error:', err);
           }
           
           // Now start speech recognition
-          console.log('🎤 Starting speech recognition...');
           setTranscript('');
           setInterimTranscript('');
           setFeedback(null);
@@ -268,22 +268,18 @@ export default function VoicePractice() {
           
           try {
             startRecognition();
-            console.log('✅ recognition.start() called');
             setRecordingState('recording');
-            console.log('✅ Recording state set to "recording"');
           } catch (err: any) {
-            console.error('❌ Failed to start recognition:', err);
+            console.error('Failed to start recognition:', err);
             if (err.message && err.message.includes('already started')) {
-              console.log('⚠️ Recognition already running, stopping first...');
               try {
                 stopRecognition();
                 setTimeout(() => {
                   try {
                     startRecognition();
                     setRecordingState('recording');
-                    console.log('✅ Recognition restarted successfully');
                   } catch (e) {
-                    console.error('❌ Failed to restart:', e);
+                    console.error('Failed to restart:', e);
                     toast({
                       title: "Failed to Start Recording",
                       description: "Please refresh the page and try again.",
@@ -292,7 +288,7 @@ export default function VoicePractice() {
                   }
                 }, 100);
               } catch (e) {
-                console.error('❌ Failed to stop/restart:', e);
+                console.error('Failed to stop/restart:', e);
               }
             } else {
               toast({
@@ -304,7 +300,7 @@ export default function VoicePractice() {
           }
         })
         .catch(err => {
-          console.error('❌ Microphone access denied:', err);
+          console.error('Microphone access denied:', err);
           toast({
             title: "Microphone Access Required",
             description: "Please allow microphone access in your browser settings.",
@@ -312,7 +308,7 @@ export default function VoicePractice() {
           });
         });
     } else {
-      console.error('❌ getUserMedia not supported');
+      console.error('getUserMedia not supported');
       toast({
         title: "Microphone Access Not Supported",
         description: "Your browser does not support microphone access. Please use Chrome, Edge, or Safari.",
@@ -333,25 +329,25 @@ export default function VoicePractice() {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       try {
         mediaRecorderRef.current.stop();
-        console.log('✅ MediaRecorder stopped');
       } catch (e) {
-        console.error('❌ Failed to stop MediaRecorder:', e);
+        console.error('Failed to stop MediaRecorder:', e);
       }
     }
     
     setRecordingState('recorded');
     
-    // Calculate feedback
-    if (currentQuestion) {
-      const result = calculateFeedback(transcript, currentQuestion.answer, duration);
+    // Calculate feedback using refs to avoid stale closures
+    const question = currentQuestionRef.current;
+    if (question) {
+      const result = calculateFeedback(transcriptRef.current, question.answer, durationRef.current);
       setFeedback(result);
       
       // In interview mode, reveal answer after recording
-      if (mode === 'interview') {
+      if (modeRef.current === 'interview') {
         setShowAnswer(true);
       }
     }
-  }, [transcript, currentQuestion, duration, mode]);
+  }, [stopRecognition]);
 
   // Reset for new question
   const resetForNewQuestion = useCallback(() => {
@@ -387,7 +383,6 @@ export default function VoicePractice() {
       
       audio.onplay = () => {
         setIsPlayingAudio(true);
-        console.log('🔊 Playing recorded audio');
       };
       
       audio.onended = () => {
@@ -396,7 +391,6 @@ export default function VoicePractice() {
           URL.revokeObjectURL(audioUrlRef.current);
           audioUrlRef.current = null;
         }
-        console.log('✅ Audio playback finished');
       };
       
       audio.onerror = (e) => {
@@ -598,60 +592,6 @@ export default function VoicePractice() {
 
           {/* Main Content */}
           <main className="max-w-4xl mx-auto px-4 py-6">
-            {/* Debug Info Panel */}
-            <div className="mb-4 p-4 bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-xl">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="text-2xl">🔍</div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-[var(--gh-fg)] mb-2">System Status</h3>
-                  <div className="grid grid-cols-2 gap-2 text-xs font-mono text-[var(--gh-fg-muted)]">
-                    <div>Speech API: <span className={isSpeechRecognitionSupported ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}>{isSpeechRecognitionSupported ? '✓ Available' : '✗ Not Available'}</span></div>
-                    <div>Recognition: <span className={recognitionReady ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-attention-fg)]'}>{recognitionReady ? '✓ Ready' : '⏳ Initializing...'}</span></div>
-                    <div>Protocol: <span className="text-[var(--gh-fg)]">{typeof window !== 'undefined' ? window.location.protocol : 'unknown'}</span></div>
-                    <div>Recording: <span className="text-[var(--gh-fg)]">{recordingState}</span></div>
-                  </div>
-                </div>
-              </div>
-              
-              {!isSpeechRecognitionSupported && (
-                <div className="p-3 bg-[var(--gh-danger-fg)]/10 border border-[var(--gh-danger-fg)]/30 rounded-lg text-sm">
-                  <div className="font-semibold text-[var(--gh-danger-fg)] mb-1">⚠️ Browser Not Supported</div>
-                  <div className="text-[var(--gh-fg-muted)]">
-                    Please use Chrome, Edge, or Safari. Firefox is not supported.
-                  </div>
-                </div>
-              )}
-              
-              {isSpeechRecognitionSupported && !recognitionReady && (
-                <div className="p-3 bg-[var(--gh-attention-fg)]/10 border border-[var(--gh-attention-fg)]/30 rounded-lg text-sm">
-                  <div className="font-semibold text-[var(--gh-attention-fg)] mb-1">⏳ Initializing...</div>
-                  <div className="text-[var(--gh-fg-muted)]">
-                    Setting up speech recognition. If this takes too long, check console (F12).
-                  </div>
-                </div>
-              )}
-              
-              {isSpeechRecognitionSupported && recognitionReady && (
-                <div className="p-3 bg-[var(--gh-success-fg)]/10 border border-[var(--gh-success-fg)]/30 rounded-lg text-sm">
-                  <div className="font-semibold text-[var(--gh-success-fg)] mb-1">✓ Ready to Record</div>
-                  <div className="text-[var(--gh-fg-muted)]">
-                    Click "Start Recording" and allow microphone access when prompted.
-                  </div>
-                </div>
-              )}
-              
-              <div className="mt-3 pt-3 border-t border-[var(--gh-border)] text-xs text-[var(--gh-fg-subtle)]">
-                💡 <strong>Troubleshooting:</strong> Open browser console (F12) to see detailed logs. 
-                <a 
-                  href="/test-speech-recognition.html" 
-                  target="_blank"
-                  className="ml-2 text-[var(--gh-accent-fg)] hover:underline"
-                >
-                  Run diagnostic test →
-                </a>
-              </div>
-            </div>
-            
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentQuestion.id}

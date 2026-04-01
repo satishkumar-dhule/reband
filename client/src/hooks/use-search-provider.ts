@@ -14,11 +14,17 @@ export function useSearchProvider() {
 
   // Check if Pagefind is available
   useEffect(() => {
+    const controller = new AbortController();
+    
     async function checkPagefind() {
       try {
-        const response = await fetch('/pagefind/pagefind.js', { method: 'HEAD' });
+        const response = await fetch('/pagefind/pagefind.js', { method: 'HEAD', signal: controller.signal });
         setPagefindAvailable(response.ok);
-      } catch {
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          // Request was cancelled, do nothing
+          return;
+        }
         // Silently fail - Pagefind not available in dev mode
         setPagefindAvailable(false);
       }
@@ -30,6 +36,8 @@ export function useSearchProvider() {
       // In dev mode, default to fuzzy search
       setPagefindAvailable(false);
     }
+    
+    return () => controller.abort();
   }, []);
 
   const setSearchProvider = (newProvider: SearchProvider) => {

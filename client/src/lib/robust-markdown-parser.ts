@@ -100,9 +100,16 @@ export function structureMarkdownContent(text: string): {
 }[] {
   const parsed = parseRobustMarkdown(text);
   const lines = parsed.split('\n');
-  const blocks: any[] = [];
   
-  let currentBlock: any = null;
+  type MarkdownBlock = 
+    | { type: 'paragraph'; content: string; items?: undefined }
+    | { type: 'list'; content: string; items: string[] }
+    | { type: 'heading'; content: string; items?: undefined }
+    | { type: 'code'; content: string; items?: undefined };
+  
+  const blocks: MarkdownBlock[] = [];
+  
+  let currentBlock: MarkdownBlock | null = null;
   
   for (const line of lines) {
     const trimmed = line.trim();
@@ -119,7 +126,7 @@ export function structureMarkdownContent(text: string): {
     if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
       if (!currentBlock || currentBlock.type !== 'list') {
         if (currentBlock) blocks.push(currentBlock);
-        currentBlock = { type: 'list', items: [] };
+        currentBlock = { type: 'list', content: '', items: [] };
       }
       currentBlock.items.push(trimmed.substring(2));
     }

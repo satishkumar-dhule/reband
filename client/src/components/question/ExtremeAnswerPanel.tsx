@@ -91,7 +91,7 @@ function isValidMermaidDiagram(diagram: string | undefined | null): boolean {
   const trimmed = diagram.trim();
   if (!trimmed || trimmed.length < 10) return false;
   const validStarts = ['graph', 'flowchart', 'sequenceDiagram', 'classDiagram', 'stateDiagram', 'erDiagram', 'journey', 'gantt', 'pie', 'gitGraph', 'mindmap', 'timeline', 'quadrantChart', 'sankey', 'xychart', 'block'];
-  const firstLine = trimmed.split('\n')[0].toLowerCase().trim();
+  const firstLine = trimmed.split('\n')[0]?.toLowerCase().trim() || '';
   const hasValidStart = validStarts.some(start => firstLine.startsWith(start.toLowerCase()));
   if (!hasValidStart) return false;
   const lines = trimmed.split('\n').filter(line => {
@@ -180,8 +180,8 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
           margin: 0, 
           padding: '1.5rem', 
           background: 'transparent',
-          fontSize: '0.875rem',
-          lineHeight: '1.6',
+          fontSize: 'var(--text-sm)',
+          lineHeight: 'var(--leading-mono)',
         }}
         wrapLines={true}
         wrapLongLines={true}
@@ -435,7 +435,17 @@ export function ExtremeAnswerPanel({ question }: ExtremeAnswerPanelProps) {
   const [blogPost, setBlogPost] = useState<{ title: string; slug: string; url: string } | null>(null);
 
   useEffect(() => {
-    BlogService.getByQuestionId(question.id).then(setBlogPost);
+    const controller = new AbortController();
+    
+    BlogService.getByQuestionId(question.id)
+      .then(setBlogPost)
+      .catch((err) => {
+        if (err.name === 'AbortError') return;
+        console.error('Failed to fetch blog post:', err);
+        setBlogPost(null);
+      });
+    
+    return () => controller.abort();
   }, [question.id]);
 
   const hasTldr = !!question.answer;
@@ -530,16 +540,16 @@ export function ExtremeAnswerPanel({ question }: ExtremeAnswerPanelProps) {
           },
           table({ children }) {
             return (
-              <div className="my-4 overflow-x-auto">
+              <div className="my-4 overflow-x-auto rounded border border-[var(--gh-border)]">
                 <table className="w-full border-collapse text-xs sm:text-sm">{children}</table>
               </div>
             );
           },
           th({ children }) {
-            return <th className="px-3 py-2 text-left font-bold bg-muted border border-border text-xs sm:text-sm text-foreground">{children}</th>;
+            return <th className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border)] text-[var(--gh-fg-muted)]">{children}</th>;
           },
           td({ children }) {
-            return <td className="px-3 py-2 border border-border text-xs sm:text-sm text-foreground">{children}</td>;
+            return <td className="px-4 py-3 border-b border-[var(--gh-border)] text-xs sm:text-sm text-[var(--gh-fg)]">{children}</td>;
           },
         }}
       >

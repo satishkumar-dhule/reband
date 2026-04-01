@@ -1,10 +1,10 @@
-# Learn_Reels Roadmap
+# DevPrep / Open-Interview Roadmap
 
-This document outlines the planned features and improvements for Learn_Reels.
+This document outlines the planned features and improvements for DevPrep / Open-Interview.
 
 ## Vision
 
-Learn_Reels aims to become the most comprehensive, interactive platform for technical interview preparation with community-driven content and AI-powered learning.
+DevPrep (formerly Learn_Reels, now Open-Interview) aims to become the most comprehensive, interactive platform for technical interview preparation with community-driven content and AI-powered learning.
 
 ## Current Status (v2.1.0)
 
