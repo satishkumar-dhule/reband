@@ -1,0 +1,57 @@
+[
+  {
+    "url": "https://open-interview.github.io/",
+    "loadMs": 232,
+    "timing": {
+      "navigationStart": 1775045459929,
+      "domContentLoadedEventEnd": 1775045460161,
+      "loadEventEnd": 1775045460161
+    },
+    "screenshot": "perf/screenshots/open-interview_github_io_.png",
+    "timestamp": "2026-04-01T12:10:59.760Z"
+  },
+  {
+    "url": "https://open-interview.github.io/channel-browser",
+    "loadMs": 116,
+    "timing": {
+      "navigationStart": 1775045460680,
+      "domContentLoadedEventEnd": 1775045460796,
+      "loadEventEnd": 1775045460796
+    },
+    "screenshot": "perf/screenshots/open-interview_github_io_channel-browser.png",
+    "timestamp": "2026-04-01T12:11:00.391Z"
+  },
+  {
+    "url": "https://open-interview.github.io/login",
+    "loadMs": 105,
+    "timing": {
+      "navigationStart": 1775045461361,
+      "domContentLoadedEventEnd": 1775045461466,
+      "loadEventEnd": 1775045461466
+    },
+    "screenshot": "perf/screenshots/open-interview_github_io_login.png",
+    "timestamp": "2026-04-01T12:11:01.092Z"
+  },
+  {
+    "url": "https://open-interview.github.io/channel/algorithms",
+    "loadMs": 118,
+    "timing": {
+      "navigationStart": 1775045462017,
+      "domContentLoadedEventEnd": 1775045462135,
+      "loadEventEnd": 1775045462135
+    },
+    "screenshot": "perf/screenshots/open-interview_github_io_channel_algorithms.png",
+    "timestamp": "2026-04-01T12:11:01.752Z"
+  },
+  {
+    "url": "https://open-interview.github.io/interview",
+    "loadMs": 123,
+    "timing": {
+      "navigationStart": 1775045462851,
+      "domContentLoadedEventEnd": 1775045462965,
+      "loadEventEnd": 1775045462974
+    },
+    "screenshot": "perf/screenshots/open-interview_github_io_interview.png",
+    "timestamp": "2026-04-01T12:11:02.586Z"
+  }
+]

@@ -1,0 +1,96 @@
+/**
+ * Icon Component Styles
+ * 
+ * CSS Module for Icon component with design token integration.
+ * Supports dark mode via CSS custom properties.
+ */
+
+/* Base icon styles */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  transition: color var(--animation-duration-fast, 100ms) var(--animation-easing-ease-out, ease-out);
+}
+
+/* Size variants */
+.size-sm {
+  width: 16px;
+  height: 16px;
+}
+
+.size-md {
+  width: 24px;
+  height: 24px;
+}
+
+.size-lg {
+  width: 32px;
+  height: 32px;
+}
+
+/* Color variants */
+.color-default {
+  color: var(--gh-fg);
+}
+
+.color-muted {
+  color: var(--gh-fg-muted);
+}
+
+.color-accent {
+  color: var(--gh-accent-fg);
+}
+
+.color-error {
+  color: var(--gh-danger-fg);
+}
+
+.color-success {
+  color: var(--gh-success-fg);
+}
+
+.color-warning {
+  color: var(--gh-attention-fg);
+}
+
+.color-inherit {
+  color: inherit;
+}
+
+/* Dark mode support via data-theme attribute is handled by github-tokens.css */
+@media (prefers-color-scheme: dark) {
+  .color-default {
+    color: var(--gh-fg);
+  }
+
+  .color-muted {
+    color: var(--gh-fg-muted);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .icon {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .color-muted {
+    color: var(--color-text-primary, #24292f);
+  }
+}
+
+/* Focus styles for interactive icons */
+.icon:focus-visible {
+  outline: 2px solid var(--color-primary-500, #0969da);
+  outline-offset: 2px;
+  border-radius: var(--spacing-1, 0.25rem);
+}

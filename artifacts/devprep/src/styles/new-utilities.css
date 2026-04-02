@@ -1,0 +1,561 @@
+@layer utilities {
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  
+  .text-clip {
+    @apply overflow-hidden text-ellipsis whitespace-nowrap;
+  }
+  
+  .text-truncate {
+    @apply overflow-hidden text-ellipsis whitespace-nowrap;
+  }
+  
+  .text-ellipsis {
+    text-overflow: ellipsis;
+  }
+  
+  /* Display utilities */
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+  
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+  
+  .flex-start {
+    @apply flex items-center justify-start;
+  }
+  
+  .flex-end {
+    @apply flex items-center justify-end;
+  }
+  
+  .grid-center {
+    @apply grid place-items-center;
+  }
+  
+  /* Size utilities */
+  .size-0 {
+    @apply w-0 h-0;
+  }
+  
+  .size-px {
+    @apply w-[1px] h-[1px];
+  }
+  
+  .size-0-5 {
+    @apply w-[2px] h-[2px];
+  }
+  
+  .size-1 {
+    @apply w-[4px] h-[4px];
+  }
+  
+  .size-1-5 {
+    @apply w-[6px] h-[6px];
+  }
+  
+  .size-2 {
+    @apply w-[8px] h-[8px];
+  }
+  
+  .size-2-5 {
+    @apply w-[10px] h-[10px];
+  }
+  
+  .size-3 {
+    @apply w-[12px] h-[12px];
+  }
+  
+  .size-3-5 {
+    @apply w-[14px] h-[14px];
+  }
+  
+  .size-4 {
+    @apply w-[16px] h-[16px];
+  }
+  
+  .size-5 {
+    @apply w-[20px] h-[20px];
+  }
+  
+  .size-6 {
+    @apply w-[24px] h-[24px];
+  }
+  
+  .size-7 {
+    @apply w-[28px] h-[28px];
+  }
+  
+  .size-8 {
+    @apply w-[32px] h-[32px];
+  }
+  
+  .size-9 {
+    @apply w-[36px] h-[36px];
+  }
+  
+  .size-10 {
+    @apply w-[40px] h-[40px];
+  }
+  
+  .size-11 {
+    @apply w-[44px] h-[44px];
+  }
+  
+  .size-12 {
+    @apply w-[48px] h-[48px];
+  }
+  
+  .size-14 {
+    @apply w-[56px] h-[56px];
+  }
+  
+  .size-16 {
+    @apply w-[64px] h-[64px];
+  }
+  
+  .size-20 {
+    @apply w-[80px] h-[80px];
+  }
+  
+  .size-24 {
+    @apply w-[96px] h-[96px];
+  }
+  
+  .size-28 {
+    @apply w-[112px] h-[112px];
+  }
+  
+  .size-32 {
+    @apply w-[128px] h-[128px];
+  }
+  
+  .size-36 {
+    @apply w-[144px] h-[144px];
+  }
+  
+  .size-40 {
+    @apply w-[160px] h-[160px];
+  }
+  
+  .size-44 {
+    @apply w-[176px] h-[176px];
+  }
+  
+  .size-48 {
+    @apply w-[192px] h-[192px];
+  }
+  
+  .size-52 {
+    @apply w-[208px] h-[208px];
+  }
+  
+  .size-56 {
+    @apply w-[224px] h-[224px];
+  }
+  
+  .size-60 {
+    @apply w-[240px] h-[240px];
+  }
+  
+  .size-64 {
+    @apply w-[256px] h-[256px];
+  }
+  
+  .size-72 {
+    @apply w-[288px] h-[288px];
+  }
+  
+  .size-80 {
+    @apply w-[320px] h-[320px];
+  }
+  
+  .size-96 {
+    @apply w-[384px] h-[384px];
+  }
+  
+  /* Aspect ratio utilities */
+  .ratio-1x1 {
+    @apply aspect-[1/1];
+  }
+  
+  .ratio-4x3 {
+    @apply aspect-[4/3];
+  }
+  
+  .ratio-16x9 {
+    @apply aspect-[16/9];
+  }
+  
+  .ratio-21x9 {
+    @apply aspect-[21/9];
+  }
+  
+  .ratio-3x2 {
+    @apply aspect-[3/2];
+  }
+  
+  .ratio-2x3 {
+    @apply aspect-[2/3];
+  }
+  
+  .ratio-9x16 {
+    @apply aspect-[9/16];
+  }
+  
+  /* Opacity utilities */
+  .opacity-0 {
+    @apply opacity-0;
+  }
+  
+  .opacity-5 {
+    @apply opacity-5;
+  }
+  
+  .opacity-10 {
+    @apply opacity-10;
+  }
+  
+  .opacity-20 {
+    @apply opacity-20;
+  }
+  
+  .opacity-25 {
+    @apply opacity-25;
+  }
+  
+  .opacity-30 {
+    @apply opacity-30;
+  }
+  
+  .opacity-40 {
+    @apply opacity-40;
+  }
+  
+  .opacity-50 {
+    @apply opacity-50;
+  }
+  
+  .opacity-60 {
+    @apply opacity-60;
+  }
+  
+  .opacity-70 {
+    @apply opacity-70;
+  }
+  
+  .opacity-75 {
+    @apply opacity-75;
+  }
+  
+  .opacity-80 {
+    @apply opacity-80;
+  }
+  
+  .opacity-90 {
+    @apply opacity-90;
+  }
+  
+  .opacity-95 {
+    @apply opacity-95;
+  }
+  
+  .opacity-100 {
+    @apply opacity-100;
+  }
+  
+  /* Shadow utilities */
+  .shadow-xs {
+    @apply shadow-sm;
+  }
+  
+  .shadow-sm {
+    @apply shadow-md;
+  }
+  
+  .shadow-md {
+    @apply shadow-lg;
+  }
+  
+  .shadow-lg {
+    @apply shadow-xl;
+  }
+  
+  .shadow-xl {
+    @apply shadow-2xl;
+  }
+  
+  .shadow-2xl {
+    @apply shadow-[0_25px_50px_-12px_rgb(0_0_0_/0.15),0_8px_16px_-4px_rgb(0_0_0_/0.05)];
+  }
+  
+  .shadow-inner {
+    @apply shadow-inner;
+  }
+  
+  .shadow-none {
+    @apply shadow-none;
+  }
+  
+  /* Ring utilities */
+  .ring-primary {
+    @apply ring-ring ring-offset-2;
+  }
+  
+  .ring-secondary {
+    @apply ring-ring-secondary ring-offset-2;
+  }
+  
+  .ring-accent {
+    @apply ring-ring-accent ring-offset-2;
+  }
+  
+  .ring-destructive {
+    @apply ring-ring-destructive ring-offset-2;
+  }
+  
+  .ring-muted {
+    @apply ring-ring-muted ring-offset-2;
+  }
+  
+  /* Transition utilities */
+  .transition-none {
+    @apply transition-none;
+  }
+  
+  .transition-all {
+    @apply transition-all;
+  }
+  
+  .transition-colors {
+    @apply transition-colors;
+  }
+  
+  .transition-opacity {
+    @apply transition-opacity;
+  }
+  
+  .transition-shadow {
+    @apply transition-shadow;
+  }
+  
+  .transition-transform {
+    @apply transition-transform;
+  }
+  
+  .transition-fast {
+    @apply duration-75;
+  }
+  
+  .transition-slow {
+    @apply duration-300;
+  }
+  
+  .ease-in {
+    @apply ease-in;
+  }
+  
+  .ease-out {
+    @apply ease-out;
+  }
+  
+  .ease-in-out {
+    @apply ease-in-out;
+  }
+  
+  /* Z-index utilities */
+  .z-index-0 {
+    @apply z-index-0;
+  }
+  
+  .z-index-10 {
+    @apply z-index-10;
+  }
+  
+  .z-index-20 {
+    @apply z-index-20;
+  }
+  
+  .z-index-30 {
+    @apply z-index-30;
+  }
+  
+  .z-index-40 {
+    @apply z-index-40;
+  }
+  
+  .z-index-50 {
+    @apply z-index-50;
+  }
+  
+  .z-index-modal {
+    @apply z-index-[1000];
+  }
+  
+  .z-index-popover {
+    @apply z-index-[1100];
+  }
+  
+  .z-index-tooltip {
+    @apply z-index-[1200];
+  }
+  
+  /* Container utilities */
+  .container-sm {
+    @apply max-w-sm w-full mx-auto;
+  }
+  
+  .container-md {
+    @apply max-w-md w-full mx-auto;
+  }
+  
+  .container-lg {
+    @apply max-w-lg w-full mx-auto;
+  }
+  
+  .container-xl {
+    @apply max-w-xl w-full mx-auto;
+  }
+  
+  .container-2xl {
+    @apply max-w-2xl w-full mx-auto;
+  }
+  
+  .container-3xl {
+    @apply max-w-3xl w-full mx-auto;
+  }
+  
+  .container-4xl {
+    @apply max-w-4xl w-full mx-auto;
+  }
+  
+  .container-5xl {
+    @apply max-w-5xl w-full mx-auto;
+  }
+  
+  .container-6xl {
+    @apply max-w-6xl w-full mx-auto;
+  }
+  
+  .container-full {
+    @apply max-w-[1440px] w-full mx-auto px-4;
+  }
+  
+  @media (min-width: 640px) {
+    .container-full {
+      @apply px-6;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .container-full {
+      @apply px-8;
+    }
+  }
+  
+  /* Divider utilities */
+  .divider-horizontal {
+    @apply border-t border-border my-4;
+  }
+  
+  .divider-vertical {
+    @apply border-l border-border mx-4;
+  }
+  
+  .divider-dashed {
+    @apply border-dashed;
+  }
+  
+  .divider-dotted {
+    @apply border-dotted;
+  }
+  
+  /* Scrollbar utilities */
+  .scrollbar-none {
+    @apply -ms-overflow-style:none scrollbar-width:none;
+  }
+  
+  .scrollbar-none::-webkit-scrollbar {
+    @apply hidden;
+  }
+  
+  .scrollbar-thin {
+    @apply scrollbar-thin;
+  }
+  
+  .scrollbar-default {
+    @apply scrollbar;
+  }
+  
+  /* Whitespace utilities */
+  .whitespace-nowrap {
+    @apply whitespace-nowrap;
+  }
+  
+  .whitespace-normal {
+    @apply whitespace-normal;
+  }
+  
+  .whitespace-pre {
+    @apply whitespace-pre;
+  }
+  
+  .whitespace-pre-line {
+    @apply whitespace-pre-line;
+  }
+  
+  .whitespace-pre-wrap {
+    @apply whitespace-pre-wrap;
+  }
+  
+  /* Break utilities */
+  .break-normal {
+    @apply break-normal;
+  }
+  
+  .break-words {
+    @apply break-words;
+  }
+  
+  .break-all {
+    @apply break-all;
+  }
+  
+  /* Font style utilities */
+  .font-italic {
+    @apply italic;
+  }
+  
+  .font-not-italic {
+    @apply not-italic;
+  }
+  
+  .font-mono {
+    @apply font-mono;
+  }
+  
+  .font-serif {
+    @apply font-serif;
+  }
+  
+  .font-sans {
+    @apply font-sans;
+  }
+  
+  /* Font smoothing utilities */
+  .antialiased {
+    @apply antialiased;
+  }
+  
+  .subpixel-antialiased {
+    @apply subpixel-antialiased;
+  }
+}

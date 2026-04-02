@@ -1,0 +1,47 @@
+[
+  {
+    "question": "What is the Android Activity lifecycle and why is it important?",
+    "answer": "The Android Activity lifecycle is a set of callback methods that manage an Activity's state from creation to destruction. The main states are: onCreate, onStart, onResume, onPause, onStop, and onDestroy. Understanding this lifecycle is crucial for preventing memory leaks, saving UI state, and ensuring smooth user experiences when navigating between screens or handling configuration changes like screen rotation.",
+    "explanation": "The Activity lifecycle consists of three key state pairs: (1) Entire visible lifetime - between onStart and onStop where the user can see the activity. (2) Foreground lifetime - between onResume and onPause where the activity is in the foreground and interactive. (3) Entire lifetime - between onCreate and onDestroy. Common issues arise when developers don't properly handle onPause/onResume for resource cleanup, don't save state in onSaveInstanceState, or leak memory by holding references in background callbacks. The lifecycle also affects how background services and broadcasts behave - for example, a service started in onCreate will continue running even when the user leaves the app until onDestroy is called.",
+    "difficulty": "beginner",
+    "subChannel": "general",
+    "tags": ["android", "activity", "lifecycle", "fundamentals"],
+    "companies": ["Google", "Meta", "Amazon", "Uber"]
+  },
+  {
+    "question": "Explain the Android Handler mechanism and when you would use it.",
+    "answer": "The Android Handler allows you to schedule messages and runnable tasks to be executed at some point in the future. It runs in conjunction with a Looper which continuously loops through a message queue. Handlers are essential for communicating between the main thread and background threads, enabling UI updates from background work without blocking the UI thread.",
+    "explanation": "Handlers work by posting messages or runnables to a MessageQueue which is managed by a Looper. Each thread can have only one Looper, attached automatically to the main thread but needing explicit setup in worker threads. Use cases include: updating UI after an AsyncTask or background thread completes, creating delayed operations, and implementing periodic tasks. However, handlers can cause memory leaks if the outer class (like an Activity) holds a strong reference to the handler, which is why you should use static inner classes with weak references to Activities. Modern alternatives include Kotlin coroutines and Java's ExecutorService which provide cleaner APIs for the same functionality.",
+    "difficulty": "intermediate",
+    "subChannel": "general",
+    "tags": ["android", "handler", "looper", "multithreading", "ui-threads"],
+    "companies": ["Google", "Twitter", "Spotify", "Airbnb"]
+  },
+  {
+    "question": "What are Jetpack Compose state management best practices?",
+    "answer": "Jetpack Compose manages state through State<T> objects and remember/rememberSaveable functions. Best practices include: using ViewModel to hold UI state, exposing StateFlow from ViewModels, using collectAsState() in composables, and avoiding passing mutable objects directly. The unidirectional data flow (UDF) pattern ensures state flows from ViewModel to UI and events flow from UI to ViewModel.",
+    "explanation": "State in Compose triggers recomposition when it changes. remember saves state across recompositions within the same composition, while rememberSaveable persists state across configuration changes. Key principles: (1) Always use val with State<T> instead of var, (2) Prefer immutable data classes for UI state, (3) Use derivedStateOf for expensive computations that should only recalculate when dependencies change, (4) Avoid mutableStateListOf when possible - prefer immutable lists with immutableStateOf(). The rememberSaveable caveat is that it doesn't work with complex objects without custom SaveableStateRegistry implementation. State hoisting - moving state up to the lowest common ancestor - makes composables testable and reusable. For large apps, consider using libraries like Molecule or Orbit for complex state management patterns.",
+    "difficulty": "intermediate",
+    "subChannel": "general",
+    "tags": ["android", "jetpack-compose", "state-management", "kotlin", "ui"],
+    "companies": ["Google", "Netflix", "Airbnb", "Uber"]
+  },
+  {
+    "question": "Describe the Android dependency injection patterns and when to use Hilt vs manual DI.",
+    "answer": "Dependency Injection (DI) in Android involves providing dependencies to classes rather than having them create instances. Manual DI uses constructors or passing dependencies manually. Hilt is Google's recommended DI framework built on top of Dagger, providing compile-time verification, reduced boilerplate through annotation processing, and standardized scoping. Use Hilt for medium-to-large apps with complex dependency graphs; use manual DI for simple projects or learning purposes.",
+    "explanation": "Hilt uses @HiltAndroidApp to trigger code generation, @AndroidEntryPoint for Activities/Fragments, and @Inject for constructors/fields. It automatically generates components based on @Module and @InstallIn annotations. Key advantages over manual DI: no manual construction code, guaranteed null safety at compile time, easy testing with @TestInstallIn, and standardized scoping (@Singleton, @ActivityScope). Hilt integrates with ViewModel via @HiltViewModel, with WorkManager via @WorkerInject, and with Navigation via @NavHostArg. However, Hilt adds build time from annotation processing and has a learning curve. Manual DI might be preferable for: very small apps, library code that shouldn't depend on Hilt, or teams transitioning from manual DI gradually. Comparison: Hilt reduces boilerplate but adds complexity; manual DI has more boilerplate but is more transparent.",
+    "difficulty": "intermediate",
+    "subChannel": "general",
+    "tags": ["android", "dependency-injection", "hilt", "dagger", "architecture"],
+    "companies": ["Google", "Square", "Spotify", "Slack"]
+  },
+  {
+    "question": "Explain how Android handles process death and state restoration with SavedStateHandle.",
+    "answer": "When an Android process is killed (due to memory pressure or user navigating away), the system preserves view state through ViewModel's SavedStateHandle. This mechanism saves: bundle arguments from navigation, UI state saved via saveStateHandle(), and custom keys set programmatically. Data persists across process death and is available immediately when ViewModel is recreated, unlike Bundle in onRestoreInstanceState which required asynchronous IPC.",
+    "explanation": "SavedStateHandle uses a combination of: (1) Process death survival - uses file-based persistence in $_STATE_DIR, survives both configuration changes and process death. (2) SavedStateRegistry - allows any component to participate in saving state during saveNonConfigInstance. (3) Lifecycle-aware saving - only saves when Lifecycle is at least STARTED. Key methods: get, getLiveData, put, remove. The handle is automatically provided to ViewModels created with the right SavedStateViewModelFactory. Without SavedStateHandle, developers had to use onSaveInstanceState (limited to 500KB, requires IPC), or rely on persistence layers like Room. Performance considerations: SavedStateHandle writes to disk, so avoid storing large data; consider lazy initialization for expensive operations. Testing requires using createSavedStateHandle() or the testing library. Unlike Bundle, SavedStateHandle survives indefinite process death time and doesn't share the 500KB limit.",
+    "difficulty": "advanced",
+    "subChannel": "general",
+    "tags": ["android", "savedstatehandle", "viewmodel", "process-death", "state-restoration"],
+    "companies": ["Google", "Twitch", "Robinhood", "Lyft"]
+  }
+]

@@ -1,0 +1,361 @@
+/**
+ * Gen Z Certifications Page - Get Certified, Get Hired
+ * Same aesthetic as Channels page
+ */
+
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useLocation } from 'wouter';
+import { motion } from 'framer-motion';
+import { AppLayout } from '../components/layout/AppLayout';
+import { SEOHead } from '../components/SEOHead';
+import { Button, IconButton } from '../components/unified/Button';
+import { Input } from '../components/ui/input';
+import {
+  Search, Award, Clock, ChevronRight, Sparkles, TrendingUp, Check, Plus,
+  Cloud, Shield, Database, Brain, Code, Users, Box, Terminal, Server, Cpu,
+  Layers, Network, GitBranch, Loader2, Target, AlertTriangle, RefreshCw
+} from 'lucide-react';
+
+// Certification type
+interface Certification {
+  id: string;
+  name: string;
+  provider: string;
+  description: string;
+  icon: string;
+  color: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  category: string;
+  estimatedHours: number;
+  examCode?: string;
+  questionCount: number;
+  passingScore: number;
+  examDuration: number;
+}
+
+// Icon mapping
+const iconMap: Record<string, any> = {
+  'cloud': Cloud,
+  'shield': Shield,
+  'database': Database,
+  'brain': Brain,
+  'code': Code,
+  'users': Users,
+  'box': Box,
+  'terminal': Terminal,
+  'server': Server,
+  'cpu': Cpu,
+  'layers': Layers,
+  'network': Network,
+  'infinity': GitBranch,
+  'award': Award,
+};
+
+// Categories
+const categories = [
+  { id: 'cloud', name: 'Cloud' },
+  { id: 'devops', name: 'DevOps' },
+  { id: 'security', name: 'Security' },
+  { id: 'data', name: 'Data' },
+  { id: 'ai', name: 'AI & ML' },
+  { id: 'development', name: 'Development' },
+  { id: 'management', name: 'Management' }
+];
+
+// Fetch certifications with proper error handling
+function useCertifications() {
+  const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchCertifications() {
+      try {
+        const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
+        const response = await fetch(`${basePath}data/certifications.json`);
+        if (!response.ok) throw new Error(`Failed to fetch certifications (${response.status})`);
+        const data = await response.json();
+        setCertifications(data);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error occurred';
+        console.error('Failed to load certifications:', message);
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCertifications();
+  }, []);
+
+  return { certifications, loading, error };
+}
+
+export default function Certifications() {
+  const [, navigate] = useLocation();
+  const { certifications, loading, error } = useCertifications();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [startedCerts, setStartedCerts] = useState<Set<string>>(new Set());
+
+  // Load started certifications from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('startedCertifications');
+      if (saved) {
+        setStartedCerts(new Set(JSON.parse(saved)));
+      }
+    } catch (e) {
+      console.error('Failed to load started certs:', e);
+    }
+  }, []);
+
+  // Toggle started certification - useCallback to prevent stale closures
+  const toggleStarted = useCallback((certId: string) => {
+    setStartedCerts(prev => {
+      const newStarted = new Set(prev);
+      if (newStarted.has(certId)) {
+        newStarted.delete(certId);
+      } else {
+        newStarted.add(certId);
+      }
+      try {
+        localStorage.setItem('startedCertifications', JSON.stringify(Array.from(newStarted)));
+      } catch (e) {
+        console.error('Failed to save:', e);
+      }
+      return newStarted;
+    });
+  }, []);
+
+  // Filter certifications - memoized to avoid recalc on every render
+  const filteredCerts = useMemo(() => certifications.filter(cert => {
+    const matchesSearch = cert.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         cert.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         cert.provider.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = !selectedCategory || cert.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  }), [certifications, searchQuery, selectedCategory]);
+
+  if (loading) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background flex items-center justify-center pt-safe pb-safe">
+          <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-primary animate-spin" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Show error state with retry option
+  if (error) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center pt-safe pb-safe px-4">
+          <div className="bg-[var(--gh-danger-subtle)] border border-[var(--gh-danger-fg)]/20 p-6 rounded-2xl mb-6 max-w-md text-center">
+            <AlertTriangle className="w-12 h-12 text-[var(--gh-danger-fg)] mx-auto mb-4" />
+            <h2 className="text-lg font-semibold text-[var(--gh-fg)] mb-2">Failed to load certifications</h2>
+            <p className="text-sm text-[var(--gh-fg-muted)]">{error}</p>
+          </div>
+          <Button onClick={() => window.location.reload()} variant="primary">
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </Button>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  return (
+    <>
+      <SEOHead
+        title="Certifications - Get Certified, Get Hired 🎓"
+        description="Practice for AWS, Azure, GCP, Kubernetes, and more certifications"
+        canonical="https://open-interview.github.io/certifications"
+      />
+
+      <AppLayout>
+        <div className="min-h-screen bg-background text-foreground pt-safe">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 pb-safe">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center space-y-4 md:space-y-6 mb-8 md:mb-12"
+            >
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black">
+                Get
+                <br />
+                <span className="bg-gradient-to-r from-primary to-cyan-500 bg-clip-text text-transparent">
+                  certified
+                </span>
+              </h1>
+              <p className="text-base md:text-xl text-muted-foreground">
+                {filteredCerts.length} certifications to master
+              </p>
+            </motion.div>
+
+            {/* Search Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="max-w-2xl mx-auto mb-6 md:mb-8"
+            >
+              <div className="relative">
+                <Search className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-5 h-5 md:w-6 md:h-6 text-muted-foreground pointer-events-none" />
+                <Input
+                  type="text"
+                  placeholder="Search certifications..."
+                  aria-label="Search certifications"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-12 md:pl-16 pr-4 md:pr-6 py-4 md:py-6 bg-muted/50 backdrop-blur-xl border border-border rounded-[20px] md:rounded-[24px] text-base md:text-xl focus:border-primary transition-all"
+                />
+              </div>
+            </motion.div>
+
+            {/* Category Filters */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex flex-wrap gap-2 md:gap-3 justify-center mb-8 md:mb-12"
+            >
+              <Button
+                onClick={() => setSelectedCategory(null)}
+                variant={!selectedCategory ? 'primary' : 'ghost'}
+                rounded="full"
+                className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-semibold"
+              >
+                All
+              </Button>
+              {categories.map((cat) => (
+                <Button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  variant={selectedCategory === cat.id ? 'primary' : 'ghost'}
+                  rounded="full"
+                  className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base font-semibold"
+                >
+                  {cat.name}
+                </Button>
+              ))}
+            </motion.div>
+
+            {/* Certifications Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {filteredCerts.map((cert, i) => {
+                const IconComponent = iconMap[cert.icon] || Award;
+                const isStarted = startedCerts.has(cert.id);
+
+                return (
+                  <motion.div
+                    key={cert.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: Math.min(i * 0.05, 0.5) }}
+                    className="group relative p-4 md:p-6 bg-muted/50 backdrop-blur-xl rounded-[20px] md:rounded-[24px] border border-border hover:border-primary/50 hover:scale-[1.02] transition-all duration-200 overflow-hidden"
+                  >
+                    {/* Background gradient on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                    <div className="relative space-y-3 md:space-y-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+                          {/* Icon */}
+                          <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-primary/20 to-cyan-500/20 rounded-[14px] md:rounded-[16px] flex items-center justify-center flex-shrink-0 border border-primary/30">
+                            <IconComponent className="w-6 h-6 md:w-7 md:h-7 text-primary" strokeWidth={2} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs text-muted-foreground mb-1 truncate min-w-0">{cert.provider}</div>
+                            <h3 className="text-base md:text-xl font-bold leading-tight line-clamp-2 min-w-0">{cert.name}</h3>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">{cert.description}</p>
+
+                      {/* Stats */}
+                      <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm">
+                        <div className="flex items-center gap-1.5 md:gap-2">
+                          <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary flex-shrink-0" />
+                          <span className="text-muted-foreground">{cert.questionCount} questions</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 md:gap-2">
+                          <Clock className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary flex-shrink-0" />
+                          <span className="text-muted-foreground">{cert.estimatedHours}h</span>
+                        </div>
+                      </div>
+
+                      {/* Difficulty Badge */}
+                      <div className="flex items-center gap-2">
+                        <Target className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground flex-shrink-0" />
+                        <span className={`text-xs font-semibold uppercase ${
+                          cert.difficulty === 'beginner' ? 'text-[var(--gh-success-fg)]' :
+                          cert.difficulty === 'intermediate' ? 'text-[var(--gh-attention-fg)]' :
+                          cert.difficulty === 'advanced' ? 'text-[var(--gh-orange-fg)]' :
+                          'text-[var(--gh-danger-fg)]'
+                        }`}>
+                          {cert.difficulty}
+                        </span>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <Button
+                          onClick={() => toggleStarted(cert.id)}
+                          variant={isStarted ? 'outline' : 'primary'}
+                          className="flex-1 px-4 md:px-6 py-2.5 md:py-3 rounded-[14px] md:rounded-[16px] text-sm md:text-base font-bold"
+                        >
+                          {isStarted ? (
+                            <span className="flex items-center justify-center gap-2">
+                              <Check className="w-4 h-4 md:w-5 md:h-5" />
+                              <span className="hidden sm:inline">Started</span>
+                            </span>
+                          ) : (
+                            <span className="flex items-center justify-center gap-2">
+                              <Plus className="w-4 h-4 md:w-5 md:h-5" />
+                              <span className="hidden sm:inline">Start</span>
+                            </span>
+                          )}
+                        </Button>
+
+                        {isStarted && (
+                          <IconButton
+                            onClick={() => navigate(`/channel/${cert.id}`)}
+                            aria-label="View certification"
+                            variant="ghost"
+                            size="sm"
+                            icon={<ChevronRight className="w-4 h-4 md:w-5 md:h-5" />}
+                            className="px-4 md:px-6 py-2.5 md:py-3"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Empty State */}
+            {filteredCerts.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center justify-center min-h-[40vh]"
+              >
+                <div className="text-center px-4">
+                  <div className="text-4xl md:text-6xl mb-3 md:mb-4">🔍</div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-2">No certifications found</h3>
+                  <p className="text-sm md:text-base text-muted-foreground">Try a different search or category</p>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </AppLayout>
+    </>
+  );
+}

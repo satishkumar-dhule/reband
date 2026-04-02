@@ -1,0 +1,73 @@
+name: 🎲 Manual Intake
+
+# Manually add a question to the database
+
+on:
+  workflow_dispatch:
+    inputs:
+      question:
+        description: 'Your question (will be mapped to channel and refined)'
+        required: true
+        type: string
+
+jobs:
+  intake:
+    name: 📥 Process Question
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-bot
+
+      - name: Validate Input
+        run: |
+          QUESTION="${{ inputs.question }}"
+          if [ -z "$QUESTION" ]; then
+            echo "❌ Question cannot be empty"
+            exit 1
+          fi
+          if [ ${#QUESTION} -lt 10 ]; then
+            echo "❌ Question must be at least 10 characters"
+            exit 1
+          fi
+          if [ ${#QUESTION} -gt 5000 ]; then
+            echo "❌ Question must be less than 5000 characters"
+            exit 1
+          fi
+          echo "✅ Input validated"
+
+      - name: Process and add question
+        run: node script/add-random-question.js
+        env:
+          INPUT_QUESTION: ${{ inputs.question }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          CI: 'true'
+
+      - name: Regenerate RSS feed
+        run: node script/generate-rss.js
+        env:
+
+      - name: Trigger deploy
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'deploy-app.yml',
+              ref: 'main'
+            });
+
+      - name: Summary
+        run: |
+          echo "## 🎲 Question Added" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Input:** ${{ inputs.question }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Question processed and added" >> $GITHUB_STEP_SUMMARY
+          echo "✅ RSS feed regenerated" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Deploy triggered" >> $GITHUB_STEP_SUMMARY

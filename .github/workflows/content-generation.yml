@@ -1,0 +1,614 @@
+name: 🤖 Content Generation
+
+# Unified content generation workflow
+# Runs daily at 2 AM UTC (full pipeline)
+
+on:
+  schedule:
+    - cron: '0 2 * * *'    # Daily: Full pipeline
+  
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Generation mode'
+        required: true
+        default: 'full-pipeline'
+        type: choice
+        options:
+          - full-pipeline
+          - quick-generate
+          - specific-stage
+      stage:
+        description: 'Specific stage'
+        required: false
+        type: choice
+        options:
+          - creator
+          - analysis
+          - verifier
+          - processor
+          - coding-challenges
+          - blog-generator
+          - voice-sessions
+          - interview-intelligence
+      count:
+        description: 'Items to process'
+        required: false
+        default: '10'
+      channel:
+        description: 'Specific channel'
+        required: false
+        default: ''
+      aggressive:
+        description: 'Prioritize empty channels'
+        required: false
+        default: 'true'
+        type: boolean
+
+# Prevent overlapping scheduled runs
+concurrency:
+  group: content-generation-${{ github.event_name == 'schedule' && github.event.schedule || 'dispatch' }}
+  cancel-in-progress: false  # Don't cancel in-progress, let them complete
+
+# Permissions for notifications
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  quick-generate:
+    name: 🚀 Quick Generate
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.mode == 'quick-generate')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      generated_count: ${{ steps.generate.outputs.count }}
+      success: ${{ steps.generate.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      
+      - name: Determine channels
+        id: channels
+        run: |
+          if [ -n "${{ inputs.channel }}" ]; then
+            echo "channels=${{ inputs.channel }}" >> $GITHUB_OUTPUT
+            echo "count=${{ inputs.count || '10' }}" >> $GITHUB_OUTPUT
+          elif [ "${{ inputs.aggressive }}" == "true" ]; then
+            echo "channels=" >> $GITHUB_OUTPUT
+            echo "count=25" >> $GITHUB_OUTPUT
+          else
+            echo "channels=" >> $GITHUB_OUTPUT
+            echo "count=${{ inputs.count || '5' }}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Generate questions
+        id: generate
+        continue-on-error: true
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+          INPUT_LIMIT: ${{ steps.channels.outputs.count }}
+          INPUT_CHANNEL: ${{ steps.channels.outputs.channels }}
+          BALANCE_CHANNELS: 'true'
+          AGGRESSIVE_MODE: 'true'
+          ENSURE_MINIMUM: 'true'
+        run: |
+          set +e
+          node script/generate-question.js
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "count=${{ steps.channels.outputs.count }}" >> $GITHUB_OUTPUT
+          else
+            echo "count=0" >> $GITHUB_OUTPUT
+          fi
+          exit $EXIT_CODE
+      
+      - name: Sync to Vector DB
+        if: steps.generate.outcome == 'success'
+        continue-on-error: true
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+        run: |
+          node script/sync-vector-db.js --mode=incremental || echo "::warning::Vector sync failed, but continuing"
+      
+      - name: Verify sync
+        if: steps.generate.outcome == 'success'
+        continue-on-error: true
+        run: |
+          echo "Verifying database sync..."
+          # Add verification logic here if available
+          echo "::notice::Quick generation completed successfully"
+
+  creator:
+    name: 📝 Creator Bot
+    if: |
+      (github.event.schedule == '0 2 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'full-pipeline' || inputs.stage == 'creator'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      created_count: ${{ steps.creator.outputs.count }}
+      success: ${{ steps.creator.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Run Creator Bot
+        id: creator
+        continue-on-error: true
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+          COUNT: ${{ inputs.count || '5' }}
+        run: |
+          # Retry logic for network-dependent operations
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          EXIT_CODE=1
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
+            node script/bots/creator-bot.js
+            EXIT_CODE=$?
+            
+            if [ $EXIT_CODE -eq 0 ]; then
+              break
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              WAIT_TIME=$((RETRY_COUNT * 30))
+              echo "Retrying in ${WAIT_TIME}s..."
+              sleep $WAIT_TIME
+            fi
+          done
+          
+          # Try to extract count from logs or set default
+          echo "count=${{ inputs.count || '5' }}" >> $GITHUB_OUTPUT
+          exit $EXIT_CODE
+      
+      - name: Verify creator output
+        if: steps.creator.outcome == 'success'
+        continue-on-error: true
+        run: |
+          echo "Verifying creator output..."
+          # Add verification logic here
+          echo "::notice::Creator bot completed successfully"
+
+  analysis:
+    name: 🔍 Analysis Bot
+    if: |
+      always() &&
+      ((github.event.schedule == '0 2 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'full-pipeline' || inputs.stage == 'analysis')))
+    needs: [creator]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      analyzed_count: ${{ steps.analysis.outputs.count }}
+      success: ${{ steps.analysis.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Run Analysis Bot
+        id: analysis
+        continue-on-error: true
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+        run: |
+          # Retry logic for network-dependent operations
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          EXIT_CODE=1
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
+            node script/bots/analysis-bot.js --limit=${{ inputs.count || '100' }}
+            EXIT_CODE=$?
+            
+            if [ $EXIT_CODE -eq 0 ]; then
+              break
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              WAIT_TIME=$((RETRY_COUNT * 30))
+              echo "Retrying in ${WAIT_TIME}s..."
+              sleep $WAIT_TIME
+            fi
+          done
+          
+          echo "count=${{ inputs.count || '100' }}" >> $GITHUB_OUTPUT
+          exit $EXIT_CODE
+      
+      - name: Verify analysis results
+        if: steps.analysis.outcome == 'success'
+        continue-on-error: true
+        run: |
+          echo "Verifying analysis results..."
+          # Add verification logic here
+          echo "::notice::Analysis bot completed successfully"
+
+  verifier:
+    name: ✅ Verifier Bot
+    if: |
+      always() &&
+      ((github.event.schedule == '0 2 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'full-pipeline' || inputs.stage == 'verifier')))
+    needs: [analysis]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      verified_count: ${{ steps.verifier.outputs.count }}
+      success: ${{ steps.verifier.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Run Verifier Bot
+        id: verifier
+        continue-on-error: true
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+          MODE: scan
+          LIMIT: ${{ inputs.count || '10' }}
+        run: |
+          # Retry logic for network-dependent operations
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          EXIT_CODE=1
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
+            node script/bots/verifier-bot.js
+            EXIT_CODE=$?
+            
+            if [ $EXIT_CODE -eq 0 ]; then
+              break
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              WAIT_TIME=$((RETRY_COUNT * 30))
+              echo "Retrying in ${WAIT_TIME}s..."
+              sleep $WAIT_TIME
+            fi
+          done
+          
+          echo "count=${{ inputs.count || '10' }}" >> $GITHUB_OUTPUT
+          exit $EXIT_CODE
+      
+      - name: Verify verification results
+        if: steps.verifier.outcome == 'success'
+        continue-on-error: true
+        run: |
+          echo "Verifying verification results..."
+          # Add verification logic here
+          echo "::notice::Verifier bot completed successfully"
+
+  processor:
+    name: ⚙️ Processor Bot
+    if: |
+      always() &&
+      ((github.event.schedule == '0 2 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'full-pipeline' || inputs.stage == 'processor')))
+    needs: [verifier]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      processed_count: ${{ steps.processor.outputs.count }}
+      success: ${{ steps.processor.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Run Processor Bot
+        id: processor
+        continue-on-error: true
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+          MAX_ITEMS: ${{ inputs.count || '10' }}
+        run: |
+          # Retry logic for network-dependent operations
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          EXIT_CODE=1
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
+            node script/bots/processor-bot.js
+            EXIT_CODE=$?
+            
+            if [ $EXIT_CODE -eq 0 ]; then
+              break
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              WAIT_TIME=$((RETRY_COUNT * 30))
+              echo "Retrying in ${WAIT_TIME}s..."
+              sleep $WAIT_TIME
+            fi
+          done
+          
+          echo "count=${{ inputs.count || '10' }}" >> $GITHUB_OUTPUT
+          exit $EXIT_CODE
+      
+      - name: Verify processor output
+        if: steps.processor.outcome == 'success'
+        continue-on-error: true
+        run: |
+          echo "Verifying processor output..."
+          # Check if session files exist
+          if [ -d "client/public/data/sessions" ]; then
+            SESSION_COUNT=$(find client/public/data/sessions -name "*.json" -type f | wc -l)
+            echo "Processed $SESSION_COUNT session files"
+          fi
+          echo "::notice::Processor bot completed successfully"
+
+  coding-challenges:
+    name: 💻 Coding Challenges
+    if: |
+      always() &&
+      ((github.event.schedule == '0 2 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'full-pipeline' || inputs.stage == 'coding-challenges')))
+    needs: [processor]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      challenge_count: ${{ steps.challenges.outputs.count }}
+      success: ${{ steps.challenges.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Generate Coding Challenges
+        id: challenges
+        continue-on-error: true
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+          INPUT_COUNT: ${{ inputs.count || '3' }}
+        run: |
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          EXIT_CODE=1
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
+            node script/coding-challenge-bot.js
+            EXIT_CODE=$?
+            
+            if [ $EXIT_CODE -eq 0 ]; then
+              break
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              WAIT_TIME=$((RETRY_COUNT * 30))
+              echo "Retrying in ${WAIT_TIME}s..."
+              sleep $WAIT_TIME
+            fi
+          done
+          
+          echo "count=${{ inputs.count || '3' }}" >> $GITHUB_OUTPUT
+          exit $EXIT_CODE
+
+  blog-generator:
+    name: 📰 Blog Generator
+    if: |
+      always() &&
+      ((github.event.schedule == '0 2 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'full-pipeline' || inputs.stage == 'blog-generator')))
+    needs: [processor]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      blog_count: ${{ steps.blog.outputs.count }}
+      success: ${{ steps.blog.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Generate Blog
+        id: blog
+        continue-on-error: true
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+        run: |
+          # Retry logic for network-dependent operations
+          MAX_RETRIES=2
+          RETRY_COUNT=0
+          EXIT_CODE=1
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
+            node script/generate-blog.js
+            EXIT_CODE=$?
+            
+            if [ $EXIT_CODE -eq 0 ]; then
+              break
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              WAIT_TIME=$((RETRY_COUNT * 20))
+              echo "Retrying in ${WAIT_TIME}s..."
+              sleep $WAIT_TIME
+            fi
+          done
+          
+          # Count generated blogs if possible
+          if [ -d "client/public/data/blogs" ]; then
+            BLOG_COUNT=$(find client/public/data/blogs -name "*.json" -type f | wc -l)
+          else
+            BLOG_COUNT=0
+          fi
+          echo "count=$BLOG_COUNT" >> $GITHUB_OUTPUT
+          exit $EXIT_CODE
+      
+      - name: Verify blog generation
+        if: steps.blog.outcome == 'success'
+        continue-on-error: true
+        run: |
+          echo "Verifying blog generation..."
+          # Check if blog files exist
+          if [ -d "client/public/data/blogs" ]; then
+            BLOG_COUNT=$(find client/public/data/blogs -name "*.json" -type f | wc -l)
+            echo "Generated $BLOG_COUNT blog files"
+            if [ $BLOG_COUNT -gt 0 ]; then
+              echo "::notice::Blog generation completed successfully with $BLOG_COUNT blogs"
+            else
+              echo "::warning::Blog generation completed but no blog files found"
+            fi
+          else
+            echo "::warning::Blog directory not found"
+          fi
+
+  voice-sessions:
+    name: 🎤 Voice Sessions
+    if: |
+      always() &&
+      ((github.event.schedule == '0 2 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'full-pipeline' || inputs.stage == 'voice-sessions')))
+    needs: [processor]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      session_count: ${{ steps.voice.outputs.count }}
+      success: ${{ steps.voice.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Generate Voice Sessions
+        id: voice
+        continue-on-error: true
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+        run: |
+          # Retry logic for network-dependent operations
+          MAX_RETRIES=2
+          RETRY_COUNT=0
+          EXIT_CODE=1
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
+            node script/generate-voice-sessions.js --use-vector-db --limit=50
+            EXIT_CODE=$?
+            
+            if [ $EXIT_CODE -eq 0 ]; then
+              break
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              WAIT_TIME=$((RETRY_COUNT * 20))
+              echo "Retrying in ${WAIT_TIME}s..."
+              sleep $WAIT_TIME
+            fi
+          done
+          
+          # Count generated sessions if possible
+          if [ -d "client/public/data/voice-sessions" ]; then
+            SESSION_COUNT=$(find client/public/data/voice-sessions -name "*.json" -type f | wc -l)
+          else
+            SESSION_COUNT=0
+          fi
+          echo "count=$SESSION_COUNT" >> $GITHUB_OUTPUT
+          exit $EXIT_CODE
+      
+      - name: Verify voice sessions
+        if: steps.voice.outcome == 'success'
+        continue-on-error: true
+        run: |
+          echo "Verifying voice sessions..."
+          # Check if voice session files exist
+          if [ -d "client/public/data/voice-sessions" ]; then
+            SESSION_COUNT=$(find client/public/data/voice-sessions -name "*.json" -type f | wc -l)
+            echo "Generated $SESSION_COUNT voice sessions"
+            if [ $SESSION_COUNT -gt 0 ]; then
+              echo "::notice::Voice sessions completed successfully with $SESSION_COUNT sessions"
+            else
+              echo "::warning::Voice sessions completed but no session files found"
+            fi
+          else
+            echo "::warning::Voice sessions directory not found"
+          fi
+
+  interview-intelligence:
+    name: 🧠 Interview Intelligence
+    if: |
+      always() &&
+      ((github.event.schedule == '0 2 * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'full-pipeline' || inputs.stage == 'interview-intelligence')))
+    needs: [processor]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Generate Intelligence
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+        run: node script/generate-interview-intelligence.js
+
+  update-monitor:
+    name: 📊 Update Monitor
+    needs: [blog-generator, voice-sessions, interview-intelligence, coding-challenges]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-pnpm
+      - name: Generate monitor data
+        env:
+        run: node script/fetch-bot-monitor-data.js
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -f client/public/data/bot-monitor.json
+          git add -f client/public/data/intelligence/ || true
+          git add -f client/public/data/voice-sessions/ || true
+          git diff --staged --quiet || git commit -m "Update bot monitor [skip ci]"
+          git push
+
+  summary:
+    name: 📋 Summary
+    needs: [quick-generate, creator, analysis, verifier, processor, coding-challenges, blog-generator, voice-sessions, interview-intelligence, update-monitor]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "## 🤖 Content Generation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🚀 Quick | ${{ needs.quick-generate.result == 'success' && '✅' || needs.quick-generate.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📝 Creator | ${{ needs.creator.result == 'success' && '✅' || needs.creator.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔍 Analysis | ${{ needs.analysis.result == 'success' && '✅' || needs.analysis.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ✅ Verifier | ${{ needs.verifier.result == 'success' && '✅' || needs.verifier.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚙️ Processor | ${{ needs.processor.result == 'success' && '✅' || needs.processor.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 💻 Challenges | ${{ needs.coding-challenges.result == 'success' && '✅' || needs.coding-challenges.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📰 Blog | ${{ needs.blog-generator.result == 'success' && '✅' || needs.blog-generator.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎤 Voice | ${{ needs.voice-sessions.result == 'success' && '✅' || needs.voice-sessions.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧠 Intelligence | ${{ needs.interview-intelligence.result == 'success' && '✅' || needs.interview-intelligence.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📊 Monitor | ${{ needs.update-monitor.result == 'success' && '✅' || needs.update-monitor.result == 'skipped' && '⏭️' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY

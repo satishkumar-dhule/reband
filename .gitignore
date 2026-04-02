@@ -1,0 +1,66 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+test-results/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Generated data (fetched from Turso at build time)
+client/public/data/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime
+server/public
+vite.config.ts.*
+
+# Archives
+*.tar.gz
+*.zip
+
+# Temporary files
+.tmp/
+temp/
+*.tmp
+
+# Testing
+coverage/
+.nyc_output/
+
+# Local development
+.local/
+.cache/
+playwright-report/
+.kiro/
+playwright-report/index.html
+.local/
+.config/
+*.db
+*.log

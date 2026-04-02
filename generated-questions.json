@@ -1,0 +1,47 @@
+[
+  {
+    "question": "What is the difference between var, let, and const in JavaScript?",
+    "answer": "var is function-scoped and can be redeclared, while let and const are block-scoped. const is similar to let but cannot be reassigned after initialization. var variables are hoisted and initialized with undefined, while let/const are hoisted but in a 'temporal dead zone' until declaration.",
+    "explanation": "Before ES6, var was the only way to declare variables. ES6 introduced let and const to address var's issues. var's function scope causes bugs in loops (closure issues), whereas let/const use block scope making code more predictable. const doesn't make objects immutable—it only prevents reassignment of the variable itself. The temporal dead zone means accessing let/const before declaration throws ReferenceError.",
+    "difficulty": "beginner",
+    "subChannel": "es6",
+    "tags": ["javascript", "es6", "variables", "scope"],
+    "companies": ["Google", "Meta", "Amazon"]
+  },
+  {
+    "question": "Explain the JavaScript event loop and how async code executes.",
+    "answer": "The event loop continuously checks the call stack and task queue. When the stack is empty, it takes the first task from the queue and pushes it to the stack. Async operations (setTimeout, promises) queue their callbacks in the task queue, and microtasks (promise then/catch) queue in the microtask queue which runs before the next macrotask.",
+    "explanation": "JavaScript is single-threaded but handles async operations through the event loop. The call stack executes synchronous code. When async operations complete, their callbacks enter queues. The event loop prioritizes microtasks over macrotasks—this distinction matters for setTimeout vs Promise callbacks. This model enables non-blocking I/O despite being single-threaded.",
+    "difficulty": "intermediate",
+    "subChannel": "async",
+    "tags": ["javascript", "async", "event-loop", "promises"],
+    "companies": ["Netflix", "Stripe", "Shopify"]
+  },
+  {
+    "question": "How do JavaScript closures work and what practical problems do they solve?",
+    "answer": "A closure is a function that retains access to variables from its outer scope even after that outer function has returned. This happens because the inner function forms a 'closure' over the outer function's scope chain. Closures enable data privacy, function factories, and maintaining state in async callbacks.",
+    "explanation": "Every function in JavaScript forms a closure by capturing its lexical environment. When a function is defined inside another, it accesses variables from the outer function even after execution completes. Common use cases include: creating private variables (module pattern), currying functions, maintaining state in event handlers, and preserving values in loops (classic 'var i' bug).",
+    "difficulty": "intermediate",
+    "subChannel": "es6",
+    "tags": ["javascript", "closures", "scope", "functional-programming"],
+    "companies": ["Airbnb", "Uber", "LinkedIn"]
+  },
+  {
+    "question": "Describe how you would prevent event propagation and why it matters.",
+    "answer": "Use event.stopPropagation() to prevent the event from bubbling up the DOM tree, or event.stopImmediatePropagation() to prevent other listeners on the same element from firing. The event bubbles by default, meaning parent elements receive events from their children.",
+    "explanation": "Event propagation has three phases: capture (root to target), target (at element), and bubble (target to root). Most code uses bubble phase. Stopping propagation prevents parent handlers from executing—useful for nested clickable elements like buttons in cards. However, overuse can make code brittle; consider delegation patterns instead when dealing with many elements.",
+    "difficulty": "beginner",
+    "subChannel": "dom",
+    "tags": ["javascript", "dom", "events", "bubbling"],
+    "companies": ["Twitter", "Spotify", "Reddit"]
+  },
+  {
+    "question": "How does the ES6 module system differ from CommonJS, and why does it matter?",
+    "answer": "ES6 modules are asynchronous and use export/import syntax with static analysis (compile-time). They're deferred by default and support named exports, default exports, and re-exports. CommonJS is synchronous, uses require/module.exports, and executes at runtime. ES6 modules have live bindings while CommonJS copies values.",
+    "explanation": "ES6 modules load asynchronously allowing parallel fetching without blocking. Static imports enable tree-shaking (unused code elimination) which reduces bundle size. Live bindings mean exported values reflect changes in the source module—this differs from CommonJS which copies values at require time. ES6 also supports dynamic imports() for code splitting.",
+    "difficulty": "advanced",
+    "subChannel": "modules",
+    "tags": ["javascript", "modules", "es6", "commonjs", "bundling"],
+    "companies": ["Webpack", "Vercel", "Shopify"]
+  }
+]

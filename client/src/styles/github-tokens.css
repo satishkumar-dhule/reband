@@ -1,0 +1,306 @@
+/**
+ * GitHub Design System Tokens
+ * 
+ * This file provides the single source of truth for all GitHub-themed colors.
+ * All colors follow GitHub Primer design tokens and include both light/dark mode variants.
+ * WCAG AA compliant (4.5:1 contrast ratio for text).
+ * 
+ * Usage in CSS: color: var(--gh-fg-muted);
+ * Usage in Tailwind: text-[var(--gh-fg-muted)] or use mapped utility classes
+ * 
+ * @see https://primer.style/css/support/color-system
+ */
+
+/* ===== LIGHT MODE (Default) ===== */
+:root,
+[data-theme="light"],
+.light {
+  /* Canvas backgrounds */
+  --gh-canvas: #ffffff;
+  --gh-canvas-subtle: #f6f8fa;
+  --gh-canvas-inset: #f0f6fc;
+  --gh-canvas-overlay: #ffffff;
+  
+  /* Foreground / text - WCAG AA compliant */
+  --gh-fg: #1f2328;
+  --gh-fg-muted: #59636e; /* Was #636c76 - adjusted for WCAG AA */
+  --gh-fg-subtle: #6e7781;
+  --gh-fg-on-emphasis: #ffffff;
+  
+  /* Borders */
+  --gh-border: #d0d7de;
+  --gh-border-muted: #d8dee4;
+  
+  /* Accent (blue) */
+  --gh-accent-fg: #0969da;
+  --gh-accent-emphasis: #0969da;
+  --gh-accent-subtle: #ddf4ff;
+  --gh-accent-hover: #0550ae;
+  
+  /* Success (green) */
+  --gh-success-fg: #1a7f37;
+  --gh-success-emphasis: #1f883d;
+  --gh-success-subtle: #dafbe1;
+  --gh-success-hover: #116329;
+  
+  /* Attention (yellow/orange) */
+  --gh-attention-fg: #9a6700;
+  --gh-attention-emphasis: #bf8700;
+  --gh-attention-subtle: #fff8c5;
+  --gh-attention-hover: #7d4e00;
+  
+  /* Danger (red) */
+  --gh-danger-fg: #d1242f;
+  --gh-danger-emphasis: #cf222e;
+  --gh-danger-subtle: #ffebe9;
+  --gh-danger-hover: #82071e;
+  
+  /* Done (purple) */
+  --gh-done-fg: #8250df;
+  --gh-done-emphasis: #8250df;
+  --gh-done-subtle: #fbefff;
+  --gh-done-hover: #6e40c9;
+  
+  /* Neutral */
+  --gh-neutral-emphasis: #6e7781;
+  --gh-neutral-subtle: #eaeef2;
+  --gh-neutral-muted: #8b949e;
+  
+  /* Pink accent (for gradients) */
+  --gh-pink-fg: #bf3989;
+  --gh-pink-emphasis: #a371f7;
+  --gh-pink-subtle: #ffeff7;
+  
+  /* Cody colors */
+  --gh-cody-fg: #8b5cf6;
+  
+  /* Difficulty badges */
+  --gh-diff-beginner: #1f883d;
+  --gh-diff-beginner-bg: #dafbe1;
+  --gh-diff-intermediate: #9a6700;
+  --gh-diff-intermediate-bg: #fff8c5;
+  --gh-diff-advanced: #cf222e;
+  --gh-diff-advanced-bg: #ffebe9;
+  
+  /* Focus ring */
+  --gh-focus-ring: rgba(9, 105, 218, 0.4);
+  
+  /* Shadows */
+  --gh-shadow-xs: 0 1px 0 rgba(27, 31, 36, 0.04);
+  --gh-shadow-sm: 0 1px 2px rgba(27, 31, 36, 0.04);
+  --gh-shadow-md: 0 3px 6px rgba(140, 149, 159, 0.15);
+  --gh-shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.2);
+  --gh-shadow-xl: 0 12px 48px rgba(140, 149, 159, 0.3);
+  
+  /* Common backgrounds for components */
+  --gh-bg-elevated: #ffffff;
+  --gh-bg-muted: #f6f8fa;
+  --gh-bg-inset: #f6f8fa;
+  
+  /* Skeleton backgrounds - optimized for loading states */
+  /* Light mode: subtle gray with good contrast on white */
+  --gh-skeleton-bg: #e8eaed;
+  --gh-skeleton-bg-dark: #30363d;
+}
+
+/* ===== DARK MODE ===== */
+[data-theme="dark"],
+.dark {
+  /* Canvas backgrounds */
+  --gh-canvas: #0d1117;
+  --gh-canvas-subtle: #161b22;
+  --gh-canvas-inset: #010409;
+  --gh-canvas-overlay: #161b22;
+  
+  /* Foreground / text - WCAG AA compliant */
+  --gh-fg: #e6edf3;
+  --gh-fg-muted: #8b949e;
+  --gh-fg-subtle: #6e7681;
+  --gh-fg-on-emphasis: #ffffff;
+  
+  /* Borders */
+  --gh-border: #30363d;
+  --gh-border-muted: #21262d;
+  
+  /* Accent (blue) */
+  --gh-accent-fg: #58a6ff;
+  --gh-accent-emphasis: #1f6feb;
+  --gh-accent-subtle: #031d30;
+  --gh-accent-hover: #388bfd;
+  
+  /* Success (green) */
+  --gh-success-fg: #3fb950;
+  --gh-success-emphasis: #238636;
+  --gh-success-subtle: #0d1f12;
+  --gh-success-hover: #2ea043;
+  
+  /* Attention (yellow/orange) */
+  --gh-attention-fg: #d29922;
+  --gh-attention-emphasis: #9e6a03;
+  --gh-attention-subtle: #1c1502;
+  --gh-attention-hover: #e3b341;
+  
+  /* Danger (red) */
+  --gh-danger-fg: #f85149;
+  --gh-danger-emphasis: #da3633;
+  --gh-danger-subtle: #160b10;
+  --gh-danger-hover: #ff7b72;
+  
+  /* Done (purple) */
+  --gh-done-fg: #bc8cff;
+  --gh-done-emphasis: #6e40c9;
+  --gh-done-subtle: #21003d;
+  --gh-done-hover: #d2a8ff;
+  
+  /* Neutral */
+  --gh-neutral-emphasis: #6e7681;
+  --gh-neutral-subtle: #21262d;
+  --gh-neutral-muted: #484f58;
+  
+  /* Pink accent (for gradients) */
+  --gh-pink-fg: #f778ba;
+  --gh-pink-emphasis: #a371f7;
+  --gh-pink-subtle: #320755;
+  
+  /* Cody colors */
+  --gh-cody-fg: #a371f7;
+  
+  /* Difficulty badges */
+  --gh-diff-beginner: #3fb950;
+  --gh-diff-beginner-bg: #0d1f12;
+  --gh-diff-intermediate: #d29922;
+  --gh-diff-intermediate-bg: #1c1502;
+  --gh-diff-advanced: #f85149;
+  --gh-diff-advanced-bg: #160b10;
+  
+  /* Focus ring */
+  --gh-focus-ring: rgba(88, 166, 255, 0.4);
+  
+  /* Shadows */
+  --gh-shadow-xs: 0 1px 0 rgba(0, 0, 0, 0);
+  --gh-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --gh-shadow-md: 0 3px 6px rgba(1, 4, 9, 0.4);
+  --gh-shadow-lg: 0 8px 24px rgba(1, 4, 9, 0.5);
+  --gh-shadow-xl: 0 12px 48px rgba(1, 4, 9, 0.6);
+  
+  /* Common backgrounds for components */
+  --gh-bg-elevated: #161b22;
+  --gh-bg-muted: #21262d;
+  --gh-bg-inset: #0d1117;
+}
+
+/* ===== LEGACY COMPATIBILITY ALIASES ===== */
+/* These map to the new --gh-* naming convention for backward compatibility */
+:root {
+  /* Text colors - legacy aliases */
+  --color-text-primary: var(--gh-fg);
+  --color-text-secondary: var(--gh-fg-muted);
+  --color-text-tertiary: var(--gh-fg-subtle);
+  
+  /* Background colors - legacy aliases */
+  --background: var(--gh-canvas);
+  --foreground: var(--gh-fg);
+  --card: var(--gh-canvas);
+  --card-foreground: var(--gh-fg);
+  --popover: var(--gh-canvas-overlay);
+  --popover-foreground: var(--gh-fg);
+  --primary: var(--gh-accent-fg);
+  --primary-foreground: var(--gh-fg-on-emphasis);
+  --secondary: var(--gh-canvas-subtle);
+  --secondary-foreground: var(--gh-fg);
+  --muted: var(--gh-canvas-subtle);
+  --muted-foreground: var(--gh-fg-muted);
+  --accent: var(--gh-accent-fg);
+  --accent-foreground: var(--gh-fg-on-emphasis);
+  --destructive: var(--gh-danger-emphasis);
+  --destructive-foreground: var(--gh-fg-on-emphasis);
+  --border: var(--gh-border);
+  --input: var(--gh-border);
+  --ring: var(--gh-accent-fg);
+  
+  /* Sidebar colors */
+  --sidebar-bg: var(--gh-canvas-subtle);
+  --sidebar-foreground: var(--gh-fg);
+  --sidebar-border: var(--gh-border);
+  --sidebar-accent: var(--gh-canvas-subtle);
+  --sidebar-accent-foreground: var(--gh-fg);
+  --sidebar-ring: var(--gh-accent-fg);
+  --sidebar-active-bg: var(--gh-neutral-subtle);
+  --sidebar-active-border: var(--gh-accent-fg);
+  --header-bg: var(--gh-canvas);
+  
+  /* Semantic colors */
+  --success: var(--gh-success-emphasis);
+  --success-foreground: var(--gh-fg-on-emphasis);
+  --color-success: var(--gh-success-fg);
+  --color-success-light: var(--gh-success-fg);
+  
+  /* GitHub specific */
+  --gh-green: var(--gh-success-fg);
+  --gh-blue: var(--gh-accent-fg);
+  --button-outline: var(--gh-border);
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Text colors */
+.gh-text { color: var(--gh-fg); }
+.gh-text-muted { color: var(--gh-fg-muted); }
+.gh-text-subtle { color: var(--gh-fg-subtle); }
+.gh-text-accent { color: var(--gh-accent-fg); }
+.gh-text-success { color: var(--gh-success-fg); }
+.gh-text-warning { color: var(--gh-attention-fg); }
+.gh-text-danger { color: var(--gh-danger-fg); }
+.gh-text-done { color: var(--gh-done-fg); }
+
+/* Background colors */
+.gh-bg { background-color: var(--gh-canvas); }
+.gh-bg-subtle { background-color: var(--gh-canvas-subtle); }
+.gh-bg-inset { background-color: var(--gh-canvas-inset); }
+.gh-bg-overlay { background-color: var(--gh-canvas-overlay); }
+.gh-bg-muted { background-color: var(--gh-bg-muted); }
+
+/* Border colors */
+.gh-border { border-color: var(--gh-border); }
+.gh-border-muted { border-color: var(--gh-border-muted); }
+
+/* Focus states */
+.gh-focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--gh-focus-ring);
+}
+
+.gh-focus:focus-visible {
+  outline: 2px solid var(--gh-accent-fg);
+  outline-offset: 2px;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+/* GitHub-style responsive breakpoints */
+:root {
+  /* Breakpoints (matching GitHub Primer design system) */
+  --breakpoint-sm: 544px;   /* Mobile landscape */
+  --breakpoint-md: 768px;   /* Tablet */
+  --breakpoint-lg: 1012px; /* Desktop */
+  --breakpoint-xl: 1280px; /* Large desktop */
+  
+  /* Container widths */
+  --container-sm: 544px;
+  --container-md: 768px;
+  --container-lg: 1012px;
+  --container-xl: 1280px;
+  --container-max: 1280px;
+}
+
+/* ===== MEDIA QUERY FOR PREFERENCES ===== */
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

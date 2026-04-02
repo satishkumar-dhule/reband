@@ -1,0 +1,870 @@
+/**
+ * Fetch questions from local SQLite database and generate static JSON files for GitHub Pages build.
+ * This script runs during the build process to embed all questions into the static site.
+ *
+ * Optimizations:
+ * - Writes minified JSON (no whitespace) for smallest file size
+ * - Reports file sizes for build monitoring
+ * - Writes to both public/data/ (dev) and dist/data/ (post-build copy)
+ * - Uses parameterized queries for safety
+ */
+import 'dotenv/config';
+import { createClient } from '@libsql/client';
+import fs from 'fs';
+import path from 'path';
+
+const OUTPUT_DIR = 'client/public/data';
+const DIST_DATA_DIR = 'dist/public/data';
+
+const url = 'file:local.db';
+const authToken = undefined;
+
+if (!url) {
+  console.error('❌ Missing database URL');
+  process.exit(1);
+}
+
+const client = createClient({ url, authToken });
+
+/**
+ * Write JSON to multiple output directories
+ */
+function writeJson(filePath, data) {
+  const dirs = [OUTPUT_DIR];
+  // Also write to dist if it exists (post-build scenario)
+  if (fs.existsSync(DIST_DATA_DIR)) {
+    dirs.push(DIST_DATA_DIR);
+  }
+
+  const minified = JSON.stringify(data);
+  for (const dir of dirs) {
+    const fullPath = path.join(dir, path.basename(filePath));
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+    fs.writeFileSync(fullPath, minified);
+  }
+
+  return minified.length;
+}
+
+/**
+ * Quality Gate: Validate question format
+ * Prevents malformed questions from being included in build
+ */
+function validateQuestionFormat(question) {
+  const issues = [];
+  
+  // Check for multiple-choice format in answer field (wrong format)
+  if (question.answer && question.answer.startsWith('[{')) {
+    issues.push('Multiple-choice format in text answer field');
+  }
+  
+  // Check for missing required fields
+  if (!question.question || question.question.length < 10) {
+    issues.push('Question text too short or missing');
+  }
+  
+  if (!question.answer || question.answer.length < 10) {
+    issues.push('Answer text too short or missing');
+  }
+  
+  // Check for placeholder content
+  const placeholders = ['TODO', 'FIXME', 'TBD', 'placeholder', 'lorem ipsum'];
+  const content = `${question.question} ${question.answer}`.toLowerCase();
+  if (placeholders.some(p => content.includes(p.toLowerCase()))) {
+    issues.push('Contains placeholder content');
+  }
+  
+  return {
+    isValid: issues.length === 0,
+    issues
+  };
+}
+
+function safeJsonParse(str, fallback = null) {
+  if (!str) return fallback;
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    console.warn(`   ⚠️ JSON parse error: ${e.message}`);
+    return fallback;
+  }
+}
+
+function parseQuestionRow(row) {
+  return {
+    id: row.id,
+    question: row.question,
+    answer: row.answer,
+    explanation: row.explanation,
+    tldr: row.tldr,
+    diagram: row.diagram,
+    difficulty: row.difficulty,
+    tags: safeJsonParse(row.tags, []),
+    channel: row.channel,
+    subChannel: row.sub_channel,
+    sourceUrl: row.source_url,
+    videos: safeJsonParse(row.videos, null),
+    companies: safeJsonParse(row.companies, null),
+    eli5: row.eli5,
+    relevanceScore: row.relevance_score,
+    relevanceDetails: row.relevance_details,
+    jobTitleRelevance: row.job_title_relevance,
+    experienceLevelTags: safeJsonParse(row.experience_level_tags, []),
+    voiceKeywords: safeJsonParse(row.voice_keywords, null),
+    voiceSuitable: row.voice_suitable === 1,
+    isNew: row.is_new === 1, // Parse isNew flag from database
+    lastUpdated: row.last_updated,
+    createdAt: row.created_at,
+  };
+}
+
+// Check if a date is within the last 7 days
+function isWithinLastWeek(dateStr) {
+  if (!dateStr) return false;
+  const date = new Date(dateStr);
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  return date >= weekAgo;
+}
+
+/**
+ * Format bytes to human-readable string
+ */
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+async function main() {
+  console.log('=== Fetching Questions from Turso for Static Build ===\n');
+
+  // Ensure output directory exists
+  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+  // Fetch all active questions
+  console.log('📥 Fetching all active questions...');
+  const result = await client.execute("SELECT * FROM questions WHERE status = 'active' ORDER BY channel, sub_channel, id");
+  const allQuestions = result.rows.map(parseQuestionRow);
+  console.log(`   Found ${allQuestions.length} questions`);
+
+  // Apply quality gate
+  console.log('\n🔒 Applying quality gate...');
+  const questions = [];
+  const rejected = [];
+  
+  for (const q of allQuestions) {
+    const validation = validateQuestionFormat(q);
+    if (validation.isValid) {
+      questions.push(q);
+    } else {
+      rejected.push({ id: q.id, issues: validation.issues });
+      console.log(`   ❌ Rejected ${q.id}: ${validation.issues.join(', ')}`);
+    }
+  }
+  
+  console.log(`   ✓ Accepted: ${questions.length} questions`);
+  console.log(`   ✗ Rejected: ${rejected.length} questions`);
+  
+  if (rejected.length > 0) {
+    console.log('\n⚠️  Rejected questions need to be fixed in the database');
+    console.log('   Run: node script/fix-cert-questions-with-bots.js');
+  }
+
+  // Group questions by channel
+  const channelData = {};
+  const channelStats = [];
+
+  for (const q of questions) {
+    if (!channelData[q.channel]) {
+      channelData[q.channel] = {
+        questions: [],
+        subChannels: new Set(),
+        companies: new Set(),
+        stats: { total: 0, beginner: 0, intermediate: 0, advanced: 0, newThisWeek: 0 }
+      };
+    }
+    
+    channelData[q.channel].questions.push(q);
+    channelData[q.channel].subChannels.add(q.subChannel);
+    channelData[q.channel].stats.total++;
+    channelData[q.channel].stats[q.difficulty]++;
+    
+    // Count questions added in the last week
+    if (isWithinLastWeek(q.createdAt)) {
+      channelData[q.channel].stats.newThisWeek++;
+    }
+    
+    if (q.companies) {
+      q.companies.forEach(c => channelData[q.channel].companies.add(c));
+    }
+  }
+
+  // Track total output size
+  let totalBytes = 0;
+
+  // Write individual channel files (with chunking for large channels)
+  console.log('\n📝 Writing channel files...');
+  const CHUNK_SIZE = 5; // Max questions per chunk file
+  for (const [channelId, data] of Object.entries(channelData)) {
+    const questions = data.questions;
+    const subChannelsArr = Array.from(data.subChannels).sort();
+    const companiesArr = Array.from(data.companies).sort();
+
+    // If channel has more than CHUNK_SIZE questions, split into chunks
+    if (questions.length > CHUNK_SIZE) {
+      const numChunks = Math.ceil(questions.length / CHUNK_SIZE);
+      for (let i = 0; i < numChunks; i++) {
+        const chunkQuestions = questions.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+        const chunkFile = path.join(OUTPUT_DIR, `${channelId}-chunk-${i}.json`);
+        fs.writeFileSync(chunkFile, JSON.stringify({
+          chunk: i,
+          totalChunks: numChunks,
+          questions: chunkQuestions,
+        }, null, 0));
+      }
+
+      // Write a manifest file for chunked channels
+      const manifestFile = path.join(OUTPUT_DIR, `${channelId}.json`);
+      fs.writeFileSync(manifestFile, JSON.stringify({
+        chunked: true,
+        totalChunks: numChunks,
+        subChannels: subChannelsArr,
+        companies: companiesArr,
+        stats: data.stats,
+      }, null, 0));
+      console.log(`   ✓ ${channelId}.json (${numChunks} chunks, ${questions.length} questions)`);
+    } else {
+      // Small channel — write as single file (backward compatible)
+      const channelFile = path.join(OUTPUT_DIR, `${channelId}.json`);
+      fs.writeFileSync(channelFile, JSON.stringify({
+        questions,
+        subChannels: subChannelsArr,
+        companies: companiesArr,
+        stats: data.stats,
+      }, null, 0));
+      console.log(`   ✓ ${channelId}.json (${questions.length} questions)`);
+    }
+
+    channelStats.push({
+      id: channelId,
+      questionCount: data.stats.total,
+      ...data.stats
+    });
+  }
+
+  // Write channels index
+  const channelsBytes = writeJson('channels.json', channelStats);
+  totalBytes += channelsBytes;
+  console.log(`   ✓ channels.json (${channelStats.length} channels, ${formatBytes(channelsBytes)})`);
+
+  // Write all questions index (for search)
+  const searchIndex = questions.map(q => ({
+    id: q.id,
+    question: q.question,
+    channel: q.channel,
+    subChannel: q.subChannel,
+    difficulty: q.difficulty,
+    tags: q.tags,
+    companies: q.companies
+  }));
+  const searchBytes = writeJson('all-questions.json', searchIndex);
+  totalBytes += searchBytes;
+  console.log(`   ✓ all-questions.json (search index, ${formatBytes(searchBytes)})`);
+
+  // Write stats
+  const chunkedChannels = Object.entries(channelData)
+    .filter(([, data]) => data.questions.length > 5)
+    .map(([id, data]) => ({
+      id,
+      questionCount: data.questions.length,
+      chunkCount: Math.ceil(data.questions.length / 5),
+    }));
+  const statsBytes = writeJson('stats.json', {
+    totalQuestions: questions.length,
+    totalChannels: channelStats.length,
+    channels: channelStats,
+    lastUpdated: new Date().toISOString(),
+    // Chunking metadata for the frontend
+    chunking: {
+      enabled: true,
+      chunkSize: 5,
+      channels: chunkedChannels,
+    }
+  });
+  totalBytes += statsBytes;
+  console.log(`   ✓ stats.json (${formatBytes(statsBytes)})`);
+
+  // Fetch bot activity from work_queue
+  console.log('\n📥 Fetching bot activity...');
+  try {
+    // First check if work_queue table exists and what columns it has
+    const tableInfo = await client.execute(`
+      SELECT name FROM sqlite_master WHERE type='table' AND name='work_queue'
+    `);
+    
+    if (tableInfo.rows.length === 0) {
+      throw new Error('work_queue table does not exist');
+    }
+
+    // Try simple query first to check available columns
+    const testQuery = await client.execute(`SELECT * FROM work_queue LIMIT 1`);
+    const hasCompletedAt = testQuery.columns.includes('completed_at');
+    const hasBotType = testQuery.columns.includes('bot_type');
+    
+    if (!hasCompletedAt || !hasBotType) {
+      throw new Error('Required columns missing from work_queue table');
+    }
+
+    // Get only the most recent activity per question per bot (no duplicates)
+    const activityResult = await client.execute(`
+      WITH RankedActivity AS (
+        SELECT 
+          w.id,
+          w.bot_type as botType,
+          w.question_id as questionId,
+          q.question as questionText,
+          q.channel,
+          w.reason as action,
+          w.status,
+          w.result,
+          w.completed_at as completedAt,
+          ROW_NUMBER() OVER (PARTITION BY w.bot_type, w.question_id ORDER BY w.completed_at DESC) as rn
+        FROM work_queue w
+        LEFT JOIN questions q ON w.question_id = q.id
+        WHERE w.status IN ('completed', 'failed')
+      )
+      SELECT id, botType, questionId, questionText, channel, action, status, result, completedAt
+      FROM RankedActivity
+      WHERE rn = 1
+      ORDER BY completedAt DESC
+      LIMIT 100
+    `);
+
+    const activities = activityResult.rows.map(row => ({
+      id: row.id,
+      botType: row.botType,
+      questionId: row.questionId,
+      questionText: row.questionText ? String(row.questionText).substring(0, 100) : 'Unknown question',
+      channel: row.channel || 'unknown',
+      action: row.action || 'processed',
+      status: row.status,
+      completedAt: row.completedAt
+    }));
+
+    // Calculate stats per bot (still count all runs for accurate totals)
+    const statsResult = await client.execute(`
+      SELECT 
+        bot_type as botType,
+        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+        SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
+        MAX(completed_at) as lastRun
+      FROM work_queue
+      WHERE status IN ('completed', 'failed')
+      GROUP BY bot_type
+      ORDER BY lastRun DESC
+    `);
+
+    const botStats = statsResult.rows.map(row => ({
+      botType: row.botType,
+      completed: Number(row.completed) || 0,
+      failed: Number(row.failed) || 0,
+      lastRun: row.lastRun || new Date().toISOString()
+    }));
+
+    const botActivityData = {
+      activities,
+      stats: botStats,
+      lastUpdated: new Date().toISOString()
+    };
+    const botBytes = writeJson('bot-activity.json', botActivityData);
+    totalBytes += botBytes;
+    console.log(`   ✓ bot-activity.json (${activities.length} activities, ${botStats.length} bots, ${formatBytes(botBytes)})`);
+  } catch (e) {
+    console.log(`   ⚠️ Could not fetch bot activity: ${e.message}`);
+    // Write empty bot activity file
+    const botBytes = writeJson('bot-activity.json', {
+      activities: [],
+      stats: [],
+      lastUpdated: new Date().toISOString()
+    });
+    totalBytes += botBytes;
+    console.log(`   ✓ bot-activity.json (empty - work_queue may not exist, ${formatBytes(botBytes)})`);
+  }
+
+  // Fetch GitHub analytics
+  console.log('\n📥 Fetching GitHub analytics...');
+  try {
+    // Get recent views/clones data
+    const viewsResult = await client.execute(`
+      SELECT date, repo, metric_type, metric_name, count, uniques
+      FROM github_analytics
+      WHERE metric_type IN ('views', 'clones')
+      ORDER BY date DESC
+      LIMIT 60
+    `);
+
+    // Get latest referrers
+    const referrersResult = await client.execute(`
+      SELECT metric_name as referrer, count, uniques
+      FROM github_analytics
+      WHERE metric_type = 'referrer'
+      AND date = (SELECT MAX(date) FROM github_analytics WHERE metric_type = 'referrer')
+      ORDER BY count DESC
+      LIMIT 10
+    `);
+
+    // Get latest repo stats
+    const repoStatsResult = await client.execute(`
+      SELECT repo, metric_name, count
+      FROM github_analytics
+      WHERE metric_type = 'repo_stat'
+      AND date = (SELECT MAX(date) FROM github_analytics WHERE metric_type = 'repo_stat')
+    `);
+
+    // Aggregate views by date
+    const viewsByDate = {};
+    const clonesByDate = {};
+    for (const row of viewsResult.rows) {
+      const date = row.date;
+      if (row.metric_type === 'views') {
+        if (!viewsByDate[date]) viewsByDate[date] = { count: 0, uniques: 0 };
+        viewsByDate[date].count += Number(row.count) || 0;
+        viewsByDate[date].uniques += Number(row.uniques) || 0;
+      } else if (row.metric_type === 'clones') {
+        if (!clonesByDate[date]) clonesByDate[date] = { count: 0, uniques: 0 };
+        clonesByDate[date].count += Number(row.count) || 0;
+        clonesByDate[date].uniques += Number(row.uniques) || 0;
+      }
+    }
+
+    // Format for chart display
+    const views = Object.entries(viewsByDate)
+      .map(([date, data]) => ({ date, ...data }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    const clones = Object.entries(clonesByDate)
+      .map(([date, data]) => ({ date, ...data }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    const referrers = referrersResult.rows.map(row => ({
+      referrer: row.referrer,
+      count: Number(row.count) || 0,
+      uniques: Number(row.uniques) || 0
+    }));
+
+    // Aggregate repo stats
+    const repoStats = {};
+    for (const row of repoStatsResult.rows) {
+      const repo = row.repo;
+      if (!repoStats[repo]) repoStats[repo] = {};
+      repoStats[repo][row.metric_name] = Number(row.count) || 0;
+    }
+
+    const githubAnalyticsData = {
+      views,
+      clones,
+      referrers,
+      repoStats,
+      lastUpdated: new Date().toISOString()
+    };
+    const gaBytes = writeJson('github-analytics.json', githubAnalyticsData);
+    totalBytes += gaBytes;
+    console.log(`   ✓ github-analytics.json (${views.length} days of data, ${formatBytes(gaBytes)})`);
+  } catch (e) {
+    console.log(`   ⚠️ Could not fetch GitHub analytics: ${e.message}`);
+    // Write empty analytics file
+    const gaBytes = writeJson('github-analytics.json', {
+      views: [],
+      clones: [],
+      referrers: [],
+      repoStats: {},
+      lastUpdated: new Date().toISOString()
+    });
+    totalBytes += gaBytes;
+    console.log(`   ✓ github-analytics.json (empty - table may not exist yet, ${formatBytes(gaBytes)})`);
+  }
+
+  // Fetch tests from database
+  console.log('\n📥 Fetching tests...');
+  try {
+    const testsResult = await client.execute(`
+      SELECT id, channel_id, channel_name, title, description, questions, passing_score, created_at, last_updated, version
+      FROM tests
+      ORDER BY channel_name
+    `);
+
+    // Create a map of questions for enrichment
+    const questionMap = new Map(questions.map(q => [q.id, q]));
+
+    // Filter out irrelevant questions that reference specific scenarios/case studies
+    const isIrrelevantQuestion = (q) => {
+      const text = (q.question || '').toLowerCase();
+      return (
+        text.includes('percentage') && text.includes('candidate') ||
+        text.includes('the candidate') && text.includes('when') ||
+        text.includes('how many') && text.includes('candidate') ||
+        text.includes('what number') && text.includes('candidate') ||
+        text.includes('the team') && text.includes('when they') ||
+        text.includes('in the scenario') ||
+        text.includes('in this case') ||
+        text.includes('monitoring data') && text.includes('decision') ||
+        text.includes('critical database migration') ||
+        text.length < 30
+      );
+    };
+
+    const tests = testsResult.rows.map(row => {
+      const allQuestions = safeJsonParse(row.questions, []);
+      // Filter out irrelevant questions and enrich with channel/subChannel
+      const filteredQuestions = allQuestions
+        .filter(q => !isIrrelevantQuestion(q))
+        .map(tq => {
+          // Enrich test question with channel and subChannel from original question
+          const originalQuestion = questionMap.get(tq.questionId);
+          if (originalQuestion) {
+            return {
+              ...tq,
+              channel: originalQuestion.channel,
+              subChannel: originalQuestion.subChannel
+            };
+          }
+          // Fallback: use test's channel if original question not found
+          return {
+            ...tq,
+            channel: tq.channel || row.channel_id,
+            subChannel: tq.subChannel || 'general'
+          };
+        });
+      
+      return {
+        id: row.id,
+        channelId: row.channel_id,
+        channelName: row.channel_name,
+        title: row.title,
+        description: row.description,
+        questions: filteredQuestions,
+        passingScore: row.passing_score || 70,
+        createdAt: row.created_at,
+        lastUpdated: row.last_updated,
+        version: row.version || 1
+      };
+    });
+
+    const testsData = tests;
+    const testsBytes = writeJson('tests.json', testsData);
+    totalBytes += testsBytes;
+    console.log(`   ✓ tests.json (${tests.length} tests, ${formatBytes(testsBytes)})`);
+  } catch (e) {
+    console.log(`   ⚠️ Could not fetch tests: ${e.message}`);
+    const testsBytes = writeJson('tests.json', []);
+    totalBytes += testsBytes;
+    console.log(`   ✓ tests.json (empty - table may not exist yet, ${formatBytes(testsBytes)})`);
+  }
+
+  // Fetch coding challenges from database
+  console.log('\n📥 Fetching coding challenges...');
+  try {
+    const challengesResult = await client.execute(`
+      SELECT id, title, description, difficulty, category, tags, companies,
+             starter_code_js, starter_code_py, test_cases, hints,
+             solution_js, solution_py, complexity_time, complexity_space, complexity_explanation,
+             time_limit, created_at
+      FROM coding_challenges
+      ORDER BY category, difficulty, id
+    `);
+
+    const challenges = challengesResult.rows.map(row => ({
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      difficulty: row.difficulty,
+      category: row.category,
+      tags: safeJsonParse(row.tags, []),
+      companies: safeJsonParse(row.companies, []),
+      starterCode: {
+        javascript: row.starter_code_js,
+        python: row.starter_code_py
+      },
+      testCases: safeJsonParse(row.test_cases, []),
+      hints: safeJsonParse(row.hints, []),
+      solution: {
+        javascript: row.solution_js,
+        python: row.solution_py
+      },
+      complexity: {
+        time: row.complexity_time,
+        space: row.complexity_space,
+        explanation: row.complexity_explanation
+      },
+      timeLimit: row.time_limit || 15,
+      createdAt: row.created_at
+    }));
+
+    const challengesData = challenges;
+    const challengesBytes = writeJson('coding-challenges.json', challengesData);
+    totalBytes += challengesBytes;
+    console.log(`   ✓ coding-challenges.json (${challenges.length} challenges, ${formatBytes(challengesBytes)})`);
+  } catch (e) {
+    console.log(`   ⚠️ Could not fetch coding challenges: ${e.message}`);
+    const challengesBytes = writeJson('coding-challenges.json', []);
+    totalBytes += challengesBytes;
+    console.log(`   ✓ coding-challenges.json (empty - table may not exist yet, ${formatBytes(challengesBytes)})`);
+  }
+
+  // Generate changelog from bot activity
+  console.log('\n📥 Generating changelog from bot activity...');
+  try {
+    // First check if work_queue table exists and has required columns
+    const tableInfo = await client.execute(`
+      SELECT name FROM sqlite_master WHERE type='table' AND name='work_queue'
+    `);
+    
+    if (tableInfo.rows.length === 0) {
+      throw new Error('work_queue table does not exist');
+    }
+
+    // Check for required columns
+    const testQuery = await client.execute(`SELECT * FROM work_queue LIMIT 1`);
+    const hasCompletedAt = testQuery.columns.includes('completed_at');
+    const hasBotType = testQuery.columns.includes('bot_type');
+    
+    if (!hasCompletedAt || !hasBotType) {
+      throw new Error('Required columns missing from work_queue table');
+    }
+
+    // Get recent bot activity grouped by date
+    const changelogResult = await client.execute(`
+      SELECT 
+        DATE(completed_at) as date,
+        bot_type,
+        COUNT(*) as count,
+        GROUP_CONCAT(DISTINCT q.channel) as channels
+      FROM work_queue w
+      LEFT JOIN questions q ON w.question_id = q.id
+      WHERE w.status = 'completed'
+        AND w.completed_at >= DATE('now', '-30 days')
+      GROUP BY DATE(completed_at), bot_type
+      ORDER BY date DESC, count DESC
+    `);
+
+    // Group by date
+    const entriesByDate = {};
+    for (const row of changelogResult.rows) {
+      const date = row.date;
+      if (!entriesByDate[date]) {
+        entriesByDate[date] = {
+          date,
+          questionsAdded: 0,
+          questionsImproved: 0,
+          channels: new Set(),
+          activities: []
+        };
+      }
+      
+      const entry = entriesByDate[date];
+      const channels = row.channels ? row.channels.split(',').filter(Boolean) : [];
+      channels.forEach(c => entry.channels.add(c));
+      
+      if (row.bot_type === 'generate' || row.bot_type === 'coding-challenge') {
+        entry.questionsAdded += Number(row.count) || 0;
+        entry.activities.push({ type: row.bot_type, action: 'added', count: Number(row.count) || 0 });
+      } else if (['improve', 'mermaid', 'eli5', 'tldr', 'video', 'company'].includes(row.bot_type)) {
+        entry.questionsImproved += Number(row.count) || 0;
+        entry.activities.push({ type: row.bot_type, action: 'improved', count: Number(row.count) || 0 });
+      }
+    }
+
+    // Convert to changelog entries
+    const changelogEntries = Object.values(entriesByDate)
+      .filter(e => e.questionsAdded > 0 || e.questionsImproved > 0)
+      .map(e => ({
+        date: e.date,
+        type: e.questionsAdded > 0 ? 'added' : 'improved',
+        title: e.questionsAdded > 0 
+          ? `${e.questionsAdded} new question${e.questionsAdded > 1 ? 's' : ''} added`
+          : `${e.questionsImproved} question${e.questionsImproved > 1 ? 's' : ''} improved`,
+        description: `Bot activity on ${e.date}`,
+        details: {
+          questionsAdded: e.questionsAdded,
+          questionsImproved: e.questionsImproved,
+          channels: Array.from(e.channels),
+          activities: e.activities
+        }
+      }))
+      .slice(0, 30); // Keep last 30 days
+
+    // Calculate totals
+    const totals = await client.execute(`
+      SELECT 
+        SUM(CASE WHEN bot_type IN ('generate', 'coding-challenge') THEN 1 ELSE 0 END) as added,
+        SUM(CASE WHEN bot_type NOT IN ('generate', 'coding-challenge') THEN 1 ELSE 0 END) as improved
+      FROM work_queue
+      WHERE status = 'completed'
+    `);
+
+    const changelog = {
+      entries: changelogEntries.length > 0 ? changelogEntries : [{
+        date: new Date().toISOString().split('T')[0],
+        type: 'feature',
+        title: 'Platform Active',
+        description: 'Questions served from Turso database with real-time bot updates.',
+        details: { features: ['Real-time updates', 'AI-powered improvements'] }
+      }],
+      stats: {
+        totalQuestionsAdded: Number(totals.rows[0]?.added) || questions.length,
+        totalQuestionsImproved: Number(totals.rows[0]?.improved) || 0,
+        lastUpdated: new Date().toISOString()
+      }
+    };
+
+    const changelogBytes = writeJson('changelog.json', changelog);
+    totalBytes += changelogBytes;
+    console.log(`   ✓ changelog.json (${changelogEntries.length} entries, ${formatBytes(changelogBytes)})`);
+  } catch (e) {
+    console.log(`   ⚠️ Could not generate changelog: ${e.message}`);
+    // Write default changelog
+    const changelogBytes = writeJson('changelog.json', {
+      entries: [{
+        date: new Date().toISOString().split('T')[0],
+        type: 'feature',
+        title: 'Platform Active',
+        description: 'Questions served from database.',
+        details: {}
+      }],
+      stats: {
+        totalQuestionsAdded: questions.length,
+        totalQuestionsImproved: 0,
+        lastUpdated: new Date().toISOString()
+      }
+    });
+    totalBytes += changelogBytes;
+    console.log(`   ✓ changelog.json (default, ${formatBytes(changelogBytes)})`);
+  }
+
+  // Fetch blog posts mapping
+  console.log('\n📥 Fetching blog posts...');
+  try {
+    const blogResult = await client.execute(`
+      SELECT question_id, title, slug
+      FROM blog_posts
+      ORDER BY created_at DESC
+    `);
+
+    const blogPosts = {};
+    for (const row of blogResult.rows) {
+      blogPosts[row.question_id] = {
+        title: row.title,
+        slug: row.slug,
+        url: `/posts/${row.question_id}/${row.slug}/`
+      };
+    }
+
+    const blogBytes = writeJson('blog-posts.json', blogPosts);
+    totalBytes += blogBytes;
+    console.log(`   ✓ blog-posts.json (${Object.keys(blogPosts).length} posts, ${formatBytes(blogBytes)})`);
+  } catch (e) {
+    console.log(`   ⚠️ Could not fetch blog posts: ${e.message}`);
+    const blogBytes = writeJson('blog-posts.json', {});
+    totalBytes += blogBytes;
+    console.log(`   ✓ blog-posts.json (empty - table may not exist yet, ${formatBytes(blogBytes)})`);
+  }
+
+  // Fetch certifications from database
+  console.log('\n📥 Fetching certifications...');
+  try {
+    const certsResult = await client.execute(`
+      SELECT id, name, provider, description, icon, color, difficulty, category,
+             estimated_hours, exam_code, official_url, domains, prerequisites,
+             status, question_count, passing_score, exam_duration, created_at, last_updated,
+             channel_mappings
+      FROM certifications
+      WHERE status = 'active'
+      ORDER BY name
+    `);
+
+    // Calculate actual question counts for each certification
+    const certifications = await Promise.all(certsResult.rows.map(async (row) => {
+      // Get question count by checking channel mappings or certification ID as channel
+      let questionCount = 0;
+      
+      try {
+        // First try: Use channel_mappings if they exist
+        if (row.channel_mappings) {
+          const channelMappings = safeJsonParse(row.channel_mappings, []);
+          for (const mapping of channelMappings) {
+            const countResult = await client.execute({
+              sql: mapping.subChannel 
+                ? `SELECT COUNT(*) as count FROM questions WHERE channel = ? AND sub_channel = ? AND status = 'active'`
+                : `SELECT COUNT(*) as count FROM questions WHERE channel = ? AND status = 'active'`,
+              args: mapping.subChannel ? [mapping.channel, mapping.subChannel] : [mapping.channel]
+            });
+            questionCount += countResult.rows[0]?.count || 0;
+          }
+        }
+        
+        // Fallback: Check if certification ID matches a channel name
+        if (questionCount === 0) {
+          const countResult = await client.execute({
+            sql: `SELECT COUNT(*) as count FROM questions WHERE channel = ? AND status = 'active'`,
+            args: [row.id]
+          });
+          questionCount = countResult.rows[0]?.count || 0;
+        }
+      } catch (e) {
+        console.log(`   ⚠️ Could not calculate question count for ${row.id}: ${e.message}`);
+      }
+      
+      return {
+        id: row.id,
+        name: row.name,
+        provider: row.provider,
+        description: row.description,
+        icon: row.icon || 'award',
+        color: row.color || 'text-primary',
+        difficulty: row.difficulty,
+        category: row.category,
+        estimatedHours: row.estimated_hours || 40,
+        examCode: row.exam_code,
+        officialUrl: row.official_url,
+        domains: safeJsonParse(row.domains, []),
+        prerequisites: safeJsonParse(row.prerequisites, []),
+        questionCount: questionCount,
+        passingScore: row.passing_score || 70,
+        examDuration: row.exam_duration || 90,
+        createdAt: row.created_at,
+        lastUpdated: row.last_updated
+      };
+    }));
+
+    const certsBytes = writeJson('certifications.json', certifications);
+    totalBytes += certsBytes;
+    console.log(`   ✓ certifications.json (${certifications.length} certifications, ${formatBytes(certsBytes)})`);
+  } catch (e) {
+    console.log(`   ⚠️ Could not fetch certifications: ${e.message}`);
+    const certsBytes = writeJson('certifications.json', []);
+    totalBytes += certsBytes;
+    console.log(`   ✓ certifications.json (empty - table may not exist yet, ${formatBytes(certsBytes)})`);
+  }
+
+  // Print summary
+  console.log('\n' + '='.repeat(60));
+  console.log('📊 DATA EXPORT SUMMARY');
+  console.log('='.repeat(60));
+  console.log(`   Total questions:    ${questions.length}`);
+  console.log(`   Total channels:     ${channelStats.length}`);
+  console.log(`   Total output size:  ${formatBytes(totalBytes)}`);
+  console.log(`   Output directory:   ${OUTPUT_DIR}`);
+  if (fs.existsSync(DIST_DATA_DIR)) {
+    console.log(`   Also copied to:     ${DIST_DATA_DIR}`);
+  }
+  console.log('='.repeat(60));
+  console.log('\n✅ Static data files generated successfully!');
+}
+
+main().catch(e => {
+  console.error('Fatal:', e);
+  process.exit(1);
+});

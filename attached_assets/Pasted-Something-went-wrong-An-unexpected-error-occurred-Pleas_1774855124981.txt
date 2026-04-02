@@ -1,0 +1,31 @@
+Something went wrong
+An unexpected error occurred. Please try again or return to the home page.
+
+useSidebar must be used within a SidebarProvider
+
+
+    at DesktopSidebar (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/components/layout/UnifiedNav.tsx:596:34)
+    at div (<anonymous>)
+    at AppLayout (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/components/layout/AppLayout.tsx:10:3)
+    at AllChannelsGenZ (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/pages/AllChannelsGenZ.tsx:91:41)
+    at Route (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/node_modules/.vite/deps/wouter.js?v=93f6258d:299:16)
+    at Switch (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/node_modules/.vite/deps/wouter.js?v=93f6258d:356:17)
+    at Suspense (<anonymous>)
+    at MinimalApp (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/App.tsx:204:22)
+    at OnboardingGuard (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/App.tsx:97:28)
+    at PublicRoute (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/components/ProtectedRoute.tsx:56:3)
+    at ProtectedRoute (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/components/ProtectedRoute.tsx:31:3)
+    at UnifiedNotificationManager (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/components/UnifiedNotificationManager.tsx:5:46)
+    at AchievementProvider (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/context/AchievementContext.tsx:5:39)
+    at CreditsProvider (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/context/CreditsContext.tsx:20:35)
+    at LiveRegionProvider (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/components/LiveRegion.tsx:17:38)
+    at FullApp (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/App.tsx:330:3)
+    at div (<anonymous>)
+    at Provider (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/node_modules/.vite/deps/chunk-RC363X6H.js?v=8368cfcc:39:15)
+    at TooltipProvider (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=65c9309a:2663:5)
+    at QueryClientProvider (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/node_modules/.vite/deps/@tanstack_react-query.js?v=93f6258d:3130:3)
+    at UserPreferencesProvider (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/context/UserPreferencesContext.tsx:22:43)
+    at ThemeProvider (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/context/ThemeContext.tsx:11:33)
+    at ErrorBoundary (https://23906669-eac4-4dce-b165-1f4684467283-00-e9cchqcyffuq.worf.replit.dev:8000/src/components/ErrorBoundary.tsx:6:5)
+    at App (<anonymous>)
+Try Again

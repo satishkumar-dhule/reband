@@ -1,0 +1,217 @@
+/**
+ * Badge Component Styles
+ * 
+ * CSS Module for Badge component with design token integration.
+ * Supports dark mode via CSS custom properties.
+ */
+
+/* Base badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-1, 0.25rem);
+  font-family: var(--font-sans);
+  font-weight: var(--font-semibold);
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-radius: var(--spacing-8, 2rem);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--animation-duration-fast, 100ms) var(--animation-easing-ease-out, ease-out),
+              box-shadow var(--animation-duration-fast, 100ms) var(--animation-easing-ease-out, ease-out);
+}
+
+/* Size variants */
+.size-sm {
+  min-width: var(--spacing-6, 1.5rem);
+  height: var(--spacing-6, 1.5rem);
+  padding: var(--spacing-1, 0.25rem) var(--spacing-2, 0.5rem);
+  font-size: var(--text-xs);
+}
+
+.size-md {
+  min-width: var(--spacing-8, 2rem);
+  height: var(--spacing-8, 2rem);
+  padding: var(--spacing-1, 0.25rem) var(--spacing-3, 0.75rem);
+  font-size: var(--text-sm);
+}
+
+.size-lg {
+  min-width: var(--spacing-10, 2.5rem);
+  height: var(--spacing-10, 2.5rem);
+  padding: var(--spacing-2, 0.5rem) var(--spacing-4, 1rem);
+  font-size: var(--text-base);
+}
+
+/* Badge types */
+.type-xp {
+  background: linear-gradient(135deg, var(--gh-accent-fg) 0%, var(--gh-accent-hover) 100%);
+  box-shadow: 0 2px 4px var(--gh-focus-ring);
+}
+
+.type-level {
+  background: linear-gradient(135deg, var(--gh-done-fg) 0%, var(--gh-done-hover) 100%);
+  box-shadow: 0 2px 4px rgba(130, 80, 223, 0.3);
+}
+
+.type-mastery {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.type-streak {
+  background: linear-gradient(135deg, var(--gh-attention-fg) 0%, var(--gh-attention-hover) 100%);
+  box-shadow: 0 2px 4px rgba(210, 153, 34, 0.3);
+}
+
+.type-notification {
+  background: linear-gradient(135deg, var(--gh-danger-fg) 0%, var(--gh-danger-hover) 100%);
+  box-shadow: 0 2px 4px rgba(207, 34, 46, 0.3);
+}
+
+/* Icon styles */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon svg {
+  width: 1em;
+  height: 1em;
+}
+
+/* Value styles */
+.value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animation */
+.animate {
+  animation: pulse-badge 2s var(--animation-easing-ease-in-out, ease-in-out) infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* New badge glow effect */
+.is-new::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: inherit;
+  background: inherit;
+  z-index: 0;
+  animation: glow-pulse 2s var(--animation-easing-ease-in-out, ease-in-out) infinite;
+  filter: blur(4px);
+  opacity: 0.7;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* Hover effects */
+.badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Focus styles for accessibility */
+.badge:focus-visible {
+  outline: 2px solid var(--color-primary-500, #0969da);
+  outline-offset: 2px;
+}
+
+/* Dark mode support - using data-theme selectors for app theme system consistency */
+:root,
+[data-theme="dark"],
+.dark {
+  --badge-dark-border: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .badge,
+.dark .badge {
+  border-color: var(--gh-border-muted);
+}
+
+[data-theme="dark"] .type-xp,
+.dark .type-xp {
+  background: linear-gradient(135deg, var(--gh-accent-fg) 0%, var(--gh-accent-emphasis) 100%);
+}
+
+[data-theme="dark"] .type-level,
+.dark .type-level {
+  background: linear-gradient(135deg, var(--gh-done-fg) 0%, var(--gh-done-emphasis) 100%);
+}
+
+[data-theme="dark"] .type-streak,
+.dark .type-streak {
+  background: linear-gradient(135deg, var(--gh-attention-fg) 0%, var(--gh-attention-emphasis) 100%);
+}
+
+[data-theme="dark"] .type-notification,
+.dark .type-notification {
+  background: linear-gradient(135deg, var(--gh-danger-fg) 0%, var(--gh-danger-emphasis) 100%);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .badge {
+    transition: none;
+  }
+
+  .animate,
+  .is-new::before {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .badge {
+    border-width: 3px;
+    font-weight: var(--font-bold);
+  }
+
+  .badge:focus-visible {
+    outline-width: 3px;
+    outline-color: var(--color-primary-500, #0969da);
+  }
+}
+
+/* Print styles */
+@media print {
+  .badge {
+    box-shadow: none;
+    border: 1px solid #000000;
+    /* Ensure proper colors for print */
+    background-color: var(--gh-neutral-subtle) !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  .is-new::before {
+    display: none;
+  }
+}

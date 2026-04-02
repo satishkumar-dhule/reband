@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.schema.json",
+  "theme": "github-dark",
+  "model": "anthropic/claude-sonnet-4-5",
+  "agents": {
+    "default": "devprep-supervisor"
+  },
+  "instructions": [
+    "AGENTS.md",
+    "replit.md"
+  ]
+}

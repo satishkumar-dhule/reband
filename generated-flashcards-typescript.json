@@ -1,0 +1,215 @@
+{
+  "channel": "typescript",
+  "flashcards": [
+    {
+      "id": "fla-ts-001",
+      "channelId": "typescript",
+      "front": "What is the difference between `type` and `interface` in TypeScript?",
+      "back": "**Interfaces** can be extended and merged declaratively, while **types** use intersection for extension and cannot be merged. Interfaces are better for object shapes that may be implemented, while types are better for unions, primitives, and complex type compositions. Both support extending — interfaces use `extends`, types use `&`.",
+      "hint": "Think about declaration merging and object-oriented patterns",
+      "tags": ["typescript", "types", "interfaces", "basics"],
+      "difficulty": "beginner",
+      "category": "Types Vs Interfaces",
+      "codeExample": {
+        "language": "typescript",
+        "code": "interface User { name: string; }\ninterface User { age: number; }\n// User has BOTH properties - merging!\n\ntype Person = { name: string } & { age: number; };"
+      }
+    },
+    {
+      "id": "fla-ts-002",
+      "channelId": "typescript",
+      "front": "How do you define a generic function in TypeScript?",
+      "back": "Use **type parameters** in angle brackets before the function parentheses. Type parameters act as placeholders that get replaced with actual types when the function is called. You can name them anything (convention uses single letters like `T`, `U`), and they enable the same logic to work with multiple types while maintaining type safety.",
+      "hint": "Angle brackets before function name hold the type parameter",
+      "tags": ["typescript", "generics", "functions"],
+      "difficulty": "beginner",
+      "category": "Generic Functions",
+      "codeExample": {
+        "language": "typescript",
+        "code": "function identity<T>(value: T): T {\n  return value;\n}\n\nconst num = identity(42);       // type: number\nconst str = identity(\"hello\"); // type: string"
+      }
+    },
+    {
+      "id": "fla-ts-003",
+      "channelId": "typescript",
+      "front": "What does the `Partial<T>` utility type do?",
+      "back": "**Partial<T>** transforms all properties of type `T` to be optional. It maps each property to `Property?`. This is useful when you need to create or update objects where not all properties are required, such as form updates or configuration objects where you only specify what changes.",
+      "hint": "Makes all properties optional in an object type",
+      "tags": ["typescript", "utility-types", "partial"],
+      "difficulty": "beginner",
+      "category": "Utility Types",
+      "codeExample": {
+        "language": "typescript",
+        "code": "interface User {\n  name: string;\n  age: number;\n  email: string;\n}\n\ntype PartialUser = Partial<User>;\n// Equivalent to:\n// { name?: string; age?: number; email?: string; }"
+      }
+    },
+    {
+      "id": "fla-ts-004",
+      "channelId": "typescript",
+      "front": "How does a `typeof` type guard work in TypeScript?",
+      "back": "The **`typeof` operator** in TypeScript refines types within conditional blocks. When used with `typeof x === \"string\"` or `typeof x === \"number\"`, TypeScript knows the variable is that specific type in the true branch. It works for primitives: `\"string\"`, `\"number\"`, `\"boolean\"`, `\"undefined\"`, `\"function\"`, `\"symbol\"`, `\"bigint\"`.",
+      "hint": "Check the runtime type in a conditional branch",
+      "tags": ["typescript", "type-guards", "typeof"],
+      "difficulty": "beginner",
+      "category": "Type Guards",
+      "codeExample": {
+        "language": "typescript",
+        "code": "function print(value: string | number) {\n  if (typeof value === \"string\") {\n    console.log(value.toUpperCase()); // value is string\n  } else {\n    console.log(value.toFixed(2));    // value is number\n  }\n}"
+      }
+    },
+    {
+      "id": "fla-ts-005",
+      "channelId": "typescript",
+      "front": "What is a union type in TypeScript?",
+      "back": "A **union type** (`|`) represents a value that can be one of multiple types. TypeScript will only allow operations available on ALL types in the union. Use the pipe operator to combine types: `string | number` accepts either type. This is fundamental for handling values that come from different sources or have varying shapes.",
+      "hint": "Pipe operator combines multiple possible types",
+      "tags": ["typescript", "union-types", "basics"],
+      "difficulty": "beginner",
+      "category": "Union Types",
+      "codeExample": {
+        "language": "typescript",
+        "code": "type ID = string | number;\n\nfunction getId(id: ID): string {\n  return id.toString(); // works on both\n}\n\nconst userId: ID = \"abc123\";\nconst numericId: ID = 42;"
+      }
+    },
+    {
+      "id": "fla-ts-006",
+      "channelId": "typescript",
+      "front": "When should you use `interface` over `type` in TypeScript?",
+      "back": "Use **`interface`** when defining object shapes that may be implemented by classes or merged across declarations. Interfaces support **declaration merging**, making them ideal for library extensions and third-party types. Use **`type`** for unions, computed types, primitives, and when you need features like conditional types or template literals.",
+      "hint": "Consider declaration merging and object-oriented patterns",
+      "tags": ["typescript", "interfaces", "types", "best-practices"],
+      "difficulty": "intermediate",
+      "category": "Types Vs Interfaces",
+      "codeExample": {
+        "language": "typescript",
+        "code": "// Interface allows declaration merging\ninterface Window { title: string; }\ninterface Window { ts: TypeScript; }\n\n// Type alias for unions\ntype ID = string | number;\n\n// Type for computed properties\ntype Keys = \"firstName\" | \"lastName\";"
+      }
+    },
+    {
+      "id": "fla-ts-007",
+      "channelId": "typescript",
+      "front": "How do generic constraints work with `extends`?",
+      "back": "Generic **constraints** using `extends` limit what types can be passed to a generic. The type parameter must satisfy the constraint — either extend a specific type or have certain properties. Use `T extends BaseType` to ensure the generic has required members. This lets you access properties safely inside the generic function.",
+      "hint": "Restrict the generic type to meet requirements",
+      "tags": ["typescript", "generics", "constraints", "extends"],
+      "difficulty": "intermediate",
+      "category": "Generic Constraints",
+      "codeExample": {
+        "language": "typescript",
+        "code": "interface HasLength {\n  length: number;\n}\n\nfunction logLength<T extends HasLength>(arg: T): number {\n  return arg.length; // Safe - T has length\n}\n\nlogLength(\"hello\");     // string has length\nlogLength([1, 2, 3]);    // array has length\nlogLength(123);          // Error: number doesn't have length"
+      }
+    },
+    {
+      "id": "fla-ts-008",
+      "channelId": "typescript",
+      "front": "What is the difference between `Pick<T, K>` and `Omit<T, K>`?",
+      "back": "**Pick<T, K>** creates a type with only the specified keys from `T`. **Omit<T, K>** creates a type excluding the specified keys from `T`. Both take a type and key names. Use Pick when you want a subset, Omit when you want almost everything except certain properties.",
+      "hint": "Pick selects properties, Omit excludes them",
+      "tags": ["typescript", "utility-types", "pick", "omit"],
+      "difficulty": "intermediate",
+      "category": "Utility Types",
+      "codeExample": {
+        "language": "typescript",
+        "code": "interface User {\n  id: number;\n  name: string;\n  email: string;\n  createdAt: Date;\n}\n\ntype UserPreview = Pick<User, \"id\" | \"name\">;\n// { id: number; name: string; }\n\ntype UserWithoutTimestamps = Omit<User, \"createdAt\">;\n// { id: number; name: string; email: string; }"
+      }
+    },
+    {
+      "id": "fla-ts-009",
+      "channelId": "typescript",
+      "front": "What are mapped types in TypeScript?",
+      "back": "**Mapped types** transform existing types by iterating over their keys. They use the `[Key in Keys]` syntax to create new object types. By adding modifiers like `readonly` or `?`, you can transform property mutability and optionality. Mapped types are the foundation for utility types like `Partial` and `Readonly`.",
+      "hint": "Transform types by iterating over keys",
+      "tags": ["typescript", "mapped-types", "advanced-types"],
+      "difficulty": "intermediate",
+      "category": "Mapped Types",
+      "codeExample": {
+        "language": "typescript",
+        "code": "type Readonly<T> = {\n  readonly [K in keyof T]: T[K];\n};\n\ntype Optional<T> = {\n  [K in keyof T]?: T[K];\n};\n\ninterface User {\n  name: string;\n  age: number;\n}\n\ntype ReadonlyUser = Readonly<User>;\ntype OptionalUser = Optional<User>;"
+      }
+    },
+    {
+      "id": "fla-ts-010",
+      "channelId": "typescript",
+      "front": "When should you use the `never` type in TypeScript?",
+      "back": "Use **`never`** for functions that never return or always throw. It represents values that never occur. Common cases: functions that throw errors infinitely, type guards that narrow to impossible states, or exhaustive switch checks. Variables of type `never` cannot be assigned any value.",
+      "hint": "Function that never returns or always throws",
+      "tags": ["typescript", "never-type", "type-system"],
+      "difficulty": "intermediate",
+      "category": "Never Type",
+      "codeExample": {
+        "language": "typescript",
+        "code": "function throwError(msg: string): never {\n  throw new Error(msg);\n}\n\nfunction process(value: string | number) {\n  if (typeof value === \"string\") {\n    return value;\n  } else if (typeof value === \"number\") {\n    return value;\n  } else {\n    // value is never here - exhaustive check\n    throwError(\"Unexpected value: \" + value);\n  }\n}"
+      }
+    },
+    {
+      "id": "fla-ts-011",
+      "channelId": "typescript",
+      "front": "How does the `unknown` type differ from `any`?",
+      "back": "**`unknown`** requires type narrowing before use — you must narrow it to a specific type. **`any`** bypasses all type checking entirely. Use `unknown` when the type is truly unknown and you want TypeScript safety. Use `any` only when migrating from JavaScript or when deliberately opting out of type safety.",
+      "hint": "unknown requires narrowing before operations",
+      "tags": ["typescript", "unknown-type", "any-type", "type-safety"],
+      "difficulty": "intermediate",
+      "category": "Unknown Type",
+      "codeExample": {
+        "language": "typescript",
+        "code": "function processAny(value: any): void {\n  value.toUpperCase(); // Works - no safety\n}\n\nfunction processUnknown(value: unknown): void {\n  // value.toUpperCase(); // Error!\n  \n  if (typeof value === \"string\") {\n    value.toUpperCase(); // OK after narrowing\n  }\n}"
+      }
+    },
+    {
+      "id": "fla-ts-012",
+      "channelId": "typescript",
+      "front": "What are conditional types in TypeScript?",
+      "back": "**Conditional types** select types based on other types using `T extends U ? X : Y`. They are like ternary operators for types. This pattern is fundamental to many utility types and enables powerful type transformations. The `infer` keyword lets you extract types from within other types.",
+      "hint": "Ternary operator for types - chooses based on condition",
+      "tags": ["typescript", "conditional-types", "advanced-types"],
+      "difficulty": "intermediate",
+      "category": "Conditional Types",
+      "codeExample": {
+        "language": "typescript",
+        "code": "type IsString<T> = T extends string ? true : false;\n\ntype A = IsString<string>;  // true\ntype B = IsString<number>;   // false\n\n// Extract return type with infer\ntype ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;\n\ntype R = ReturnType<() => number>; // number"
+      }
+    },
+    {
+      "id": "fla-ts-013",
+      "channelId": "typescript",
+      "front": "What are template literal types in TypeScript?",
+      "back": "**Template literal types** build new string types using template literal syntax. Combine with existing types to create precise string patterns. They support concatenation, union in template positions, and special placeholders. Use them for type-safe strings like event names, CSS properties, or API responses.",
+      "hint": "Create precise string patterns using template syntax",
+      "tags": ["typescript", "template-literals", "advanced-types"],
+      "difficulty": "advanced",
+      "category": "Template Literal Types",
+      "codeExample": {
+        "language": "typescript",
+        "code": "type EventName = `on${string}`;\n\ntype CSSProp = `${string}-${string}`;\n\ntype Action = \"set\" | \"get\";\ntype APIEndpoint = `${Action}${string}`;\n// \"setUser\" | \"setData\" | \"getUser\" | \"getData\"...\n\nconst event: EventName = \"onClick\"; // OK\nconst prop: CSSProp = \"background-color\"; // OK"
+      }
+    },
+    {
+      "id": "fla-ts-014",
+      "channelId": "typescript",
+      "front": "How does `infer` work in TypeScript conditional types?",
+      "back": "**`infer`** declares a type variable within a conditional type to extract parts of another type. Use it in the `extends` branch to capture the inferred type, then use that captured type in the true branch. It's essential for building utility types that extract element types, return types, or parameter types.",
+      "hint": "Extract type parts within conditional type branches",
+      "tags": ["typescript", "infer", "conditional-types", "utility-types"],
+      "difficulty": "advanced",
+      "category": "Infer Keyword",
+      "codeExample": {
+        "language": "typescript",
+        "code": "type ArrayElement<T> = T extends (infer U)[] ? U : never;\n\ntype StrArr = string[];\ntype NumArr = number[];\n\ntype Str = ArrayElement<StrArr>;  // string\ntype Num = ArrayElement<NumArr>; // number\n\n// Extract promise result type\ntype Awaited<T> = T extends Promise<infer U> ? U : never;\ntype Result = Awaited<Promise<string>>; // string"
+      }
+    },
+    {
+      "id": "fla-ts-015",
+      "channelId": "typescript",
+      "front": "How do key remapping and modifiers work in mapped types?",
+      "back": "In mapped types, use **`as`** to remap keys with a type transform. Add `?` for optional and `readonly` for immutability modifiers. Combine with conditional types for complex transformations. The syntax `[K in keyof T as NewKey]` allows creating new key names from existing ones.",
+      "hint": "Use 'as' clause to transform keys in mapped types",
+      "tags": ["typescript", "mapped-types", "key-remapping", "modifiers"],
+      "difficulty": "advanced",
+      "category": "Key Remapping",
+      "codeExample": {
+        "language": "typescript",
+        "code": "type RemoveKind<T> = {\n  [K in keyof T as Exclude<K, \"kind\">]: T[K];\n};\n\ntype MakeOptional<T> = {\n  [K in keyof T]?: T[K];\n};\n\ntype PrefixKeys<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: T[K];\n};\n\ninterface User { name: string; age: number; }\ntype Prefixed = PrefixKeys<User>;\n// { getName: string; getAge: number; }"
+      }
+    }
+  ]
+}

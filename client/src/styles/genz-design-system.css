@@ -1,0 +1,548 @@
+/**
+ * Gen Z Design System - Global Styles
+ * Premium dark theme with vibrant accent gradients
+ * 
+ * This file extends design-system.css with Gen Z specific components
+ * All colors align with design-system.css
+ */
+
+/* ===== GENZ-SPECIFIC EXTENSIONS ===== */
+/* Note: Core color palette, gradients, glows, shadows are inherited from design-system.css */
+:root {
+  /* Legacy aliases for compatibility */
+  --bg-black: var(--color-base-black);
+  --bg-dark: var(--color-base-card);
+  --bg-elevated: var(--color-base-elevated);
+  --bg-hover: var(--color-base-darker);
+  
+  /* Glass Effect */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-hover: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 20px;
+  
+  /* Neon Accents - aligned with design-system.css accent colors */
+  --neon-green: var(--color-success-light);
+  --neon-cyan: var(--color-accent-cyan);
+  --neon-pink: var(--color-accent-pink);
+  --neon-purple: var(--color-accent-purple);
+  
+  /* Text aliases */
+  --foreground: var(--color-text-primary);
+  --muted-foreground: var(--color-text-secondary);
+  
+  /* GenZ-specific gradients */
+  --gradient-secondary: linear-gradient(135deg, var(--color-accent-pink), var(--color-accent-purple));
+  --gradient-purple: linear-gradient(135deg, var(--color-accent-purple), var(--color-accent-pink));
+  
+  /* Touch target minimum */
+  --touch-target-min: 44px;
+}
+
+/* Global Resets */
+* {
+  font-family: var(--font-sans);
+}
+
+/* Body uses theme variables */
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* ===== COMPONENT STYLES ===== */
+
+/* Glass Card - aligned with design-system.css */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/**
+ * @deprecated CSS button classes are deprecated
+ * Use <Button variant="primary"> from unified/Button instead
+ */
+
+/* Premium button - aligned with design-system.css */
+.btn-primary,
+.neon-button {
+  background: var(--gradient-primary);
+  color: white;
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: var(--touch-target-min);
+  box-shadow: var(--shadow-md);
+}
+
+.neon-button {
+  font-weight: 700;
+}
+
+.btn-primary:hover,
+.neon-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--glow-cyan);
+}
+
+.btn-primary:active,
+.neon-button:active {
+  transform: scale(0.98);
+}
+
+/* Progress Bar */
+.progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full, 9999px);
+  overflow: hidden;
+}
+
+.progress-fill,
+.genz-progress-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full, 9999px);
+  transition: width 1s ease-out;
+}
+
+/* Shimmer Effect - uses keyframes from design-system.css */
+/* .shimmer class is inherited from design-system.css */
+
+/* Glow Effects - aligned with design-system.css */
+.glow-green {
+  box-shadow: var(--glow-success);
+}
+
+.glow-cyan {
+  box-shadow: var(--glow-cyan);
+}
+
+.glow-purple {
+  box-shadow: var(--glow-purple);
+}
+
+.glow-pink {
+  box-shadow: var(--glow-pink);
+}
+
+/* Scrollbar - aligned with design-system.css */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong, hsl(0 0% 24%));
+  border-radius: var(--radius-full, 9999px);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-default, hsl(0 0% 18%));
+}
+
+/* Selection */
+::selection {
+  background: var(--color-accent-cyan);
+  color: var(--color-base-black);
+}
+
+/* Focus Outline - use theme-aware ring variable */
+*:focus-visible {
+  outline: 2px solid var(--ring, var(--color-accent-cyan));
+  outline-offset: 2px;
+}
+
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+/* Pulse Animation - aligned with design-system.css */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.pulse {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.bounce {
+  animation: bounce 1s infinite;
+}
+
+/* Float Animation - uses keyframes from index.css */
+/* .animate-float class is inherited from design-system.css */
+
+/* Gradient Text - aligned with design-system.css */
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-vertical {
+  background: var(--gradient-primary-vertical);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Stat Card */
+.stat-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl, 1.5rem);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-md);
+}
+
+/* Badge - aligned with design-system.css */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.badge-primary,
+.badge-green {
+  background: hsla(190, 100%, 50%, 0.1);
+  border-color: hsla(190, 100%, 50%, 0.3);
+  color: var(--color-accent-cyan);
+}
+
+.badge-cyan {
+  background: hsla(190, 100%, 50%, 0.1);
+  border-color: hsla(190, 100%, 50%, 0.3);
+  color: var(--color-accent-cyan);
+}
+
+.badge-purple {
+  background: hsla(270, 100%, 65%, 0.1);
+  border-color: hsla(270, 100%, 65%, 0.3);
+  color: var(--color-accent-purple-light);
+}
+
+.badge-pink {
+  background: hsla(330, 100%, 65%, 0.1);
+  border-color: hsla(330, 100%, 65%, 0.3);
+  color: var(--color-accent-pink-light);
+}
+
+.badge-success {
+  background: hsla(142, 76%, 46%, 0.1);
+  border-color: hsla(142, 76%, 46%, 0.3);
+  color: var(--color-success-light);
+}
+
+.badge-warning {
+  background: hsla(38, 92%, 60%, 0.1);
+  border-color: hsla(38, 92%, 60%, 0.3);
+  /* Fixed: Use darker warning color for WCAG AA compliance (was 60% lightness, now 50%) */
+  color: hsl(38, 92%, 50%);
+}
+
+.badge-error {
+  background: hsla(0, 84%, 60%, 0.1);
+  border-color: hsla(0, 84%, 60%, 0.3);
+  /* Fixed: Use darker error color for WCAG AA compliance (was 70% lightness, now 55%) */
+  color: hsl(0, 84%, 55%);
+}
+
+/* Utility Classes */
+.text-hero {
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.text-display {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.text-title {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.text-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+@media (max-width: 640px) {
+  .text-hero {
+    font-size: 2.5rem;
+    line-height: 1.15;
+  }
+  
+  .text-display {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  .text-title {
+    font-size: 1.75rem;
+    line-height: 1.25;
+  }
+  
+  .text-heading {
+    font-size: 1.375rem;
+    line-height: 1.3;
+  }
+}
+
+/* Ensure minimum 14px text on mobile for all body content */
+@media (max-width: 640px) {
+  /* Base body text minimum */
+  body {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  /* Ensure all text elements respect minimum readable size */
+  p, span, div, li {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Form inputs on mobile */
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+}
+
+/* ===== REDUCED MOTION SUPPORT ===== */
+/* Respect user's motion preferences for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable or minimize all animations and transitions */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  /* Disable decorative animations */
+  .shimmer,
+  .pulse,
+  .bounce,
+  .animate-float {
+    animation: none !important;
+  }
+  
+  /* Keep progress bar functional but instant */
+  .genz-progress-fill,
+  .progress-fill {
+    transition: width 0.01ms !important;
+  }
+  
+  /* Disable hover transforms */
+  .neon-button:hover,
+  .stat-card:hover,
+  .glass-card:hover,
+  .btn-primary:hover {
+    transform: none !important;
+  }
+  
+  /* Disable active state transforms */
+  .neon-button:active,
+  .btn-primary:active {
+    transform: none !important;
+  }
+}
+
+
+/* ===== TOUCH TARGET ACCESSIBILITY ===== */
+/* Ensure all interactive elements meet WCAG 2.1 AA minimum touch target size (44x44px) */
+
+/* Neon buttons - ensure minimum size */
+.neon-button,
+.btn-primary {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  padding: 0.75rem 1.5rem;
+}
+
+/* Glass cards with interactive elements */
+.glass-card button,
+.glass-card a {
+  min-height: var(--touch-target-min);
+  padding: 0.75rem 1rem;
+}
+
+/* Progress bar controls */
+.progress-bar-container button {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+}
+
+/* Icon buttons in GenZ style */
+.icon-btn,
+button[class*="icon"] {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  padding: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Form controls */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+input[type="number"],
+select,
+textarea {
+  min-height: var(--touch-target-min);
+  padding: 0.75rem 1rem;
+  background: var(--color-base-elevated);
+  border: 1px solid var(--color-border-subtle, hsl(0 0% 12%));
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-accent-cyan);
+  box-shadow: 0 0 0 3px hsla(190, 100%, 50%, 0.1);
+}
+
+/* Checkboxes and radio buttons */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 24px;
+  height: 24px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+/* Links */
+a {
+  min-height: var(--touch-target-min);
+  padding: 0.25rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-accent-cyan);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile optimizations for GenZ components - consistent with index.css breakpoints (640px/1023px) */
+@media (max-width: 640px) {
+  .neon-button,
+  .btn-primary {
+    min-height: 48px;
+    padding: 1.125rem 2.25rem;
+  }
+  
+  .glass-card button,
+  .glass-card a {
+    min-height: 48px;
+  }
+}
+
+/* ===== MOBILE MOMENTUM SCROLL UTILITIES ===== */
+/* These classes enable native momentum scrolling on mobile devices */
+
+.momentum-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+.momentum-scroll-x {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Touch gesture handling utilities */
+.touch-pan-y {
+  touch-action: pan-y;
+}
+
+.touch-pan-x {
+  touch-action: pan-x;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Allow vertical scroll while detecting horizontal swipes */
+.swipe-scroll-container {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
