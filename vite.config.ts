@@ -214,14 +214,10 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    // Exclude problematic CJS/ESM packages from pre-bundling
-    // Let Vite handle them natively at runtime
-    exclude: [
-      'lowlight',
-      'highlight.js',
+    include: [
       'react-syntax-highlighter',
-      'refractor',
-      'prismjs',
+      'react-syntax-highlighter/dist/esm/styles/prism',
+      'react-syntax-highlighter/dist/esm/styles/hljs',
     ],
     esbuildOptions: {
       target: 'esnext',
