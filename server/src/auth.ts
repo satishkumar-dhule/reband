@@ -1,6 +1,11 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { client } from "../db";
+import { drizzle } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
+import * as authSchema from "./auth-schema";
+
+const libsqlClient = createClient({ url: "file:local.db" });
+const db = drizzle(libsqlClient, { schema: authSchema });
 
 const replitDomain = process.env.REPLIT_DOMAINS
   ? `https://${process.env.REPLIT_DOMAINS}`
@@ -21,8 +26,9 @@ const trustedOrigins = [
 ];
 
 export const auth = betterAuth({
-  database: drizzleAdapter(client, {
+  database: drizzleAdapter(db, {
     provider: "sqlite",
+    schema: authSchema,
   }),
   baseURL: process.env.BETTER_AUTH_URL ||
     (process.env.REPLIT_DOMAINS
