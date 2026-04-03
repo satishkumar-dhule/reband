@@ -99,6 +99,35 @@
   --radius-lg: var(--radius);
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, monospace;
+
+  /* ── GitHub design system color tokens ─────────────── */
+  --color-gh-accent: var(--gh-accent-fg);
+  --color-gh-accent-hover: var(--gh-accent-hover);
+  --color-gh-accent-subtle: var(--gh-accent-subtle);
+  --color-gh-accent-emphasis: var(--gh-accent-emphasis);
+  --color-gh-fg: var(--gh-fg);
+  --color-gh-fg-muted: var(--gh-fg-muted);
+  --color-gh-fg-subtle: var(--gh-fg-subtle);
+  --color-gh-fg-on-emphasis: var(--gh-fg-on-emphasis);
+  --color-gh-border: var(--gh-border);
+  --color-gh-border-muted: var(--gh-border-muted);
+  --color-gh-canvas: var(--gh-canvas);
+  --color-gh-canvas-subtle: var(--gh-canvas-subtle);
+  --color-gh-canvas-inset: var(--gh-canvas-inset);
+  --color-gh-danger: var(--gh-danger-fg);
+  --color-gh-danger-emphasis: var(--gh-danger-emphasis);
+  --color-gh-danger-hover: var(--gh-danger-hover);
+  --color-gh-danger-subtle: var(--gh-danger-subtle);
+  --color-gh-success: var(--gh-success-fg);
+  --color-gh-success-emphasis: var(--gh-success-emphasis);
+  --color-gh-success-hover: var(--gh-success-hover);
+  --color-gh-success-subtle: var(--gh-success-subtle);
+  --color-gh-attention: var(--gh-attention-fg);
+  --color-gh-attention-subtle: var(--gh-attention-subtle);
+  --color-gh-done: var(--gh-done-fg);
+  --color-gh-done-subtle: var(--gh-done-subtle);
+  --color-gh-pink: var(--gh-pink-fg);
+  --color-gh-neutral-subtle: var(--gh-neutral-subtle);
 }
 
 /* ── Deferred CSS — loaded after first paint ───────────── */
