@@ -27,7 +27,6 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
       }
 
       try {
-        console.log(`🎨 [Attempt ${attemptId}] Starting Mermaid render...`);
         setStatus('loading');
         setError(null);
 
@@ -49,13 +48,10 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
           }
         }
 
-        console.log(`📝 [Attempt ${attemptId}] Code length: ${mermaidCode.length} chars`);
-        console.log(`📝 [Attempt ${attemptId}] First 100 chars:`, mermaidCode.substring(0, 100));
 
         // Dynamic import with error handling - lazy loads mermaid library
         let mermaid;
         try {
-          console.log(`📦 [Attempt ${attemptId}] Importing Mermaid (lazy)...`);
           const mermaidModule = await import('mermaid/dist/mermaid.esm.mjs');
           // Handle both default and named exports
           mermaid = mermaidModule.default || mermaidModule;
@@ -66,19 +62,16 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
             throw new Error('Mermaid module does not have required methods');
           }
           
-          console.log(`✅ [Attempt ${attemptId}] Mermaid imported successfully (lazy loaded)`);
         } catch (importError: any) {
           console.error('Import error details:', importError);
           throw new Error(`Failed to import Mermaid: ${importError.message}`);
         }
 
         if (cancelled) {
-          console.log(`⏹️ [Attempt ${attemptId}] Cancelled before init`);
           return;
         }
 
         // Initialize Mermaid
-        console.log(`⚙️ [Attempt ${attemptId}] Initializing Mermaid...`);
         mermaid.initialize({
           startOnLoad: false,
           theme: 'dark',
@@ -103,19 +96,15 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
           securityLevel: 'loose',
           logLevel: 'debug',
         });
-        console.log(`✅ [Attempt ${attemptId}] Mermaid initialized`);
 
         if (cancelled) {
-          console.log(`⏹️ [Attempt ${attemptId}] Cancelled before render`);
           return;
         }
 
         // Generate unique ID
         const id = `mermaid-${attemptId}-${Date.now()}`;
-        console.log(`🆔 [Attempt ${attemptId}] Using ID: ${id}`);
 
         // Render with timeout
-        console.log(`🎬 [Attempt ${attemptId}] Starting render...`);
         const renderPromise = mermaid.render(id, mermaidCode);
         const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Render timeout after 10 seconds')), 10000)
@@ -124,7 +113,6 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
         const result = await Promise.race([renderPromise, timeoutPromise]);
 
         if (cancelled) {
-          console.log(`⏹️ [Attempt ${attemptId}] Cancelled after render`);
           return;
         }
 
@@ -143,13 +131,10 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
             });
           }
           containerRef.current.innerHTML = sanitizedSvg;
-          console.log(`✅ [Attempt ${attemptId}] Diagram rendered successfully!`);
-          console.log(`📊 [Attempt ${attemptId}] SVG length: ${sanitizedSvg.length} chars`);
           setStatus('success');
         }
       } catch (err: any) {
         if (cancelled) {
-          console.log(`⏹️ [Attempt ${attemptId}] Cancelled during error handling`);
           return;
         }
 
@@ -186,7 +171,6 @@ export function MermaidDiagram({ content, className = '' }: MermaidDiagramProps)
     return () => {
       cancelled = true;
       clearTimeout(timer);
-      console.log(`🧹 [Attempt ${attemptId}] Cleanup`);
     };
   }, [content]);
 

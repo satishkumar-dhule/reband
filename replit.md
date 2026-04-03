@@ -297,3 +297,4 @@ Last Updated: 2026-04-03
 - **Skeleton Screens**: Per-route loading skeletons in client/src/components/skeletons/PageSkeletons.tsx
 - **Route Prefetching**: Hover-based prefetch system in client/src/lib/prefetch.ts
 - **GitHub Management**: New agents for issue/PR/repo management in .opencode/agents/
+- **Import Fix**: react-syntax-highlighter uses default export (not `{ Prism as SyntaxHighlighter }`)

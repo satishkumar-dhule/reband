@@ -101,13 +101,9 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
     }
   }, [mobileOpen]);
 
-  // Full-width layout without nav - still needs proper container wrapper with padding
+  // Full-width / fullscreen layout (e.g. coding challenge) — no nav, no padding
   if (hideNav) {
-    return (
-      <div className="min-h-screen bg-background pt-4 px-4 pb-4">
-        {children}
-      </div>
-    );
+    return <>{children}</>;
   }
 
   return (

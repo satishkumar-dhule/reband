@@ -35,6 +35,7 @@ export default function LearningPaths() {
   const [certsLoading, setCertsLoading] = useState(true);
   const [certsError, setCertsError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'Beginner' | 'Intermediate' | 'Advanced'>('all');
+  type TabValue = 'all' | 'Beginner' | 'Intermediate' | 'Advanced';
   const modalRef = useRef<HTMLDivElement>(null);
   
   // Custom path builder state
@@ -237,7 +238,7 @@ export default function LearningPaths() {
                   key={tab}
                   variant="ghost"
                   size="sm"
-                  onClick={() => setActiveTab(tab as any)}
+                  onClick={() => setActiveTab(tab as TabValue)}
                   className={`border-b-2 rounded-none ${
                     activeTab === tab
                       ? 'border-[var(--gh-accent-fg)] text-[var(--gh-fg)]'

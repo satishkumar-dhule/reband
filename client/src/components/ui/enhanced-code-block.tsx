@@ -10,7 +10,7 @@ import {
   Loader2, Keyboard, PlayCircle, CheckCircle2, XCircle, 
   Terminal, EyeOff, Columns2, Plus, Minus, Code2
 } from 'lucide-react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import SyntaxHighlighter from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { cn } from '@/lib/utils';
 

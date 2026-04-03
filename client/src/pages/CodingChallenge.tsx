@@ -211,7 +211,6 @@ export default function CodingChallenge() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  console.log('[CodingChallenge] Rendering:', { id, viewState, challengesCount: challenges.length, isLoading });
 
   const [currentChallenge, setCurrentChallenge] = useState<Challenge | null>(null);
   const [language, setLanguage] = useState<Language>(getStoredLanguage);
@@ -444,7 +443,7 @@ export default function CodingChallenge() {
           </header>
 
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+          <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
             {/* Mobile Tab Switcher */}
             <div className="lg:hidden flex border-b bg-[var(--gh-canvas)]">
               <Button
@@ -466,7 +465,7 @@ export default function CodingChallenge() {
             </div>
 
             {/* Left Pane - Problem Description (full-width on mobile, 1/3 on desktop) */}
-            <div className={`lg:w-1/3 lg:border-r bg-[var(--gh-canvas)] flex flex-col ${showDescription ? 'flex' : 'hidden lg:flex'} min-w-0`}>
+            <div className={`lg:w-1/3 lg:border-r bg-[var(--gh-canvas)] flex flex-col ${showDescription ? 'flex' : 'hidden lg:flex'} min-w-0 min-h-0`}>
               <ScrollArea className="flex-1 p-4 lg:p-6">
                 <div className="prose prose-sm max-w-none">
                   <h2 className="text-lg font-bold text-[var(--gh-fg)] mb-4">Description</h2>
@@ -537,7 +536,7 @@ export default function CodingChallenge() {
             </div>
 
                 {/* Right Pane - Editor & Results (full-width on mobile, flex-1 on desktop) */}
-                <div className={`flex-1 flex flex-col min-w-0 bg-[var(--gh-canvas)] ${!showDescription ? 'flex' : 'hidden lg:flex'}`}>
+                <div className={`flex-1 flex flex-col min-w-0 min-h-0 bg-[var(--gh-canvas)] ${!showDescription ? 'flex' : 'hidden lg:flex'}`}>
                   {/* Editor Toolbar */}
                   <div className="h-10 border-b bg-[var(--gh-canvas-subtle)] flex items-center justify-between px-4 shrink-0">
                     <div className="flex items-center gap-2">
@@ -557,7 +556,7 @@ export default function CodingChallenge() {
                   </div>
 
                 {/* Editor */}
-                <div className="flex-1 relative overflow-hidden h-full">
+                <div className="flex-1 relative overflow-hidden min-h-0">
                   <CodeEditor
                     value={code}
                     onChange={setCode}

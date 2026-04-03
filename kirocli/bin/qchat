@@ -1,0 +1,2 @@
+#!/bin/sh
+"$HOME/.local/bin/kiro-cli" --show-legacy-warning chat "$@"

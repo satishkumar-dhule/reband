@@ -8,6 +8,11 @@
 
 import { useRef, useCallback, useState, useEffect, type ComponentType } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { 
+  Copy, Check, RotateCcw, ChevronUp, ChevronDown, 
+  Settings, X, Maximize2, Minimize2, Play
+} from 'lucide-react';
+import { Button } from './ui/button';
 
 // Monaco editor types (imported for types only, not runtime)
 type OnMount = (editor: any, monaco: any) => void;
@@ -86,9 +91,12 @@ interface CodeEditorProps {
   value: string;
   onChange: (value: string) => void;
   language: 'javascript' | 'python';
+  onLanguageChange?: (lang: 'javascript' | 'python') => void;
   placeholder?: string;
   readOnly?: boolean;
   height?: string;
+  showToolbar?: boolean;
+  initialCode?: string;
 }
 
 const defaultEditorOptions = {
@@ -242,14 +250,23 @@ export function CodeEditor({
   value,
   onChange,
   language,
+  onLanguageChange,
   readOnly = false,
   height = '300px',
+  showToolbar = true,
+  initialCode = '',
 }: CodeEditorProps) {
   const { theme } = useTheme();
   const editorRef = useRef<unknown>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const isDark = !lightThemes.includes(theme);
   const [EditorComponent, setEditorComponent] = useState<ComponentType<any> | null>(null);
   const [themeReady, setThemeReady] = useState(false);
+  const [fontSize, setFontSize] = useState(14);
+  const [editorHeight, setEditorHeight] = useState(height);
+  const [showSettings, setShowSettings] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -274,22 +291,134 @@ export function CodeEditor({
     [onChange]
   );
 
+  const handleCopy = useCallback(async () => {
+    await navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [value]);
+
+  const handleReset = useCallback(() => {
+    onChange(initialCode);
+  }, [onChange, initialCode]);
+
+  const handleFontSizeIncrease = useCallback(() => {
+    setFontSize(prev => Math.min(prev + 2, 24));
+  }, []);
+
+  const handleFontSizeDecrease = useCallback(() => {
+    setFontSize(prev => Math.max(prev - 2, 10));
+  }, []);
+
+  const handleToggleFullscreen = useCallback(() => {
+    setIsFullscreen(prev => !prev);
+    if (!isFullscreen) {
+      setEditorHeight('calc(100vh - 200px)');
+    } else {
+      setEditorHeight(height);
+    }
+  }, [isFullscreen, height]);
+
+  const currentOptions = {
+    ...defaultEditorOptions,
+    readOnly,
+    fontSize,
+  };
+
   if (!EditorComponent) {
     return <div className="overflow-hidden h-full">{editorLoadingFallback}</div>;
   }
 
   return (
-    <div className="overflow-hidden h-full" data-testid="monaco-editor">
-      <EditorComponent
-        height={height}
-        language={language}
-        value={value}
-        onChange={handleChange}
-        onMount={handleEditorDidMount}
-        theme={isDark && themeReady ? 'vscode-dark-plus' : 'light'}
-        options={{ ...defaultEditorOptions, readOnly }}
-        loading={editorLoadingFallback}
-      />
+    <div 
+      ref={containerRef}
+      className={`overflow-hidden h-full flex flex-col ${isFullscreen ? 'fixed inset-0 z-50 bg-background' : ''}`}
+      data-testid="monaco-editor"
+    >
+      {showToolbar && !readOnly && (
+        <div className="flex items-center justify-between px-3 py-2 bg-muted/50 dark:bg-[var(--gh-canvas-subtle)] border-b border-border">
+          <div className="flex items-center gap-2">
+            {/* Language Selector */}
+            <select
+              value={language}
+              onChange={(e) => onLanguageChange?.(e.target.value as 'javascript' | 'python')}
+              className="px-2 py-1 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+            </select>
+
+            {/* Font Size Controls */}
+            <div className="flex items-center gap-1 ml-2">
+              <button
+                onClick={handleFontSizeDecrease}
+                className="p-1 hover:bg-background rounded transition-colors"
+                title="Decrease font size"
+              >
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <span className="text-xs text-muted-foreground min-w-[24px] text-center">
+                {fontSize}
+              </span>
+              <button
+                onClick={handleFontSizeIncrease}
+                className="p-1 hover:bg-background rounded transition-colors"
+                title="Increase font size"
+              >
+                <ChevronUp className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1">
+            {/* Copy Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="h-8 px-2"
+              title="Copy code"
+            >
+              {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+            </Button>
+
+            {/* Reset Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReset}
+              className="h-8 px-2"
+              title="Reset to original"
+              disabled={value === initialCode}
+            >
+              <RotateCcw className="w-4 h-4" />
+            </Button>
+
+            {/* Fullscreen Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleToggleFullscreen}
+              className="h-8 px-2"
+              title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+            >
+              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex-1 overflow-hidden min-h-0">
+        <EditorComponent
+          height={editorHeight === '100%' ? '100%' : editorHeight}
+          language={language}
+          value={value}
+          onChange={handleChange}
+          onMount={handleEditorDidMount}
+          theme={isDark && themeReady ? 'vscode-dark-plus' : 'light'}
+          options={currentOptions}
+          loading={editorLoadingFallback}
+        />
+      </div>
     </div>
   );
 }
@@ -307,6 +436,7 @@ export function CodeDisplay({
   const { theme } = useTheme();
   const isDark = !lightThemes.includes(theme);
   const [EditorComponent, setEditorComponent] = useState<ComponentType<any> | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -318,12 +448,28 @@ export function CodeDisplay({
     return () => { cancelled = true; };
   }, []);
 
+  const handleCopy = useCallback(async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [code]);
+
   if (!EditorComponent) {
     return <div className="rounded-lg overflow-hidden border border-border min-h-[200px]">{editorLoadingFallback}</div>;
   }
 
   return (
     <div className="rounded-lg overflow-hidden border border-border">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-muted/50 dark:bg-[var(--gh-canvas-subtle)] border-b border-border">
+        <span className="text-xs text-muted-foreground capitalize">{language}</span>
+        <button
+          onClick={handleCopy}
+          className="p-1 hover:bg-background rounded transition-colors"
+          title="Copy code"
+        >
+          {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+        </button>
+      </div>
       <EditorComponent
         height={height}
         language={language}

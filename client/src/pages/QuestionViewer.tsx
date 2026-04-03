@@ -44,7 +44,6 @@ export default function QuestionViewer() {
   const channelId = params?.id;
   const questionIdFromUrl = params?.questionId;
   
-  console.log('[QuestionViewer] Rendering:', { channelId, params, location: location.substring(0, 50) });
   
   const searchParams = new URLSearchParams(location.split('?')[1] || '');
   const questionIdFromSearch = searchParams.get('q');

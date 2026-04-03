@@ -4,7 +4,8 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Prism as SyntaxHighlighter, type SyntaxHighlighterProps } from 'react-syntax-highlighter';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import type { SyntaxHighlighterProps } from 'react-syntax-highlighter';
 import { useCodeTheme } from '../hooks/useCodeTheme';
 import { InlineCodeThemeSelector } from './CodeThemeSelector';
 import { Code2, Copy, Check } from 'lucide-react';
