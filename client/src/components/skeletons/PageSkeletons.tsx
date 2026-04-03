@@ -1,6 +1,22 @@
-import { memo } from "react";
+import { memo, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Skeleton loading primitives for GitHub-themed UI
+ * These components provide visual loading states that match the app's design system
+ */
+
+/**
+ * A single skeleton "bone" element for loading placeholders
+ * Uses GitHub canvas-subtle color and pulse animation
+ * 
+ * @example
+ * // Simple bone
+ * <Bone />
+ * 
+ * // Custom size
+ * <Bone className="h-8 w-32" />
+ */
 function Bone({ className }: { className?: string }) {
   return (
     <div
@@ -12,7 +28,18 @@ function Bone({ className }: { className?: string }) {
   );
 }
 
-const AppShell = memo(function AppShell({ children }: { children: React.ReactNode }) {
+/**
+ * App shell skeleton showing the standard layout structure
+ * Includes sidebar navigation, header, and main content area
+ * Used as wrapper for page-specific skeleton content
+ * 
+ * @param children - Page-specific skeleton content to render inside the shell
+ * @example
+ * <AppShell>
+ *   <HomeSkeleton />
+ * </AppShell>
+ */
+const AppShell = memo(function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen bg-[var(--gh-canvas-default)]">
       <aside className="hidden lg:flex w-56 shrink-0 flex-col border-r border-[var(--gh-border-default)] bg-[var(--gh-canvas-default)] p-3 gap-1">

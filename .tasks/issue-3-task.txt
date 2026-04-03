@@ -1,0 +1,18 @@
+PROCESS ISSUE #3 - Home Page Data Fetching RearchitectURE
+
+## Task
+Modify client/src/pages/Home.tsx to fix the following issues:
+
+1. Replace custom useEffect fetch with TanStack Query useQuery hook
+2. Wrap channels grid in ChannelsSkeleton while loading
+3. Memoize stat calculations (totalQuestions, completedChannels, streak) with useMemo
+4. Lazy-load ContributionGrid using React.lazy
+5. Extract CreditsChip as isolated sub-component
+
+## Acceptance Criteria
+- npx tsc --noEmit passes
+- No fetch inside useEffect for channels data
+- Skeleton displayed on first load
+
+Read the current Home.tsx first, then implement all changes.
+Report back: files modified, any blockers, verification status.

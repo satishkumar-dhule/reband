@@ -35,6 +35,7 @@ export interface SpeechRecognitionOptions {
   onResult?: (result: SpeechRecognitionResult) => void;
   onInterim?: (transcript: string) => void;
   onFinal?: (transcript: string) => void;
+  onSegmentEnd?: (transcript: string) => void;
   onStart?: () => void;
   onEnd?: () => void;
   onError?: (error: string) => void;
@@ -50,6 +51,8 @@ export interface SpeechRecognitionControls {
   abort: () => void;
   reset: () => void;
   recognition: any; // Expose for advanced use cases
+  recognitionRef: React.MutableRefObject<any>;
+  flushAccumulated: () => void;
 }
 
 // Check for browser support
@@ -66,6 +69,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
     onResult,
     onInterim,
     onFinal,
+    onSegmentEnd,
     onStart,
     onEnd,
     onError
@@ -82,6 +86,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
   const onResultRef = useRef(onResult);
   const onInterimRef = useRef(onInterim);
   const onFinalRef = useRef(onFinal);
+  const onSegmentEndRef = useRef(onSegmentEnd);
   const onStartRef = useRef(onStart);
   const onEndRef = useRef(onEnd);
   const onErrorRef = useRef(onError);
@@ -90,10 +95,11 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
     onResultRef.current = onResult;
     onInterimRef.current = onInterim;
     onFinalRef.current = onFinal;
+    onSegmentEndRef.current = onSegmentEnd;
     onStartRef.current = onStart;
     onEndRef.current = onEnd;
     onErrorRef.current = onError;
-  }, [onResult, onInterim, onFinal, onStart, onEnd, onError]);
+  }, [onResult, onInterim, onFinal, onSegmentEnd, onStart, onEnd, onError]);
 
   // Initialize recognition
   useEffect(() => {
@@ -125,6 +131,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
           final += text + ' ';
           onResultRef.current?.({ transcript: text, isFinal: true, confidence });
           onFinalRef.current?.(text);
+          onSegmentEndRef.current?.(text);
         } else {
           interim += text;
           onResultRef.current?.({ transcript: text, isFinal: false, confidence });
@@ -219,6 +226,12 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
     setInterimTranscript('');
   }, []);
 
+  const flushAccumulated = useCallback(() => {
+    if (finalTranscriptRef.current.trim()) {
+      setTranscript(finalTranscriptRef.current.trim());
+    }
+  }, []);
+
   return {
     transcript,
     interimTranscript,
@@ -228,7 +241,9 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}): Sp
     stop,
     abort,
     reset,
-    recognition: recognitionRef.current
+    recognition: recognitionRef.current,
+    recognitionRef,
+    flushAccumulated
   };
 }
 

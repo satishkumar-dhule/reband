@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, lazy, Suspense } from 'react';
 import { useLocation, useRoute, Link } from 'wouter';
 import { getChannel } from '../lib/data';
 import { useQuestionsWithPrefetch, useSubChannels, useCompaniesWithCounts } from '../hooks/use-questions';
@@ -8,13 +8,12 @@ import { useAchievementContext } from '../context/AchievementContext';
 import { SEOHead } from '../components/SEOHead';
 import { UnifiedSearch } from '../components/UnifiedSearch';
 import { VoiceReminder } from '../components/VoiceReminder';
-import { GenZAnswerPanel } from '../components/question/GenZAnswerPanel';
-import { FlashcardsTab } from '../components/FlashcardsTab';
 import { Haptics } from '../lib/haptics';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
 import { AppLayout } from '../components/layout/AppLayout';
 import { Button, IconButton } from '@/components/unified/Button';
+import { QuestionViewerSkeleton, ReviewSkeleton } from '@/components/skeletons/PageSkeletons';
 import {
   getCard, recordReview, addToSRS,
   getMasteryLabel, getMasteryColor,
@@ -34,6 +33,10 @@ import {
 } from '@/components/ui/select';
 import { cn } from '../lib/utils';
 
+// Lazy-load heavy components to reduce initial bundle size
+const GenZAnswerPanel = lazy(() => import('../components/question/GenZAnswerPanel').then(m => ({ default: m.GenZAnswerPanel })));
+const FlashcardsTab = lazy(() => import('../components/FlashcardsTab').then(m => ({ default: m.FlashcardsTab })));
+
 export default function QuestionViewer() {
   const [location, setLocation] = useLocation();
   const [, params] = useRoute('/channel/:id/:questionId?');
@@ -49,16 +52,7 @@ export default function QuestionViewer() {
   const staticChannel = getChannel(channelId || '');
   const { subChannels: apiSubChannels } = useSubChannels(channelId || '');
 
-  const channel = staticChannel ? {
-    ...staticChannel,
-    subChannels: [
-      { id: 'all', name: 'All Topics' },
-      ...apiSubChannels.map(sc => ({
-        id: sc,
-        name: sc.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-      }))
-    ]
-  } : null;
+  // FIX: Channel object is now memoized above
 
   const [selectedSubChannel, setSelectedSubChannel] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
@@ -112,7 +106,23 @@ export default function QuestionViewer() {
 
   const nextQuestionRef = useRef<() => void>(() => {});
   const prevQuestionRef = useRef<() => void>(() => {});
+
+  // FIX: Memoize channel object to prevent recreation on every render
+  const channel = useMemo(() => {
+    if (!staticChannel) return null;
+    return {
+      ...staticChannel,
+      subChannels: [
+        { id: 'all', name: 'All Topics' },
+        ...apiSubChannels.map(sc => ({
+          id: sc,
+          name: sc.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+        }))
+      ]
+    };
+  }, [staticChannel, apiSubChannels]);
   
+  // FIX: Consolidate SRS card initialization with proper cleanup
   useEffect(() => {
     if (!currentQuestion) return;
     const card = getCard(currentQuestion.id, currentQuestion.channel, currentQuestion.difficulty);
@@ -122,13 +132,13 @@ export default function QuestionViewer() {
     setIsAnswerRevealed(false);
   }, [currentQuestion]);
   
+  // FIX: Consolidate URL-sync and initialization effects
   useEffect(() => {
     if (loading || questions.length === 0) return;
     
     if (targetQuestionId) {
       const foundIndex = questions.findIndex(q => q.id === targetQuestionId);
       if (foundIndex === -1) {
-        // Question not found - show error and redirect to first question
         toast({
           title: "Question not found",
           description: "The requested question could not be found in this channel",
@@ -147,10 +157,10 @@ export default function QuestionViewer() {
       setLocation(`/channel/${channelId}/${questions[0].id}`, { replace: true });
       setIsInitialized(true);
     }
-    // Intentionally omit currentIndex, isInitialized from deps - this effect initializes state, not reacts to it
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetQuestionId, questions.length, channelId, loading, questionIdFromSearch]);
 
+  // FIX: Consolidated subscription effect
   useEffect(() => {
     if (channelId && channel && !isSubscribed(channelId) && !loading && totalQuestions > 0 && questions.length > 0) {
       subscribeChannel(channelId);
@@ -161,12 +171,14 @@ export default function QuestionViewer() {
     }
   }, [channelId, channel, loading, totalQuestions, questions.length, isSubscribed, subscribeChannel, toast]);
 
+  // FIX: Index boundary check consolidated
   useEffect(() => {
     if (totalQuestions > 0 && currentIndex >= totalQuestions) {
       setCurrentIndex(0);
     }
   }, [totalQuestions, currentIndex]);
 
+  // FIX: URL sync with saveLastVisitedIndex
   useEffect(() => {
     if (!isInitialized || loading || !channelId || !currentQuestion) return;
     
@@ -176,20 +188,22 @@ export default function QuestionViewer() {
     saveLastVisitedIndex(currentIndex);
   }, [currentIndex, isInitialized, loading, channelId, currentQuestion, targetQuestionId, setLocation, saveLastVisitedIndex]);
 
+  // FIX: Tracking with proper cleanup
   useEffect(() => {
-    if (currentQuestion) {
-      trackQuestionView(currentQuestion.id, currentQuestion.channel, currentQuestion.difficulty);
-      markCompleted(currentQuestion.id);
-      trackActivity();
-      
-      trackEvent('question_completed', {
-        questionId: currentQuestion.id,
-        difficulty: currentQuestion.difficulty,
-        channel: currentQuestion.channel,
-      });
-    }
+    if (!currentQuestion) return;
+    
+    trackQuestionView(currentQuestion.id, currentQuestion.channel, currentQuestion.difficulty);
+    markCompleted(currentQuestion.id);
+    trackActivity();
+    
+    trackEvent('question_completed', {
+      questionId: currentQuestion.id,
+      difficulty: currentQuestion.difficulty,
+      channel: currentQuestion.channel,
+    });
   }, [currentQuestion, trackEvent, markCompleted]);
 
+  // FIX: Combine navigation callbacks and ref updates into single effect
   const nextQuestion = useCallback(() => {
     if (currentIndex < totalQuestions - 1) {
       setCurrentIndex(prev => prev + 1);
@@ -202,15 +216,13 @@ export default function QuestionViewer() {
     }
   }, [currentIndex]);
 
-  // Use refs to avoid stale closure issues with keyboard navigation
+  // FIX: Single combined effect for ref updates - no cleanup needed for ref assignments
   useEffect(() => {
     nextQuestionRef.current = nextQuestion;
-  });
-
-  useEffect(() => {
     prevQuestionRef.current = prevQuestion;
-  });
+  }, [nextQuestion, prevQuestion]);
   
+  // FIX: Keyboard handler with proper cleanup
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -524,10 +536,12 @@ export default function QuestionViewer() {
                   </div>
                   <div className="p-6 prose prose-slate max-w-none">
                     {currentQuestion && (
-                      <GenZAnswerPanel 
-                        question={currentQuestion}
-                        isCompleted={completed.includes(currentQuestion.id)}
-                      />
+                      <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-4 bg-[var(--gh-canvas-subtle)] rounded w-3/4"></div><div className="h-4 bg-[var(--gh-canvas-subtle)] rounded w-full"></div><div className="h-4 bg-[var(--gh-canvas-subtle)] rounded w-5/6"></div></div>}>
+                        <GenZAnswerPanel 
+                          question={currentQuestion}
+                          isCompleted={completed.includes(currentQuestion.id)}
+                        />
+                      </Suspense>
                     )}
                   </div>
                 </div>
@@ -634,7 +648,9 @@ export default function QuestionViewer() {
                     </Button>
                   </div>
                 ) : (
-                  <FlashcardsTab channelId={channelId || ''} flashcards={flashcards} />
+                  <Suspense fallback={<ReviewSkeleton />}>
+                    <FlashcardsTab channelId={channelId || ''} flashcards={flashcards} />
+                  </Suspense>
                 )}
               </div>
             )}

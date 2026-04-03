@@ -1,0 +1,17 @@
+PROCESS ISSUE #6 - VoiceSession Optimization
+
+## Task
+Modify client/src/pages/VoiceSession.tsx to fix the following issues:
+
+1. Verify parallel loading with Promise.all for channel questions
+2. Replace Loader2 spinner with VoiceSkeleton component
+3. Add cleanup for SpeechRecognition in useEffect return
+4. Debounce transcript state updates with ref accumulator
+
+## Acceptance Criteria
+- No memory leak after navigating away
+- Skeleton matches card layout
+- npx tsc --noEmit passes
+
+Read the current VoiceSession.tsx first, then implement all changes.
+Report back: files modified, any blockers, verification status.

@@ -25,8 +25,8 @@ Free technical interview prep app — swipe learning, voice practice, spaced rep
 | Frontend | React 19 + Vite 7, TypeScript, Tailwind CSS 4, shadcn/ui |
 | Backend | Express on Node.js (tsx), serving API + client |
 | Routing | wouter v3 (requires explicit `<Router>` wrapper in App.tsx) |
-| Database | LibSQL (local.db + questions.db) |
-| ORM | Drizzle ORM |
+| Database | LibSQL (local.db) with Drizzle ORM |
+| Auth | better-auth with email/password |
 | Search | Pagefind (static search index) |
 | Package manager | pnpm (monorepo) |
 
@@ -286,8 +286,14 @@ npm run sync-db     # Sync from remote Turso
 
 ---
 
-Last Updated: 2026-04-01
+Last Updated: 2026-04-03
 
 ### Performance instrumentation
 - Perf-measure tooling added: scripts/measure-perf.js, perf:measure script, and perf-measure.yml CI workflow.
 - Run locally via npm run perf:measure; CI runs on PRs/staging; artifacts include perf-results.json and perf/screenshots.
+
+### Recent Changes (v2.2.0)
+- **Authentication**: better-auth with Drizzle ORM adapter (server/src/auth.ts)
+- **Skeleton Screens**: Per-route loading skeletons in client/src/components/skeletons/PageSkeletons.tsx
+- **Route Prefetching**: Hover-based prefetch system in client/src/lib/prefetch.ts
+- **GitHub Management**: New agents for issue/PR/repo management in .opencode/agents/

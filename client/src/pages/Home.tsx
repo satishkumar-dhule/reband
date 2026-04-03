@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, { useMemo, useCallback, lazy, Suspense } from "react";
 import {
   Mic, Code, RotateCcw, BookOpen, ChevronRight,
   Flame, CheckCircle2, Layers, TrendingUp,
@@ -11,66 +11,63 @@ import { AppLayout } from "../components/layout/AppLayout";
 import { SEOHead } from "@/components/SEOHead";
 import { allChannelsConfig } from "../lib/channels-config";
 import { cn } from "../lib/utils";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "../components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "../components/ui/breadcrumb";
 import { useCredits } from "../context/CreditsContext";
 import { Button } from "@/components/unified/Button";
+import { HomeSkeleton } from "@/components/skeletons/PageSkeletons";
+
+// Lazy-load ContributionGrid to not block initial paint
+const ContributionGrid = lazy(() => import("./ContributionGrid"));
 
 interface ApiChannel {
   id: string;
   questionCount: number;
 }
 
+/**
+ * Data fetching with TanStack Query - proper caching, staleTime, and deduplication.
+ * No more raw useEffect + fetch that bypasses the cache.
+ */
 function useApiChannels() {
-  const [channels, setChannels] = useState<ApiChannel[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const controller = new AbortController();
-    
-    async function fetchChannels() {
-      try {
-        const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
-        const response = await fetch(`${basePath}data/channels.json`, { signal: controller.signal });
-        if (cancelled) return;
-        if (!response.ok) throw new Error(`Failed to fetch channels: ${response.status}`);
-        const data = await response.json();
-        if (cancelled) return;
-        if (!Array.isArray(data) || data.length === 0) {
-          setError('No channels available');
-          return;
-        }
-        setChannels(data);
-      } catch (err) {
-        if (cancelled) return;
-        if (err instanceof Error && err.name === 'AbortError') return;
-        
-        if (import.meta.env.DEV) {
-          try {
-            const r = await fetch("/api/channels", { signal: controller.signal });
-            if (cancelled) return;
-            if (!r.ok) throw new Error(`Failed to fetch channels: ${r.status}`);
-            const data = await r.json();
-            setChannels(data);
-            return;
-          } catch {
-            // Fall through to error
-          }
-        }
-        setError(err instanceof Error ? err.message : 'Failed to load channels');
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+  return useQuery<ApiChannel[]>({
+    queryKey: ['channels'],
+    staleTime: Infinity, // Static data - never refetch
+    gcTime: 5 * 60 * 1000, // 5 minutes cache
+    queryFn: async () => {
+      const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
+      const response = await fetch(`${basePath}data/channels.json`);
+      if (!response.ok) throw new Error(`Failed to fetch channels: ${response.status}`);
+      const data = await response.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error('No channels available');
       }
-    }
-    fetchChannels();
-    return () => { cancelled = true; controller.abort(); };
-  }, []);
-
-  return { data: channels, isLoading: loading, error };
+      return data;
+    },
+  });
 }
+
+// Isolated CreditsChip component to prevent re-renders of entire page on balance change
+const CreditsChip = React.memo(function CreditsChip() {
+  const { balance } = useCredits();
+  return (
+    <section className="gh-card p-4">
+      <div className="flex items-center gap-2">
+        <Coins className="w-4 h-4 text-[var(--gh-attention-fg)]" />
+        <h2 className="text-sm font-semibold text-[var(--gh-fg)]">Credits</h2>
+      </div>
+      <div className="mt-3 text-center">
+        <p className="text-2xl font-bold text-[var(--gh-fg)]">{balance.toLocaleString()}</p>
+        <p className="text-xs text-[var(--gh-fg-muted)]">Available credits</p>
+      </div>
+      <Link 
+        href="/profile" 
+        className="block mt-3 text-xs text-center text-[var(--gh-accent-fg)] hover:underline"
+      >
+        View credits & redeem coupons →
+      </Link>
+    </section>
+  );
+});
 
 function getProgress(channelId: string, total: number) {
   try {
@@ -96,64 +93,6 @@ const recentActivity = [
   { icon: Award, text: "Earned 'First Steps' badge", time: "2 days ago", color: "text-[var(--gh-attention-fg)]" },
   { icon: Code, text: "Solved Binary Search challenge", time: "3 days ago", color: "text-[var(--gh-done-fg)]" },
 ];
-
-function ContributionGrid() {
-  const weeks = 15;
-  const days = 7;
-  const levels = [0, 1, 2, 3, 4];
-  
-  const cells = useMemo(() => {
-    const seed = 12345;
-    let random = seed;
-    const nextRandom = () => {
-      random = (random * 1103515245 + 12345) & 0x7fffffff;
-      return random / 0x7fffffff;
-    };
-    return Array.from({ length: weeks }, (_, w) =>
-      Array.from({ length: days }, (_, d) => {
-        const val = nextRandom();
-        if (val < 0.4) return 0;
-        if (val < 0.6) return 1;
-        if (val < 0.75) return 2;
-        if (val < 0.9) return 3;
-        return 4;
-      })
-    );
-  }, []);
-
-  const colorMap = [
-    "bg-[var(--gh-canvas-inset)]",
-    "bg-[hsl(136_70%_20%)]",
-    "bg-[hsl(136_70%_30%)]",
-    "bg-[hsl(136_70%_42%)]",
-    "bg-[var(--gh-success-emphasis)]",
-  ];
-
-  return (
-    <div>
-      <div className="flex gap-1">
-        {cells.map((week, wi) => (
-          <div key={wi} className="flex flex-col gap-1">
-            {week.map((level, di) => (
-              <div
-                key={di}
-                className={cn("w-3 h-3 rounded-sm", colorMap[level])}
-                title={`Level ${level}`}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center justify-end gap-1.5 mt-2">
-        <span className="text-[10px] text-[var(--gh-fg-muted)]">Less</span>
-        {levels.map((l) => (
-          <div key={l} className={cn("w-3 h-3 rounded-sm", colorMap[l])} />
-        ))}
-        <span className="text-[10px] text-[var(--gh-fg-muted)]">More</span>
-      </div>
-    </div>
-  );
-}
 
 const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }: { channelId: string; questionCount: number }) {
   const [, setLocation] = useLocation();
@@ -384,7 +323,7 @@ export default function Home() {
                     <div className="bg-[var(--gh-danger-subtle)] border border-[var(--gh-danger-fg)]/20 p-6 rounded-xl mb-4 max-w-md">
                       <AlertCircle className="w-10 h-10 text-[var(--gh-danger-fg)] mx-auto mb-3" />
                       <h3 className="text-base font-semibold text-[var(--gh-fg)] mb-2">Failed to load channels</h3>
-                      <p className="text-sm text-[var(--gh-fg-muted)]">{error}</p>
+                      <p className="text-sm text-[var(--gh-fg-muted)]">{error instanceof Error ? error.message : String(error)}</p>
                     </div>
                     <Button
                       variant="primary"

@@ -1,14 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useLocation } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { useCredits } from '../context/CreditsContext';
-import { EnhancedMermaid } from '../components/EnhancedMermaid';
 import { ListenButton } from '../components/ListenButton';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '../components/unified/Button';
 import {
   Brain, ChevronLeft, Eye, Flame, Sparkles, Zap, Check, RotateCcw, BookOpen, ArrowRight
@@ -17,6 +12,20 @@ import { SRS_CONFIG } from '../lib/srs-config';
 import { getDueCards, recordReview, getSRSStats, type ReviewCard, type ConfidenceRating } from '../lib/spaced-repetition';
 import { getQuestionByIdAsync, loadChannelQuestions } from '../lib/questions-loader';
 import type { Question } from '../types';
+
+// Lazy-load heavy dependencies to reduce initial bundle size (~150KB savings)
+// EnhancedMermaid uses named export, so wrap it
+const EnhancedMermaid = lazy(() => 
+  import('../components/EnhancedMermaid').then(m => ({ default: m.EnhancedMermaid as unknown as React.ComponentType<any> }))
+);
+const ReactMarkdown = lazy(() => 
+  import('react-markdown').then(m => ({ default: m.default as unknown as React.ComponentType<any> }))
+);
+
+// Skeleton fallback for lazy components
+function ComponentSkeleton() {
+  return <div className="h-24 animate-pulse rounded-md bg-[var(--gh-neutral-muted)]" />;
+}
 
 const confidenceLevels: { id: ConfidenceRating; label: string; colorClass: string }[] = [
   { id: 'again', label: 'Again', colorClass: 'bg-[var(--gh-danger-emphasis)]' },
@@ -35,11 +44,13 @@ function DiagramSection({ diagram }: { diagram: string }) {
         <span className="text-xs font-semibold uppercase tracking-wider text-[var(--gh-fg-muted)]">Diagram</span>
       </div>
       <div className="overflow-x-auto">
-        <EnhancedMermaid
-          chart={diagram}
-          onRenderResult={(success) => setRenderSuccess(success)}
-          caption="Visual explanation"
-        />
+        <Suspense fallback={<ComponentSkeleton />}>
+          <EnhancedMermaid
+            chart={diagram}
+            onRenderResult={(success: boolean) => setRenderSuccess(success)}
+            caption="Visual explanation"
+          />
+        </Suspense>
       </div>
     </div>
   );
@@ -55,6 +66,67 @@ function preprocessMarkdown(text: string): string {
   processed = processed.replace(/^[•·]\s*/gm, '- ');
   processed = processed.replace(/\n{3,}/g, '\n\n');
   return processed.trim();
+}
+
+// Lazy-loaded markdown renderer component
+function MarkdownRenderer({ content }: { content: string }) {
+  const [SyntaxHighlighterComponent, setSyntaxHighlighter] = useState<React.ComponentType<any> | null>(null);
+  const [syntaxStyle, setSyntaxStyle] = useState<any>(null);
+  const [remarkGfmPlugin, setRemarkGfmPlugin] = useState<any>(null);
+
+  useEffect(() => {
+    Promise.all([
+      import('react-syntax-highlighter').then(m => m.Prism),
+      import('react-syntax-highlighter/dist/esm/styles/prism').then(m => m.vscDarkPlus),
+      import('remark-gfm').then(m => m.default),
+    ]).then(([SyntaxHighlighter, style, remarkGfm]) => {
+      setSyntaxHighlighter(() => SyntaxHighlighter);
+      setSyntaxStyle(style);
+      setRemarkGfmPlugin(() => remarkGfm);
+    });
+  }, []);
+
+  if (!SyntaxHighlighterComponent || !syntaxStyle || !remarkGfmPlugin) {
+    return <ComponentSkeleton />;
+  }
+
+  return (
+    <Suspense fallback={<ComponentSkeleton />}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfmPlugin]}
+        components={{
+          code({ className, children }: { className?: string; children: React.ReactNode }) {
+            const match = /language-(\w+)/.exec(className || '');
+            const isInline = !match && !String(children).includes('\n');
+            if (isInline) {
+              return (
+                <code className="px-1.5 py-0.5 rounded bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] text-xs font-mono text-[var(--gh-fg)]">
+                  {children}
+                </code>
+              );
+            }
+            return (
+              <div className="my-4 rounded-md overflow-hidden border border-[var(--gh-border)]">
+                <SyntaxHighlighterComponent
+                  language={match ? match[1] : 'text'}
+                  style={syntaxStyle}
+                  customStyle={{ margin: 0, padding: '1rem', fontSize: '0.85rem' }}
+                >
+                  {String(children).replace(/\n$/, '')}
+                </SyntaxHighlighterComponent>
+              </div>
+            );
+          },
+          p: ({ children }: { children: React.ReactNode }) => <p className="mb-3 text-[var(--gh-fg-muted)]">{children}</p>,
+          strong: ({ children }: { children: React.ReactNode }) => <strong className="font-semibold text-[var(--gh-fg)]">{children}</strong>,
+          ul: ({ children }: { children: React.ReactNode }) => <ul className="list-disc pl-4 mb-3 space-y-1">{children}</ul>,
+          li: ({ children }: { children: React.ReactNode }) => <li className="text-[var(--gh-fg-muted)]">{children}</li>,
+        }}
+      >
+        {preprocessMarkdown(content)}
+      </ReactMarkdown>
+    </Suspense>
+  );
 }
 
 interface SessionCard {
@@ -93,18 +165,20 @@ export default function ReviewSession() {
           return;
         }
 
-        // Pre-load channels needed to resolve questions
+        // Pre-load channels needed to resolve questions (parallel)
         const channelsNeeded = [...new Set(dueCards.map(c => c.channel))];
         await Promise.all(channelsNeeded.map(ch => loadChannelQuestions(ch).catch(() => null)));
 
-        // Resolve each SRS card to its full question
+        // Resolve all SRS cards to their full questions (PARALLEL - no waterfall)
         const resolved: SessionCard[] = [];
-        for (const srs of dueCards) {
-          const question = await getQuestionByIdAsync(srs.questionId);
+        const questionResults = await Promise.all(
+          dueCards.map(srs => getQuestionByIdAsync(srs.questionId))
+        );
+        questionResults.forEach((question, index) => {
           if (question) {
-            resolved.push({ srs, question });
+            resolved.push({ srs: dueCards[index], question });
           }
-        }
+        });
 
         if (!cancelled) {
           setSessionCards(resolved);
@@ -381,39 +455,7 @@ export default function ReviewSession() {
                         <span className="font-bold uppercase text-xs text-[var(--gh-fg-muted)] tracking-wider">Analysis</span>
                       </div>
                       <div className="prose prose-sm max-w-none prose-slate">
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          components={{
-                            code({ className, children }) {
-                              const match = /language-(\w+)/.exec(className || '');
-                              const isInline = !match && !String(children).includes('\n');
-                              if (isInline) {
-                                return (
-                                  <code className="px-1.5 py-0.5 rounded bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] text-xs font-mono text-[var(--gh-fg)]">
-                                    {children}
-                                  </code>
-                                );
-                              }
-                              return (
-                                <div className="my-4 rounded-md overflow-hidden border border-[var(--gh-border)]">
-                                  <SyntaxHighlighter
-                                    language={match ? match[1] : 'text'}
-                                    style={vscDarkPlus}
-                                    customStyle={{ margin: 0, padding: '1rem', fontSize: '0.85rem' }}
-                                  >
-                                    {String(children).replace(/\n$/, '')}
-                                  </SyntaxHighlighter>
-                                </div>
-                              );
-                            },
-                            p: ({ children }) => <p className="mb-3 text-[var(--gh-fg-muted)]">{children}</p>,
-                            strong: ({ children }) => <strong className="font-semibold text-[var(--gh-fg)]">{children}</strong>,
-                            ul: ({ children }) => <ul className="list-disc pl-4 mb-3 space-y-1">{children}</ul>,
-                            li: ({ children }) => <li className="text-[var(--gh-fg-muted)]">{children}</li>,
-                          }}
-                        >
-                          {preprocessMarkdown(question.explanation)}
-                        </ReactMarkdown>
+                        <MarkdownRenderer content={question.explanation} />
                       </div>
                     </div>
                   )}

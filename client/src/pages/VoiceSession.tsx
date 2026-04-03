@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import {
   Home, Target, Play, CheckCircle, XCircle, AlertCircle,
-  Loader2, RotateCcw, ArrowRight, Mic, Zap, Crown, Star,
+  RotateCcw, ArrowRight, Mic, Zap, Crown, Star,
   Clock, TrendingUp, Award, Lock, ChevronLeft, Volume2, Trophy,
   Info, MessageSquare, Brain, BarChart3, ChevronRight, Share2, Bookmark
 } from 'lucide-react';
@@ -15,6 +15,7 @@ import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use
 import { CreditsDisplay } from '../components/CreditsDisplay';
 import { AppLayout } from '../components/layout/AppLayout';
 import { Button } from '../components/unified/Button';
+import { VoiceSkeleton } from '../components/skeletons/PageSkeletons';
 import {
   type VoiceSession,
   type SessionState,
@@ -115,7 +116,10 @@ export default function VoiceSession() {
   const [sessionDuration, setSessionDuration] = useState(0);
   
   const sessionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
+
+  // Accumulator ref for batching transcript updates — avoids a state flush per spoken phrase
+  const transcriptAccumRef = useRef('');
+
   const { onVoiceInterview } = useCredits();
   const { trackEvent } = useAchievementContext();
 
@@ -125,16 +129,25 @@ export default function VoiceSession() {
     transcript: hookTranscript,
     interimTranscript: hookInterim,
     start: startRecognition,
-    stop: stopRecognition
+    stop: stopRecognition,
+    recognitionRef
   } = useSpeechRecognition({
     continuous: true,
     interimResults: true,
     lang: 'en-US',
-    autoRestart: true,
-    onFinal: (text) => {
-      setTranscript(prev => prev + text + ' ');
-    },
+    autoRestart: false,
     onInterim: (text) => setInterimTranscript(text),
+    onSegmentEnd: (text) => {
+      // Accumulate in a ref — state is flushed once per recording session
+      transcriptAccumRef.current += text + ' ';
+    },
+    onEnd: () => {
+      // Flush accumulated transcript on session end
+      if (transcriptAccumRef.current.trim()) {
+        setTranscript(prev => (prev + transcriptAccumRef.current).trim() + ' ');
+        transcriptAccumRef.current = '';
+      }
+    },
     onError: (err) => {
       console.error('Speech recognition error:', err);
       if (err === 'not-allowed') {
@@ -158,6 +171,16 @@ export default function VoiceSession() {
       }
     }
   });
+
+  // Cleanup: stop SpeechRecognition when navigating away — prevents memory leak
+  useEffect(() => {
+    return () => {
+      if (recognitionRef?.current) {
+        recognitionRef.current.stop();
+        recognitionRef.current = null;
+      }
+    };
+  }, [recognitionRef]);
 
   useEffect(() => {
     async function loadData() {
@@ -321,9 +344,7 @@ export default function VoiceSession() {
   if (pageState === 'loading') {
     return (
       <AppLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-[var(--gh-accent-fg)]" />
-        </div>
+        <VoiceSkeleton />
       </AppLayout>
     );
   }

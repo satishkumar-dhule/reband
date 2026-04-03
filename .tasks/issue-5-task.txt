@@ -1,0 +1,18 @@
+PROCESS ISSUE #5 - ReviewSession Optimization
+
+## Task
+Modify client/src/pages/ReviewSession.tsx to fix the following issues:
+
+1. Replace sequential for...of await loop with Promise.all for parallel fetches
+2. Lazy-load SyntaxHighlighter using React.lazy
+3. Lazy-load ReactMarkdown using React.lazy
+4. Lazy-load EnhancedMermaid using React.lazy
+5. Wrap all lazy components in Suspense with pulse fallback
+
+## Acceptance Criteria
+- Network waterfall eliminated
+- Heavy libraries absent from initial JS bundle
+- npx tsc --noEmit passes
+
+Read the current ReviewSession.tsx first, then implement all changes.
+Report back: files modified, any blockers, verification status.

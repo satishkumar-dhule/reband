@@ -1,0 +1,18 @@
+PROCESS ISSUE #4 - QuestionViewer Optimization
+
+## Task
+Modify client/src/pages/QuestionViewer.tsx to fix the following issues:
+
+1. Consolidate multiple URL-sync useEffect hooks into a single effect
+2. Lazy-load FlashcardsTab using React.lazy with Suspense
+3. Lazy-load GenZAnswerPanel with QuestionViewerSkeleton fallback
+4. Memoize filtered question list with useMemo
+5. Memoize channel lookup to avoid re-derivation
+
+## Acceptance Criteria
+- Tab switching to Flashcards loads lazily
+- Filter changes do not cause full component remount
+- npx tsc --noEmit passes
+
+Read the current QuestionViewer.tsx first, then implement all changes.
+Report back: files modified, any blockers, verification status.
