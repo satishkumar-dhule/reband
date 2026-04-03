@@ -64,3 +64,6 @@ playwright-report/index.html
 .config/
 *.db
 *.log
+
+# Large binaries
+kirocli/bin/
