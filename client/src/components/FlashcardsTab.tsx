@@ -162,7 +162,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
               style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0)' }}
             >
               <div
-                className="backface-hidden p-6 rounded-xl border border-[var(--gh-border-default)] bg-[var(--gh-canvas-default)]"
+                className="absolute inset-0 p-6 rounded-xl border border-[var(--gh-border-default)] bg-[var(--gh-canvas-default)]"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 <div className="flex flex-col h-full">
@@ -183,10 +183,10 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
               </div>
 
               <div
-                className="backface-hidden p-6 rounded-xl border border-[var(--gh-border-default)] bg-[var(--gh-canvas-inset)] rotate-y-180"
+                className="absolute inset-0 p-6 rounded-xl border border-[var(--gh-border-default)] bg-[var(--gh-canvas-inset)]"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col h-full overflow-y-auto">
                   <span className="text-xs uppercase tracking-wider text-[var(--gh-fg-muted)] mb-3">Answer</span>
                   <p className="text-lg flex-1">{currentCard.back}</p>
                   {currentCard.codeExample && (
