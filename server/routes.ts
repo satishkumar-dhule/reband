@@ -46,6 +46,12 @@ function invalidateChannelCache(): void {
   channelCache.clear();
 }
 
+// Helper: set aggressive HTTP cache headers for read-only API responses
+function setReadCache(res: any, maxAgeSeconds = 60, staleWhileRevalidate = 300) {
+  res.set("Cache-Control", `public, max-age=${maxAgeSeconds}, stale-while-revalidate=${staleWhileRevalidate}`);
+  res.set("Vary", "Accept-Encoding");
+}
+
 // Helper to parse JSON fields from DB
 function parseQuestion(row: any) {
   // Sanitize answer field - ensure no JSON/MCQ format
@@ -114,6 +120,7 @@ export async function registerRoutes(
         });
         return result.rows.map((r: any) => ({ id: r.channel, questionCount: r.count }));
       });
+      setReadCache(res, 300, 600);
       res.json(data);
     } catch (error) {
       console.error("Error fetching channels:", error);
@@ -239,6 +246,7 @@ export async function registerRoutes(
         ...stat
       }));
 
+      setReadCache(res, 120, 300);
       res.json(stats);
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -357,6 +365,7 @@ export async function registerRoutes(
         return result.rows.map(parseCodingChallenge);
       });
 
+      setReadCache(res, 120, 300);
       res.json(data);
     } catch (error) {
       console.error("Error fetching coding challenges:", error);
@@ -768,6 +777,7 @@ export async function registerRoutes(
         return result.rows.map(parseCertification);
       });
 
+      setReadCache(res, 120, 300);
       res.json(data);
     } catch (error) {
       console.error("Error fetching certifications:", error);

@@ -1,6 +1,5 @@
 import { Switch, Route, useLocation, Router } from "wouter";
-import { Suspense, lazy, useState, useEffect, ReactNode, useMemo } from "react";
-import { useUserPreferences } from "./context/UserPreferencesContext";
+import { Suspense, lazy, useEffect, ReactNode, startTransition, ComponentType } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +14,18 @@ import { SidebarProvider } from "@/context/SidebarContext";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import NotFound from "@/pages/not-found";
+import {
+  HomeSkeleton,
+  ChannelsSkeleton,
+  QuestionViewerSkeleton,
+  CodingSkeleton,
+  StatsSkeleton,
+  ReviewSkeleton,
+  VoiceSkeleton,
+  CertificationsSkeleton,
+  ProfileSkeleton,
+  GenericPageSkeleton,
+} from "@/components/skeletons/PageSkeletons";
 
 // Import prefetch utilities
 import { 
@@ -116,80 +127,103 @@ function OnboardingGuard({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-// Lightweight suspense fallback — minimal flicker on navigation
-function EnhancedSuspenseFallback() {
-  return (
-    <main className="min-h-[calc(100vh-56px)] flex items-center justify-center" id="main-content">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-[var(--gh-accent-fg)] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-muted-foreground">Loading…</p>
-      </div>
-    </main>
-  );
+/** Wrap a lazy component with its own Suspense + per-route skeleton. */
+function S<P extends object>(
+  Component: ComponentType<P>,
+  Fallback: ComponentType
+): ComponentType<P> {
+  return function SuspenseRoute(props: P) {
+    return (
+      <Suspense fallback={<Fallback />}>
+        <Component {...props} />
+      </Suspense>
+    );
+  };
 }
+
+const HomeRoute = S(Home, HomeSkeleton);
+const ChannelsRoute = S(Channels, ChannelsSkeleton);
+const QuestionViewerRoute = S(QuestionViewer, QuestionViewerSkeleton);
+const VoicePracticeRoute = S(VoicePractice, VoiceSkeleton);
+const VoiceSessionRoute = S(VoiceSession, VoiceSkeleton);
+const CodingChallengeRoute = S(CodingChallenge, CodingSkeleton);
+const ReviewSessionRoute = S(ReviewSession, ReviewSkeleton);
+const StatsRoute = S(Stats, StatsSkeleton);
+const BookmarksRoute = S(Bookmarks, GenericPageSkeleton);
+const ProfileRoute = S(Profile, ProfileSkeleton);
+const LearningPathsRoute = S(LearningPaths, GenericPageSkeleton);
+const BadgesRoute = S(Badges, GenericPageSkeleton);
+const CertificationsRoute = S(Certifications, CertificationsSkeleton);
+const CertificationPracticeRoute = S(CertificationPractice, CertificationsSkeleton);
+const CertificationExamRoute = S(CertificationExam, CertificationsSkeleton);
+const TestsRoute = S(Tests, GenericPageSkeleton);
+const TestSessionRoute = S(TestSession, GenericPageSkeleton);
+const MyPathRoute = S(MyPath, GenericPageSkeleton);
+const OnboardingRoute = S(Onboarding, GenericPageSkeleton);
+const AboutRoute = S(About, GenericPageSkeleton);
+const WhatsNewRoute = S(WhatsNew, GenericPageSkeleton);
+const BotActivityRoute = S(BotActivity, GenericPageSkeleton);
+const TrainingModeRoute = S(TrainingMode, GenericPageSkeleton);
 
 function MinimalApp() {
   const [location] = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    startTransition(() => {
+      window.scrollTo(0, 0);
+    });
   }, [location]);
 
-  // Memoize the Suspense component to prevent unnecessary re-renders
-  const suspenseFallback = useMemo(() => <EnhancedSuspenseFallback />, []);
-
   return (
-    <Suspense fallback={suspenseFallback}>
-      <Switch>
-        {/* Channels */}
-        <Route path="/channels" component={Channels} />
-        
-        {/* Channel routes */}
-        <Route path="/channel/:id" component={QuestionViewer} />
-        <Route path="/channel/:id/:questionId" component={QuestionViewer} />
-        
-        {/* Voice routes */}
-        <Route path="/voice-interview" component={VoicePractice} />
-        <Route path="/voice-session" component={VoiceSession} />
-        
-        {/* Coding routes */}
-        <Route path="/coding" component={CodingChallenge} />
-        <Route path="/coding/:id" component={CodingChallenge} />
-        
-        {/* Protected routes - require user data */}
-        <Route path="/review" component={ReviewSession} />
-        <Route path="/stats" component={Stats} />
-        <Route path="/bookmarks" component={Bookmarks} />
-        <Route path="/profile" component={Profile} />
-        <Route path="/learning-paths" component={LearningPaths} />
-        <Route path="/badges" component={Badges} />
-        <Route path="/certifications" component={Certifications} />
-        <Route path="/certification/:id/exam" component={CertificationExam} />
-        <Route path="/certification/:id" component={CertificationPractice} />
-        <Route path="/tests" component={Tests} />
-        <Route path="/test/:channelId" component={TestSession} />
-        <Route path="/my-path" component={MyPath} />
-        
-        {/* Public-only route */}
-        <Route path="/onboarding" component={Onboarding} />
-        
-        {/* About & What's New */}
-        <Route path="/about" component={About} />
-        <Route path="/whats-new" component={WhatsNew} />
+    <Switch>
+      {/* Channels */}
+      <Route path="/channels" component={ChannelsRoute} />
 
-        {/* Bot activity */}
-        <Route path="/bot-activity" component={BotActivity} />
-        
-        {/* Training */}
-        <Route path="/training" component={TrainingMode} />
-        
-        {/* Home route - must come BEFORE catch-all */}
-        <Route path="/" component={Home} />
-        
-        {/* 404 - catch-all must be LAST */}
-        <Route component={NotFound} />
-      </Switch>
-    </Suspense>
+      {/* Channel routes */}
+      <Route path="/channel/:id" component={QuestionViewerRoute} />
+      <Route path="/channel/:id/:questionId" component={QuestionViewerRoute} />
+
+      {/* Voice routes */}
+      <Route path="/voice-interview" component={VoicePracticeRoute} />
+      <Route path="/voice-session" component={VoiceSessionRoute} />
+
+      {/* Coding routes */}
+      <Route path="/coding" component={CodingChallengeRoute} />
+      <Route path="/coding/:id" component={CodingChallengeRoute} />
+
+      {/* Protected routes */}
+      <Route path="/review" component={ReviewSessionRoute} />
+      <Route path="/stats" component={StatsRoute} />
+      <Route path="/bookmarks" component={BookmarksRoute} />
+      <Route path="/profile" component={ProfileRoute} />
+      <Route path="/learning-paths" component={LearningPathsRoute} />
+      <Route path="/badges" component={BadgesRoute} />
+      <Route path="/certifications" component={CertificationsRoute} />
+      <Route path="/certification/:id/exam" component={CertificationExamRoute} />
+      <Route path="/certification/:id" component={CertificationPracticeRoute} />
+      <Route path="/tests" component={TestsRoute} />
+      <Route path="/test/:channelId" component={TestSessionRoute} />
+      <Route path="/my-path" component={MyPathRoute} />
+
+      {/* Public-only route */}
+      <Route path="/onboarding" component={OnboardingRoute} />
+
+      {/* About & What's New */}
+      <Route path="/about" component={AboutRoute} />
+      <Route path="/whats-new" component={WhatsNewRoute} />
+
+      {/* Bot activity */}
+      <Route path="/bot-activity" component={BotActivityRoute} />
+
+      {/* Training */}
+      <Route path="/training" component={TrainingModeRoute} />
+
+      {/* Home route — must come BEFORE catch-all */}
+      <Route path="/" component={HomeRoute} />
+
+      {/* 404 — catch-all must be LAST */}
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 

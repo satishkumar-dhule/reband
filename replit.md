@@ -34,12 +34,40 @@ Free technical interview prep app — swipe learning, voice practice, spaced rep
 
 | Fix | Description |
 |-----|-------------|
-| Dev script | Uses `npx tsx server/index.ts` (not `./node_modules/.bin/tsx`) |
+| Dev script | Uses `./node_modules/.bin/tsx server/index.ts` (not `npx tsx` — avoids interactive download prompt) |
 | React deduplication | `resolve.dedupe` + absolute aliases in vite.config.ts prevent duplicate React instances |
 | wouter Router | Explicit `<Router>` wrapper added in FullApp (App.tsx) required for wouter v3 |
 | JSON-LD noise | `process.stderr` filter suppresses Vite's non-fatal inline JSON parse warnings in dev |
 | Server logging | API middleware logs only method/path/status — no response body serialization |
 | Keep-alive | Built-in ping to `/api/keep-alive` every 4 min prevents Replit sleep |
+
+---
+
+## Performance Architecture
+
+### Server-side
+| Technique | Implementation |
+|-----------|---------------|
+| Gzip compression | `compression` middleware (level 6, threshold 1KB) on all responses — 60-70% smaller payloads |
+| In-memory LRU cache | `getCached()` utility with 60-second TTL, max 100 entries — eliminates DB round-trips |
+| HTTP caching headers | `Cache-Control: public, max-age=N, stale-while-revalidate=M` on all read-only API routes |
+| `Vary: Accept-Encoding` | Ensures CDN/browser caches separate compressed vs uncompressed copies |
+
+### Client-side
+| Technique | Implementation |
+|-----------|---------------|
+| Route-level code splitting | Every page is `lazy()` loaded — only the current route's JS is downloaded |
+| Per-route skeleton screens | `client/src/components/skeletons/PageSkeletons.tsx` — layout-matched skeletons for each route |
+| `startTransition` for scroll | Navigation scroll-to-top uses `startTransition` to avoid blocking paint |
+| `requestIdleCallback` preloading | Heavy modules (Mermaid, Monaco, react-markdown) preloaded during browser idle time |
+| `staleTime: Infinity` | TanStack Query never refetches static data — fully from in-memory cache |
+| `content-visibility: auto` | `cv-auto` / `cv-auto-sm` CSS utilities to skip rendering off-screen sections |
+| Static JSON prefetch | `<link rel="prefetch">` in `index.html` for `channels.json`, `stats.json`, etc. |
+| Critical CSS inlined | First-paint styles inlined in `<head>` — no render-blocking stylesheet |
+| Lazy font loading | Google Fonts loaded via `media="print"` trick to avoid render-blocking |
+
+### Key rule
+Never add `import React from "react"` — the Vite JSX transform injects it automatically. Use named imports only (`import { ComponentType } from "react"`).
 
 ---
 

@@ -46,6 +46,10 @@
 @utility mb-safe { margin-bottom: env(safe-area-inset-bottom); }
 @utility pt-safe { padding-top: env(safe-area-inset-top); }
 
+/* content-visibility: auto — skip rendering off-screen sections entirely */
+@utility cv-auto { content-visibility: auto; contain-intrinsic-size: auto 400px; }
+@utility cv-auto-sm { content-visibility: auto; contain-intrinsic-size: auto 200px; }
+
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
