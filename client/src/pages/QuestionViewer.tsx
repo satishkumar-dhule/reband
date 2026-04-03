@@ -34,6 +34,21 @@ import {
 } from '@/components/ui/select';
 import { cn } from '../lib/utils';
 
+// Flashcard shape compatible with FlashcardsTab component
+interface FlashcardItem {
+  id: string;
+  channel: string;
+  front: string;
+  back: string;
+  hint?: string;
+  codeExample?: string;
+  difficulty: string;
+  tags?: string | null;
+  category?: string | null;
+  status?: string | null;
+  createdAt?: string | null;
+}
+
 // Lazy-load heavy components to reduce initial bundle size
 const GenZAnswerPanel = lazy(() => import('../components/question/GenZAnswerPanel').then(m => ({ default: m.GenZAnswerPanel })));
 const FlashcardsTab = lazy(() => import('../components/FlashcardsTab').then(m => ({ default: m.FlashcardsTab })));
@@ -75,7 +90,7 @@ export default function QuestionViewer() {
   type MainViewTab = 'questions' | 'flashcards' | 'voice';
   const [activeMainTab, setActiveMainTab] = useState<MainViewTab>('questions');
 
-  const [flashcards, setFlashcards] = useState<any[]>([]);
+  const [flashcards, setFlashcards] = useState<FlashcardItem[]>([]);
   const [flashcardsLoading, setFlashcardsLoading] = useState(false);
   
   const { preferences, isSubscribed, subscribeChannel } = useUserPreferences();
@@ -673,7 +688,7 @@ export default function QuestionViewer() {
             {activeMainTab === 'voice' && (
               <div className="gh-card p-6 text-center">
                 <p className="text-[var(--gh-fg-muted)] mb-4">Practice answering questions with voice recording.</p>
-                <Button variant="primary" onClick={() => window.location.href = '/voice-interview'}>
+                <Button variant="primary" onClick={() => setLocation('/voice-interview')}>
                   Start Voice Practice
                 </Button>
               </div>
