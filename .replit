@@ -114,6 +114,11 @@ localPort = 5177
 localPort = 9999
 externalPort = 8099
 
+[[ports]]
+localPort = 63774
+externalPort = 3001
+exposeLocalhost = true
+
 [userenv]
 
 [userenv.development]

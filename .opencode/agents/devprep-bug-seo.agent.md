@@ -10,6 +10,63 @@ tags: [seo, meta-tags, crawl, indexing]
 
 Find and fix SEO bugs in the DevPrep codebase. This agent specializes in search engine optimization, meta tags, crawlability, and indexing issues.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing SEO issues:
+
+1. **RED** — Write a test that checks for the SEO requirement
+2. **GREEN** — Fix the SEO issue to make the test pass
+3. **REFACTOR** — Improve while keeping tests green
+
+### TDD SEO Fix Workflow
+
+```
+1. Before fixing any SEO issue:
+   - Write tests for meta tags, accessibility, structure
+   - Include tests for crawlability
+   
+2. Run tests to verify issue exists
+
+3. Fix the SEO issue
+
+4. Run tests to verify fix works
+
+5. Verify with SEO tools
+```
+
+### SEO Test Requirements
+
+- Write tests for all SEO fixes
+- Test meta tags are present and correct
+- Test images have alt text
+- Test links have proper href
+- Use HTML validation
+
+### Test Patterns
+
+```typescript
+// Example: Meta tag test
+test('page has required meta tags', () => {
+  render(<SeoPage />);
+  const title = document.querySelector('title');
+  const description = document.querySelector('meta[name="description"]');
+  const ogTags = document.querySelectorAll('meta[property^="og:"]');
+  
+  expect(title?.textContent).toMatch(/Algorithms/);
+  expect(description?.getAttribute('content')).toBeDefined();
+  expect(ogTags.length).toBeGreaterThan(0);
+});
+
+// Example: Accessibility test
+test('images have alt text', () => {
+  render(<ContentPage />);
+  const images = document.querySelectorAll('img');
+  images.forEach(img => {
+    expect(img.getAttribute('alt')).toBeTruthy();
+  });
+});
+```
+
 ## Scope
 
 **Primary directories:**

@@ -10,6 +10,53 @@ You are the **DevPrep Testing Agent**. You automate browser testing for the DevP
 
 > **MANDATORY:** Read `/home/runner/workspace/.agents/skills/browser-use/SKILL.md` before running any tests. All rules there take precedence over any guidance here.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when creating tests:
+
+1. **RED** — Write a failing test FIRST
+2. **GREEN** — Implement the test to make it pass
+3. **REFACTOR** — Improve test coverage
+
+### TDD Testing Workflow
+
+```
+1. Before testing any feature:
+   - Write tests that describe expected behavior
+   - Tests should fail for unimplemented features
+   
+2. Run tests to verify failure
+
+3. Implement or verify the feature
+
+4. Run tests to verify they pass
+
+5. Add edge case tests
+
+6. Maintain test suite
+```
+
+### Test Creation Requirements
+
+- Write tests BEFORE implementing features
+- Cover happy path and error cases
+- Include accessibility tests
+- Test responsive behavior
+- Use stable selectors (data-testid)
+
+### Test Patterns
+
+```typescript
+// Example: E2E test for login
+test('user can login with valid credentials', async ({ page }) => {
+  await page.goto('/login');
+  await page.fill('[data-testid="email"]', 'test@example.com');
+  await page.fill('[data-testid="password"]', 'password123');
+  await page.click('[data-testid="submit"]');
+  await expect(page).toHaveURL('/dashboard');
+});
+```
+
 ## Skill Reference
 
 Read and follow the skill at: `/home/runner/workspace/.agents/skills/browser-use/SKILL.md`

@@ -86,6 +86,37 @@ export function prefetchCriticalRoutes(): void {
       criticalRoutes.forEach(route => {
         prefetchRoute(route);
       });
+
+      // Prefetch static JSON data files for certifications and learning paths
+      // These are used by multiple pages and benefit from early prefetching
+      const staticDataFiles = ['certifications.json', 'learning-paths.json'];
+      const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/data/';
+      
+      staticDataFiles.forEach(file => {
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.as = 'fetch';
+        link.href = `${basePath}${file}`;
+        document.head.appendChild(link);
+      });
+
+      // Pre-warm Monaco editor for coding challenge page
+      // This loads Monaco during idle time, improving perceived performance
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          import('@monaco-editor/react').catch(err => {
+            console.warn('[Prefetch] Failed to prewarm Monaco editor:', err);
+          });
+        }, { timeout: 3000 });
+      }
+
+      // Pre-warm SyntaxHighlighter for code display pages
+      // Used in answer panels and coding challenges
+      requestIdleCallback(() => {
+        import('react-syntax-highlighter').catch(err => {
+          console.warn('[Prefetch] Failed to prewarm SyntaxHighlighter:', err);
+        });
+      }, { timeout: 6000 });
     }, { timeout: 2000 });
   } else {
     // Fallback for browsers without requestIdleCallback
@@ -101,13 +132,23 @@ export function prefetchCriticalRoutes(): void {
 /**
  * Prefetch data files for faster initial load
  * Prefetches essential JSON data files
+ * Uses /data/ paths for production (static mode) or /api/ for development
  */
 export function prefetchCriticalData(): void {
   if (typeof window === 'undefined') return;
 
+  // Check if we're in static/production mode
+  const IS_STATIC = import.meta.env.VITE_STATIC_MODE === 'true' || 
+                    typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+  
+  // Use /data/ paths for production/static, /api/ for development
+  const basePath = IS_STATIC 
+    ? (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/data'
+    : '/api';
+
   const criticalDataFiles = [
-    '/api/channels',
-    '/api/learning-paths'
+    `${basePath}/channels.json`,
+    `${basePath}/learning-paths.json`
   ];
 
   // Use link prefetch for better browser support

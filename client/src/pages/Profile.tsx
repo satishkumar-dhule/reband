@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, Link } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
@@ -15,6 +15,75 @@ import { Button, IconButton } from '@/components/unified/Button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 
+// Unified progress storage key for O(1) access
+const ALL_PROGRESS_KEY = 'allProgress';
+
+/**
+ * Get total completed questions count using O(1) localStorage access.
+ * Uses allProgress key if available, otherwise falls back to indexing progress-*.
+ */
+function getTotalCompleted(): number {
+  try {
+    // Try unified key first (O(1))
+    const allProgress = localStorage.getItem(ALL_PROGRESS_KEY);
+    if (allProgress) {
+      const progress = JSON.parse(allProgress);
+      // progress is { channelId: Set<string> } or array
+      if (Array.isArray(progress)) {
+        return progress.length;
+      }
+      if (typeof progress === 'object') {
+        return Object.values(progress).reduce((acc: number, ids: unknown) => {
+          if (Array.isArray(ids)) return acc + ids.length;
+          if (ids instanceof Set) return acc + ids.size;
+          return acc;
+        }, 0);
+      }
+    }
+
+    // Fallback: build index from progress-* keys (O(N) but only on first access)
+    const allCompletedIds = new Set<string>();
+    const indexKey = 'progress-index';
+    const indexStr = localStorage.getItem(indexKey);
+
+    if (indexStr) {
+      // Use pre-built index - O(K) where K = number of channels with progress
+      const channelIds = indexStr.split(',').filter(Boolean);
+      for (const channelId of channelIds) {
+        try {
+          const ids: string[] = JSON.parse(localStorage.getItem(`progress-${channelId}`) || '[]');
+          ids.forEach(id => allCompletedIds.add(id));
+        } catch {
+          // skip malformed entry
+        }
+      }
+    } else {
+      // Scan all keys - O(N) but caches result
+      const indexedChannels: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key?.startsWith('progress-') && !key.startsWith('progress-index')) {
+          const channelId = key.replace('progress-', '');
+          indexedChannels.push(channelId);
+          try {
+            const ids: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+            ids.forEach(id => allCompletedIds.add(id));
+          } catch {
+            // skip malformed entry
+          }
+        }
+      }
+      // Cache the index for future access
+      localStorage.setItem(indexKey, indexedChannels.join(','));
+    }
+
+    return allCompletedIds.size;
+  } catch {
+    return 0;
+  }
+}
+
+// Move achievements outside component - constant data doesn't need to be recreated
 const achievements = [
   { id: 1, name: 'First Steps', desc: 'Complete your first question', icon: '🌟', achieved: true },
   { id: 2, name: 'Quick Learner', desc: 'Complete 10 questions', icon: '⚡', achieved: true },
@@ -31,6 +100,75 @@ const learningHistory = [
   { id: 4, channel: 'Node.js', questions: 15, total: 90, lastActive: '1 week ago' },
 ];
 
+// Isolated PreferencesPanel component - prevents preference toggles from re-rendering achievements
+interface PreferencesPanelProps {
+  preferences: {
+    shuffleQuestions?: boolean;
+    prioritizeUnvisited?: boolean;
+    hideCertifications?: boolean;
+  };
+  toggleShuffleQuestions: () => void;
+  togglePrioritizeUnvisited: () => void;
+  toggleHideCertifications: () => void;
+}
+
+function PreferencesPanel({
+  preferences,
+  toggleShuffleQuestions,
+  togglePrioritizeUnvisited,
+  toggleHideCertifications,
+}: PreferencesPanelProps) {
+  return (
+    <section className="pt-8 border-t border-[var(--gh-border)]">
+      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-6 flex items-center gap-2">
+        <Settings className="w-5 h-5" />
+        Preferences
+      </h2>
+      
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Shuffle Questions</h3>
+            <p className="text-xs text-[var(--gh-fg-muted)]">Randomize question order</p>
+          </div>
+          <Switch
+            checked={preferences.shuffleQuestions}
+            onCheckedChange={toggleShuffleQuestions}
+            aria-label="Toggle shuffle questions"
+            data-testid="switch-shuffle-questions"
+          />
+        </div>
+
+        <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Prioritize Unvisited</h3>
+            <p className="text-xs text-[var(--gh-fg-muted)]">Show new questions first</p>
+          </div>
+          <Switch
+            checked={preferences.prioritizeUnvisited}
+            onCheckedChange={togglePrioritizeUnvisited}
+            aria-label="Toggle prioritize unvisited"
+            data-testid="switch-prioritize-unvisited"
+          />
+        </div>
+
+        <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Hide Certifications</h3>
+            <p className="text-xs text-[var(--gh-fg-muted)]">Hide certification paths</p>
+          </div>
+          <Switch
+            checked={preferences.hideCertifications}
+            onCheckedChange={toggleHideCertifications}
+            aria-label="Toggle hide certifications"
+            data-testid="switch-hide-certifications"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Profile() {
   const [, setLocation] = useLocation();
   const { preferences, toggleShuffleQuestions, togglePrioritizeUnvisited, toggleHideCertifications } = useUserPreferences();
@@ -42,28 +180,27 @@ export default function Profile() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    // Count completed questions directly from localStorage (no need to load all questions)
-    const allCompletedIds = new Set<string>();
-    try {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key?.startsWith('progress-')) {
-          try {
-            const ids: string[] = JSON.parse(localStorage.getItem(key) || '[]');
-            ids.forEach(id => allCompletedIds.add(id));
-          } catch {
-            // skip malformed entry
-          }
-        }
-      }
-    } catch {
-      // localStorage access error
-    }
-    setTotalCompleted(allCompletedIds.size);
+    // Use O(1) unified progress access instead of O(N) localStorage loop
+    const completed = getTotalCompleted();
+    setTotalCompleted(completed);
     setIsLoading(false);
   }, []);
 
-  const handleCouponSubmit = (e: React.FormEvent) => {
+  // Memoize achievedCount to prevent recalculation on every render
+  const achievedCount = useMemo(
+    () => achievements.filter(a => a.achieved).length,
+    []
+  );
+
+  // Memoize level calculation
+  const level = useMemo(() => Math.floor(balance / 100), [balance]);
+
+  // Memoize the preferences toggle functions to prevent unnecessary re-renders
+  const handleShuffleToggle = useCallback(() => toggleShuffleQuestions(), [toggleShuffleQuestions]);
+  const handlePrioritizeToggle = useCallback(() => togglePrioritizeUnvisited(), [togglePrioritizeUnvisited]);
+  const handleHideCertToggle = useCallback(() => toggleHideCertifications(), [toggleHideCertifications]);
+
+  const handleCouponSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
     if (!couponCode.trim()) {
@@ -81,10 +218,7 @@ export default function Profile() {
     }
     setIsSubmitting(false);
     setTimeout(() => setCouponMessage(null), 3000);
-  };
-
-  const level = Math.floor(balance / 100);
-  const achievedCount = achievements.filter(a => a.achieved).length;
+  }, [couponCode, isSubmitting, onRedeemCoupon]);
 
   // Loading skeleton
   if (isLoading) {
@@ -165,11 +299,11 @@ export default function Profile() {
                 </div>
 
                 <div className="mb-6">
-                  <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">User_{level}</h1>
+                  <h1 className="text-2xl font-semibold text-[var(--gh-fg)]" data-testid="text-username">User_{level}</h1>
                   <p className="text-xl text-[var(--gh-fg-muted)] font-light">Dev Enthusiast</p>
                 </div>
 
-                <Button variant="secondary" className="w-full mb-6">
+                <Button variant="secondary" className="w-full mb-6" data-testid="button-edit-profile">
                   Edit profile
                 </Button>
 
@@ -317,6 +451,7 @@ export default function Profile() {
                         <div 
                           key={achievement.id}
                           className={`p-3 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-center transition-all ${achievement.achieved ? 'opacity-100 hover:scale-[1.02] hover:shadow-md' : 'opacity-40 grayscale'}`}
+                          data-testid={`achievement-${achievement.id}`}
                         >
                           <div className="text-2xl mb-1">{achievement.icon}</div>
                           <div className="text-xs font-semibold text-[var(--gh-fg)] truncate">{achievement.name}</div>
@@ -356,51 +491,13 @@ export default function Profile() {
                     </div>
                   </section>
 
-                  {/* Settings Section */}
-                  <section className="pt-8 border-t border-[var(--gh-border)]">
-                    <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-6 flex items-center gap-2">
-                      <Settings className="w-5 h-5" />
-                      Preferences
-                    </h2>
-                    
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
-                        <div>
-                          <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Shuffle Questions</h3>
-                          <p className="text-xs text-[var(--gh-fg-muted)]">Randomize question order</p>
-                        </div>
-                        <Switch
-                          checked={preferences.shuffleQuestions}
-                          onCheckedChange={toggleShuffleQuestions}
-                          aria-label="Toggle shuffle questions"
-                        />
-                      </div>
-
-                      <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
-                        <div>
-                          <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Prioritize Unvisited</h3>
-                          <p className="text-xs text-[var(--gh-fg-muted)]">Show new questions first</p>
-                        </div>
-                        <Switch
-                          checked={preferences.prioritizeUnvisited}
-                          onCheckedChange={togglePrioritizeUnvisited}
-                          aria-label="Toggle prioritize unvisited"
-                        />
-                      </div>
-
-                      <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
-                        <div>
-                          <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Hide Certifications</h3>
-                          <p className="text-xs text-[var(--gh-fg-muted)]">Hide certification paths</p>
-                        </div>
-                        <Switch
-                          checked={preferences.hideCertifications}
-                          onCheckedChange={toggleHideCertifications}
-                          aria-label="Toggle hide certifications"
-                        />
-                      </div>
-                    </div>
-                  </section>
+                  {/* Settings Section - Isolated PreferencesPanel */}
+                  <PreferencesPanel
+                    preferences={preferences}
+                    toggleShuffleQuestions={handleShuffleToggle}
+                    togglePrioritizeUnvisited={handlePrioritizeToggle}
+                    toggleHideCertifications={handleHideCertToggle}
+                  />
                 </div>
               </div>
             </div>

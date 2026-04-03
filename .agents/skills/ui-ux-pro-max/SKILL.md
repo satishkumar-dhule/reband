@@ -7,6 +7,66 @@ description: "UI/UX design intelligence for web and mobile. Includes 50+ styles,
 
 Comprehensive design guide for web and mobile applications. Contains 50+ styles, 161 color palettes, 57 font pairings, 161 product types with reasoning rules, 99 UX guidelines, and 25 chart types across 10 technology stacks. Searchable database with priority-based recommendations.
 
+## Test Driven Development (TDD)
+
+**ALWAYS follow TDD for UI/UX code:**
+
+1. **RED** — Write a failing test FIRST that describes the expected UI behavior
+2. **GREEN** — Implement minimal code to make the test pass
+3. **REFACTOR** — Improve design while keeping tests green
+
+### TDD UI/UX Workflow
+
+```
+1. Before writing any UI code:
+   - Write tests for component behavior, interactions, accessibility
+   - Include tests for: render, user events, error states, responsive behavior
+   
+2. Run tests to verify they FAIL (expected)
+
+3. Implement the UI to make tests pass
+
+4. Apply UX optimizations (from guidelines below)
+
+5. Run tests to verify they still PASS
+
+6. Refactor for design quality while keeping tests green
+```
+
+### Test Requirements for UI
+
+- Every component needs tests BEFORE implementation
+- Test files go next to source: `Component.test.tsx`
+- Use Vitest + React Testing Library
+- Minimum coverage: render, user interactions, accessibility
+- Run `npm test` after each change
+
+### Test Patterns
+
+```typescript
+// Example: Component render test
+test('card renders with correct layout', () => {
+  render(<ChannelCard title="Algorithms" count={50} />);
+  expect(screen.getByText('Algorithms')).toBeInTheDocument();
+  expect(screen.getByText('50')).toBeInTheDocument();
+});
+
+// Example: Interaction test
+test('card navigates on click', async () => {
+  render(<Card onNavigate={navigate} />);
+  await userEvent.click(screen.getByRole('button'));
+  expect(navigate).toHaveBeenCalled();
+});
+
+// Example: Accessibility test
+test('button is keyboard accessible', async () => {
+  render(<Button />);
+  const button = screen.getByRole('button');
+  button.focus();
+  expect(button).toHaveFocus();
+});
+```
+
 ## When to Apply
 
 This Skill should be used when the task involves **UI structure, visual design decisions, interaction patterns, or user experience quality control**.

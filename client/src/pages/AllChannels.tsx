@@ -3,12 +3,15 @@
  * Clean, light, professional design replacing GenZ dark aesthetic.
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
-import { allChannelsConfig } from '../lib/channels-config';
-import { useChannelStats } from '../hooks/use-stats';
 import { SEOHead } from '../components/SEOHead';
+import { SkipLink } from '@/components/unified/SkipLink';
+import { allChannelsConfig, ChannelConfig } from '../lib/channels-config';
+import { useChannelStats } from '../hooks/use-stats';
+import { useDebounce, useProgress } from '../hooks';
+import { ChannelsSkeleton } from '../components/skeletons/PageSkeletons';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/unified/Button';
 import {
@@ -73,6 +76,9 @@ export function AllChannels() {
   const [, setLocation] = useLocation();
   const { stats, loading, error } = useChannelStats();
 
+  // Debounce search input (300ms)
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
   const channelStatsMap = useMemo(() => {
     return (stats || []).reduce((acc, curr) => {
       acc[curr.id] = curr;
@@ -86,17 +92,43 @@ export function AllChannels() {
     return Array.from(cats).sort();
   }, []);
 
+  // Memoize filtered channels to prevent re-computation on unrelated renders
   const filteredChannels = useMemo(() => {
     return allChannelsConfig.filter(channel => {
-      const matchesSearch = channel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          channel.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = channel.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+                          channel.description.toLowerCase().includes(debouncedSearch.toLowerCase());
       const matchesCategory = !selectedCategory || channel.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [debouncedSearch, selectedCategory]);
+
+  // Memoize grouped channels by category
+  const groupedChannels = useMemo(() => {
+    const groups: Record<string, typeof allChannelsConfig> = {};
+    filteredChannels.forEach(channel => {
+      const cat = channel.category;
+      if (!groups[cat]) {
+        groups[cat] = [];
+      }
+      groups[cat].push(channel);
+    });
+    return groups;
+  }, [filteredChannels]);
+
+  // Get total question count for each channel from stats
+  const channelQuestionCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allChannelsConfig.forEach(channel => {
+      const stat = channelStatsMap[channel.id];
+      counts[channel.id] = stat?.total || 0;
+    });
+    return counts;
+  }, [channelStatsMap]);
 
   return (
-    <AppLayout>
+    <>
+      <SkipLink />
+      <AppLayout>
       <SEOHead 
         title="All Topics | DevPrep" 
         description="Explore all interview topics and learning paths."
@@ -119,6 +151,7 @@ export function AllChannels() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
+                data-testid="input-search-channels"
               />
             </div>
           </div>
@@ -128,6 +161,7 @@ export function AllChannels() {
               onClick={() => setSelectedCategory(null)}
               variant={!selectedCategory ? 'primary' : 'ghost'}
               size="sm"
+              data-testid="button-filter-all"
             >
               All Topics
             </Button>
@@ -137,6 +171,7 @@ export function AllChannels() {
                 onClick={() => setSelectedCategory(cat)}
                 variant={selectedCategory === cat ? 'primary' : 'ghost'}
                 size="sm"
+                data-testid={`button-filter-${cat}`}
               >
                 {categoryLabels[cat] || cat}
               </Button>
@@ -147,12 +182,7 @@ export function AllChannels() {
 
       <div className="max-w-7xl mx-auto px-4 py-8 md:px-8">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-muted-foreground">Loading topics...</p>
-            </div>
-          </div>
+          <ChannelsSkeleton />
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-20 bg-card border border-destructive/20 rounded-md">
             <div className="p-3 bg-destructive/10 rounded-full mb-4">
@@ -174,55 +204,14 @@ export function AllChannels() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredChannels.map((channel) => {
               const channelStat = channelStatsMap[channel.id] || { total: 0 };
-              // Note: We don't have per-channel completion data in useChannelStats yet
-              // This is a placeholder for progress until we have useProgress integrated
-              const progress = 0; 
-
-              const Icon = iconMap[channel.icon] || Box;
-
+              const questionCount = channelStat.total || 0;
+              
               return (
-                <div 
+                <ChannelCard 
                   key={channel.id}
-                  onClick={() => setLocation(`/channel/${channel.id}`)}
-                  className="group bg-card border border-border rounded-md p-4 hover:border-primary hover:shadow-sm transition-all cursor-pointer flex flex-col h-full"
-                >
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <div className="p-2 bg-muted rounded-md border border-border-muted group-hover:border-primary transition-colors">
-                      <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-                    </div>
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border-muted">
-                      {categoryLabels[channel.category] || channel.category}
-                    </span>
-                  </div>
-
-                  <h3 className="font-semibold text-foreground group-hover:text-primary mb-1">
-                    {channel.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-grow">
-                    {channel.description}
-                  </p>
-
-                  <div className="mt-auto pt-4 border-t border-border-muted">
-                    <div className="flex justify-between items-center gap-2 text-xs mb-1.5">
-                      <span className="text-muted-foreground">
-                        {channelStat.total} questions
-                      </span>
-                      {progress > 0 && (
-                        <span className="font-medium text-muted-foreground">
-                          {Math.round(progress)}%
-                        </span>
-                      )}
-                    </div>
-                    {progress > 0 && (
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full transition-all duration-300"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  channel={channel}
+                  questionCount={questionCount}
+                />
               );
             })}
           </div>
@@ -247,6 +236,79 @@ export function AllChannels() {
         )}
       </div>
     </AppLayout>
+    </>
+  );
+}
+
+// Channel Card component - gets its own progress state
+interface ChannelCardProps {
+  channel: ChannelConfig;
+  questionCount: number;
+}
+
+function ChannelCard({ channel, questionCount }: ChannelCardProps) {
+  const [, setLocation] = useLocation();
+  const { completed } = useProgress(channel.id);
+  
+  const progress = questionCount > 0 
+    ? Math.round((completed.length / questionCount) * 100) 
+    : 0;
+  
+  const Icon = iconMap[channel.icon] || Box;
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setLocation(`/channel/${channel.id}`);
+    }
+  }, [setLocation, channel.id]);
+
+  return (
+    <button
+      type="button"
+      onClick={() => setLocation(`/channel/${channel.id}`)}
+      onKeyDown={handleKeyDown}
+      className="group bg-card border border-border rounded-md p-4 hover:border-primary hover:shadow-sm transition-all cursor-pointer flex flex-col h-full text-left w-full"
+      data-testid={`card-channel-${channel.id}`}
+      aria-label={`${channel.name}: ${questionCount} questions, ${progress}% completed`}
+    >
+      <div className="flex items-start justify-between gap-2 mb-3">
+        <div className="p-2 bg-muted rounded-md border border-border-muted group-hover:border-primary transition-colors">
+          <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+        </div>
+        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border-muted">
+          {categoryLabels[channel.category] || channel.category}
+        </span>
+      </div>
+
+      <h3 className="font-semibold text-foreground group-hover:text-primary mb-1">
+        {channel.name}
+      </h3>
+      <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-grow">
+        {channel.description}
+      </p>
+
+      <div className="mt-auto pt-4 border-t border-border-muted">
+        <div className="flex justify-between items-center gap-2 text-xs mb-1.5">
+          <span className="text-muted-foreground">
+            {questionCount} questions
+          </span>
+          {progress > 0 && (
+            <span className="font-medium text-muted-foreground">
+              {progress}%
+            </span>
+          )}
+        </div>
+        {progress > 0 && (
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
+      </div>
+    </button>
   );
 }
 

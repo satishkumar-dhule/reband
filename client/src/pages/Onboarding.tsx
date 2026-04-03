@@ -9,7 +9,8 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { PreferencesStorage, OnboardingStorage } from '../services/storage.service';
-import { getRecommendedChannels } from '../lib/channels-config';
+import { getRecommendedChannelsFromManifest } from '../lib/channels-manifest';
+import { t } from '../lib/i18n';
 import {
   ArrowRight, ArrowLeft, Check, Code, Server, Layout, Database,
   Cloud, Brain, Target, Rocket, BookOpen, Zap, ChevronRight, Trophy, Sparkles, Star
@@ -27,53 +28,53 @@ interface Role {
 const roles: Role[] = [
   {
     id: 'frontend',
-    name: 'Frontend Developer',
-    description: 'React, JavaScript, CSS, and modern web development',
+    name: t('role.frontend'),
+    description: t('role.frontend.desc'),
     icon: Layout,
     channels: ['frontend', 'react', 'javascript', 'css', 'html']
   },
   {
     id: 'backend',
-    name: 'Backend Engineer',
-    description: 'Node.js, Python, databases, and APIs',
+    name: t('role.backend'),
+    description: t('role.backend.desc'),
     icon: Server,
     channels: ['backend', 'nodejs', 'python', 'database', 'api']
   },
   {
     id: 'fullstack',
-    name: 'Full Stack Developer',
-    description: 'End-to-end development with React and Node.js',
+    name: t('role.fullstack'),
+    description: t('role.fullstack.desc'),
     icon: Code,
     channels: ['frontend', 'backend', 'database', 'api']
   },
   {
     id: 'devops',
-    name: 'DevOps Engineer',
-    description: 'Cloud infrastructure, containers, and CI/CD',
+    name: t('role.devops'),
+    description: t('role.devops.desc'),
     icon: Cloud,
     channels: ['devops', 'docker', 'kubernetes', 'aws', 'ci-cd']
   },
   {
     id: 'data',
-    name: 'Data Engineer',
-    description: 'Data pipelines, SQL, and analytics',
+    name: t('role.data'),
+    description: t('role.data.desc'),
     icon: Database,
     channels: ['database', 'sql', 'python', 'data-engineering']
   },
   {
     id: 'ml',
-    name: 'ML Engineer',
-    description: 'Machine learning, AI, and data science',
+    name: t('role.ml'),
+    description: t('role.ml.desc'),
     icon: Brain,
     channels: ['python', 'ml', 'ai', 'data-science']
   }
 ];
 
 const steps = [
-  { id: 1, title: 'Welcome', description: 'Get started with DevPrep' },
-  { id: 2, title: 'Choose Your Path', description: 'Select your career focus' },
-  { id: 3, title: 'Set Goals', description: 'Define your learning objectives' },
-  { id: 4, title: 'Ready to Go', description: 'Start your journey' }
+  { id: 1, title: t('onboarding.step1.title'), description: t('onboarding.step1.description') },
+  { id: 2, title: t('onboarding.step2.title'), description: t('onboarding.step2.description') },
+  { id: 3, title: t('onboarding.step3.title'), description: t('onboarding.step3.description') },
+  { id: 4, title: t('onboarding.step4.title'), description: t('onboarding.step4.description') }
 ];
 
 export default function OnboardingPage() {
@@ -87,7 +88,7 @@ export default function OnboardingPage() {
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const recommendedChannels = selectedRole 
-    ? getRecommendedChannels(selectedRole)
+    ? getRecommendedChannelsFromManifest(selectedRole)
     : [];
 
   const toggleChannel = (channelId: string) => {
@@ -106,11 +107,11 @@ export default function OnboardingPage() {
   const handleContinue = () => {
     // Validate before proceeding
     if (currentStep === 2 && !selectedRole) {
-      setValidationError('Please select a career path to continue');
+      setValidationError(t('onboarding.validation.selectRole'));
       return;
     }
     if (currentStep === 3 && selectedChannels.length === 0) {
-      setValidationError('Please select at least one focus area to continue');
+      setValidationError(t('onboarding.validation.selectChannels'));
       return;
     }
     setValidationError(null);
@@ -185,9 +186,9 @@ export default function OnboardingPage() {
                     <div className="w-20 h-20 rounded-xl bg-[var(--gh-canvas-inset)] border border-[var(--gh-border)] flex items-center justify-center mb-6 text-[var(--gh-accent-fg)]">
                       <Rocket className="w-10 h-10" />
                     </div>
-                    <h1 className="text-3xl font-bold text-[var(--gh-fg)] mb-4">Welcome to DevPrep</h1>
+                    <h1 className="text-3xl font-bold text-[var(--gh-fg)] mb-4">{t('onboarding.welcome.title')}</h1>
                     <p className="text-[var(--gh-fg-muted)] text-lg mb-10 max-w-lg">
-                      Your personal AI-powered interview preparation assistant. Let's set up your learning journey in just a few steps.
+                      {t('onboarding.welcome.subtitle')}
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-2xl">
@@ -195,22 +196,22 @@ export default function OnboardingPage() {
                         <div className="w-10 h-10 rounded-md bg-[var(--gh-success-subtle)] flex items-center justify-center mb-3 text-[var(--gh-success-fg)]">
                           <BookOpen className="w-5 h-5" />
                         </div>
-                        <h3 className="font-semibold text-sm mb-1">Learn</h3>
-                        <p className="text-xs text-[var(--gh-fg-muted)]">Thousands of interview questions</p>
+                        <h3 className="font-semibold text-sm mb-1">{t('onboarding.welcome.learn')}</h3>
+                        <p className="text-xs text-[var(--gh-fg-muted)]">{t('onboarding.welcome.learn.desc')}</p>
                       </div>
                       <div className="flex flex-col items-center p-4">
                         <div className="w-10 h-10 rounded-md bg-[var(--gh-attention-subtle)] flex items-center justify-center mb-3 text-[var(--gh-attention-fg)]">
                           <Target className="w-5 h-5" />
                         </div>
-                        <h3 className="font-semibold text-sm mb-1">Practice</h3>
-                        <p className="text-xs text-[var(--gh-fg-muted)]">Voice & coding sessions</p>
+                        <h3 className="font-semibold text-sm mb-1">{t('onboarding.welcome.practice')}</h3>
+                        <p className="text-xs text-[var(--gh-fg-muted)]">{t('onboarding.welcome.practice.desc')}</p>
                       </div>
                       <div className="flex flex-col items-center p-4">
                         <div className="w-10 h-10 rounded-md bg-[var(--gh-done-subtle)] flex items-center justify-center mb-3 text-[var(--gh-done-fg)]">
                           <Trophy className="w-5 h-5" />
                         </div>
-                        <h3 className="font-semibold text-sm mb-1">Achieve</h3>
-                        <p className="text-xs text-[var(--gh-fg-muted)]">Track progress & earn badges</p>
+                        <h3 className="font-semibold text-sm mb-1">{t('onboarding.welcome.achieve')}</h3>
+                        <p className="text-xs text-[var(--gh-fg-muted)]">{t('onboarding.welcome.achieve.desc')}</p>
                       </div>
                     </div>
                   </div>
@@ -219,8 +220,8 @@ export default function OnboardingPage() {
                 {currentStep === 2 && (
                   <div>
                     <div className="mb-8">
-                      <h2 className="text-2xl font-bold text-[var(--gh-fg)] mb-2">Choose Your Career Path</h2>
-                      <p className="text-[var(--gh-fg-muted)]">Select the role you're currently focusing on.</p>
+                      <h2 className="text-2xl font-bold text-[var(--gh-fg)] mb-2">{t('onboarding.chooseRole.title')}</h2>
+                      <p className="text-[var(--gh-fg-muted)]">{t('onboarding.chooseRole.subtitle')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -249,7 +250,7 @@ export default function OnboardingPage() {
                             {isSelected && (
                               <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-[var(--gh-accent-fg)]">
                                 <Check className="w-3.5 h-3.5" />
-                                SELECTED
+                                {t('onboarding.chooseRole.selected')}
                               </div>
                             )}
                           </Button>
@@ -262,13 +263,13 @@ export default function OnboardingPage() {
                 {currentStep === 3 && (
                   <div>
                     <div className="mb-8">
-                      <h2 className="text-2xl font-bold text-[var(--gh-fg)] mb-2">Select Focus Areas</h2>
-                      <p className="text-[var(--gh-fg-muted)]">Pick the topics you want to prioritize in your prep.</p>
+                      <h2 className="text-2xl font-bold text-[var(--gh-fg)] mb-2">{t('onboarding.selectChannels.title')}</h2>
+                      <p className="text-[var(--gh-fg-muted)]">{t('onboarding.selectChannels.subtitle')}</p>
                     </div>
 
                     <div className="flex items-center gap-2 mb-6 p-3 bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-md text-sm text-[var(--gh-fg-muted)]">
                       <Zap className="w-4 h-4 text-[var(--gh-attention-fg)]" />
-                      Recommended based on your <strong>{roles.find(r => r.id === selectedRole)?.name}</strong> choice
+                      {t('onboarding.selectChannels.recommended', { role: roles.find(r => r.id === selectedRole)?.name || '' })}
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -299,25 +300,25 @@ export default function OnboardingPage() {
                     <div className="w-24 h-24 rounded-full bg-[var(--gh-success-subtle)] flex items-center justify-center mb-8 text-[var(--gh-success-fg)]">
                       <Sparkles className="w-12 h-12" />
                     </div>
-                    <h2 className="text-3xl font-bold text-[var(--gh-fg)] mb-4">You're all set!</h2>
+                    <h2 className="text-3xl font-bold text-[var(--gh-fg)] mb-4">{t('onboarding.complete.title')}</h2>
                     <p className="text-[var(--gh-fg-muted)] text-lg mb-10 max-w-md">
-                      Your personalized roadmap is ready. Let's start building the career you deserve.
+                      {t('onboarding.complete.subtitle')}
                     </p>
 
                     <div className="flex gap-12 mb-12">
                       <div>
                         <div className="text-3xl font-bold text-[var(--gh-fg)]">{selectedChannels.length}</div>
-                        <div className="text-sm text-[var(--gh-fg-muted)]">Topics</div>
+                        <div className="text-sm text-[var(--gh-fg-muted)]">{t('onboarding.complete.topics')}</div>
                       </div>
                       <div>
                         <div className="text-3xl font-bold text-[var(--gh-fg)]">20+</div>
-                        <div className="text-sm text-[var(--gh-fg-muted)]">Channels</div>
+                        <div className="text-sm text-[var(--gh-fg-muted)]">{t('onboarding.complete.channels')}</div>
                       </div>
                       <div>
                         <div className="text-3xl font-bold text-[var(--gh-accent-fg)]">
                           <Star className="w-8 h-8 inline-block fill-current" />
                         </div>
-                        <div className="text-sm text-[var(--gh-fg-muted)]">Ready</div>
+                        <div className="text-sm text-[var(--gh-fg-muted)]">{t('onboarding.complete.ready')}</div>
                       </div>
                     </div>
                   </div>
@@ -341,7 +342,7 @@ export default function OnboardingPage() {
                         onClick={() => setLocation('/')}
                         className="text-[var(--gh-fg-muted)]"
                       >
-                        Skip for now
+                        {t('onboarding.button.skip')}
                       </Button>
                     ) : (
                       <Button 
@@ -352,7 +353,7 @@ export default function OnboardingPage() {
                         }}
                         className="text-[var(--gh-fg)]"
                       >
-                        <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {t('onboarding.button.back')}
                       </Button>
                     )}
                   </div>
@@ -363,14 +364,14 @@ export default function OnboardingPage() {
                       onClick={handleContinue}
                       disabled={currentStep === 2 && !selectedRole || currentStep === 3 && selectedChannels.length === 0}
                     >
-                      Continue <ArrowRight className="w-4 h-4 ml-2" />
+                      {t('onboarding.button.continue')} <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   ) : (
                     <Button 
                       variant="success"
                       onClick={handleComplete}
                     >
-                      Start Your Journey <ChevronRight className="w-4 h-4 ml-2" />
+                      {t('onboarding.button.startJourney')} <ChevronRight className="w-4 h-4 ml-2" />
                     </Button>
                   )}
                 </div>
@@ -378,7 +379,7 @@ export default function OnboardingPage() {
             </div>
 
             <p className="text-center mt-8 text-sm text-[var(--gh-fg-subtle)]">
-              Welcome to the community of world-class developers.
+              {t('onboarding.footer.community')}
             </p>
           </div>
         </div>

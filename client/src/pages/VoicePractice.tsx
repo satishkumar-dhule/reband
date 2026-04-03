@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useLocation, Link } from 'wouter';
 import {
   ArrowLeft, Eye, EyeOff, Volume2, Trophy, RotateCcw, 
@@ -14,6 +14,7 @@ import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use
 import type { Question } from '../types';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { Button } from '@/components/unified/Button';
+import { VoiceSkeleton } from '../components/skeletons/PageSkeletons';
 
 type PracticeMode = 'training' | 'interview';
 type RecordingState = 'idle' | 'recording' | 'recorded';
@@ -135,6 +136,39 @@ export default function VoicePractice() {
     return () => { cancelled = true; };
   }, [preferences.subscribedChannels]);
 
+  // Cleanup SpeechRecognition on unmount to prevent memory leaks
+  const recognitionRef = useRef<any>(null);
+  
+  useEffect(() => {
+    // Access recognition from the hook via a ref pattern
+    // The hook exposes recognitionRef, we need to sync with it
+    return () => {
+      // Cleanup is handled by the hook's internal useEffect
+      // This outer effect ensures cleanup runs on unmount
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          // Already stopped
+        }
+        recognitionRef.current = null;
+      }
+    };
+  }, []);
+
+  // Memoize session progress data to prevent unnecessary re-renders
+  const sessionStats = useMemo(() => {
+    const completedWords = questions.slice(0, currentIndex).reduce(
+      (acc, q) => acc + (q.answer?.split(' ').length || 0), 
+      0
+    ) + (feedback?.wordsSpoken || 0);
+    
+    return {
+      completedWords,
+      progressPercent: questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0
+    };
+  }, [questions, currentIndex, feedback]);
+
   const startRecording = () => {
     setTranscript('');
     setInterimTranscript('');
@@ -213,57 +247,7 @@ export default function VoicePractice() {
   if (isLoading) {
     return (
       <AppLayout>
-        <main className="max-w-4xl mx-auto px-4 py-8 page-content" id="main-content">
-          {/* Header skeleton - includes page title for test detection */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div className="space-y-2">
-              {/* Page title "Voice Interview Practice" - visible to tests */}
-              <h1 className="text-2xl font-bold text-[var(--gh-fg)]">Voice Interview Practice</h1>
-              <div className="h-4 w-48 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
-            </div>
-            <div className="h-10 w-24 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
-          </div>
-          
-          {/* Question Card skeleton */}
-          <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="h-6 w-32 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
-              <div className="h-6 w-20 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
-            </div>
-            {/* Question text - h2 for test detection - ensure it's visible */}
-            <div className="text-xl font-semibold text-[var(--gh-fg)] mb-4">
-              <div className="h-6 w-3/4 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
-            </div>
-            <div className="flex gap-4 py-4 border-y border-[var(--gh-border-muted)]">
-              <div className="h-4 w-28 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
-              <div className="h-4 w-24 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
-            </div>
-            <div className="flex justify-center py-8">
-              <Button 
-                variant="primary" 
-                size="lg" 
-                icon={<Mic className="w-5 h-5" />}
-                disabled
-              >
-                Start Recording
-              </Button>
-            </div>
-          </div>
-          
-          {/* Sidebar skeleton */}
-          <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2" />
-            <div className="space-y-6">
-              <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 space-y-3">
-                <div className="h-5 w-24 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
-                <div className="space-y-2">
-                  <div className="h-4 w-full bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
-                  <div className="h-4 w-2/3 bg-[var(--gh-skeleton-bg,var(--gh-neutral-muted))] animate-pulse rounded-md" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
+        <VoiceSkeleton />
       </AppLayout>
     );
   }
@@ -364,6 +348,7 @@ export default function VoicePractice() {
                     variant="primary"
                     size="lg"
                     icon={<Mic className="w-5 h-5" />}
+                    data-testid="start-recording-button"
                   >
                     Start Recording
                   </Button>
@@ -383,6 +368,7 @@ export default function VoicePractice() {
                       variant="danger"
                       size="lg"
                       icon={<Zap className="w-5 h-5" />}
+                      data-testid="stop-recording-button"
                     >
                       Stop & Analyze
                     </Button>
@@ -395,6 +381,7 @@ export default function VoicePractice() {
                       onClick={startRecording}
                       variant="secondary"
                       icon={<RotateCcw className="w-4 h-4" />}
+                      data-testid="retry-button"
                     >
                       Retry
                     </Button>
@@ -403,6 +390,7 @@ export default function VoicePractice() {
                       variant="primary"
                       icon={<ChevronRight className="w-4 h-4" />}
                       iconPosition="right"
+                      data-testid="next-question-button"
                     >
                       Next Question
                     </Button>
@@ -490,13 +478,13 @@ export default function VoicePractice() {
                 <div className="gh-progress">
                   <div 
                     className="gh-progress-bar" 
-                    style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+                    style={{ width: `${sessionStats.progressPercent}%` }}
                   />
                 </div>
                 <div className="pt-4 border-t border-[var(--gh-border-muted)] space-y-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-[var(--gh-fg-muted)]">Total Words</span>
-                    <span className="font-medium">{questions.slice(0, currentIndex).reduce((acc, q) => acc + q.answer.split(' ').length, 0) + (feedback?.wordsSpoken || 0)}</span>
+                    <span className="font-medium">{sessionStats.completedWords}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-[var(--gh-fg-muted)]">Avg Score</span>

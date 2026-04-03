@@ -227,8 +227,14 @@ const editorLoadingFallback = (
   <div className="flex items-center justify-center h-full bg-muted dark:bg-[var(--gh-canvas-inset,#0F0F0F)]">
     <div className="flex flex-col items-center gap-3">
       <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
-      <span className="text-sm text-muted-foreground font-mono">Loading editor...</span>
+      <span className="text-sm text-muted-foreground font-mono">Loading code editor...</span>
     </div>
+  </div>
+);
+
+const editorEmptyPlaceholder = (
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+    <span className="text-muted-foreground/50 font-mono text-sm">Start typing your code here...</span>
   </div>
 );
 

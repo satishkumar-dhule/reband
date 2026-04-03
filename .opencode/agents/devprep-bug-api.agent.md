@@ -14,6 +14,59 @@ tags: [api, routing, network, http, fetch]
 
 Find and fix API and routing bugs in the DevPrep codebase. This agent specializes in HTTP communication issues, REST endpoint problems, route configuration errors, and data fetching patterns.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing API bugs:
+
+1. **RED** — Write a test that demonstrates the API bug
+2. **GREEN** — Fix the API code to make the test pass
+3. **REFACTOR** — Improve while keeping tests green
+
+### TDD API Fix Workflow
+
+```
+1. Before fixing any API bug:
+   - Write a test that demonstrates the broken behavior
+   - Mock external services if needed
+   
+2. Run tests to verify bug is reproduced
+
+3. Fix the API code
+
+4. Run tests to verify fix works
+
+5. Verify error handling still works
+```
+
+### API Test Requirements
+
+- Write integration tests for all API fixes
+- Test success and error paths
+- Test edge cases (empty data, large payloads)
+- Mock external services (MSW for frontend)
+- Test race conditions with AbortController
+
+### Test Patterns
+
+```typescript
+// Example: Test API error handling
+test('fetchQuestions handles network error', async () => {
+  server.use(
+    rest.get('/api/questions', (req, res, ctx) => {
+      return res.networkError('Failed to connect');
+    })
+  );
+  await expect(fetchQuestions('algorithms')).rejects.toThrow('Network Error');
+});
+
+// Example: Test route parameter
+test('question page loads with valid id', async () => {
+  render(<Route path="/questions/:id" component={QuestionPage} />);
+  await route('/questions/123');
+  expect(screen.getByTestId('question-title')).toBeInTheDocument();
+});
+```
+
 ## Scope
 
 **Primary directories:**

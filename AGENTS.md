@@ -271,6 +271,17 @@ task("devprep-bug-performance", "Analyze bundle sizes and render paths...")
 ### Creative & Strategy (4)
 `copywriting`, `brainstorming`, `find-skills`, `swarm-coordination`
 
+### Bug Fix & Analysis (2)
+`bug-fix-workflow`, `website-bug-analyzer`
+
+---
+
+## Bug Fix Supervisor Agent
+
+| Agent | Description |
+|-------|-------------|
+| `devprep-bug-fix-supervisor` | Orchestrates bug fixing using swarm pattern - assigns bugs to specialized agents, tracks progress, aggregates results |
+
 ---
 
 ## Unified Controls

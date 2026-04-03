@@ -170,11 +170,6 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
     };
   }, []);
 
-  // Auto-start if requested - use refs to avoid stale closure issues
-  const autoStartRef = useRef(autoStart);
-  const stopRecordingRef = useRef<() => void>(() => {});
-  autoStartRef.current = autoStart;
-
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -234,7 +229,6 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
   }, []);
 
   const stopRecording = useCallback(() => {
-    stopRecordingRef.current = stopRecording;
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop();
     }
@@ -377,7 +371,7 @@ export function useVoiceRecording(options: VoiceRecordingOptions = {}): VoiceRec
   // Max duration check effect
   useEffect(() => {
     if (maxDuration && state.duration >= maxDuration && state.isRecording) {
-      stopRecordingRef.current();
+      stopRecording();
     }
   }, [state.duration, maxDuration, state.isRecording, stopRecording]);
 

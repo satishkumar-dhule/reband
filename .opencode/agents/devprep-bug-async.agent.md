@@ -14,6 +14,73 @@ tags: [async, await, promise, error-handling]
 
 Find and fix async/await bugs in the DevPrep codebase. This agent specializes in async operations, promise handling, error catching, and preventing memory leaks from unhandled promises.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing async bugs:
+
+1. **RED** — Write a test that demonstrates the async bug
+2. **GREEN** — Fix the async code to make the test pass
+3. **REFACTOR** — Improve while keeping tests green
+
+### TDD Async Fix Workflow
+
+```
+1. Before fixing any async bug:
+   - Write tests for error handling, loading states
+   - Include tests for abort/cleanup behavior
+   
+2. Run tests to verify bug is reproduced
+
+3. Fix the async code
+
+4. Run tests to verify fix works
+
+5. Test that success path still works
+```
+
+### Async Test Requirements
+
+- Write tests for all async error paths
+- Test loading and error states
+- Test cleanup/abort behavior
+- Test race conditions
+- Mock timers and fetch for reliable tests
+
+### Test Patterns
+
+```typescript
+// Example: Error handling test
+test('fetchData shows error on failure', async () => {
+  server.use(
+    rest.get('/api/data', (req, res) => {
+      return res.status(500);
+    })
+  );
+  
+  render(<DataComponent />);
+  await waitFor(() => {
+    expect(screen.getByText(/error/i)).toBeInTheDocument();
+  });
+});
+
+// Example: Abort cleanup test
+test('component cleanup aborts pending request', async () => {
+  let pending = true;
+  server.use(
+    rest.get('/api/slow', (req, res) => {
+      return res.delay(1000);
+    })
+  );
+  
+  const { unmount } = render(<SlowComponent />);
+  unmount();
+  
+  await waitFor(() => {
+    expect(pending).toBe(false); // Should be aborted
+  });
+});
+```
+
 ## Scope
 
 **Primary directories:**

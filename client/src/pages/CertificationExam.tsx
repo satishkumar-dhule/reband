@@ -4,7 +4,7 @@
  * Features: Timer, domain tracking, exam simulation mode
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useReducer, memo } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -40,6 +40,164 @@ interface AnswerRecord {
   timeSpent: number;
 }
 
+// ============================================
+// EXAM STATE REDUCER - Batch updates for performance
+// ============================================
+
+interface ExamState {
+  currentIndex: number;
+  answers: AnswerRecord[];
+  flaggedQuestions: Set<number>;
+}
+
+type ExamAction =
+  | { type: 'SET_ANSWER'; payload: AnswerRecord }
+  | { type: 'SET_CURRENT_INDEX'; payload: number }
+  | { type: 'TOGGLE_FLAG'; payload: number }
+  | { type: 'SET_QUESTIONS'; payload: CertificationQuestion[] }
+  | { type: 'RESET' };
+
+function examReducer(state: ExamState, action: ExamAction): ExamState {
+  switch (action.type) {
+    case 'SET_ANSWER':
+      return {
+        ...state,
+        answers: [...state.answers, action.payload],
+      };
+    case 'SET_CURRENT_INDEX':
+      return {
+        ...state,
+        currentIndex: action.payload,
+      };
+    case 'TOGGLE_FLAG': {
+      const newFlagged = new Set(state.flaggedQuestions);
+      if (newFlagged.has(action.payload)) {
+        newFlagged.delete(action.payload);
+      } else {
+        newFlagged.add(action.payload);
+      }
+      return {
+        ...state,
+        flaggedQuestions: newFlagged,
+      };
+    }
+    case 'SET_QUESTIONS':
+      return { ...state, answers: [], currentIndex: 0, flaggedQuestions: new Set() };
+    case 'RESET':
+      return { currentIndex: 0, answers: [], flaggedQuestions: new Set() };
+    default:
+      return state;
+  }
+}
+
+// ============================================
+// EXAM TIMER - Isolated Timer Component
+// ============================================
+
+interface ExamTimerProps {
+  isActive: boolean;
+  initialTime: number; // in seconds
+  onTimeUp: () => void;
+}
+
+const ExamTimer = memo(function ExamTimer({ isActive, initialTime, onTimeUp }: ExamTimerProps) {
+  const [timeLeft, setTimeLeft] = useState(initialTime);
+
+  // Reset timer when initialTime changes
+  useEffect(() => {
+    setTimeLeft(initialTime);
+  }, [initialTime]);
+
+  // Timer effect - only depends on isActive and onTimeUp to avoid unnecessary restarts
+  useEffect(() => {
+    if (!isActive || timeLeft <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          onTimeUp();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isActive, onTimeUp]);
+
+  const formatTime = useCallback((seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }, []);
+
+  const isLowTime = timeLeft <= 60;
+
+  return (
+    <span className={`font-mono text-sm ${isLowTime ? 'text-red-500 animate-pulse' : 'text-muted-foreground'}`}>
+      {formatTime(timeLeft)}
+    </span>
+  );
+});
+
+// ============================================
+// EXAM SIDEBAR - Memoized Question List
+// ============================================
+
+interface ExamSidebarProps {
+  questions: CertificationQuestion[];
+  currentIndex: number;
+  answers: AnswerRecord[];
+  flaggedQuestions: Set<number>;
+  onGoToQuestion: (index: number) => void;
+}
+
+const ExamSidebar = memo(function ExamSidebar({
+  questions,
+  currentIndex,
+  answers,
+  flaggedQuestions,
+  onGoToQuestion,
+}: ExamSidebarProps) {
+  return (
+    <div className="space-y-2">
+      {questions.map((_, i) => {
+        const answer = answers.find(a => a.questionId === questions[i]?.id);
+        const isCurrent = i === currentIndex;
+        const isFlag = flaggedQuestions.has(i);
+
+        let variant: 'primary' | 'secondary' | 'success' | 'danger' = 'secondary';
+        if (isCurrent) variant = 'primary';
+        else if (answer) variant = answer.isCorrect ? 'success' : 'danger';
+
+        return (
+          <button
+            key={i}
+            onClick={() => onGoToQuestion(i)}
+            className={`w-full p-2 rounded-lg text-sm font-medium transition-all ${
+              variant === 'primary' ? 'bg-primary text-primary-foreground' :
+              variant === 'success' ? 'bg-green-500/20 text-green-500' :
+              variant === 'danger' ? 'bg-red-500/20 text-red-500' :
+              'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            {i + 1}
+            {isFlag && <Flag className="inline w-3 h-3 ml-1 text-yellow-500" />}
+          </button>
+        );
+      })}
+    </div>
+  );
+});
+
+interface AnswerRecord {
+  questionId: string;
+  selectedOptionId: string;
+  isCorrect: boolean;
+  timeSpent: number;
+}
+
 export default function CertificationExam() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute('/certification/:id/exam');
@@ -54,14 +212,17 @@ export default function CertificationExam() {
   const [examMode, setExamMode] = useState<ExamMode>('practice');
   const [questionCount, setQuestionCount] = useState(10);
   const [sessionId, setSessionId] = useState<string>(`certification-session-${certificationId}`);
+  const [isGeneratingSession, setIsGeneratingSession] = useState(false);
   
-  // Active session
+  // Active session - using useReducer for batched updates
   const [questions, setQuestions] = useState<CertificationQuestion[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<AnswerRecord[]>([]);
+  const [examState, dispatch] = useReducer(examReducer, {
+    currentIndex: 0,
+    answers: [],
+    flaggedQuestions: new Set<number>(),
+  });
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number>>(new Set());
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
 
   const { toast } = useUnifiedToast();
@@ -83,23 +244,30 @@ export default function CertificationExam() {
 
 
 
+  // Derived values from examState
+  const currentIndex = examState.currentIndex;
+  const answers = examState.answers;
+  const flaggedQuestions = examState.flaggedQuestions;
+
   const currentQuestion = questions[currentIndex] ?? null;
   const isAnswered = currentQuestion ? answers.some(a => a.questionId === currentQuestion.id) : false;
   const currentAnswer = currentQuestion ? answers.find(a => a.questionId === currentQuestion.id) : undefined;
 
-  // Start exam session
+  // Start exam session - async to avoid blocking UI
   const startSession = useCallback(() => {
-    const sessionQuestions = generatePracticeSession(certificationId!, questionCount);
-    setQuestions(sessionQuestions);
-    setCurrentIndex(0);
-    setAnswers([]);
-    setSelectedOption(null);
-    setShowExplanation(false);
-    setFlaggedQuestions(new Set());
-    setQuestionStartTime(Date.now());
-    setSessionState('active');
-    saveSessionProgress();
-  }, [certificationId, questionCount, examMode, examConfig]);
+    setIsGeneratingSession(true);
+    // Use setTimeout to defer execution and not block first paint
+    setTimeout(() => {
+      const sessionQuestions = generatePracticeSession(certificationId!, questionCount);
+      setQuestions(sessionQuestions);
+      dispatch({ type: 'SET_QUESTIONS', payload: sessionQuestions });
+      setSelectedOption(null);
+      setShowExplanation(false);
+      setQuestionStartTime(Date.now());
+      setSessionState('active');
+      setIsGeneratingSession(false);
+    }, 0);
+  }, [certificationId, questionCount]);
 
   // Save session progress
   const saveSessionProgress = useCallback(() => {
@@ -153,7 +321,7 @@ export default function CertificationExam() {
       timeSpent,
     };
 
-    setAnswers(prev => [...prev, record]);
+    dispatch({ type: 'SET_ANSWER', payload: record });
     setSelectedOption(optionId);
     
     if (examMode === 'practice') {
@@ -164,7 +332,7 @@ export default function CertificationExam() {
   // Navigation
   const goToNext = useCallback(() => {
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      dispatch({ type: 'SET_CURRENT_INDEX', payload: currentIndex + 1 });
       setSelectedOption(null);
       setShowExplanation(false);
       setQuestionStartTime(Date.now());
@@ -174,7 +342,7 @@ export default function CertificationExam() {
 
   const goToPrev = useCallback(() => {
     if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
+      dispatch({ type: 'SET_CURRENT_INDEX', payload: currentIndex - 1 });
       const prevAnswer = answers.find(a => a.questionId === questions[currentIndex - 1]?.id);
       setSelectedOption(prevAnswer?.selectedOptionId || null);
       setShowExplanation(false);
@@ -183,7 +351,7 @@ export default function CertificationExam() {
   }, [currentIndex, answers, questions, saveSessionProgress]);
 
   const goToQuestion = useCallback((index: number) => {
-    setCurrentIndex(index);
+    dispatch({ type: 'SET_CURRENT_INDEX', payload: index });
     const answer = answers.find(a => a.questionId === questions[index]?.id);
     setSelectedOption(answer?.selectedOptionId || null);
     setShowExplanation(false);
@@ -192,15 +360,7 @@ export default function CertificationExam() {
   }, [answers, questions, saveSessionProgress]);
 
   const toggleFlag = useCallback(() => {
-    setFlaggedQuestions(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(currentIndex)) {
-        newSet.delete(currentIndex);
-      } else {
-        newSet.add(currentIndex);
-      }
-      return newSet;
-    });
+    dispatch({ type: 'TOGGLE_FLAG', payload: currentIndex });
     saveSessionProgress();
   }, [currentIndex, saveSessionProgress]);
 
@@ -337,7 +497,7 @@ export default function CertificationExam() {
             }}
             onReview={() => {
               setExamMode('review');
-              setCurrentIndex(0);
+              dispatch({ type: 'SET_CURRENT_INDEX', payload: 0 });
               setSessionState('active');
             }}
             onBack={() => setLocation(`/certification/${certificationId}`)}

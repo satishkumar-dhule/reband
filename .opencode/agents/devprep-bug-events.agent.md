@@ -10,6 +10,80 @@ tags: [events, listeners, propagation, handlers]
 
 Find and fix event handler bugs in the DevPrep codebase. This agent specializes in DOM event handling, event listener management, propagation control, and React synthetic events.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing event bugs:
+
+1. **RED** — Write a test that demonstrates the event bug
+2. **GREEN** — Fix the event handler to make the test pass
+3. **REFACTOR** — Improve while keeping tests green
+
+### TDD Event Fix Workflow
+
+```
+1. Before fixing any event handler bug:
+   - Write tests for event behavior, cleanup, propagation
+   - Include tests for memory leaks if applicable
+   
+2. Run tests to verify bug is reproduced
+
+3. Fix the event handler
+
+4. Run tests to verify fix works
+
+5. Test that events still fire correctly
+```
+
+### Event Test Requirements
+
+- Write tests for all event handler fixes
+- Test event cleanup on unmount
+- Test propagation behavior
+- Test double-click protection
+- Test keyboard interactions
+
+### Test Patterns
+
+```typescript
+// Example: Cleanup test
+test('listener removed on unmount', () => {
+  const addListener = jest.fn();
+  const removeListener = jest.fn();
+  
+  render(<Component addListener={addListener} removeListener={removeListener} />);
+  
+  expect(addListener).toHaveBeenCalled();
+  
+  unmount();
+  
+  expect(removeListener).toHaveBeenCalled();
+});
+
+// Example: Event propagation test
+test('parent handler not called when stopPropagation', async () => {
+  const parentHandler = jest.fn();
+  render(
+    <Parent onClick={parentHandler}>
+      <Child onClick={(e) => e.stopPropagation()} />
+    </Parent>
+  );
+  
+  await userEvent.click(screen.getByTestId('child'));
+  
+  expect(parentHandler).not.toHaveBeenCalled();
+});
+
+// Example: Double-click protection test
+test('submit button disabled during submission', async () => {
+  render(<SubmitForm />);
+  
+  const button = screen.getByRole('button', { name: /submit/i });
+  await userEvent.click(button);
+  
+  expect(button).toBeDisabled();
+});
+```
+
 ## Scope
 
 **Primary directories:**

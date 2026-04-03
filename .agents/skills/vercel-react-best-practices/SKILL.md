@@ -11,6 +11,64 @@ metadata:
 
 Comprehensive performance optimization guide for React and Next.js applications, maintained by Vercel. Contains 65 rules across 8 categories, prioritized by impact to guide automated refactoring and code generation.
 
+## Test Driven Development (TDD)
+
+**ALWAYS follow TDD for React code:**
+
+1. **RED** — Write a failing test FIRST that describes expected behavior
+2. **GREEN** — Implement minimal code to make the test pass
+3. **REFACTOR** — Apply performance optimizations while keeping tests green
+
+### TDD React Workflow
+
+```
+1. Before writing any React code:
+   - Write tests for component behavior, interactions, state changes
+   - Include tests for: render output, user events, async data, error states
+   
+2. Run tests to verify they FAIL (expected)
+
+3. Implement the component to make tests pass
+
+4. Apply performance optimizations (from rules below)
+
+5. Run tests to verify they still PASS
+
+6. Refactor for quality while keeping tests green
+```
+
+### Test Requirements for React
+
+- Every component needs tests BEFORE implementation
+- Test files go next to source: `Component.test.tsx`
+- Use Vitest + React Testing Library
+- Minimum coverage: render, user interactions, async behavior
+- Run `npm test` after each change
+
+### Test Patterns
+
+```typescript
+// Example: Component render test
+test('renders question with correct content', () => {
+  render(<Question question={mockQuestion} />);
+  expect(screen.getByText(mockQuestion.title)).toBeInTheDocument();
+});
+
+// Example: Interaction test
+test('submit button works', async () => {
+  render(<Form />);
+  await userEvent.click(screen.getByRole('button'));
+  expect(screen.getByText(/success/i)).toBeInTheDocument();
+});
+
+// Example: Performance test
+test('memoized component does not re-render', () => {
+  const renderCount = { current: 0 };
+  render(<MemoizedComponent renderCount={renderCount} />);
+  expect(renderCount.current).toBe(1);
+});
+```
+
 ## When to Apply
 
 Reference these guidelines when:

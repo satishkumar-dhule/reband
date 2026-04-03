@@ -10,6 +10,68 @@ tags: [typescript, types, safety, strict]
 
 Find and fix TypeScript type errors in the DevPrep codebase. This agent specializes in type safety, strict mode compliance, and proper type definitions.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing type issues:
+
+1. **RED** — Write a test that exercises the typed code
+2. **GREEN** — Fix the types to make TypeScript happy
+3. **REFACTOR** — Improve types while keeping typecheck green
+
+### TDD Type Fix Workflow
+
+```
+1. Before fixing any type error:
+   - Write runtime tests for the component/function
+   - Test actual values match expected behavior
+   
+2. Run tests to verify behavior
+
+3. Fix the types
+
+4. Run typecheck to verify types are correct
+
+5. Run tests to ensure runtime behavior unchanged
+```
+
+### Type Test Requirements
+
+- Write runtime tests for all typed code
+- Test that values match expected types at runtime
+- Test edge cases (null, undefined, empty)
+- Test API response parsing
+- Use type predicates properly
+
+### Test Patterns
+
+```typescript
+// Example: Runtime type validation
+test('parseChannel returns correct type', () => {
+  const result = parseChannel(rawApiResponse);
+  expect(result).toHaveProperty('id');
+  expect(result).toHaveProperty('questionCount');
+  expect(typeof result.id).toBe('string');
+  expect(typeof result.questionCount).toBe('number');
+});
+
+// Example: Type guard test
+test('isQuestion filters correctly', () => {
+  const items = [validQuestion, invalidObject, validQuestion];
+  const questions = items.filter(isQuestion);
+  expect(questions).toHaveLength(2);
+});
+
+// Example: API response type test
+test('fetchChannels returns Channel[]', async () => {
+  const channels = await fetchChannels();
+  expect(Array.isArray(channels)).toBe(true);
+  channels.forEach(channel => {
+    expect(channel).toHaveProperty('id');
+    expect(channel).toHaveProperty('label');
+  });
+});
+```
+
 ## Scope
 
 **Primary directories:**

@@ -156,6 +156,7 @@ export async function registerRoutes(
         return result.rows.map((r: any) => parseQuestion(r));
       });
       
+      setReadCache(res, 60, 120);
       res.json(data);
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -846,23 +847,30 @@ export async function registerRoutes(
       const { id } = req.params;
       const { domain, difficulty, limit = '50' } = req.query;
       
-      let sql = "SELECT * FROM questions WHERE channel = ? AND status != 'deleted'";
-      const args: any[] = [id];
+      const cacheKey = `cert-questions-${id}-${domain}-${difficulty}-${limit}`;
+      
+      const data = await getCached(cacheKey, async () => {
+        let sql = "SELECT * FROM questions WHERE channel = ? AND status != 'deleted'";
+        const args: any[] = [id];
 
-      if (domain && domain !== 'all') {
-        sql += " AND sub_channel = ?";
-        args.push(domain);
-      }
-      if (difficulty && difficulty !== 'all') {
-        sql += " AND difficulty = ?";
-        args.push(difficulty);
-      }
+        if (domain && domain !== 'all') {
+          sql += " AND sub_channel = ?";
+          args.push(domain);
+        }
+        if (difficulty && difficulty !== 'all') {
+          sql += " AND difficulty = ?";
+          args.push(difficulty);
+        }
 
-      sql += " ORDER BY RANDOM() LIMIT ?";
-      args.push(parseInt(limit as string));
+        sql += " ORDER BY RANDOM() LIMIT ?";
+        args.push(parseInt(limit as string));
 
-      const result = await client.execute({ sql, args });
-      res.json(result.rows.map(parseQuestion));
+        const result = await client.execute({ sql, args });
+        return result.rows.map(parseQuestion);
+      });
+
+      setReadCache(res, 60, 120);
+      res.json(data);
     } catch (error) {
       console.error("Error fetching certification questions:", error);
       res.status(500).json({ error: "Failed to fetch certification questions" });
@@ -1281,23 +1289,29 @@ export async function registerRoutes(
   app.get("/api/flashcards/:channelId", async (req, res) => {
     try {
       const { channelId } = req.params;
-      const result = await client.execute({
-        sql: "SELECT * FROM flashcards WHERE channel = ? AND status = 'active' ORDER BY created_at ASC",
-        args: [channelId],
+      const cacheKey = `flashcards-${channelId}`;
+      
+      const data = await getCached(cacheKey, async () => {
+        const result = await client.execute({
+          sql: "SELECT * FROM flashcards WHERE channel = ? AND status = 'active' ORDER BY created_at ASC",
+          args: [channelId],
+        });
+        return result.rows.map((row: any) => ({
+          id: row.id,
+          channel: row.channel,
+          front: row.front,
+          back: row.back,
+          hint: row.hint,
+          codeExample: row.code_example,
+          mnemonic: row.mnemonic,
+          difficulty: row.difficulty,
+          tags: row.tags ? JSON.parse(row.tags) : [],
+          category: row.category,
+        }));
       });
-      const cards = result.rows.map((row: any) => ({
-        id: row.id,
-        channel: row.channel,
-        front: row.front,
-        back: row.back,
-        hint: row.hint,
-        codeExample: row.code_example,
-        mnemonic: row.mnemonic,
-        difficulty: row.difficulty,
-        tags: row.tags ? JSON.parse(row.tags) : [],
-        category: row.category,
-      }));
-      res.json(cards);
+
+      setReadCache(res, 60, 120);
+      res.json(data);
     } catch (error) {
       console.error("Error fetching flashcards:", error);
       res.status(500).json({ error: "Failed to fetch flashcards" });

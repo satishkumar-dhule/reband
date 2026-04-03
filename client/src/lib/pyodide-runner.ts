@@ -25,6 +25,10 @@ let loadingPromise: Promise<PyodideInterface> | null = null;
 
 const PYODIDE_CDN = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/';
 
+export function isPyodideLoading(): boolean {
+  return loadingPromise !== null && pyodideInstance === null;
+}
+
 /**
  * Load the Pyodide script dynamically
  */
@@ -66,7 +70,6 @@ export async function initPyodide(): Promise<PyodideInterface> {
 
     return pyodideInstance;
   })().catch(err => {
-    // Reset loading promise on failure so callers can retry
     loadingPromise = null;
     throw err;
   });
@@ -79,13 +82,6 @@ export async function initPyodide(): Promise<PyodideInterface> {
  */
 export function isPyodideReady(): boolean {
   return pyodideInstance !== null;
-}
-
-/**
- * Check if Pyodide is currently loading
- */
-export function isPyodideLoading(): boolean {
-  return loadingPromise !== null && pyodideInstance === null;
 }
 
 export interface PythonExecutionResult {
@@ -108,30 +104,21 @@ export async function executePython(
   try {
     const pyodide = await initPyodide();
 
-    // Wrap the execution to capture the result
-    // The input string may contain multiple comma-separated arguments like "[1,2], [3,4]"
-    // We wrap it in parentheses to create a tuple, then unpack appropriately
     const wrappedCode = `
 import json
 from collections.abc import Iterator, Iterable
 
 ${code}
 
-# Parse the input - wrap in tuple to handle multiple arguments
-# Input like "[1,2], [3,4]" becomes tuple ([1,2], [3,4])
 _input_tuple = (${input},)
 
-# If input was already a tuple (multiple args), flatten it
-# e.g., (([1,2], [3,4]),) should become ([1,2], [3,4])
 if len(_input_tuple) == 1 and isinstance(_input_tuple[0], tuple):
     _args = _input_tuple[0]
 else:
     _args = _input_tuple
 
-# Call the function with unpacked arguments
 _result = ${functionName}(*_args)
 
-# Convert result to JSON-compatible format
 def to_json_compatible(obj):
     if obj is None:
         return None
@@ -143,10 +130,8 @@ def to_json_compatible(obj):
         return [to_json_compatible(x) for x in obj]
     if isinstance(obj, dict):
         return {str(k): to_json_compatible(v) for k, v in obj.items()}
-    # Handle iterators (like reversed(), map(), filter(), etc.)
     if isinstance(obj, Iterator):
         return [to_json_compatible(x) for x in obj]
-    # Handle other iterables
     if isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
         return [to_json_compatible(x) for x in obj]
     return str(obj)
@@ -167,10 +152,8 @@ _json_result
     const executionTime = performance.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : 'Unknown Python error';
     
-    // Provide more helpful error messages for common issues
     let friendlyError = errorMessage;
     if (errorMessage.includes('missing') && errorMessage.includes('required positional argument')) {
-      // Extract function name and expected args from error
       const match = errorMessage.match(/(\w+)\(\) missing (\d+) required positional argument/);
       if (match) {
         friendlyError = `Function signature mismatch: Your ${match[1]}() function expects more arguments than the test provides. Check the expected function signature in the starter code.`;

@@ -14,6 +14,81 @@ tags: [database, queries, sql, drizzle, turso]
 
 Find and fix database query bugs in the DevPrep codebase. This agent specializes in SQL queries, Drizzle ORM, and database performance.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing database bugs:
+
+1. **RED** — Write a test that demonstrates the query bug
+2. **GREEN** — Fix the query to make the test pass
+3. **REFACTOR** — Optimize while keeping tests green
+
+### TDD Database Fix Workflow
+
+```
+1. Before fixing any database bug:
+   - Write tests for expected query results
+   - Include tests for edge cases (empty, large datasets)
+   
+2. Run tests to verify current behavior (may fail)
+
+3. Fix the query
+
+4. Run tests to verify fix works
+
+5. Run EXPLAIN ANALYZE to verify performance
+```
+
+### Database Test Requirements
+
+- Write tests for all query fixes
+- Test with realistic data volumes
+- Test edge cases (empty results, duplicates)
+- Mock database for unit tests
+- Use test database for integration tests
+
+### Test Patterns
+
+```typescript
+// Example: Query result test
+test('fetchQuestions returns questions for channel', async () => {
+  const questions = await fetchQuestions('algorithms');
+  expect(questions).toHaveLength(50);
+  expect(questions[0]).toMatchObject({
+    channel: 'algorithms',
+    difficulty: expect.stringMatching(/easy|medium|hard/)
+  });
+});
+
+// Example: Edge case test
+test('fetchQuestions handles empty channel', async () => {
+  const questions = await fetchQuestions('empty-channel');
+  expect(questions).toEqual([]);
+});
+
+// Example: N+1 fix test
+test('fetchQuestions with users avoids N+1', async () => {
+  const questions = await fetchQuestionsWithAuthors('algorithms');
+  // Should be single query, not N+1
+  expect(db.queryCount).toBe(1);
+});
+```
+
+### Testing with Drizzle
+
+```typescript
+// Use in-memory SQLite for tests
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
+
+test('schema constraints enforced', async () => {
+  const db = drizzle(new Database(':memory:'));
+  
+  await expect(
+    db.insert(questions).values({})
+  ).rejects.toThrow();
+});
+```
+
 ## Scope
 
 **Primary directories:**

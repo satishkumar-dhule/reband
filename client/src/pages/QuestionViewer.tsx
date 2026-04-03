@@ -12,6 +12,7 @@ import { Haptics } from '../lib/haptics';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
 import { AppLayout } from '../components/layout/AppLayout';
+import { SkipLink } from '@/components/unified/SkipLink';
 import { Button, IconButton } from '@/components/unified/Button';
 import { QuestionViewerSkeleton, ReviewSkeleton } from '@/components/skeletons/PageSkeletons';
 import {
@@ -370,7 +371,9 @@ export default function QuestionViewer() {
   }
 
   return (
-    <AppLayout>
+    <>
+      <SkipLink />
+      <AppLayout>
       <SEOHead 
         title={`${currentQuestion?.question || 'Question'} | DevPrep`}
         description={currentQuestion?.question || 'Interview practice'}
@@ -406,6 +409,7 @@ export default function QuestionViewer() {
                 size="sm"
                 aria-label="Previous question"
                 icon={<ChevronLeft className="w-4 h-4" />}
+                data-testid="button-prev-question"
               />
               <Button 
                 onClick={nextQuestion}
@@ -414,6 +418,7 @@ export default function QuestionViewer() {
                 size="sm"
                 aria-label="Next question"
                 icon={<ChevronRight className="w-4 h-4" />}
+                data-testid="button-next-question"
               />
             </div>
           </div>
@@ -428,6 +433,7 @@ export default function QuestionViewer() {
                 variant={activeMainTab === 'questions' ? 'primary' : 'ghost'}
                 size="md"
                 className="rounded-none border-b-2"
+                data-testid="tab-questions"
               >
                 Questions
               </Button>
@@ -436,6 +442,7 @@ export default function QuestionViewer() {
                 variant={activeMainTab === 'flashcards' ? 'primary' : 'ghost'}
                 size="md"
                 className="rounded-none border-b-2"
+                data-testid="tab-flashcards"
               >
                 Flashcards
                 {flashcards.length > 0 && (
@@ -449,6 +456,7 @@ export default function QuestionViewer() {
                 variant={activeMainTab === 'voice' ? 'primary' : 'ghost'}
                 size="md"
                 className="rounded-none border-b-2"
+                data-testid="tab-voice"
               >
                 Voice
               </Button>
@@ -510,16 +518,17 @@ export default function QuestionViewer() {
             {/* Answer Section */}
             {!isAnswerRevealed ? (
               <div className="flex flex-col items-center py-8">
-                <Button 
-                  onClick={() => {
-                    setIsAnswerRevealed(true);
-                    Haptics.light();
-                  }}
-                  variant="primary"
-                  size="md"
-                  icon={<Brain className="w-5 h-5" />}
-                >
-                  Show Answer
+              <Button 
+                onClick={() => {
+                  setIsAnswerRevealed(true);
+                  Haptics.light();
+                }}
+                variant="primary"
+                size="md"
+                icon={<Brain className="w-5 h-5" />}
+                data-testid="button-show-answer"
+              >
+                Show Answer
                 </Button>
                 <p className="mt-4 text-sm text-[var(--gh-fg-muted)]">
                   Take a moment to think about your answer.
@@ -559,6 +568,7 @@ export default function QuestionViewer() {
                         onClick={() => handleSRSRating('again')}
                         variant="secondary"
                         size="sm"
+                        data-testid="button-rate-again"
                       >
                         Again
                       </Button>
@@ -566,6 +576,7 @@ export default function QuestionViewer() {
                         onClick={() => handleSRSRating('hard')}
                         variant="secondary"
                         size="sm"
+                        data-testid="button-rate-hard"
                       >
                         Hard
                       </Button>
@@ -573,6 +584,7 @@ export default function QuestionViewer() {
                         onClick={() => handleSRSRating('good')}
                         variant="secondary"
                         size="sm"
+                        data-testid="button-rate-good"
                       >
                         Good
                       </Button>
@@ -580,6 +592,7 @@ export default function QuestionViewer() {
                         onClick={() => handleSRSRating('easy')}
                         variant="secondary"
                         size="sm"
+                        data-testid="button-rate-easy"
                       >
                         Easy
                       </Button>
@@ -589,6 +602,7 @@ export default function QuestionViewer() {
                       onClick={handleAddToSRS}
                       variant="secondary"
                       icon={<RotateCcw className="w-4 h-4" />}
+                      data-testid="button-add-to-srs"
                     >
                       Add to SRS Review
                     </Button>
@@ -616,6 +630,7 @@ export default function QuestionViewer() {
                     disabled={currentIndex === 0}
                     variant="secondary"
                     icon={<ChevronLeft className="w-4 h-4" />}
+                    data-testid="button-previous"
                   >
                     Previous
                   </Button>
@@ -624,6 +639,7 @@ export default function QuestionViewer() {
                     variant="primary"
                     icon={<ChevronRight className="w-4 h-4" />}
                     iconPosition="right"
+                    data-testid="button-next"
                   >
                     Next Question
                   </Button>
@@ -712,7 +728,7 @@ export default function QuestionViewer() {
                     Sub-topic
                   </label>
                   <Select value={selectedSubChannel} onValueChange={setSelectedSubChannel}>
-                    <SelectTrigger id="sub-topic-select">
+                    <SelectTrigger id="sub-topic-select" data-testid="select-sub-topic">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -729,7 +745,7 @@ export default function QuestionViewer() {
                     Difficulty
                   </label>
                   <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-                    <SelectTrigger id="difficulty-select">
+                    <SelectTrigger id="difficulty-select" data-testid="select-difficulty">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -748,7 +764,7 @@ export default function QuestionViewer() {
                       Company
                     </label>
                     <Select value={selectedCompany} onValueChange={setSelectedCompany}>
-                      <SelectTrigger id="company-select">
+                      <SelectTrigger id="company-select" data-testid="select-company">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -773,5 +789,6 @@ export default function QuestionViewer() {
         onClose={() => setShowSearchModal(false)} 
       />
     </AppLayout>
+    </>
   );
 }

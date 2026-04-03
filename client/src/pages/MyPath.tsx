@@ -8,12 +8,13 @@ import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
-import { allChannelsConfig } from '../lib/channels-config';
+import { allChannelsConfig, getChannelName } from '../lib/channels-config';
+import { curatedPaths } from '../lib/learning-paths-data';
 import { Button, IconButton, MotionButton } from '@/components/unified/Button';
 import { Input } from '@/components/ui/input';
 import {
   Plus, Trash2, Edit, ChevronRight, Brain, Check, Target, Clock, Sparkles, Award,
-  Code, Server, Rocket, X, Search
+  X, Search
 } from 'lucide-react';
 
 interface CustomPath {
@@ -32,106 +33,6 @@ interface Certification {
   icon: string;
   category: string;
 }
-
-// Curated paths (same as in LearningPaths)
-const curatedPaths = [
-  {
-    id: 'frontend',
-    name: 'Frontend Developer',
-    icon: Code,
-    gradientFrom: 'var(--gh-accent-emphasis)',
-    gradientTo: 'var(--gh-accent-emphasis)',
-    gradientOpacity: 0.7,
-    description: 'Master React, JavaScript, and modern web development',
-    channels: ['frontend', 'react-native', 'javascript', 'algorithms'],
-    difficulty: 'Beginner Friendly',
-    duration: '3-6 months',
-    totalQuestions: 450,
-    jobs: ['Frontend Developer', 'React Developer', 'UI Engineer'],
-    skills: ['React', 'JavaScript', 'CSS', 'HTML', 'TypeScript'],
-    salary: '$80k - $120k'
-  },
-  {
-    id: 'backend',
-    name: 'Backend Engineer',
-    icon: Server,
-    gradientFrom: 'var(--gh-success-fg)',
-    gradientTo: 'var(--gh-success-fg)',
-    gradientOpacity: 0.7,
-    description: 'Build scalable APIs and microservices',
-    channels: ['backend', 'database', 'system-design', 'algorithms'],
-    difficulty: 'Intermediate',
-    duration: '4-8 months',
-    totalQuestions: 520,
-    jobs: ['Backend Engineer', 'API Developer', 'Systems Engineer'],
-    skills: ['Node.js', 'Python', 'SQL', 'REST APIs', 'Microservices'],
-    salary: '$90k - $140k'
-  },
-  {
-    id: 'fullstack',
-    name: 'Full Stack Developer',
-    icon: Rocket,
-    gradientFrom: 'var(--gh-done-fg)',
-    gradientTo: 'var(--gh-danger-fg)',
-    gradientOpacity: 0.7,
-    description: 'End-to-end application development',
-    channels: ['frontend', 'backend', 'database', 'devops', 'system-design'],
-    difficulty: 'Advanced',
-    duration: '6-12 months',
-    totalQuestions: 680,
-    jobs: ['Full Stack Developer', 'Software Engineer', 'Tech Lead'],
-    skills: ['React', 'Node.js', 'SQL', 'AWS', 'System Design'],
-    salary: '$100k - $160k'
-  },
-  {
-    id: 'devops',
-    name: 'DevOps Engineer',
-    icon: Target,
-    gradientFrom: 'var(--gh-attention-fg)',
-    gradientTo: 'var(--gh-danger-fg)',
-    gradientOpacity: 0.7,
-    description: 'Infrastructure, CI/CD, and cloud platforms',
-    channels: ['devops', 'kubernetes', 'aws', 'terraform', 'docker'],
-    difficulty: 'Advanced',
-    duration: '4-8 months',
-    totalQuestions: 420,
-    jobs: ['DevOps Engineer', 'SRE', 'Cloud Engineer'],
-    skills: ['Kubernetes', 'Docker', 'AWS', 'Terraform', 'CI/CD'],
-    salary: '$110k - $170k'
-  },
-  {
-    id: 'mobile',
-    name: 'Mobile Developer',
-    icon: Sparkles,
-    gradientFrom: 'var(--gh-danger-fg)',
-    gradientTo: 'var(--gh-danger-fg)',
-    gradientOpacity: 0.7,
-    description: 'iOS and Android app development',
-    channels: ['react-native', 'ios', 'android', 'frontend'],
-    difficulty: 'Intermediate',
-    duration: '4-6 months',
-    totalQuestions: 380,
-    jobs: ['Mobile Developer', 'iOS Developer', 'Android Developer'],
-    skills: ['React Native', 'Swift', 'Kotlin', 'Mobile UI'],
-    salary: '$85k - $130k'
-  },
-  {
-    id: 'data',
-    name: 'Data Engineer',
-    icon: Brain,
-    gradientFrom: 'var(--gh-done-fg)',
-    gradientTo: 'var(--gh-done-fg)',
-    gradientOpacity: 0.7,
-    description: 'Data pipelines, warehousing, and analytics',
-    channels: ['data-engineering', 'database', 'python', 'aws'],
-    difficulty: 'Advanced',
-    duration: '6-10 months',
-    totalQuestions: 490,
-    jobs: ['Data Engineer', 'Analytics Engineer', 'ML Engineer'],
-    skills: ['Python', 'SQL', 'Spark', 'Airflow', 'Data Modeling'],
-    salary: '$95k - $150k'
-  }
-];
 
 export default function MyPath() {
   const [, setLocation] = useLocation();
@@ -218,18 +119,22 @@ export default function MyPath() {
     try {
       const currentPaths = JSON.parse(localStorage.getItem('activeLearningPaths') || '[]');
       
+      let updatedPaths: string[];
       if (currentPaths.includes(path.id)) {
         // Deactivate - remove from array
-        const updatedPaths = currentPaths.filter((id: string) => id !== path.id);
-        localStorage.setItem('activeLearningPaths', JSON.stringify(updatedPaths));
+        updatedPaths = currentPaths.filter((id: string) => id !== path.id);
       } else {
         // Activate - add to array
-        const updatedPaths = [...currentPaths, path.id];
-        localStorage.setItem('activeLearningPaths', JSON.stringify(updatedPaths));
+        updatedPaths = [...currentPaths, path.id];
       }
       
-      // Reload to reflect changes
-      window.location.reload();
+      localStorage.setItem('activeLearningPaths', JSON.stringify(updatedPaths));
+      
+      // Update local state to trigger re-render without page reload
+      setActivePathId(updatedPaths.length > 0 ? updatedPaths[0] : null);
+      
+      // Force update for custom paths array
+      setCustomPaths(prev => [...prev]);
     } catch (e) {
       console.error('Failed to toggle path:', e);
     }
@@ -240,18 +145,19 @@ export default function MyPath() {
     try {
       const currentPaths = JSON.parse(localStorage.getItem('activeLearningPaths') || '[]');
       
+      let updatedPaths: string[];
       if (currentPaths.includes(path.id)) {
         // Deactivate - remove from array
-        const updatedPaths = currentPaths.filter((id: string) => id !== path.id);
-        localStorage.setItem('activeLearningPaths', JSON.stringify(updatedPaths));
+        updatedPaths = currentPaths.filter((id: string) => id !== path.id);
       } else {
         // Activate - add to array
-        const updatedPaths = [...currentPaths, path.id];
-        localStorage.setItem('activeLearningPaths', JSON.stringify(updatedPaths));
+        updatedPaths = [...currentPaths, path.id];
       }
       
-      // Reload to reflect changes
-      window.location.reload();
+      localStorage.setItem('activeLearningPaths', JSON.stringify(updatedPaths));
+      
+      // Update local state to trigger re-render without page reload
+      setActivePathId(updatedPaths.length > 0 ? updatedPaths[0] : null);
     } catch (e) {
       console.error('Failed to toggle curated path:', e);
     }
@@ -595,12 +501,12 @@ export default function MyPath() {
                           <div>
                             <div className="text-xs text-muted-foreground mb-2">Channels</div>
                             <div className="flex flex-wrap gap-2">
-                              {path.channels.slice(0, 3).map((channel) => (
+                              {path.channels.slice(0, 3).map((channelId) => (
                                 <span
-                                  key={channel}
+                                  key={channelId}
                                   className="px-2 py-1 bg-muted/50 rounded-full text-xs font-medium"
                                 >
-                                  {channel}
+                                  {getChannelName(channelId)}
                                 </span>
                               ))}
                               {path.channels.length > 3 && (
@@ -750,12 +656,12 @@ export default function MyPath() {
                         <div>
                           <div className="text-xs text-muted-foreground mb-2">Channels ({path.channels.length})</div>
                           <div className="flex flex-wrap gap-2">
-                            {path.channels.slice(0, 3).map((channel) => (
+                            {path.channels.slice(0, 3).map((channelId) => (
                               <span
-                                key={channel}
+                                key={channelId}
                                 className="px-2 py-1 bg-muted/50 rounded-full text-xs font-medium"
                               >
-                                {channel}
+                                {getChannelName(channelId)}
                               </span>
                             ))}
                             {path.channels.length > 3 && (

@@ -96,10 +96,11 @@ function calculateMasteryLevel(card: ReviewCard): number {
   const { repetitions, interval, correctStreak } = card;
   
   if (repetitions === 0) return 0;
-  if (interval >= SRS_CONFIG.mastery.mastered.intervalDays && correctStreak >= SRS_CONFIG.mastery.mastered.streakRequired) return 5;
-  if (interval >= SRS_CONFIG.mastery.expert.intervalDays && correctStreak >= SRS_CONFIG.mastery.expert.streakRequired) return 4;
-  if (interval >= SRS_CONFIG.mastery.proficient.intervalDays && correctStreak >= SRS_CONFIG.mastery.proficient.streakRequired) return 3;
+  // Check from lowest to highest threshold so higher levels can override
   if (interval >= SRS_CONFIG.mastery.familiar.intervalDays && correctStreak >= SRS_CONFIG.mastery.familiar.streakRequired) return 2;
+  if (interval >= SRS_CONFIG.mastery.proficient.intervalDays && correctStreak >= SRS_CONFIG.mastery.proficient.streakRequired) return 3;
+  if (interval >= SRS_CONFIG.mastery.expert.intervalDays && correctStreak >= SRS_CONFIG.mastery.expert.streakRequired) return 4;
+  if (interval >= SRS_CONFIG.mastery.mastered.intervalDays && correctStreak >= SRS_CONFIG.mastery.mastered.streakRequired) return 5;
   if (repetitions >= 1) return 1;
   return 0;
 }

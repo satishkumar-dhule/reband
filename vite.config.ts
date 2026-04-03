@@ -214,30 +214,14 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    // Only pre-bundle truly critical, small deps
-    // Heavy libraries (mermaid, monaco) are excluded
-    // so they can be lazy-loaded on demand
-    include: [
-      'react',
-      'react-dom',
-      'wouter',
-      '@tanstack/react-query',
-      'lucide-react',
-      'clsx',
-      'tailwind-merge',
-      'class-variance-authority',
-      'react-hook-form',
-      '@hookform/resolvers',
-      'zod',
-    ],
-    // Exclude heavy libraries from dev pre-bundling
-    // These are dynamically imported and don't need to be pre-bundled
+    // Exclude problematic CJS/ESM packages from pre-bundling
+    // Let Vite handle them natively at runtime
     exclude: [
-      'mermaid',
-      '@monaco-editor/react',
-      'monaco-editor',
-      'react-markdown',
+      'lowlight',
+      'highlight.js',
       'react-syntax-highlighter',
+      'refractor',
+      'prismjs',
     ],
     esbuildOptions: {
       target: 'esnext',

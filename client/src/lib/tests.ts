@@ -527,15 +527,35 @@ function determineTargetDifficulty(
  * Questions are selected based on semantic similarity and adaptive difficulty
  * 
  * IMPORTANT: Uses Set to track selected question IDs to prevent duplicates
+ * 
+ * @param test - The test containing questions
+ * @param count - Number of questions to select
+ * @param answerHistory - Optional array of previous answer results for adaptive difficulty
+ *                        Each entry should be { questionId, correct: boolean }
+ * 
+ * ADAPTIVE DIFFICULTY ALGORITHM:
+ * - First 2 questions: beginner/intermediate level (ease into test)
+ * - After 2+ answers: calculate recent accuracy from last 3 answers
+ * - If recent accuracy > 70%: increase difficulty level
+ * - If recent accuracy < 40%: decrease difficulty level
+ * - Otherwise: maintain current level
  */
-export function getSessionQuestions(test: Test, count: number = 20): TestQuestion[] {
+export function getSessionQuestions(
+  test: Test, 
+  count: number = 20,
+  answerHistory?: Array<{ questionId: string; correct: boolean }>
+): TestQuestion[] {
   const maxCount = Math.min(count, test.questions.length);
   if (maxCount === 0) return [];
 
   const selectedQuestions: TestQuestion[] = [];
   const selectedIds = new Set<string>(); // Track selected question IDs to prevent duplicates
   let currentDifficulty: 'beginner' | 'intermediate' | 'advanced' = 'beginner';
-  let performanceHistory: boolean[] = [];
+  
+  // Use provided answer history or calculate from previous answers in test
+  const performanceHistory: boolean[] = answerHistory 
+    ? answerHistory.map(a => a.correct)
+    : [];
 
   // Helper to get available questions (not yet selected)
   const getAvailable = () => test.questions.filter(q => !selectedIds.has(q.id));
@@ -554,17 +574,24 @@ export function getSessionQuestions(test: Test, count: number = 20): TestQuestio
       const pool = easyQuestions.length > 0 ? easyQuestions : availableQuestions;
       nextQuestion = pool[Math.floor(Math.random() * pool.length)];
     } else {
-      // Calculate recent accuracy
-      const recentPerformance = performanceHistory.slice(-3);
+      // Calculate recent accuracy from actual performance history
+      const answeredCount = performanceHistory.length;
+      
+      // If we have provided answerHistory, use the real data for adaptation
+      // Otherwise use what we've collected in this session so far
+      const recentPerformance = answerHistory 
+        ? answerHistory.slice(-3).map(a => a.correct)
+        : performanceHistory.slice(-3);
+      
       const recentAccuracy = recentPerformance.length > 0
         ? recentPerformance.filter(Boolean).length / recentPerformance.length
         : 0.5;
 
-      // Determine target difficulty
+      // Determine target difficulty based on actual performance
       const targetDifficulty = determineTargetDifficulty(
         currentDifficulty,
         recentAccuracy,
-        i
+        answeredCount + i
       );
       currentDifficulty = targetDifficulty;
 
@@ -597,9 +624,6 @@ export function getSessionQuestions(test: Test, count: number = 20): TestQuestio
     // Add to selected and mark as used
     selectedQuestions.push(nextQuestion);
     selectedIds.add(nextQuestion.id);
-
-    // Simulate performance for next selection (assume 60% success rate)
-    performanceHistory.push(Math.random() > 0.4);
   }
 
   // Randomize options for each question

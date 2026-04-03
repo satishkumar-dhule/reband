@@ -10,6 +10,81 @@ tags: [lifecycle, useEffect, mount, unmount, cleanup]
 
 Find and fix component lifecycle bugs in the DevPrep codebase. This agent specializes in React hooks lifecycle, cleanup patterns, and preventing issues from improper mount/unmount handling.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing lifecycle bugs:
+
+1. **RED** — Write a test that demonstrates the lifecycle bug
+2. **GREEN** — Fix the lifecycle issue to make the test pass
+3. **REFACTOR** — Improve while keeping tests green
+
+### TDD Lifecycle Fix Workflow
+
+```
+1. Before fixing any lifecycle bug:
+   - Write tests for mount, unmount, and cleanup
+   - Include tests for re-renders and dependency changes
+   
+2. Run tests to verify bug is reproduced
+
+3. Fix the lifecycle issue
+
+4. Run tests to verify fix works
+
+5. Test that component still functions correctly
+```
+
+### Lifecycle Test Requirements
+
+- Write tests for mount/unmount behavior
+- Test cleanup runs on unmount
+- Test effect runs on dependency change
+- Test no state updates after unmount
+- Use `act()` for state updates
+
+### Test Patterns
+
+```typescript
+// Example: Cleanup test
+test('cleanup function called on unmount', () => {
+  const cleanup = jest.fn();
+  
+  render(<Component onCleanup={cleanup} />);
+  unmount();
+  
+  expect(cleanup).toHaveBeenCalledTimes(1);
+});
+
+// Example: Effect re-run test
+test('effect re-runs on dependency change', async () => {
+  const effect = jest.fn();
+  const { rerender } = render(<Component id="1" onEffect={effect} />);
+  
+  expect(effect).toHaveBeenCalledTimes(1);
+  
+  rerender(<Component id="2" onEffect={effect} />);
+  
+  expect(effect).toHaveBeenCalledTimes(2);
+});
+
+// Example: No update after unmount test
+test('no state update warning after unmount', () => {
+  const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+  
+  render(<AsyncComponent />);
+  unmount();
+  
+  // Advance timers to trigger async update
+  jest.runAllTimers();
+  
+  expect(consoleError).not.toHaveBeenCalledWith(
+    expect.stringContaining('update on unmounted')
+  );
+  
+  consoleError.mockRestore();
+});
+```
+
 ## Scope
 
 **Primary directories:**

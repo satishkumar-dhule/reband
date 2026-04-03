@@ -3,9 +3,9 @@ import { useLocation } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { allChannelsConfig } from '../lib/channels-config';
+import { curatedPaths } from '../lib/learning-paths-data';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import {
-  Code, Server, Rocket, Target, Sparkles, Brain,
   Plus, ChevronRight, Check, X, Search, Home, Clock, Trophy
 } from 'lucide-react';
 import { Button } from '@/components/unified/Button';
@@ -27,76 +27,6 @@ interface CustomPath {
   channels: string[];
   certifications: string[];
 }
-
-// Curated Learning Paths
-const curatedPaths = [
-  {
-    id: 'frontend',
-    name: 'Frontend Developer',
-    icon: Code,
-    description: 'Master React, JavaScript, and modern web development',
-    channels: ['frontend', 'react-native', 'javascript', 'algorithms'],
-    difficulty: 'Beginner',
-    duration: '3-6 months',
-    totalQuestions: 450,
-    skills: ['React', 'JavaScript', 'CSS', 'HTML', 'TypeScript'],
-  },
-  {
-    id: 'backend',
-    name: 'Backend Engineer',
-    icon: Server,
-    description: 'Build scalable APIs and microservices',
-    channels: ['backend', 'database', 'system-design', 'algorithms'],
-    difficulty: 'Intermediate',
-    duration: '4-8 months',
-    totalQuestions: 520,
-    skills: ['Node.js', 'Python', 'SQL', 'REST APIs', 'Microservices'],
-  },
-  {
-    id: 'fullstack',
-    name: 'Full Stack Developer',
-    icon: Rocket,
-    description: 'End-to-end application development',
-    channels: ['frontend', 'backend', 'database', 'devops', 'system-design'],
-    difficulty: 'Advanced',
-    duration: '6-12 months',
-    totalQuestions: 680,
-    skills: ['React', 'Node.js', 'SQL', 'AWS', 'System Design'],
-  },
-  {
-    id: 'devops',
-    name: 'DevOps Engineer',
-    icon: Target,
-    description: 'Infrastructure, CI/CD, and cloud platforms',
-    channels: ['devops', 'kubernetes', 'aws', 'terraform', 'docker'],
-    difficulty: 'Advanced',
-    duration: '4-8 months',
-    totalQuestions: 420,
-    skills: ['Kubernetes', 'Docker', 'AWS', 'Terraform', 'CI/CD'],
-  },
-  {
-    id: 'mobile',
-    name: 'Mobile Developer',
-    icon: Sparkles,
-    description: 'iOS and Android app development',
-    channels: ['react-native', 'ios', 'android', 'frontend'],
-    difficulty: 'Intermediate',
-    duration: '4-6 months',
-    totalQuestions: 380,
-    skills: ['React Native', 'Swift', 'Kotlin', 'Mobile UI', 'App Store'],
-  },
-  {
-    id: 'data',
-    name: 'Data Engineer',
-    icon: Brain,
-    description: 'Data pipelines, warehousing, and analytics',
-    channels: ['data-engineering', 'database', 'python', 'aws'],
-    difficulty: 'Advanced',
-    duration: '6-10 months',
-    totalQuestions: 490,
-    skills: ['Python', 'SQL', 'Spark', 'Airflow', 'Data Modeling'],
-  }
-];
 
 export default function LearningPaths() {
   const [, setLocation] = useLocation();

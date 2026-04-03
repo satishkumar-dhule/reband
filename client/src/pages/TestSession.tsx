@@ -2,7 +2,7 @@
  * Test Session - Quiz interface
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -21,6 +21,101 @@ import {
 import { mascotEvents } from '../components/PixelMascot';
 
 type SessionState = 'loading' | 'ready' | 'in-progress' | 'review' | 'completed';
+
+// ============================================================================
+// PERFORMANCE OPTIMIZATION: Memoized Question Display (TASK-018)
+// Split question display to prevent re-renders when scoring state changes
+// ============================================================================
+
+interface QuestionDisplayProps {
+  question: TestQuestion;
+  answers: Record<string, string[]>;
+  showFeedback: 'correct' | 'incorrect' | null;
+  onOptionSelect: (optionId: string) => void;
+}
+
+const QuestionDisplay = memo(function QuestionDisplay({
+  question,
+  answers,
+  showFeedback,
+  onOptionSelect,
+}: QuestionDisplayProps) {
+  const isMultiple = question.type === 'multiple';
+  
+  return (
+    <>
+      <div className="flex items-center gap-2 mb-3">
+        <span className={`px-2 py-0.5 text-xs uppercase rounded ${
+          isMultiple 
+            ? 'bg-destructive/20 text-destructive' 
+            : 'bg-cyan-500/20 text-cyan-400'
+        }`}>
+          {isMultiple ? 'Select all that apply' : 'Single choice'}
+        </span>
+        <span className={`px-2 py-0.5 text-xs uppercase rounded ${
+          question.difficulty === 'beginner' ? 'bg-primary/20 text-primary' :
+          question.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
+          'bg-destructive/20 text-destructive'
+        }`}>
+          {question.difficulty}
+        </span>
+      </div>
+
+      <h2 className="text-lg font-bold mb-6">{question.question}</h2>
+
+      <div className="space-y-2">
+        {question.options.map((option) => {
+          const isSelected = (answers[question.id] || []).includes(option.id);
+          const showCorrect = showFeedback && option.isCorrect;
+          const showWrong = showFeedback === 'incorrect' && isSelected && !option.isCorrect;
+          
+          return (
+            <Button
+              key={option.id}
+              onClick={() => onOptionSelect(option.id)}
+              disabled={showFeedback !== null}
+              variant={showCorrect ? 'success' : showWrong ? 'danger' : isSelected ? 'outline' : 'ghost'}
+              size="md"
+              fullWidth
+              className={`justify-start p-3 md:p-4 h-auto text-left min-h-[44px] ${
+                showCorrect
+                  ? 'border-primary bg-primary/20'
+                  : showWrong
+                  ? 'border-destructive bg-destructive/20'
+                  : isSelected
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border hover:border-primary/50'
+              } ${showFeedback ? 'cursor-default' : ''}`}
+            >
+              <div className="flex items-start gap-3">
+                <div className={`w-6 h-6 ${isMultiple ? 'rounded-md' : 'rounded-full'} border-2 flex items-center justify-center flex-shrink-0 ${
+                  showCorrect
+                    ? 'border-primary bg-primary'
+                    : showWrong
+                    ? 'border-destructive bg-destructive'
+                    : isSelected 
+                    ? 'border-primary bg-primary' 
+                    : 'border-border'
+                }`}>
+                  {showCorrect && <Check className="w-4 h-4 text-black" />}
+                  {showWrong && <X className="w-4 h-4 text-foreground" />}
+                  {!showFeedback && isSelected && <Check className="w-4 h-4 text-black" />}
+                </div>
+                <span className="text-sm">{option.text}</span>
+              </div>
+            </Button>
+          );
+        })}
+      </div>
+      
+      {isMultiple && !showFeedback && (
+        <p className="mt-3 text-xs text-muted-foreground text-center">
+          Select all correct answers, then click "Confirm" to continue
+        </p>
+      )}
+    </>
+  );
+});
 
 export default function TestSession() {
   const { channelId } = useParams<{ channelId: string }>();
@@ -68,7 +163,7 @@ export default function TestSession() {
     setSessionState('in-progress');
   }, [test]);
 
-  const handleOptionSelect = (optionId: string) => {
+  const handleOptionSelect = useCallback((optionId: string) => {
     if (!currentQuestion) return;
     
     if (currentQuestion.type === 'single') {
@@ -97,7 +192,7 @@ export default function TestSession() {
         }
       });
     }
-  };
+  }, [currentQuestion, questions.length]);
 
   const confirmMultipleChoice = useCallback(() => {
     if (!currentQuestion || currentQuestion.type !== 'multiple') return;
@@ -292,76 +387,13 @@ export default function TestSession() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                   >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className={`px-2 py-0.5 text-xs uppercase rounded ${
-                        currentQuestion.type === 'multiple' 
-                          ? 'bg-destructive/20 text-destructive' 
-                          : 'bg-cyan-500/20 text-cyan-400'
-                      }`}>
-                        {currentQuestion.type === 'multiple' ? 'Select all that apply' : 'Single choice'}
-                      </span>
-                      <span className={`px-2 py-0.5 text-xs uppercase rounded ${
-                        currentQuestion.difficulty === 'beginner' ? 'bg-primary/20 text-primary' :
-                        currentQuestion.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
-                        'bg-destructive/20 text-destructive'
-                      }`}>
-                        {currentQuestion.difficulty}
-                      </span>
-                    </div>
-
-                    <h2 className="text-lg font-bold mb-6">{currentQuestion.question}</h2>
-
-                    <div className="space-y-2">
-                      {currentQuestion.options.map((option) => {
-                        const isSelected = (answers[currentQuestion.id] || []).includes(option.id);
-                        const showCorrect = showFeedback && option.isCorrect;
-                        const showWrong = showFeedback === 'incorrect' && isSelected && !option.isCorrect;
-                        const isMultiple = currentQuestion.type === 'multiple';
-                        
-                        return (
-                          <Button
-                            key={option.id}
-                            onClick={() => handleOptionSelect(option.id)}
-                            disabled={showFeedback !== null}
-                            variant={showCorrect ? 'success' : showWrong ? 'danger' : isSelected ? 'outline' : 'ghost'}
-                            size="md"
-                            fullWidth
-                            className={`justify-start p-3 md:p-4 h-auto text-left min-h-[44px] ${
-                              showCorrect
-                                ? 'border-primary bg-primary/20'
-                                : showWrong
-                                ? 'border-destructive bg-destructive/20'
-                                : isSelected
-                                ? 'border-primary bg-primary/10'
-                                : 'border-border hover:border-primary/50'
-                            } ${showFeedback ? 'cursor-default' : ''}`}
-                          >
-                            <div className="flex items-start gap-3">
-                              <div className={`w-6 h-6 ${isMultiple ? 'rounded-md' : 'rounded-full'} border-2 flex items-center justify-center flex-shrink-0 ${
-                                showCorrect
-                                  ? 'border-primary bg-primary'
-                                  : showWrong
-                                  ? 'border-destructive bg-destructive'
-                                  : isSelected 
-                                  ? 'border-primary bg-primary' 
-                                  : 'border-border'
-                              }`}>
-                                {showCorrect && <Check className="w-4 h-4 text-black" />}
-                                {showWrong && <X className="w-4 h-4 text-foreground" />}
-                                {!showFeedback && isSelected && <Check className="w-4 h-4 text-black" />}
-                              </div>
-                              <span className="text-sm">{option.text}</span>
-                            </div>
-                          </Button>
-                        );
-                      })}
-                    </div>
-                    
-                    {currentQuestion.type === 'multiple' && !showFeedback && (
-                      <p className="mt-3 text-xs text-muted-foreground text-center">
-                        Select all correct answers, then click "Confirm" to continue
-                      </p>
-                    )}
+                    {/* Memoized question display */}
+                    <QuestionDisplay
+                      question={currentQuestion}
+                      answers={answers}
+                      showFeedback={showFeedback}
+                      onOptionSelect={handleOptionSelect}
+                    />
                   </motion.div>
                 </AnimatePresence>
               </div>

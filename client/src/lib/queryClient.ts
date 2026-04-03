@@ -102,3 +102,141 @@ export function prefetchChannelQuestions(channelId: string) {
     staleTime: Infinity,
   });
 }
+
+/**
+ * Pre-warm Monaco editor during idle time.
+ * Uses requestIdleCallback to load Monaco when browser is idle.
+ * This improves perceived performance when user navigates to coding challenge.
+ */
+export function prewarmMonacoEditor() {
+  if (typeof requestIdleCallback !== 'undefined') {
+    requestIdleCallback(
+      () => {
+        // Pre-import Monaco but don't mount it yet
+        import('@monaco-editor/react').catch(err => {
+          console.warn('Failed to prewarm Monaco editor:', err);
+        });
+      },
+      { timeout: 3000 }
+    );
+  } else {
+    // Fallback for browsers without requestIdleCallback
+    setTimeout(() => {
+      import('@monaco-editor/react').catch(err => {
+        console.warn('Failed to prewarm Monaco editor:', err);
+      });
+    }, 3000);
+  }
+}
+
+// ─── Idle-Time Prefetch of Static JSON Files ───
+
+// Static JSON files to prefetch during idle time
+const STATIC_JSON_FILES = [
+  'channels.json',
+  'learning-paths.json',
+  'coding-challenges.json',
+  'stats.json',
+] as const;
+
+/**
+ * Prefetch a static JSON file using React Query.
+ * Each file is cached with staleTime: Infinity since static data never changes per build.
+ */
+function prefetchStaticJson(filename: string): Promise<void> {
+  const queryKey = ['static', filename.replace('.json', '')];
+  
+  return queryClient.prefetchQuery({
+    queryKey,
+    queryFn: async () => {
+      const res = await fetch(`${DATA_BASE}/${filename}?v=${BUILD_VERSION}`);
+      if (!res.ok) {
+        // Don't throw for missing files - some may not exist in every build
+        if (res.status === 404) {
+          console.warn(`[Prefetch] Static file not found: ${filename}`);
+          return null;
+        }
+        throw new Error(`HTTP ${res.status} fetching ${filename}`);
+      }
+      return res.json();
+    },
+    staleTime: Infinity, // Static data is immutable per build
+  }).then(() => undefined).catch(() => undefined); // Ignore errors
+}
+
+/**
+ * Prefetch all critical static JSON files during idle time.
+ * Uses requestIdleCallback to avoid blocking main thread.
+ * 
+ * This warms the React Query cache so subsequent navigations are instant.
+ * Only prefetches metadata files (channels, paths, stats) - NOT individual channel questions.
+ * Individual channel data is loaded on-demand to avoid loading unnecessary data.
+ * 
+ * @param priority - If true, uses shorter timeout for higher priority
+ */
+export function prefetchAllStaticJson(priority = false): void {
+  if (typeof window === 'undefined') return; // SSR guard
+  
+  const timeout = priority ? 1000 : 5000;
+  
+  const doPrefetch = () => {
+    console.log('[Prefetch] Starting idle prefetch of static JSON files...');
+    
+    // Prefetch metadata files in parallel
+    const prefetchPromises = STATIC_JSON_FILES.map(filename => 
+      prefetchStaticJson(filename)
+    );
+    
+    Promise.all(prefetchPromises)
+      .then(() => {
+        console.log('[Prefetch] Completed idle prefetch of static JSON files');
+      })
+      .catch(err => {
+        console.warn('[Prefetch] Error during static prefetch:', err);
+      });
+  };
+  
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(doPrefetch, { timeout });
+  } else {
+    // Fallback for browsers without requestIdleCallback
+    setTimeout(doPrefetch, priority ? 500 : 2000);
+  }
+}
+
+/**
+ * Prefetch a specific channel's questions during idle time.
+ * Use this when user hovers/clicks on a channel card.
+ * 
+ * @param channelId - The channel ID to prefetch
+ * @param priority - If true, uses shorter timeout
+ */
+export function prefetchChannelOnIdle(channelId: string, priority = false): void {
+  if (typeof window === 'undefined') return;
+  
+  const timeout = priority ? 500 : 3000;
+  
+  const doPrefetch = () => {
+    prefetchChannelQuestions(channelId).catch(err => {
+      console.warn(`[Prefetch] Failed to prefetch channel ${channelId}:`, err);
+    });
+  };
+  
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(doPrefetch, { timeout });
+  } else {
+    setTimeout(doPrefetch, priority ? 200 : 1000);
+  }
+}
+
+/**
+ * Combined cache warming on app idle.
+ * Call this once when the app mounts to warm all caches.
+ */
+export function warmCachesOnIdle(): void {
+  // First prefetch all static metadata (fast, ~10KB total)
+  prefetchAllStaticJson();
+  
+  // Pre-warm Monaco editor for coding challenges
+  prewarmMonacoEditor();
+}

@@ -10,6 +10,71 @@ tags: [synchronization, cache, race-condition, stale-data]
 
 Find and fix data synchronization bugs in the DevPrep codebase. This agent specializes in preventing stale data, managing cache invalidation, handling race conditions, and implementing optimistic updates.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing sync bugs:
+
+1. **RED** — Write a test that demonstrates the sync bug
+2. **GREEN** — Fix the sync issue to make the test pass
+3. **REFACTOR** — Improve while keeping tests green
+
+### TDD Sync Fix Workflow
+
+```
+1. Before fixing any sync bug:
+   - Write tests for race conditions, cache invalidation
+   - Include tests for optimistic update rollback
+   
+2. Run tests to verify bug is reproduced
+
+3. Fix the sync issue
+
+4. Run tests to verify fix works
+
+5. Test rapid updates and navigation
+```
+
+### Sync Test Requirements
+
+- Write tests for race conditions
+- Test cache invalidation
+- Test optimistic update rollback
+- Test request cancellation
+- Mock timers for async tests
+
+### Test Patterns
+
+```typescript
+// Example: Race condition test
+test('only latest request result is used', async () => {
+  const { result } = renderHook(() => useData(1));
+  
+  // Change to new id
+  rerender({ id: 2 });
+  
+  // Slow response for id=1 should not overwrite
+  await waitFor(() => {
+    expect(result.current.data?.id).toBe(2);
+  });
+});
+
+// Example: Optimistic update test
+test('rollback on error', async () => {
+  const mutation = useUpdateQuestion();
+  
+  // Optimistic update
+  mutation.mutate({ id: 1, title: 'New' });
+  
+  expect(screen.getByText('New')).toBeInTheDocument();
+  
+  // Error occurs
+  await waitFor(() => {
+    expect(screen.queryByText('New')).not.toBeInTheDocument();
+    expect(screen.getByText('Old Title')).toBeInTheDocument();
+  });
+});
+```
+
 ## Scope
 
 **Primary directories:**

@@ -10,6 +10,71 @@ tags: [security, xss, injection, secrets]
 
 Find and fix security vulnerabilities in the DevPrep codebase. This agent specializes in identifying XSS, injection attacks, exposed secrets, and other security issues.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing security issues:
+
+1. **RED** — Write a security test that demonstrates the vulnerability
+2. **GREEN** — Fix the security issue to make the test pass
+3. **REFACTOR** — Improve while keeping security tests green
+
+### TDD Security Fix Workflow
+
+```
+1. Before fixing any security issue:
+   - Write a test that exploits the vulnerability
+   - Include XSS, injection, and auth bypass tests
+   
+2. Run tests to verify vulnerability exists
+
+3. Implement the security fix
+
+4. Run tests to verify vulnerability is blocked
+
+5. Test that legitimate use still works
+```
+
+### Security Test Requirements
+
+- Write tests for all security fixes
+- Test XSS payloads are sanitized
+- Test injection attempts are blocked
+- Test auth checks are enforced
+- Use security testing libraries where applicable
+
+### Test Patterns
+
+```typescript
+// Example: XSS prevention test
+test('user input is sanitized', () => {
+  const malicious = '<script>alert("xss")</script>';
+  const sanitized = sanitizeInput(malicious);
+  expect(sanitized).not.toContain('<script>');
+  expect(sanitized).toBeSafeHtml();
+});
+
+// Example: Auth bypass test
+test('protected route requires auth', async () => {
+  await page.goto('/protected');
+  expect(page).toRedirectTo('/login');
+});
+
+// Example: SQL injection prevention
+test('query parameters are escaped', async () => {
+  const result = await db.query.users.findFirst({
+    where: eq(users.name, "'; DROP TABLE users; --")
+  });
+  expect(result).toBeUndefined(); // Should not execute
+});
+```
+
+### Security Testing Libraries
+
+- `jest-dom` for DOM sanitization tests
+- `node-fetch` for API security testing
+- Custom XSS payload test suite
+- SQL injection test patterns
+
 ## Scope
 
 **Primary directories:**

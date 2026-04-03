@@ -11,7 +11,7 @@
  */
 
 import { useLocation } from 'wouter';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useState, useMemo, memo, useCallback, useEffect, useRef } from 'react';
 import {
   Home,
   GraduationCap,
@@ -36,7 +36,6 @@ import { useCredits } from '../../context/CreditsContext';
 import { useSidebar } from '../../context/SidebarContext';
 import { useUserPreferences } from '../../context/UserPreferencesContext';
 import { cn } from '../../lib/utils';
-import { useState, useMemo, memo, useCallback } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { prefetchRoute } from '../../lib/prefetch';
 
@@ -103,7 +102,16 @@ export function MobileBottomNav() {
   const { balance, formatCredits } = useCredits();
   const { preferences } = useUserPreferences();
   const [showMenu, setShowMenu] = useState<string | null>(null);
-  const prefersReducedMotion = useReducedMotion();
+  
+  // Check for reduced motion preference using media query
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
 
   const activeSection = getActiveSection(location);
 
@@ -148,162 +156,156 @@ export function MobileBottomNav() {
   return (
     <>
       <style>{`@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }`}</style>
-      {/* Backdrop Overlay - Glassmorphism */}
-      <AnimatePresence>
-        {showMenu && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[65] bg-background/80 backdrop-blur-md lg:hidden"
-            onClick={() => setShowMenu(null)}
-          />
-        )}
-      </AnimatePresence>
+      {/* Backdrop Overlay - CSS-only animation */}
+      {showMenu && (
+        <div
+          className={`fixed inset-0 z-[65] bg-background/80 backdrop-blur-md lg:hidden ${prefersReducedMotion ? '' : 'animate-fade-in'}`}
+          style={{ animationDuration: prefersReducedMotion ? '0ms' : '200ms' }}
+          onClick={() => setShowMenu(null)}
+        />
+      )}
 
-      {/* Full-screen Submenu with Premium UX */}
-      <AnimatePresence>
-        {showMenu && currentSubNav.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: "100%" }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-[70] glass-card border-t border-border rounded-t-[32px] shadow-2xl overflow-hidden lg:hidden max-h-[80vh] flex flex-col"
-            style={{ background: 'var(--gh-canvas-overlay)' }}
-          >
-            {/* Drag Handle */}
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-12 h-1 bg-muted-foreground/30 rounded-full" />
-            </div>
+      {/* Full-screen Submenu with Premium UX - CSS-only animation */}
+      {showMenu && currentSubNav.length > 0 && (
+        <div
+          className={`fixed inset-x-0 bottom-0 z-[70] glass-card border-t border-border rounded-t-[32px] shadow-2xl overflow-hidden lg:hidden max-h-[80vh] flex flex-col ${prefersReducedMotion ? '' : 'animate-slide-up'}`}
+          style={{ 
+            background: 'var(--gh-canvas-overlay)',
+            animationDuration: prefersReducedMotion ? '0ms' : '300ms',
+            animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
+        >
+          {/* Drag Handle */}
+          <div className="flex justify-center pt-3 pb-2">
+            <div className="w-12 h-1 bg-muted-foreground/30 rounded-full" />
+          </div>
 
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-2xl font-black text-foreground">
-                    {showMenu === 'learn' ? 'Learn' : showMenu === 'practice' ? 'Practice' : 'Progress'}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {showMenu === 'learn' ? 'Browse topics and certifications' : 
-                     showMenu === 'practice' ? 'Choose your practice mode' : 
-                     'Track your progress'}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowMenu(null)}
-                  aria-label="Close submenu"
-                  className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors touch-manipulation"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
+          {/* Header */}
+          <div className="px-6 py-4 border-b border-border">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-2xl font-black text-foreground">
+                  {showMenu === 'learn' ? 'Learn' : showMenu === 'practice' ? 'Practice' : 'Progress'}
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {showMenu === 'learn' ? 'Browse topics and certifications' : 
+                   showMenu === 'practice' ? 'Choose your practice mode' : 
+                   'Track your progress'}
+                </p>
               </div>
+              <button
+                onClick={() => setShowMenu(null)}
+                aria-label="Close submenu"
+                className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors touch-manipulation"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
             </div>
-            
-            {/* Menu Items - Single Column for Better Touch Targets */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-2 pb-28 pb-safe">
-              {currentSubNav.map((item, index) => {
-                const Icon = item.icon;
-                const isActive = location === item.path || location.startsWith(item.path + '/');
-                const isVoice = item.id === 'voice';
-                
-                return (
-                  <motion.button
-                    key={item.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    onTouchStart={() => prefetchRoute(item.path)}
-                    onMouseEnter={() => prefetchRoute(item.path)}
-                    onClick={() => {
-                      setLocation(item.path);
-                      setShowMenu(null);
-                    }}
-                    className={cn(
-                      "w-full flex items-center gap-4 p-4 rounded-[20px] transition-all relative overflow-hidden min-h-[56px] touch-manipulation",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                      isActive 
-                        ? "bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30" 
-                        : "bg-muted/50 hover:bg-muted border-2 border-transparent",
-                      isVoice && !isActive && "bg-gradient-to-br from-primary/10 to-primary/5 border-primary/10"
-                    )}
-                    type="button"
-                    aria-current={isActive ? 'page' : undefined}
-                  >
-                    {/* Icon - Glow effect for active state */}
-                    <div className={cn(
-                      "w-14 h-14 rounded-[16px] flex items-center justify-center flex-shrink-0 transition-all",
-                      isActive 
-                        ? "bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30" 
-                        : isVoice 
-                          ? "bg-gradient-to-br from-primary/20 to-primary/10"
-                          : "bg-background"
-                    )}>
-                      <Icon className={cn(
-                        "w-7 h-7",
-                        isActive ? "text-primary-foreground" : "text-foreground"
-                      )} strokeWidth={2} />
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="flex-1 text-left">
-                      <div className="flex items-center gap-2 mb-1">
+          </div>
+          
+          {/* Menu Items - Single Column for Better Touch Targets */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-2 pb-28 pb-safe">
+            {currentSubNav.map((item, index) => {
+              const Icon = item.icon;
+              const isActive = location === item.path || location.startsWith(item.path + '/');
+              const isVoice = item.id === 'voice';
+              
+              return (
+                <button
+                  key={item.id}
+                  onTouchStart={() => prefetchRoute(item.path)}
+                  onMouseEnter={() => prefetchRoute(item.path)}
+                  onClick={() => {
+                    setLocation(item.path);
+                    setShowMenu(null);
+                  }}
+                  className={cn(
+                    "w-full flex items-center gap-4 p-4 rounded-[20px] transition-all relative overflow-hidden min-h-[56px] touch-manipulation",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    isActive 
+                      ? "bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30" 
+                      : "bg-muted/50 hover:bg-muted border-2 border-transparent",
+                    isVoice && !isActive && "bg-gradient-to-br from-primary/10 to-primary/5 border-primary/10"
+                  )}
+                  style={{
+                    animationDelay: prefersReducedMotion ? '0ms' : `${index * 50}ms`
+                  }}
+                  type="button"
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {/* Icon - Glow effect for active state */}
+                  <div className={cn(
+                    "w-14 h-14 rounded-[16px] flex items-center justify-center flex-shrink-0 transition-all",
+                    isActive 
+                      ? "bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30" 
+                      : isVoice 
+                        ? "bg-gradient-to-br from-primary/20 to-primary/10"
+                        : "bg-background"
+                  )}>
+                    <Icon className={cn(
+                      "w-7 h-7",
+                      isActive ? "text-primary-foreground" : "text-foreground"
+                    )} strokeWidth={2} />
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-1 text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={cn(
+                        "text-base font-bold",
+                        isActive ? "text-primary" : "text-foreground"
+                      )}>
+                        {item.label}
+                      </span>
+                      {item.badge && (
                         <span className={cn(
-                          "text-base font-bold",
-                          isActive ? "text-primary" : "text-foreground"
+                          "text-xs font-bold px-2 py-0.5 rounded-full",
+                          item.badge === 'NEW' 
+                            ? "bg-emerald-500/20 text-emerald-400" 
+                            : "bg-amber-500/20 text-amber-400"
                         )}>
-                          {item.label}
+                          {item.badge}
                         </span>
-                        {item.badge && (
-                          <span className={cn(
-                            "text-xs font-bold px-2 py-0.5 rounded-full",
-                            item.badge === 'NEW' 
-                              ? "bg-emerald-500/20 text-emerald-400" 
-                              : "bg-amber-500/20 text-amber-400"
-                          )}>
-                            {item.badge}
-                          </span>
-                        )}
-                      </div>
-                      {item.description && (
-                        <p className="text-sm text-muted-foreground">
-                          {item.description}
-                        </p>
                       )}
                     </div>
+                    {item.description && (
+                      <p className="text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
 
-                    {/* Arrow */}
-                    <ChevronRight className={cn(
-                      "w-5 h-5 flex-shrink-0",
-                      isActive ? "text-primary" : "text-muted-foreground"
-                    )} />
-                  </motion.button>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  {/* Arrow */}
+                  <ChevronRight className={cn(
+                    "w-5 h-5 flex-shrink-0",
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  )} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Bottom Navigation Bar - Premium Glassmorphism */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden pb-safe">
         <div className="glass-card border-t border-border shadow-2xl" style={{ 
-background: 'var(--gh-canvas-overlay)',
+          background: 'var(--gh-canvas-overlay)',
           backdropFilter: 'blur(24px) saturate(200%)',
           WebkitBackdropFilter: 'blur(24px) saturate(200%)'
         }}>
-          {/* Active Indicator - Simple CSS transition instead of layoutId */}
+          {/* Active Indicator - CSS custom properties for position */}
           <div 
             className="h-1 rounded-full transition-all duration-200 ease-out"
-style={{ 
-               background: 'var(--gh-success-fg)',
-               boxShadow: '0 0 20px var(--gh-success-fg)',
-               width: 'calc(100% / 5 - 16px)',
-               marginLeft: `calc(${(mainNavItems.findIndex(i => activeSection === i.id) || 0)} * (100% / 5))`,
-               transform: `translateX(${((mainNavItems.findIndex(i => activeSection === i.id) || 0) - 1) * 4}px)`,
-               maxWidth: '48px',
-               marginRight: 'auto'
-             }}
+            style={{ 
+              background: 'var(--gh-success-fg)',
+              boxShadow: '0 0 20px var(--gh-success-fg)',
+              width: 'calc(100% / 5 - 16px)',
+              marginLeft: `calc(${(mainNavItems.findIndex(i => activeSection === i.id) || 0)} * (100% / 5))`,
+              transform: `translateX(${((mainNavItems.findIndex(i => activeSection === i.id) || 0) - 1) * 4}px)`,
+              maxWidth: '48px',
+              marginRight: 'auto'
+            }}
           />
           <div className="flex items-center justify-around h-[60px] px-1 max-w-md mx-auto">
             {mainNavItems.map((item) => {
@@ -336,12 +338,11 @@ style={{
                       boxShadow: '0 0 12px var(--gh-success-fg)'
                     }}
                   />
-                   
-                  {/* Icon Container */}
-                  <motion.div
-                    whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
+                    
+                  {/* Icon Container - CSS scale transform instead of framer-motion */}
+                  <div
                     className={cn(
-                      "w-9 h-9 rounded-[12px] flex items-center justify-center transition-all",
+                      "w-9 h-9 rounded-[12px] flex items-center justify-center transition-transform",
                       item.highlight
                         ? isActive || isMenuOpen
                           ? "bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/50" 
@@ -350,12 +351,13 @@ style={{
                           ? "bg-primary/15" 
                           : "bg-transparent"
                     )}
+                    style={{ transform: prefersReducedMotion ? 'none' : undefined }}
                   >
                     <Icon className={cn(
                       "w-5 h-5",
                       item.highlight && (isActive || isMenuOpen) ? "text-primary-foreground" : ""
                     )} strokeWidth={2.5} />
-                  </motion.div>
+                  </div>
                   
                   {/* Label */}
                   <span className={cn(

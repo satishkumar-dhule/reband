@@ -5,11 +5,13 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation } from 'wouter';
+import { useQuery } from "@tanstack/react-query";
 import { motion } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { Button, IconButton } from '../components/unified/Button';
 import { Input } from '../components/ui/input';
+import { CertificationsSkeleton } from '../components/skeletons/PageSkeletons';
 import {
   Search, Award, Clock, ChevronRight, Sparkles, TrendingUp, Check, Plus,
   Cloud, Shield, Database, Brain, Code, Users, Box, Terminal, Server, Cpu,
@@ -62,37 +64,29 @@ const categories = [
   { id: 'management', name: 'Management' }
 ];
 
-// Fetch certifications with proper error handling
+// Fetch certifications with TanStack Query - proper caching and deduplication
 function useCertifications() {
-  const [certifications, setCertifications] = useState<Certification[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchCertifications() {
-      try {
-        const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
-        const response = await fetch(`${basePath}data/certifications.json`);
-        if (!response.ok) throw new Error(`Failed to fetch certifications (${response.status})`);
-        const data = await response.json();
-        setCertifications(data);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Unknown error occurred';
-        console.error('Failed to load certifications:', message);
-        setError(message);
-      } finally {
-        setLoading(false);
+  const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
+  
+  return useQuery<Certification[]>({
+    queryKey: ['certifications'],
+    staleTime: Infinity, // Static data - never refetch per build
+    gcTime: 5 * 60 * 1000, // 5 minutes cache
+    queryFn: async () => {
+      const response = await fetch(`${basePath}data/certifications.json`);
+      if (!response.ok) throw new Error(`Failed to fetch certifications (${response.status})`);
+      const data = await response.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid certifications data');
       }
-    }
-    fetchCertifications();
-  }, []);
-
-  return { certifications, loading, error };
+      return data;
+    },
+  });
 }
 
 export default function Certifications() {
   const [, navigate] = useLocation();
-  const { certifications, loading, error } = useCertifications();
+  const { data: certifications = [], isLoading, error } = useCertifications();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [startedCerts, setStartedCerts] = useState<Set<string>>(new Set());
@@ -136,12 +130,11 @@ export default function Certifications() {
     return matchesSearch && matchesCategory;
   }), [certifications, searchQuery, selectedCategory]);
 
-  if (loading) {
+  // Loading state with skeleton
+  if (isLoading) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-background flex items-center justify-center pt-safe pb-safe">
-          <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-primary animate-spin" />
-        </div>
+        <CertificationsSkeleton />
       </AppLayout>
     );
   }
@@ -154,7 +147,7 @@ export default function Certifications() {
           <div className="bg-[var(--gh-danger-subtle)] border border-[var(--gh-danger-fg)]/20 p-6 rounded-2xl mb-6 max-w-md text-center">
             <AlertTriangle className="w-12 h-12 text-[var(--gh-danger-fg)] mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-[var(--gh-fg)] mb-2">Failed to load certifications</h2>
-            <p className="text-sm text-[var(--gh-fg-muted)]">{error}</p>
+            <p className="text-sm text-[var(--gh-fg-muted)]">{error instanceof Error ? error.message : 'Unknown error occurred'}</p>
           </div>
           <Button onClick={() => window.location.reload()} variant="primary">
             <RefreshCw className="w-4 h-4" />

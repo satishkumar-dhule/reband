@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
+import React from 'react';
 import { useLocation, useParams } from 'wouter';
 import {
   ArrowLeft, Play, RotateCcw, Eye, CheckCircle, XCircle,
@@ -15,6 +16,7 @@ import {
   runTestsAsync, saveChallengeAttempt, analyzeCodeComplexity,
   getCodingStats, getSolvedChallengeIds, ComplexityAnalysis,
 } from '../lib/coding-challenges';
+import { isPyodideReady } from '../lib/pyodide-runner';
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent } from '../components/ui/card';
 import { ScrollArea } from '../components/ui/scroll-area';
@@ -22,8 +24,152 @@ import { Separator } from '../components/ui/separator';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../components/ui/select';
 import { Button, IconButton } from '../components/unified/Button';
 import { Input } from '../components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '../components/ui/dialog';
+
+// Lazy load Monaco Editor for bundle optimization
+const MonacoSkeleton = () => (
+  <div className="flex items-center justify-center h-full bg-[var(--gh-canvas-inset)]">
+    <div className="flex flex-col items-center gap-3">
+      <div className="animate-spin w-8 h-8 border-2 border-[var(--gh-accent-fg)] border-t-transparent rounded-full" />
+      <span className="text-sm text-[var(--gh-fg-muted)] font-mono">Loading code editor...</span>
+    </div>
+  </div>
+);
 
 type ViewState = 'list' | 'challenge';
+
+interface TestOutputPanelProps {
+  results: TestResult[];
+  isExpanded: boolean;
+  onToggle: () => void;
+  testCases: any[];
+  allPassed: boolean;
+  complexity?: { time: string; space: string } | null;
+  isRunning: boolean;
+  isPythonLoading?: boolean;
+  language?: Language;
+}
+
+const TestOutputPanel = React.memo(function TestOutputPanel({
+  results,
+  isExpanded,
+  onToggle,
+  testCases,
+  allPassed,
+  complexity,
+  isRunning,
+  isPythonLoading,
+}: TestOutputPanelProps) {
+  return (
+    <div className={`border-t flex flex-col bg-[var(--gh-canvas)] transition-all duration-300 ${isExpanded ? 'h-[33vh] min-h-[150px] max-h-[50vh]' : 'h-10'}`}>
+      <div
+        className="h-10 border-b bg-[var(--gh-canvas-subtle)] flex items-center justify-between px-4 cursor-pointer shrink-0"
+        onClick={onToggle}
+      >
+        <div className="flex items-center gap-2">
+          <Terminal className="w-4 h-4 text-[var(--gh-fg-muted)]" />
+          <span className="text-xs font-medium text-[var(--gh-fg-muted)] uppercase tracking-wider">Test Results</span>
+          {results.length > 0 && (
+            <Badge variant="outline" className={`ml-2 h-5 px-1.5 text-[10px] ${
+              results.every(r => r.passed) ? "bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] border-[var(--gh-success-fg)]/30" : "bg-[var(--gh-danger-subtle)] text-[var(--gh-danger-fg)] border-[var(--gh-danger-fg)]/30"
+            }`}>
+              {results.filter(r => r.passed).length}/{results.length} Passed
+            </Badge>
+          )}
+        </div>
+        {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+      </div>
+
+      {isExpanded && (
+        <ScrollArea className="flex-1 p-4">
+          {isRunning ? (
+            <div className="h-full flex flex-col items-center justify-center text-[var(--gh-fg-muted)] space-y-2">
+              <RotateCcw className="w-8 h-8 animate-spin" />
+              <p className="text-sm font-medium">
+                {isPythonLoading
+                  ? 'Loading Python runtime, please wait...'
+                  : 'Running tests...'}
+              </p>
+            </div>
+          ) : results.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-[var(--gh-fg-muted)] space-y-2 opacity-60">
+              <Play className="w-8 h-8" />
+              <p className="text-sm font-medium">Click "Run Tests" to see your results</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {results.map((result, idx) => {
+                const testCase = testCases.find(tc => tc.id === result.testCaseId);
+                return (
+                  <div key={result.testCaseId} className={`rounded-md border p-3 ${result.passed ? 'bg-[var(--gh-success-subtle)] border-[var(--gh-success-fg)]/30' : 'bg-[var(--gh-danger-subtle)] border-[var(--gh-danger-fg)]/30'}`}>
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {result.passed ? (
+                          <CheckCircle className="w-4 h-4 text-[var(--gh-success-fg)]" />
+                        ) : (
+                          <XCircle className="w-4 h-4 text-[var(--gh-danger-fg)]" />
+                        )}
+                        <span className={`text-sm font-semibold ${result.passed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
+                          Test Case {idx + 1}: {result.passed ? 'Passed' : 'Failed'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
+                      <div className="bg-[var(--gh-canvas-inset)] p-2 rounded border">
+                        <p className="text-[var(--gh-fg-muted)] mb-1 uppercase text-[9px] font-bold">Input</p>
+                        <p className="text-[var(--gh-fg)]">{testCase?.input || 'N/A'}</p>
+                      </div>
+                      <div className="bg-[var(--gh-canvas-inset)] p-2 rounded border">
+                        <p className="text-[var(--gh-fg-muted)] mb-1 uppercase text-[9px] font-bold">Expected</p>
+                        <p className="text-[var(--gh-fg)]">{testCase?.expectedOutput || 'N/A'}</p>
+                      </div>
+                      <div className={`col-span-full p-2 rounded border ${result.passed ? 'bg-[var(--gh-success-subtle)]/30' : 'bg-[var(--gh-danger-subtle)]/30 border-[var(--gh-danger-fg)]/30'}`}>
+                        <p className="text-[var(--gh-fg-muted)] mb-1 uppercase text-[9px] font-bold">Actual Output</p>
+                        <p className={result.passed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}>{result.actualOutput}</p>
+                      </div>
+                    </div>
+                    {!result.passed && result.error && (
+                      <div className="mt-3 p-2 bg-[var(--gh-danger-subtle)]/30 border border-[var(--gh-danger-fg)]/30 rounded text-[11px] font-mono text-[var(--gh-danger-fg)]">
+                        <p className="font-bold mb-1 uppercase text-[9px]">Error Message</p>
+                        {result.error}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {allPassed && complexity && (
+                <div className="mt-6 p-4 bg-[var(--gh-accent-subtle)]/30 border border-[var(--gh-accent-fg)]/30 rounded-md">
+                  <h4 className="text-sm font-bold text-[var(--gh-accent-fg)] mb-2 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Complexity Analysis
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-[var(--gh-accent-fg)] uppercase font-bold">Time Complexity</p>
+                      <p className="text-sm font-mono text-[var(--gh-fg)]">{complexity.time}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-[var(--gh-accent-fg)] uppercase font-bold">Space Complexity</p>
+                      <p className="text-sm font-mono text-[var(--gh-fg)]">{complexity.space}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </ScrollArea>
+      )}
+    </div>
+  );
+});
 
 const CODING_LANGUAGE_KEY = 'coding-preferred-language';
 const CODING_PROGRESS_PREFIX = 'coding-progress-';
@@ -79,7 +225,8 @@ export default function CodingChallenge() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [solvedIds, setSolvedIds] = useState<Set<string>>(() => getSolvedChallengeIds());
   const [startTime, setStartTime] = useState<number>(Date.now());
-  const [resultsExpanded, setResultsExpanded] = useState(true);
+  const [showDescription, setShowDescription] = useState(true);
+  const [resultsPanelExpanded, setResultsPanelExpanded] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<'all' | 'easy' | 'medium'>('all');
 
@@ -174,7 +321,8 @@ export default function CodingChallenge() {
     if (!currentChallenge) return;
     setIsRunning(true);
     setShowSuccessModal(false);
-    setResultsExpanded(true);
+    // Switch to editor view to see test results
+    setShowDescription(false);
 
     try {
       const results = await runTestsAsync(code, currentChallenge, language);
@@ -249,7 +397,7 @@ export default function CodingChallenge() {
           {/* Top Bar */}
           <header className="h-14 border-b bg-[var(--gh-canvas)] px-4 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={goBack} className="gap-2">
+              <Button variant="ghost" size="sm" onClick={goBack} className="gap-2" data-testid="button-back">
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </Button>
@@ -271,7 +419,7 @@ export default function CodingChallenge() {
 
             <div className="flex items-center gap-3">
               <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
-                <SelectTrigger className="h-8 w-[120px] bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)] text-sm">
+                <SelectTrigger className="h-8 w-[120px] bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)] text-sm" data-testid="select-language">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -286,9 +434,11 @@ export default function CodingChallenge() {
                 className="gap-2 h-8"
                 onClick={runCode}
                 disabled={isRunning}
+                data-testid="button-run-tests"
+                aria-label={isRunning ? "Running tests, please wait" : "Run tests to check your solution"}
               >
                 {isRunning ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-                Run Tests
+                {isRunning ? "Running..." : "Run Tests"}
               </Button>
             </div>
           </header>
@@ -298,25 +448,25 @@ export default function CodingChallenge() {
             {/* Mobile Tab Switcher */}
             <div className="lg:hidden flex border-b bg-[var(--gh-canvas)]">
               <Button
-                variant={resultsExpanded ? 'secondary' : 'ghost'}
+                variant={showDescription ? 'secondary' : 'ghost'}
                 size="sm"
-                onClick={() => setResultsExpanded(true)}
-                className={`flex-1 rounded-none ${resultsExpanded ? 'border-b-2 border-[var(--gh-accent-fg)]' : ''}`}
+                onClick={() => setShowDescription(true)}
+                className={`flex-1 rounded-none ${showDescription ? 'border-b-2 border-[var(--gh-accent-fg)]' : ''}`}
               >
                 Description
               </Button>
               <Button
-                variant={!resultsExpanded ? 'secondary' : 'ghost'}
+                variant={!showDescription ? 'secondary' : 'ghost'}
                 size="sm"
-                onClick={() => setResultsExpanded(false)}
-                className={`flex-1 rounded-none ${!resultsExpanded ? 'border-b-2 border-[var(--gh-accent-fg)]' : ''}`}
+                onClick={() => setShowDescription(false)}
+                className={`flex-1 rounded-none ${!showDescription ? 'border-b-2 border-[var(--gh-accent-fg)]' : ''}`}
               >
                 Code Editor
               </Button>
             </div>
 
             {/* Left Pane - Problem Description (full-width on mobile, 1/3 on desktop) */}
-            <div className={`lg:w-1/3 lg:border-r bg-[var(--gh-canvas)] flex flex-col ${resultsExpanded ? 'flex' : 'hidden lg:flex'} min-w-0`}>
+            <div className={`lg:w-1/3 lg:border-r bg-[var(--gh-canvas)] flex flex-col ${showDescription ? 'flex' : 'hidden lg:flex'} min-w-0`}>
               <ScrollArea className="flex-1 p-4 lg:p-6">
                 <div className="prose prose-sm max-w-none">
                   <h2 className="text-lg font-bold text-[var(--gh-fg)] mb-4">Description</h2>
@@ -386,130 +536,111 @@ export default function CodingChallenge() {
               </ScrollArea>
             </div>
 
-            {/* Right Pane - Editor & Results (full-width on mobile, flex-1 on desktop) */}
-            <div className={`flex-1 flex flex-col min-w-0 bg-[var(--gh-canvas)] ${!resultsExpanded ? 'flex' : 'hidden lg:flex'}`}>
-              {/* Editor Toolbar */}
-              <div className="h-10 border-b bg-[var(--gh-canvas-subtle)] flex items-center justify-between px-4 shrink-0">
-                <div className="flex items-center gap-2">
-                  <Code className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                  <span className="text-xs font-medium text-[var(--gh-fg-muted)] uppercase tracking-wider">Code Editor</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={copyCode}>
-                    {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  </Button>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[var(--gh-danger-fg)] hover:bg-[var(--gh-danger-subtle)]" onClick={resetCode}>
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Editor */}
-              <div className="flex-1 relative overflow-hidden">
-                <CodeEditor
-                  value={code}
-                  onChange={setCode}
-                  language={language}
-                  height="100%"
-                />
-              </div>
-
-              {/* Bottom Results Panel */}
-              <div className={`border-t flex flex-col bg-[var(--gh-canvas)] transition-all duration-300 ${resultsExpanded ? 'h-1/3 min-h-[200px]' : 'h-10'}`}>
-                <div
-                  className="h-10 border-b bg-[var(--gh-canvas-subtle)] flex items-center justify-between px-4 cursor-pointer shrink-0"
-                  onClick={() => setResultsExpanded(!resultsExpanded)}
-                >
-                  <div className="flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                    <span className="text-xs font-medium text-[var(--gh-fg-muted)] uppercase tracking-wider">Test Results</span>
-                    {testResults.length > 0 && (
-                      <Badge variant="outline" className={`ml-2 h-5 px-1.5 text-[10px] ${
-                        testResults.every(r => r.passed) ? "bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] border-[var(--gh-success-fg)]/30" : "bg-[var(--gh-danger-subtle)] text-[var(--gh-danger-fg)] border-[var(--gh-danger-fg)]/30"
-                      }`}>
-                        {testResults.filter(r => r.passed).length}/{testResults.length} Passed
-                      </Badge>
-                    )}
+                {/* Right Pane - Editor & Results (full-width on mobile, flex-1 on desktop) */}
+                <div className={`flex-1 flex flex-col min-w-0 bg-[var(--gh-canvas)] ${!showDescription ? 'flex' : 'hidden lg:flex'}`}>
+                  {/* Editor Toolbar */}
+                  <div className="h-10 border-b bg-[var(--gh-canvas-subtle)] flex items-center justify-between px-4 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <Code className="w-4 h-4 text-[var(--gh-fg-muted)]" />
+                      <span className="text-xs font-medium text-[var(--gh-fg-muted)] uppercase tracking-wider">Code Editor</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={copyCode} data-testid="button-copy-code" aria-label="Copy code to clipboard">
+                        {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copied ? "Copied!" : "Copy"}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[var(--gh-danger-fg)] hover:bg-[var(--gh-danger-subtle)]" onClick={resetCode} data-testid="button-reset-code" aria-label="Reset code to starter template">
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        Reset
+                      </Button>
+                    </div>
                   </div>
-                  {resultsExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+
+                {/* Editor */}
+                <div className="flex-1 relative overflow-hidden h-full">
+                  <CodeEditor
+                    value={code}
+                    onChange={setCode}
+                    language={language}
+                    height="100%"
+                  />
                 </div>
 
-                {resultsExpanded && (
-                  <ScrollArea className="flex-1 p-4">
-                    {testResults.length === 0 ? (
-                      <div className="h-full flex flex-col items-center justify-center text-[var(--gh-fg-muted)] space-y-2 opacity-60">
-                        <Play className="w-8 h-8" />
-                        <p className="text-sm">Run your code to see test results</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {testResults.map((result, idx) => {
-                          const testCase = currentChallenge.testCases.find(tc => tc.id === result.testCaseId);
-                          return (
-                            <div key={result.testCaseId} className={`rounded-md border p-3 ${result.passed ? 'bg-[var(--gh-success-subtle)] border-[var(--gh-success-fg)]/30' : 'bg-[var(--gh-danger-subtle)] border-[var(--gh-danger-fg)]/30'}`}>
-                              <div className="flex items-start justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                  {result.passed ? (
-                                    <CheckCircle className="w-4 h-4 text-[var(--gh-success-fg)]" />
-                                  ) : (
-                                    <XCircle className="w-4 h-4 text-[var(--gh-danger-fg)]" />
-                                  )}
-                                  <span className={`text-sm font-semibold ${result.passed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
-                                    Test Case {idx + 1}: {result.passed ? 'Passed' : 'Failed'}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
-                                <div className="bg-[var(--gh-canvas-inset)] p-2 rounded border">
-                                  <p className="text-[var(--gh-fg-muted)] mb-1 uppercase text-[9px] font-bold">Input</p>
-                                  <p className="text-[var(--gh-fg)]">{testCase?.input || 'N/A'}</p>
-                                </div>
-                                <div className="bg-[var(--gh-canvas-inset)] p-2 rounded border">
-                                  <p className="text-[var(--gh-fg-muted)] mb-1 uppercase text-[9px] font-bold">Expected</p>
-                                  <p className="text-[var(--gh-fg)]">{testCase?.expectedOutput || 'N/A'}</p>
-                                </div>
-                                <div className={`col-span-full p-2 rounded border ${result.passed ? 'bg-[var(--gh-success-subtle)]/30' : 'bg-[var(--gh-danger-subtle)]/30 border-[var(--gh-danger-fg)]/30'}`}>
-                                  <p className="text-[var(--gh-fg-muted)] mb-1 uppercase text-[9px] font-bold">Actual Output</p>
-                                  <p className={result.passed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}>{result.actualOutput}</p>
-                                </div>
-                              </div>
-                              {!result.passed && result.error && (
-                                <div className="mt-3 p-2 bg-[var(--gh-danger-subtle)]/30 border border-[var(--gh-danger-fg)]/30 rounded text-[11px] font-mono text-[var(--gh-danger-fg)]">
-                                  <p className="font-bold mb-1 uppercase text-[9px]">Error Message</p>
-                                  {result.error}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-
-                        {testResults.every(r => r.passed) && currentChallenge.complexity && (
-                          <div className="mt-6 p-4 bg-[var(--gh-accent-subtle)]/30 border border-[var(--gh-accent-fg)]/30 rounded-md">
-                            <h4 className="text-sm font-bold text-[var(--gh-accent-fg)] mb-2 flex items-center gap-2">
-                              <Sparkles className="w-4 h-4" />
-                              Complexity Analysis
-                            </h4>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div className="space-y-1">
-                                <p className="text-[10px] text-[var(--gh-accent-fg)] uppercase font-bold">Time Complexity</p>
-                                <p className="text-sm font-mono text-[var(--gh-fg)]">{currentChallenge.complexity.time}</p>
-                              </div>
-                              <div className="space-y-1">
-                                <p className="text-[10px] text-[var(--gh-accent-fg)] uppercase font-bold">Space Complexity</p>
-                                <p className="text-sm font-mono text-[var(--gh-fg)]">{currentChallenge.complexity.space}</p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </ScrollArea>
-                )}
+                {/* Bottom Results Panel - Memoized to prevent re-renders */}
+                <TestOutputPanel
+                  results={testResults}
+                  isExpanded={resultsPanelExpanded}
+                  onToggle={() => setResultsPanelExpanded(!resultsPanelExpanded)}
+                  testCases={currentChallenge.testCases || []}
+                  allPassed={testResults.length > 0 && testResults.every(r => r.passed)}
+                  complexity={currentChallenge.complexity}
+                  isRunning={isRunning}
+                  isPythonLoading={!isPyodideReady() && language === 'python'}
+                  language={language}
+                />
               </div>
             </div>
           </div>
-        </div>
-      </AppLayout>
+
+          {/* Success Modal */}
+          <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+            <DialogContent size="lg" className="bg-[var(--gh-canvas)] border-[var(--gh-border)]">
+              <DialogHeader className="text-center">
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full bg-[var(--gh-success-subtle)] border-2 border-[var(--gh-success-fg)] flex items-center justify-center">
+                    <Trophy className="w-8 h-8 text-[var(--gh-success-fg)]" />
+                  </div>
+                </div>
+                <DialogTitle className="text-2xl font-bold text-[var(--gh-fg)]">
+                  Congratulations!
+                </DialogTitle>
+                <DialogDescription className="text-[var(--gh-fg-muted)] mt-2">
+                  You've successfully solved the challenge!
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="flex justify-center gap-8 py-4">
+                <div className="text-center">
+                  <p className="text-xs text-[var(--gh-fg-muted)] uppercase font-bold tracking-wider">Time</p>
+                  <p className="text-xl font-bold text-[var(--gh-fg)]">
+                    {Math.floor((Date.now() - startTime) / 60000)}:{(Math.floor((Date.now() - startTime) / 1000) % 60).toString().padStart(2, '0')}
+                  </p>
+                </div>
+                <div className="w-px bg-[var(--gh-border)]" />
+                <div className="text-center">
+                  <p className="text-xs text-[var(--gh-fg-muted)] uppercase font-bold tracking-wider">Tests</p>
+                  <p className="text-xl font-bold text-[var(--gh-fg)]">{testResults.length}</p>
+                </div>
+              </div>
+
+              <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-4">
+                <Button
+                  variant="outline"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    setLocation('/coding');
+                    setViewState('list');
+                  }}
+                >
+                  <BookOpen className="w-4 h-4" />
+                  Back to List
+                </Button>
+                <Button
+                  variant="success"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    startRandom();
+                  }}
+                >
+                  <Zap className="w-4 h-4" />
+                  Next Challenge
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </AppLayout>
     );
   }
 
@@ -529,23 +660,25 @@ export default function CodingChallenge() {
                 <h1 className="text-2xl font-bold text-[var(--gh-fg)]">Coding Challenges</h1>
                 <p className="text-[var(--gh-fg-muted)]">Master algorithms and technical interviews with instant code execution.</p>
               </div>
-              <div className="flex items-center gap-3">
-                <Button 
-                  onClick={() => startRandom()}
-                  variant="outline"
-                  className="bg-[var(--gh-canvas)] border-[var(--gh-border)] text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)]"
-                >
-                  <Zap className="w-4 h-4 mr-2 text-[var(--gh-attention-fg)]" />
-                  Random Challenge
-                </Button>
-                <Button
-                  onClick={() => startRandom('easy')}
-                  className="bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-emphasis)]/80 text-white"
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  Quick Start
-                </Button>
-              </div>
+            <div className="flex items-center gap-3">
+              <Button 
+                onClick={() => startRandom()}
+                variant="outline"
+                className="bg-[var(--gh-canvas)] border-[var(--gh-border)] text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)]"
+                data-testid="button-random-challenge"
+              >
+                <Zap className="w-4 h-4 mr-2 text-[var(--gh-attention-fg)]" />
+                Random Challenge
+              </Button>
+              <Button
+                onClick={() => startRandom('easy')}
+                className="bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-emphasis)]/80 text-white"
+                data-testid="button-quick-start"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Quick Start
+              </Button>
+            </div>
             </div>
 
             {/* Stats Row */}
@@ -579,10 +712,12 @@ export default function CodingChallenge() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <Input
                 type="text"
-                placeholder="Search challenges..."
+                placeholder="Search challenges by title or description..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4"
+                data-testid="input-search-challenges"
+                aria-label="Search challenges"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -593,6 +728,7 @@ export default function CodingChallenge() {
                     variant={difficultyFilter === diff ? 'secondary' : 'ghost'}
                     size="sm"
                     onClick={() => setDifficultyFilter(diff)}
+                    data-testid={`filter-difficulty-${diff}`}
                     className={`px-4 py-1.5 text-xs font-semibold capitalize ${
                       difficultyFilter === diff 
                         ? 'bg-[var(--gh-accent-fg)] text-white border-transparent' 
@@ -620,6 +756,7 @@ export default function CodingChallenge() {
                     solvedIds.has(challenge.id) ? 'bg-[var(--gh-success-subtle)]/30' : ''
                   }`}
                   onClick={() => startChallenge(challenge)}
+                  data-testid={`card-challenge-${challenge.id}`}
                 >
                   <CardContent className="p-5">
                     <div className="flex items-center justify-between mb-2">

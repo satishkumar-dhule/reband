@@ -8,6 +8,67 @@ This skill guides creation of distinctive, production-grade frontend interfaces 
 
 The user provides frontend requirements: a component, page, application, or interface to build. They may include context about the purpose, audience, or technical constraints.
 
+## Test Driven Development (TDD)
+
+**ALWAYS follow TDD for frontend components:**
+
+1. **RED** — Write a failing test FIRST that describes the expected UI behavior
+2. **GREEN** — Implement minimal code to make the test pass
+3. **REFACTOR** — Improve design while keeping tests green
+
+### TDD Frontend Workflow
+
+```
+1. Before writing any component code:
+   - Write a test file (e.g., Component.test.tsx) with expected behavior
+   - Include tests for: render, interactions, accessibility, visual states
+   
+2. Run tests to verify they FAIL (expected)
+
+3. Implement the component to make tests pass
+
+4. Run tests to verify they PASS
+
+5. Refactor for design quality (aesthetics, animations, polish)
+
+6. Ensure all tests still pass
+```
+
+### Test Requirements
+
+- Every component needs tests BEFORE implementation
+- Test files go next to source: `Component.test.tsx`
+- Minimum coverage: render, user interactions, accessibility, error states
+- Use Vitest + React Testing Library for React components
+- Run `npm test` or `pnpm test` after each change
+
+### Test Patterns
+
+```typescript
+// Example: Component render test
+test('renders channel card with title', () => {
+  render(<ChannelCard title="Algorithms" questionCount={50} />);
+  expect(screen.getByText('Algorithms')).toBeInTheDocument();
+  expect(screen.getByText('50 questions')).toBeInTheDocument();
+});
+
+// Example: Interaction test
+test('card navigates on click', async () => {
+  const onNavigate = jest.fn();
+  render(<ChannelCard onClick={onNavigate} />);
+  await userEvent.click(screen.getByRole('button'));
+  expect(onNavigate).toHaveBeenCalled();
+});
+
+// Example: Accessibility test
+test('card is keyboard accessible', async () => {
+  render(<ChannelCard />);
+  const card = screen.getByRole('article');
+  card.focus();
+  expect(card).toHaveFocus();
+});
+```
+
 ## Design Thinking
 
 Before coding, understand the context and commit to a BOLD aesthetic direction:

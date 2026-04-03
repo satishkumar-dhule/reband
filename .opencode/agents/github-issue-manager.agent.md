@@ -126,6 +126,43 @@ gh issue view <issue-number> --comments
 - Handle rate limits with `--paginate`
 - Use `--jq` for parsing JSON output
 
+## Permission Issues (Important)
+
+### Token Scope Issues
+If you get `403 Resource not accessible by personal access token`:
+
+1. **Check if issue creation works on another repo**
+   ```bash
+   gh issue create --repo your-other-repo --title "test" --body "test"
+   ```
+
+2. **If it works on one repo but not another**: The token doesn't have access to that specific repo. Options:
+   - Regenerate token with repo scope
+   - Add token to the specific repo in GitHub Settings
+   - Use `--repo owner/repo` with a repo you have access to
+
+3. **Use body-file for long descriptions**
+   ```bash
+   echo "Description with special chars" > /tmp/body.txt
+   gh issue create --repo owner/repo --title "Title" --body-file /tmp/body.txt --label "bug"
+   ```
+
+4. **Avoid labels with spaces** - use single-word labels or quotes
+   ```bash
+   # Don't use: --label "ui bug" (will fail)
+   # Use: --label "bug" or --label "frontend"
+   ```
+
+5. **Fallback**: If issues cannot be created, create a local bug report file instead:
+   ```markdown
+   # Bug Report - [Page Name]
+   
+   ## Bug #1
+   - Title: ...
+   - Location: ...
+   - Description: ...
+   ```
+
 ## Examples
 
 ### Create a Bug Report Issue

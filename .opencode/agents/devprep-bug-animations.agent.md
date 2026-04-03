@@ -15,6 +15,65 @@ tags: [animation, transitions, performance, css]
 
 Find and fix animation and transition bugs in the DevPrep codebase. This agent specializes in CSS animations, React animation libraries, performance optimization, and smooth motion implementation.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing animation bugs:
+
+1. **RED** — Write a test that checks animation behavior
+2. **GREEN** — Fix the animation to make the test pass
+3. **REFACTOR** — Improve while keeping tests green
+
+### TDD Animation Fix Workflow
+
+```
+1. Before fixing any animation bug:
+   - Write tests for animation properties, performance
+   - Include visual regression tests if available
+   
+2. Run tests to verify issue exists
+
+3. Fix the animation
+
+4. Run tests to verify fix works
+
+5. Test performance (60fps)
+```
+
+### Animation Test Requirements
+
+- Write tests for animation property values
+- Test prefers-reduced-motion is respected
+- Test animation timing is correct
+- Use Playwright for visual regression
+
+### Test Patterns
+
+```typescript
+// Example: Animation property test
+test('button has transition on hover', () => {
+  render(<AnimatedButton />);
+  const button = screen.getByRole('button');
+  const styles = getComputedStyle(button);
+  
+  expect(styles.transition).toContain('background');
+});
+
+// Example: Reduced motion test
+test('respects prefers-reduced-motion', () => {
+  window.matchMedia = jest.fn().mockImplementation(query => ({
+    matches: query === '(prefers-reduced-motion: reduce)',
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+  }));
+  
+  render(<AnimatedComponent />);
+  const element = screen.getByTestId('animated');
+  expect(element).toHaveClass('reduced-motion');
+});
+```
+
 ## Scope
 
 **Primary directories:**

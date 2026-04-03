@@ -1,11 +1,13 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import { useLocation } from 'wouter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { loadChannelQuestions } from '../lib/questions-loader';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { ProgressStorage } from '../services/storage.service';
 import { STORAGE_KEYS } from '../lib/constants';
+import { GenericPageSkeleton } from '../components/skeletons/PageSkeletons';
 import type { Question } from '../types';
 import {
   Bookmark, Trash2, ChevronRight, Filter,
@@ -31,17 +33,15 @@ function fmt(id: string) {
 
 export default function Bookmarks() {
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const { getSubscribedChannels } = useUserPreferences();
-  const [bookmarkedQuestions, setBookmarkedQuestions] = useState<BookmarkedQuestion[]>([]);
   const [filterChannel, setFilterChannel] = useState<string>('all');
   const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadBookmarks() {
-      setIsLoading(true);
+  // Query: Load bookmarks from storage
+  const { data: bookmarkedQuestions = [], isLoading } = useQuery({
+    queryKey: ['bookmarks'],
+    queryFn: async () => {
       const subscribedChannels = getSubscribedChannels();
       const channelIds = new Set<string>();
       subscribedChannels.forEach(c => channelIds.add(c.id));
@@ -56,7 +56,6 @@ export default function Bookmarks() {
         // localStorage access error - skip marked prefix scan
       }
 
-      // Load questions for each channel that has bookmarks
       const channelsWithMarks = Array.from(channelIds).filter(
         ch => ProgressStorage.getMarked(ch).length > 0
       );
@@ -78,15 +77,20 @@ export default function Bookmarks() {
         })
       );
 
-      if (!cancelled) {
-        setBookmarkedQuestions(bookmarked);
-        setIsLoading(false);
-      }
-    }
+      return bookmarked;
+    },
+  });
 
-    loadBookmarks();
-    return () => { cancelled = true; };
-  }, [getSubscribedChannels]);
+  // Mutation: Remove bookmark
+  const deleteBookmark = useMutation({
+    mutationFn: async (question: BookmarkedQuestion) => {
+      ProgressStorage.toggleMarked(question.channelId, question.id);
+      return question;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+    },
+  });
 
   const channelsWithBookmarks = useMemo(() =>
     Array.from(new Set(bookmarkedQuestions.map(q => q.channelId))),
@@ -100,8 +104,7 @@ export default function Bookmarks() {
   }), [bookmarkedQuestions, filterChannel, filterDifficulty]);
 
   const removeBookmark = (question: BookmarkedQuestion) => {
-    ProgressStorage.toggleMarked(question.channelId, question.id);
-    setBookmarkedQuestions(prev => prev.filter(q => q.id !== question.id));
+    deleteBookmark.mutate(question);
   };
 
   const goToQuestion = (question: BookmarkedQuestion) => {
@@ -109,6 +112,21 @@ export default function Bookmarks() {
   };
 
   const hasFilters = filterChannel !== 'all' || filterDifficulty !== 'all';
+
+  if (isLoading) {
+    return (
+      <>
+        <SEOHead title="Bookmarks - DevPrep" description="View and manage your bookmarked interview questions" />
+        <AppLayout>
+          <div className="bg-[var(--gh-canvas-subtle)] min-h-screen">
+            <div className="max-w-5xl mx-auto px-4 py-6 lg:px-8">
+              <GenericPageSkeleton />
+            </div>
+          </div>
+        </AppLayout>
+      </>
+    );
+  }
 
   return (
     <>
@@ -194,14 +212,7 @@ export default function Bookmarks() {
               </div>
 
               {/* Content */}
-              {isLoading ? (
-                <div className="flex items-center justify-center min-h-[40vh] bg-[var(--gh-canvas)]">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-8 h-8 border-2 border-[var(--gh-accent-fg)] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-[var(--gh-fg-muted)]">Loading bookmarks…</p>
-                  </div>
-                </div>
-              ) : bookmarkedQuestions.length === 0 ? (
+              {bookmarkedQuestions.length === 0 ? (
                 <div className="flex items-center justify-center min-h-[40vh] bg-[var(--gh-canvas)]">
                   <div className="text-center max-w-sm px-4">
                     <Bookmark className="w-12 h-12 text-[var(--gh-fg-subtle)] mx-auto mb-4" />

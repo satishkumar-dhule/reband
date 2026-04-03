@@ -1,0 +1,254 @@
+[
+  {
+    "severity": "high",
+    "category": "a11y",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 309,
+    "title": "Modal missing ARIA attributes for screen readers",
+    "description": "The custom path modal dialog lacks proper ARIA attributes: role='dialog', aria-modal='true', and aria-labelledby. This makes the modal inaccessible to screen reader users.",
+    "recommendation": "Add: role='dialog' aria-modal='true' aria-labelledby='modal-title' and an id='modal-title' on the h2 element"
+  },
+  {
+    "severity": "high",
+    "category": "a11y",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 256,
+    "title": "Edit modal missing ARIA attributes",
+    "description": "The edit path modal uses AnimatePresence/motion.div but lacks role='dialog', aria-modal='true', and aria-labelledby attributes for proper screen reader support.",
+    "recommendation": "Add role='dialog' aria-modal='true' and aria-labelledby pointing to the modal title"
+  },
+  {
+    "severity": "medium",
+    "category": "a11y",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 308,
+    "title": "Modal lacks keyboard navigation support",
+    "description": "Pressing Escape should close the modal, and focus should be trapped within the modal when open. Currently neither behavior exists.",
+    "recommendation": "Add useEffect with keydown listener for Escape key and implement focus trap using useRef"
+  },
+  {
+    "severity": "medium",
+    "category": "a11y",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 256,
+    "title": "Modal lacks keyboard navigation and focus management",
+    "description": "The edit modal doesn't close on Escape key and doesn't manage focus properly when opening/closing.",
+    "recommendation": "Add onKeyDown handler for Escape and use autoFocus on the first input when modal opens"
+  },
+  {
+    "severity": "medium",
+    "category": "a11y",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 268,
+    "title": "Skills badges use div instead of semantic list",
+    "description": "The skills tags are rendered as plain divs with map(), but semantically should be a ul/li list for screen readers.",
+    "recommendation": "Wrap in <ul> and use <li> for each skill tag"
+  },
+  {
+    "severity": "medium",
+    "category": "a11y",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 504,
+    "title": "Channel badges use plain span without semantic list",
+    "description": "Channel tags are rendered with div.map() which isn't semantically correct for a list of items.",
+    "recommendation": "Use <ul>/<li> semantics for channel badges"
+  },
+  {
+    "severity": "high",
+    "category": "bug",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 166,
+    "title": "Difficulty filter doesn't handle 'Beginner Friendly'",
+    "description": "The CuratedPath interface allows 'Beginner Friendly' as a difficulty value (line 17 in learning-paths-data.ts), but the filter only checks for exact match 'Beginner'. GenZHomePage.tsx uses 'Beginner Friendly' but it won't appear in filtered results.",
+    "recommendation": "Update filter logic: path.difficulty === activeTab || (activeTab === 'Beginner' && path.difficulty.includes('Beginner'))"
+  },
+  {
+    "severity": "high",
+    "category": "bug",
+    "file": "client/src/lib/learning-paths-data.ts",
+    "line": 82,
+    "title": "Invalid channel reference 'docker' doesn't exist",
+    "description": "The DevOps curated path references 'docker' as a channel, but this channel ID doesn't exist in allChannelsConfig. Users clicking on this path will encounter broken links or missing content.",
+    "recommendation": "Remove 'docker' from DevOps channels array, or add docker channel to channels-config.ts if intended"
+  },
+  {
+    "severity": "high",
+    "category": "bug",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 504,
+    "title": "Channel IDs displayed instead of names",
+    "description": "Custom paths store channel IDs (like 'algorithms', 'frontend') but MyPath.tsx displays them raw without resolving to human-readable names. Users see 'algorithms' instead of 'Algorithms'.",
+    "recommendation": "Create a lookup map from allChannelsConfig: const channelName = allChannelsConfig.find(c => c.id === channel)?.name || channel"
+  },
+  {
+    "severity": "high",
+    "category": "bug",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 40,
+    "title": "activePathId state is redundant and buggy",
+    "description": "The component tracks activePathId in state, but isPathActive() reads from localStorage directly. This causes inconsistency - after toggling, setActivePathId is set to updatedPaths[0] which may not reflect the user's selection if they activated a different path first.",
+    "recommendation": "Remove activePathId state entirely and use isPathActive() everywhere, or sync it properly via useEffect"
+  },
+  {
+    "severity": "medium",
+    "category": "bug",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 33,
+    "title": "selectedPath state is set but never read",
+    "description": "The selectedPath state variable is set on line 73 but never used anywhere in the component. This is dead code.",
+    "recommendation": "Remove the unused selectedPath state variable"
+  },
+  {
+    "severity": "medium",
+    "category": "bug",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 343,
+    "title": "Channel list has no loading state",
+    "description": "While certifications show a loading spinner, channels (from allChannelsConfig) have no loading state shown in the modal. Since allChannelsConfig is a static import, this isn't critical, but the UX is inconsistent.",
+    "recommendation": "N/A - static import, no loading needed. Consider removing cert loading indicator for consistency."
+  },
+  {
+    "severity": "high",
+    "category": "ux",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 86,
+    "title": "No confirmation or feedback when starting a path",
+    "description": "Clicking 'Start Path' immediately navigates to '/' with no visible confirmation that the path was activated. Users may not realize their path is now active.",
+    "recommendation": "Show a toast notification confirming the path was started, or navigate to a dedicated 'active path' view"
+  },
+  {
+    "severity": "medium",
+    "category": "ux",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 235,
+    "title": "Empty state when filter returns no results",
+    "description": "If filteredPaths.length === 0, the grid shows nothing. There's no empty state message to tell the user why.",
+    "recommendation": "Add empty state: {filteredPaths.length === 0 && <p className='text-center text-muted'>No paths match this filter</p>}"
+  },
+  {
+    "severity": "medium",
+    "category": "ux",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 101,
+    "title": "Delete action has no confirmation",
+    "description": "Clicking delete immediately removes the path with no confirmation dialog. Users might accidentally delete paths.",
+    "recommendation": "Add a confirmation dialog before deletion: useConfirmDialog or window.confirm()"
+  },
+  {
+    "severity": "medium",
+    "category": "ux",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 371,
+    "title": "Edit modal missing Cancel button",
+    "description": "The edit modal footer only has 'Save Changes' button. Users have no obvious way to discard changes without closing the modal.",
+    "recommendation": "Add a Cancel button next to Save Changes, or make clicking outside the modal cancel (currently closes it, but no visual indicator)"
+  },
+  {
+    "severity": "low",
+    "category": "ux",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 231,
+    "title": "Inconsistent tab naming",
+    "description": "First tab shows 'All Paths' while others show difficulty names ('Beginner', 'Intermediate'). This inconsistency could confuse users.",
+    "recommendation": "Use 'All' instead of 'All Paths' for consistency, or add descriptive labels to all tabs"
+  },
+  {
+    "severity": "high",
+    "category": "performance",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 170,
+    "title": "Filtered lists not memoized",
+    "description": "filteredChannels and filteredCerts are computed on every render. With large lists, this causes unnecessary recalculations.",
+    "recommendation": "Use useMemo: const filteredChannels = useMemo(() => allChannelsConfig.filter(...), [searchQuery])"
+  },
+  {
+    "severity": "high",
+    "category": "performance",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 237,
+    "title": "Filtered lists not memoized",
+    "description": "filteredChannels and filteredCerts are computed on every render without memoization.",
+    "recommendation": "Wrap in useMemo with [searchQuery, certifications] dependencies"
+  },
+  {
+    "severity": "medium",
+    "category": "performance",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 310,
+    "title": "Duplicate CSS max-height property",
+    "description": "Line 310 has 'max-h-[90dvh] max-h-[90svh]' - two max-height values where the second overrides the first. This is redundant.",
+    "recommendation": "Keep only one: max-h-[90dvh] (or remove the duplicate)"
+  },
+  {
+    "severity": "medium",
+    "category": "performance",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 268,
+    "title": "Same duplicate max-height issue",
+    "description": "Edit modal also has duplicate max-h-[90dvh] max-h-[90svh] properties.",
+    "recommendation": "Remove the duplicate max-height declaration"
+  },
+  {
+    "severity": "medium",
+    "category": "performance",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 218,
+    "title": "Type cast 'as any' bypasses type safety",
+    "description": "Using 'as any' to cast the tab value defeats TypeScript's type checking and could allow invalid values.",
+    "recommendation": "Properly type the activeTab state and tab array"
+  },
+  {
+    "severity": "high",
+    "category": "theme",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 387,
+    "title": "Mixed design system usage",
+    "description": "Line 387 uses 'bg-background text-foreground' (semantic tokens) while siblings use 'bg-[var(--gh-*)]' (GitHub CSS variables). This creates visual inconsistencies across light/dark modes.",
+    "recommendation": "Pick one design system approach and use consistently: either semantic tokens everywhere or CSS variables everywhere"
+  },
+  {
+    "severity": "medium",
+    "category": "theme",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 395,
+    "title": "Hardcoded font sizes outside design system",
+    "description": "text-6xl md:text-7xl are hardcoded Tailwind sizes not mapped to design tokens. These won't scale with user font preferences.",
+    "recommendation": "Create a --text-hero CSS variable or use consistent heading scale from design system"
+  },
+  {
+    "severity": "medium",
+    "category": "theme",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 247,
+    "title": "Emoji in page title",
+    "description": "Title contains '🎯' emoji which may render inconsistently across fonts/browsers and isn't accessible",
+    "recommendation": "Remove emoji and use a styled icon instead, or add aria-hidden='true'"
+  },
+  {
+    "severity": "medium",
+    "category": "theme",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 309,
+    "title": "Inline modal styles inconsistent with other modals",
+    "description": "This modal uses bg-black/50 backdrop while MyPath.tsx edit modal uses bg-background/80. They should match.",
+    "recommendation": "Use consistent backdrop styling across all modals"
+  },
+  {
+    "severity": "low",
+    "category": "theme",
+    "file": "client/src/pages/LearningPaths.tsx",
+    "line": 246,
+    "title": "Hover scale transform could cause layout shift",
+    "description": "hover:scale-[1.02] on the path cards could cause adjacent elements to shift. Consider using transform instead.",
+    "recommendation": "Use transform scale instead of layout-affecting properties: hover:scale-[1.02] is fine for small cards"
+  },
+  {
+    "severity": "high",
+    "category": "bug",
+    "file": "client/src/pages/MyPath.tsx",
+    "line": 658,
+    "title": "Curated path channels also show IDs instead of names",
+    "description": "Same issue as custom paths - curated path channels (path.channels) are displayed as raw IDs like 'system-design' instead of 'System Design'.",
+    "recommendation": "Use same channel name lookup: allChannelsConfig.find(c => c.id === channel)?.name || channel"
+  }
+]

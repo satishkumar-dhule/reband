@@ -67,6 +67,7 @@ function SessionCard({ session, onClick }: { session: VoiceSession; onClick: () 
     <div 
       onClick={onClick}
       className="p-4 border border-[var(--gh-border)] rounded-md hover:border-[var(--gh-accent-fg)] hover:bg-[var(--gh-canvas-subtle)] transition-all cursor-pointer group"
+      data-testid={`card-session-${session.id}`}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
@@ -434,8 +435,8 @@ export default function VoiceSession() {
                 </div>
               </div>
               <div className="flex gap-3 w-full">
-                <Button onClick={exitSession} variant="secondary" fullWidth>Cancel</Button>
-                <Button onClick={beginQuestions} variant="primary" fullWidth>Start Interview</Button>
+                <Button onClick={exitSession} variant="secondary" fullWidth data-testid="button-cancel">Cancel</Button>
+                <Button onClick={beginQuestions} variant="primary" fullWidth data-testid="button-start-interview">Start Interview</Button>
               </div>
             </div>
           </GHCard>
@@ -475,31 +476,33 @@ export default function VoiceSession() {
                       variant="danger"
                       size="lg"
                       icon={<Zap className="w-5 h-5" />}
+                      data-testid="button-stop-recording"
                     >
                       Stop Recording
                     </Button>
                   </>
-                ) : (
-                  <div className="w-full">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-sm font-bold uppercase tracking-wider text-[var(--gh-fg-muted)]">Your Transcript</h4>
-                      <span className="text-xs text-[var(--gh-fg-subtle)]">{transcript.split(/\s+/).length} words</span>
+                  ) : (
+                    <div className="w-full">
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-sm font-bold uppercase tracking-wider text-[var(--gh-fg-muted)]">Your Transcript</h4>
+                        <span className="text-xs text-[var(--gh-fg-subtle)]">{transcript.split(/\s+/).length} words</span>
+                      </div>
+                      <textarea 
+                        value={transcript}
+                        onChange={(e) => setTranscript(e.target.value)}
+                        className="w-full bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 min-h-[200px] text-[var(--gh-fg)] focus:outline-none focus:border-[var(--gh-accent-fg)] focus:ring-1 focus:ring-[var(--gh-accent-fg)] mb-8"
+                        data-testid="textarea-transcript"
+                      />
+                      <div className="flex gap-4">
+                        <Button onClick={beginQuestions} variant="secondary" fullWidth icon={<RotateCcw className="w-4 h-4" />} data-testid="button-redo-recording">
+                          Redo Recording
+                        </Button>
+                        <Button onClick={submitCurrentAnswer} variant="primary" fullWidth icon={<ChevronRight className="w-4 h-4" />} iconPosition="right" data-testid="button-submit-answer">
+                          Submit Answer
+                        </Button>
+                      </div>
                     </div>
-                    <textarea 
-                      value={transcript}
-                      onChange={(e) => setTranscript(e.target.value)}
-                      className="w-full bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 min-h-[200px] text-[var(--gh-fg)] focus:outline-none focus:border-[var(--gh-accent-fg)] focus:ring-1 focus:ring-[var(--gh-accent-fg)] mb-8"
-                    />
-                    <div className="flex gap-4">
-                      <Button onClick={beginQuestions} variant="secondary" fullWidth icon={<RotateCcw className="w-4 h-4" />}>
-                        Redo Recording
-                      </Button>
-                      <Button onClick={submitCurrentAnswer} variant="primary" fullWidth icon={<ChevronRight className="w-4 h-4" />} iconPosition="right">
-                        Submit Answer
-                      </Button>
-                    </div>
-                  </div>
-                )}
+                  )}
               </div>
             </div>
           </GHCard>
@@ -516,10 +519,10 @@ export default function VoiceSession() {
       <AppLayout>
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-bold">Question Analysis</h1>
+            <h1 className="text-xl font-bold" data-testid="text-question-analysis">Question Analysis</h1>
             <div className="flex gap-2">
-              <Button onClick={() => setLocation('/')} variant="secondary" icon={<Share2 className="w-4 h-4" />}>Share</Button>
-              <Button variant="secondary" icon={<Bookmark className="w-4 h-4" />}>Save</Button>
+              <Button onClick={() => setLocation('/')} variant="secondary" icon={<Share2 className="w-4 h-4" />} data-testid="button-share">Share</Button>
+              <Button variant="secondary" icon={<Bookmark className="w-4 h-4" />} data-testid="button-save">Save</Button>
             </div>
           </div>
 
@@ -541,7 +544,7 @@ export default function VoiceSession() {
             <div className="space-y-6">
               <GHCard title="AI Score">
                 <div className="text-center py-4">
-                  <div className="text-5xl font-black text-[var(--gh-success-fg)] mb-2">{feedbackScore}%</div>
+                  <div className="text-5xl font-black text-[var(--gh-success-fg)] mb-2" data-testid="text-ai-score">{feedbackScore}%</div>
                   <div className="text-sm font-semibold uppercase tracking-widest text-[var(--gh-fg-muted)]">{feedbackScore >= 60 ? 'Pass Standard' : 'Needs Improvement'}</div>
                 </div>
                 <div className="space-y-4 pt-4 border-t border-[var(--gh-border-muted)]">
@@ -570,6 +573,7 @@ export default function VoiceSession() {
                 fullWidth
                 icon={<ChevronRight className="w-5 h-5" />}
                 iconPosition="right"
+                data-testid="button-continue"
               >
                 Continue to Next
               </Button>
@@ -584,28 +588,28 @@ export default function VoiceSession() {
     return (
       <AppLayout>
         <div className="max-w-2xl mx-auto px-4 py-16">
-          <GHCard>
+          <GHCard data-testid="card-results">
             <div className="text-center py-8">
               <div className="w-24 h-24 rounded-full bg-[var(--gh-success-subtle)] border-4 border-[var(--gh-success-emphasis)] flex items-center justify-center mx-auto mb-6">
                 <Trophy className="w-12 h-12 text-[var(--gh-success-emphasis)]" />
               </div>
-              <h1 className="text-3xl font-bold mb-2">Interview Complete!</h1>
+              <h1 className="text-3xl font-bold mb-2" data-testid="text-interview-complete">Interview Complete!</h1>
               <p className="text-[var(--gh-fg-muted)] mb-10">You've successfully finished the focused session.</p>
 
               <div className="grid grid-cols-2 gap-6 mb-10">
                 <div className="p-6 bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-md">
-                  <div className="text-4xl font-black text-[var(--gh-accent-fg)]">{sessionResult.overallScore}%</div>
+                  <div className="text-4xl font-black text-[var(--gh-accent-fg)]" data-testid="text-average-score">{sessionResult.overallScore}%</div>
                   <div className="text-xs font-bold text-[var(--gh-fg-muted)] uppercase tracking-wider mt-1">Average Score</div>
                 </div>
                 <div className="p-6 bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] rounded-md">
-                  <div className="text-4xl font-black text-[var(--gh-success-fg)]">{sessionResult.answers.length}</div>
+                  <div className="text-4xl font-black text-[var(--gh-success-fg)]" data-testid="text-answered-count">{sessionResult.answers.length}</div>
                   <div className="text-xs font-bold text-[var(--gh-fg-muted)] uppercase tracking-wider mt-1">Answered</div>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <Button onClick={exitSession} variant="secondary" fullWidth>Done</Button>
-                <Button onClick={() => setLocation('/stats')} variant="primary" fullWidth>View Detailed Stats</Button>
+                <Button onClick={exitSession} variant="secondary" fullWidth data-testid="button-done">Done</Button>
+                <Button onClick={() => setLocation('/stats')} variant="primary" fullWidth data-testid="button-view-stats">View Detailed Stats</Button>
               </div>
             </div>
           </GHCard>

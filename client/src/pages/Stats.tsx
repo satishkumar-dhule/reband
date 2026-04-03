@@ -1,10 +1,11 @@
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState, useCallback } from 'react';
 import { AppLayout } from '../components/layout/AppLayout';
 import { useGlobalStats } from '../hooks/use-progress';
 import { useCredits } from '../context/CreditsContext';
 import { channels } from '../lib/data';
 import { useChannelStats } from '../hooks/use-stats';
 import { SEOHead } from '../components/SEOHead';
+import { StatsSkeleton } from '../components/skeletons/PageSkeletons';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -55,6 +56,34 @@ import {
   type LucideIcon
 } from 'lucide-react';
 
+// Module-level cache for localStorage progress
+// Runs once per page visit, re-reads only on storage event
+const progressCache = new Map<string, string[]>();
+let cacheInitialized = false;
+
+function readLocalStorageProgress(channelId: string): string[] {
+  // If cached, return from cache
+  if (progressCache.has(channelId)) {
+    return progressCache.get(channelId)!;
+  }
+  
+  // Read and cache
+  const stored = localStorage.getItem(`progress-${channelId}`);
+  let completedIdsArray: string[] = [];
+  try {
+    completedIdsArray = stored ? JSON.parse(stored) : [];
+  } catch {
+    completedIdsArray = [];
+  }
+  progressCache.set(channelId, completedIdsArray);
+  return completedIdsArray;
+}
+
+function clearProgressCache() {
+  progressCache.clear();
+  cacheInitialized = false;
+}
+
 // Icon mapping - convert string names to LucideIcon components
 const iconMap: Record<string, LucideIcon> = {
   'boxes': Boxes,
@@ -93,11 +122,17 @@ const iconMap: Record<string, LucideIcon> = {
 export default function Stats() {
   const { stats } = useGlobalStats();
   const { balance } = useCredits();
-  const { stats: channelStats } = useChannelStats();
-  const [localStorageKey, setLocalStorageKey] = useState(0);
+  const { stats: channelStats, loading: channelStatsLoading } = useChannelStats();
 
+  // Combined loading state - wait for both queries
+  const globalStatsLoading = stats.length === 0 && channelStatsLoading;
+  const isLoading = globalStatsLoading || channelStatsLoading;
+
+  // Invalidate cache on storage events
   useEffect(() => {
-    const handleStorage = () => setLocalStorageKey(k => k + 1);
+    const handleStorage = () => {
+      clearProgressCache();
+    };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
   }, []);
@@ -110,13 +145,8 @@ export default function Stats() {
     const modProgress = channels.map(ch => {
       const apiStat = statsByChannelId.get(ch.id);
       const totalCount = apiStat ? apiStat.total : 0;
-      const stored = localStorage.getItem(`progress-${ch.id}`);
-      let completedIdsArray: string[] = [];
-      try {
-        completedIdsArray = stored ? JSON.parse(stored) : [];
-      } catch {
-        completedIdsArray = [];
-      }
+      // Use cached localStorage reader instead of iterating every render
+      const completedIdsArray = readLocalStorageProgress(ch.id);
       const completedIds = new Set(completedIdsArray);
 
       Array.from(completedIds).forEach((id) => allCompletedIds.add(id));
@@ -155,7 +185,20 @@ export default function Stats() {
       moduleProgress: modProgress,
       recentActivity: recent
     };
-  }, [stats, channelStats, localStorageKey]);
+  }, [stats, channelStats]);
+
+  // Show skeleton until both queries resolve
+  if (isLoading) {
+    return (
+      <>
+        <SEOHead
+          title="Progress Stats - DevPrep"
+          description="Track your interview preparation progress"
+        />
+        <StatsSkeleton />
+      </>
+    );
+  }
 
   const level = Math.floor(balance / 100);
 
@@ -189,7 +232,7 @@ export default function Stats() {
 
           {/* Stats Overview Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default">
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default" data-testid="stat-total-completed">
               <div className="flex items-center gap-2 text-[var(--gh-fg-muted)] mb-2">
                 <CheckCircle2 className="w-4 h-4" />
                 <span className="text-sm font-medium">Total Completed</span>
@@ -200,7 +243,7 @@ export default function Stats() {
               </div>
             </div>
 
-            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default">
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default" data-testid="stat-streak">
               <div className="flex items-center gap-2 text-[var(--gh-fg-muted)] mb-2">
                 <Flame className="w-4 h-4 text-[var(--gh-attention-fg)]" />
                 <span className="text-sm font-medium">Current Streak</span>
@@ -208,7 +251,7 @@ export default function Stats() {
               <div className="text-2xl font-bold text-[var(--gh-fg)]">{streak} days</div>
             </div>
 
-            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default">
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default" data-testid="stat-xp">
               <div className="flex items-center gap-2 text-[var(--gh-fg-muted)] mb-2">
                 <Zap className="w-4 h-4 text-[var(--gh-accent-fg)]" />
                 <span className="text-sm font-medium">Total XP</span>
@@ -216,7 +259,7 @@ export default function Stats() {
               <div className="text-2xl font-bold text-[var(--gh-fg)]">{balance.toLocaleString()}</div>
             </div>
 
-            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default">
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 shadow-sm hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-accent-fg)] transition-all duration-200 cursor-default" data-testid="stat-level">
               <div className="flex items-center gap-2 text-[var(--gh-fg-muted)] mb-2">
                 <Trophy className="w-4 h-4 text-[var(--gh-attention-fg)]" />
                 <span className="text-sm font-medium">Level</span>

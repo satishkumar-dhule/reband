@@ -141,6 +141,15 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
             key={currentCard.id}
             className="relative min-h-[300px] cursor-pointer"
             onClick={handleFlip}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleFlip();
+              }
+            }}
+            tabIndex={0}
+            role="button"
+            aria-label={isFlipped ? 'Show question (click or press Enter to flip)' : 'Show answer (click or press Enter to flip)'}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -207,7 +216,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
       )}
 
       <p className="text-center text-xs text-[var(--gh-fg-muted)]">
-        Click card to flip • Progress saved automatically
+        Click card or press Enter to flip • Progress saved automatically
       </p>
     </div>
   );

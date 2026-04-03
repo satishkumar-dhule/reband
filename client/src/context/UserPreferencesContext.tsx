@@ -84,17 +84,13 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
       const recommended = getRecommendedChannels(roleId);
       const recommendedIds = recommended.map(c => c.id);
       
-      const newPrefs: UserPreferences = {
+      return {
         ...prev,
         role: roleId,
         subscribedChannels: recommendedIds,
         onboardingComplete: true,
         createdAt: new Date().toISOString()
       };
-      
-      // Save to localStorage immediately
-      PreferencesStorage.set(newPrefs);
-      return newPrefs;
     });
   }, []);
 
@@ -146,15 +142,11 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const skipOnboarding = useCallback(() => {
-    setPreferences(prev => {
-      const newPrefs: UserPreferences = {
-        ...prev,
-        subscribedChannels: DEFAULTS.SUBSCRIBED_CHANNELS as unknown as string[],
-        onboardingComplete: true
-      };
-      PreferencesStorage.set(newPrefs);
-      return newPrefs;
-    });
+    setPreferences(prev => ({
+      ...prev,
+      subscribedChannels: DEFAULTS.SUBSCRIBED_CHANNELS as unknown as string[],
+      onboardingComplete: true
+    }));
   }, []);
 
   const toggleShuffleQuestions = useCallback(() => {

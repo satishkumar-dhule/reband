@@ -4,8 +4,8 @@
  * Uses selected AI provider with conversation history
  */
 
-// Security: API keys stored in sessionStorage (cleared on tab close)
-// For production, use a backend proxy to avoid exposing keys client-side
+// Security: API keys are now encrypted using AES-GCM before storing in sessionStorage
+// Uses Web Crypto API for secure encryption with session-specific keys
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -45,6 +45,7 @@ import { SITEMAP_RAG, searchRoutes, findRoutesByKeywords, getRouteByPath } from 
 import { useSpeechRecognitionPTT, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import { Button } from './unified/Button';
 import { Input } from './ui/input';
+import { saveAISettings, loadAISettings, clearAISettings, type AISettings } from '../lib/secure-api-key-storage';
 
 interface AICompanionProps {
   pageContent?: {
@@ -248,17 +249,15 @@ export function AICompanion({ pageContent, onNavigate, onAction, availableAction
   const SETTINGS_KEY = 'ai-companion-settings';
   
   // Load settings and conversation history
-  // Note: API keys use sessionStorage (cleared on tab close)
-  // Non-sensitive settings (language, preferences) could use localStorage
+  // Note: API keys are now encrypted using AES-GCM before storing
   useEffect(() => {
-    // Load settings from sessionStorage (API keys)
-    const saved = sessionStorage.getItem(SETTINGS_KEY);
-    if (saved) {
-      try {
-        const settings = JSON.parse(saved);
-        setProvider(settings.provider || 'groq');
-        setTTSProvider(settings.ttsProvider || 'elevenlabs');
-        setLanguage(settings.language || 'en');
+    // Load settings from sessionStorage (API keys are encrypted)
+    async function loadSettings() {
+      const settings = await loadAISettings();
+      if (settings) {
+        setProvider((settings.provider as AIProvider) || 'groq');
+        setTTSProvider((settings.ttsProvider as TTSProvider) || 'webspeech');
+        setLanguage(settings.language as Language || 'en');
         setAutoSpeak(settings.autoSpeak || false);
         setSelectedVoice(settings.selectedVoice || '');
         setSpeechRate(settings.speechRate || 0.95);
@@ -268,10 +267,10 @@ export function AICompanion({ pageContent, onNavigate, onAction, availableAction
         setCohereKey(settings.cohereKey || '');
         setHuggingfaceKey(settings.huggingfaceKey || '');
         setElevenlabsKey(settings.elevenlabsKey || '');
-      } catch (error) {
-        console.warn('Failed to load AI settings:', error);
       }
     }
+    
+    loadSettings();
 
     // Load conversation history from localStorage (non-sensitive)
     const savedMessages = localStorage.getItem('ai-companion-messages');
@@ -303,10 +302,9 @@ export function AICompanion({ pageContent, onNavigate, onAction, availableAction
     }
   }, [isOpen, isMinimized]);
 
-  // Save settings to sessionStorage (API keys are cleared on tab close)
-// Security: Using sessionStorage instead of localStorage for API key storage
-  const saveSettings = () => {
-    sessionStorage.setItem(SETTINGS_KEY, JSON.stringify({
+  // Save settings to sessionStorage with encrypted API keys
+  const saveSettings = async () => {
+    const settings: AISettings = {
       provider,
       ttsProvider,
       language,
@@ -319,7 +317,9 @@ export function AICompanion({ pageContent, onNavigate, onAction, availableAction
       cohereKey,
       huggingfaceKey,
       elevenlabsKey,
-    }));
+    };
+    
+    await saveAISettings(settings);
     setShowSettings(false);
   };
 

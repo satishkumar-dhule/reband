@@ -10,7 +10,7 @@
  * - Feedback after recording completion
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo, useCallback, useMemo } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -485,70 +485,19 @@ export default function TrainingMode() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
-              {/* Question Card */}
+              {/* Question Card - Split into memoized sub-components for performance */}
               <div className="rounded-2xl border border-border bg-card p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-done flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h2 className="text-lg font-semibold text-foreground mb-2">{currentQuestion.question}</h2>
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${
-                        currentQuestion.difficulty === 'beginner' ? 'bg-success/20 text-success' :
-                        currentQuestion.difficulty === 'intermediate' ? 'bg-attention/20 text-attention' :
-                        'bg-danger/20 text-danger'
-                      }`}>
-                        {currentQuestion.difficulty}
-                      </span>
-                      <span className="text-muted-foreground">•</span>
-                      <span className="text-muted-foreground">{currentQuestion.channel}</span>
-                      <span className="text-muted-foreground">•</span>
-                      <QuestionHistoryIcon 
-                        questionId={currentQuestion.id} 
-                        questionType="question"
-                        size="sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Answer Display - Conditional based on mode */}
-                {!isInterviewMode || showAnswer ? (
-                  <div className="bg-background rounded-xl p-5 border border-border">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <Eye className="w-4 h-4 text-success" />
-                        <span className="text-sm font-semibold text-foreground">
-                          {isInterviewMode ? "Ideal Answer" : "Answer to Read"}
-                        </span>
-                      </div>
-                      <span className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded-lg">
-                        {totalWords} words
-                      </span>
-                    </div>
-
-                    <div className="max-w-none overflow-auto max-h-96">
-                      <p className="text-foreground leading-relaxed whitespace-pre-wrap break-words">
-                        {currentQuestion.answer}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-background rounded-xl p-5 border border-border">
-                    <div className="flex items-center justify-center py-8">
-                      <div className="text-center">
-                        <div className="w-16 h-16 rounded-2xl bg-danger/10 flex items-center justify-center mx-auto mb-4">
-                          <Eye className="w-8 h-8 text-danger" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-foreground mb-2">Answer Hidden</h3>
-                        <p className="text-sm text-muted-foreground max-w-md">
-                          Record your answer first. The ideal answer will be revealed after you finish recording.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <QuestionText 
+                  question={currentQuestion} 
+                  totalWords={totalWords} 
+                />
+                <AnswerReveal
+                  question={currentQuestion}
+                  totalWords={totalWords}
+                  isInterviewMode={isInterviewMode}
+                  showAnswer={showAnswer}
+                  onShowAnswerChange={() => {}}
+                />
               </div>
 
               {/* Recording Controls - Using Unified Component */}
@@ -709,6 +658,7 @@ export default function TrainingMode() {
                   disabled={currentIndex === 0}
                   variant="secondary"
                   size="lg"
+                  data-testid="training-previous-button"
                 >
                   Previous
                 </Button>
@@ -719,6 +669,7 @@ export default function TrainingMode() {
                   fullWidth
                   icon={<ChevronRight className="w-5 h-5" />}
                   iconPosition="right"
+                  data-testid="training-next-button"
                 >
                   {currentIndex === questions.length - 1 ? 'Finish' : 'Next Question'}
                 </Button>
@@ -736,3 +687,103 @@ export default function TrainingMode() {
 function countWords(text: string): number {
   return text.trim().split(/\s+/).filter(word => word.length > 0).length;
 }
+
+// ============================================================================
+// PERFORMANCE OPTIMIZATION: Isolated State Components (TASK-018)
+// Split QuestionCard into memoized sub-components to prevent re-renders
+// when reveal/scoring state changes
+// ============================================================================
+
+interface QuestionTextProps {
+  question: Question;
+  totalWords: number;
+}
+
+const QuestionText = memo(function QuestionText({ question, totalWords }: QuestionTextProps) {
+  return (
+    <div className="flex items-start gap-4 mb-4">
+      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-done flex items-center justify-center flex-shrink-0">
+        <Sparkles className="w-6 h-6 text-white" />
+      </div>
+      <div className="flex-1">
+        <h2 className="text-lg font-semibold text-foreground mb-2">{question.question}</h2>
+        <div className="flex items-center gap-2 text-sm">
+          <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${
+            question.difficulty === 'beginner' ? 'bg-success/20 text-success' :
+            question.difficulty === 'intermediate' ? 'bg-attention/20 text-attention' :
+            'bg-danger/20 text-danger'
+          }`}>
+            {question.difficulty}
+          </span>
+          <span className="text-muted-foreground">•</span>
+          <span className="text-muted-foreground">{question.channel}</span>
+          <span className="text-muted-foreground">•</span>
+          <QuestionHistoryIcon 
+            questionId={question.id} 
+            questionType="question"
+            size="sm"
+          />
+        </div>
+      </div>
+    </div>
+  );
+});
+
+interface AnswerRevealProps {
+  question: Question;
+  totalWords: number;
+  isInterviewMode: boolean;
+  showAnswer: boolean;
+  onShowAnswerChange: (show: boolean) => void;
+}
+
+const AnswerReveal = memo(function AnswerReveal({ 
+  question, 
+  totalWords, 
+  isInterviewMode, 
+  showAnswer 
+}: AnswerRevealProps) {
+  // Memoize the answer content to prevent re-renders when other state changes
+  const answerElement = useMemo(() => (
+    <div className="max-w-none overflow-auto max-h-96">
+      <p className="text-foreground leading-relaxed whitespace-pre-wrap break-words">
+        {question.answer}
+      </p>
+    </div>
+  ), [question.answer]);
+
+  if (!isInterviewMode || showAnswer) {
+    return (
+      <div className="bg-background rounded-xl p-5 border border-border">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Eye className="w-4 h-4 text-success" />
+            <span className="text-sm font-semibold text-foreground">
+              {isInterviewMode ? "Ideal Answer" : "Answer to Read"}
+            </span>
+          </div>
+          <span className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded-lg">
+            {totalWords} words
+          </span>
+        </div>
+        {answerElement}
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-background rounded-xl p-5 border border-border">
+      <div className="flex items-center justify-center py-8">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-2xl bg-danger/10 flex items-center justify-center mx-auto mb-4">
+            <Eye className="w-8 h-8 text-danger" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-2">Answer Hidden</h3>
+          <p className="text-sm text-muted-foreground max-w-md">
+            Record your answer first. The ideal answer will be revealed after you finish recording.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+});

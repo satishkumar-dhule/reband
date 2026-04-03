@@ -10,6 +10,61 @@ tags: [logic, conditions, off-by-one, operators]
 
 Find and fix logic bugs in the DevPrep codebase. This agent specializes in conditional logic errors, boundary condition mistakes, incorrect operators, and flawed algorithmic implementations.
 
+## Test Driven Development (TDD)
+
+You **MUST** follow TDD when fixing logic bugs:
+
+1. **RED** — Write a unit test that exposes the logic bug
+2. **GREEN** — Fix the logic to make the test pass
+3. **REFACTOR** — Clean up while keeping tests green
+
+### TDD Logic Fix Workflow
+
+```
+1. Before fixing any logic bug:
+   - Write tests covering the buggy case AND edge cases
+   - Include boundary conditions and edge cases
+   
+2. Run tests to verify bug is reproduced
+
+3. Fix the logic
+
+4. Run tests to verify all cases pass
+
+5. Add additional edge case tests
+```
+
+### Logic Test Requirements
+
+- Test the exact bug scenario
+- Test boundary conditions (0, 1, max, min)
+- Test off-by-one scenarios
+- Test all branches of conditional logic
+- Use table-driven tests for multiple scenarios
+
+### Test Patterns
+
+```typescript
+// Example: Off-by-one test
+test.each([
+  [0, 1],
+  [1, 2],
+  [49, 50],
+  [99, 100],
+])('pagination shows correct range for page %i', (page, expected) => {
+  const result = getPaginationRange(page);
+  expect(result.start).toBe(expected);
+});
+
+// Example: Logic condition test
+test('difficulty badge shows for correct levels', () => {
+  expect(getBadge('easy')).toBe('EasyBadge');
+  expect(getBadge('medium')).toBe('MediumBadge');
+  expect(getBadge('hard')).toBe('HardBadge');
+  expect(getBadge('expert')).toBe('HardBadge'); // expert shows as hard
+});
+```
+
 ## Scope
 
 **Primary directories:**

@@ -1,11 +1,13 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { useLocation } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { useAchievements } from '../hooks/use-achievements';
+import { AchievementProgress } from '../lib/achievements';
 import { Trophy, Lock, Award, Home } from 'lucide-react';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { Button } from '@/components/unified/Button';
+import { GenericPageSkeleton } from '@/components/skeletons/PageSkeletons';
 
 const tierColors: Record<string, string> = {
   bronze: 'text-[var(--gh-tier-bronze)]',
@@ -22,6 +24,66 @@ const tierBg: Record<string, string> = {
   platinum: 'bg-[var(--gh-tier-platinum-subtle)]',
   diamond: 'bg-[var(--gh-tier-diamond-subtle)]',
 };
+
+interface BadgeCardProps {
+  badgeProgress: AchievementProgress;
+}
+
+const BadgeCard = memo(function BadgeCard({ badgeProgress }: BadgeCardProps) {
+  const badge = badgeProgress.achievement;
+  const isUnlocked = badgeProgress.isUnlocked;
+  const tier = badge.tier as keyof typeof tierColors;
+
+  return (
+    <div
+      className={`bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 flex flex-col items-center text-center transition-all ${
+        isUnlocked ? 'hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-border-strong)]' : 'opacity-60 grayscale-[0.5] hover:opacity-80'
+      }`}
+      data-testid={`badge-${badge.id}`}
+    >
+      <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 ${
+        isUnlocked ? (tierBg[tier] || 'bg-[var(--gh-canvas-subtle)]') : 'bg-[var(--gh-canvas-subtle)]'
+      }`}>
+        {isUnlocked ? (
+          <Trophy className={`w-8 h-8 ${tierColors[tier] || 'text-[var(--gh-fg-muted)]'}`} />
+        ) : (
+          <Lock className="w-8 h-8 text-[var(--gh-fg-subtle)]" />
+        )}
+      </div>
+
+      <h3 className="text-sm font-semibold text-[var(--gh-fg)] leading-snug mb-1 line-clamp-1">{badge.name}</h3>
+      <p className="text-[10px] text-[var(--gh-fg-muted)] line-clamp-2 mb-3 h-6">{badge.description}</p>
+
+      <div className="mt-auto pt-2 border-t border-[var(--gh-border-muted)] w-full flex flex-col gap-2">
+        <span className={`text-[10px] font-bold uppercase tracking-wider ${
+          isUnlocked ? (tierColors[tier] || 'text-[var(--gh-fg-muted)]') : 'text-[var(--gh-fg-subtle)]'
+        }`}>
+          {badge.tier}
+        </span>
+        
+        {isUnlocked && badgeProgress.unlockedAt && (
+          <span className="text-[9px] text-[var(--gh-success-fg)] font-medium">
+            Unlocked {new Date(badgeProgress.unlockedAt).toLocaleDateString()}
+          </span>
+        )}
+        
+        {!isUnlocked && badgeProgress.progress !== undefined && badgeProgress.target !== undefined && (
+          <div className="w-full">
+            <div className="flex justify-between gap-2 text-[9px] text-[var(--gh-fg-subtle)] mb-1">
+              <span>{Math.round((badgeProgress.progress / badgeProgress.target) * 100)}%</span>
+            </div>
+            <div className="gh-progress h-1">
+              <div 
+                className="gh-progress-bar bg-[var(--gh-accent-emphasis)]" 
+                style={{ width: `${(badgeProgress.progress / badgeProgress.target) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
 
 export default function Badges() {
   const [, setLocation] = useLocation();
@@ -42,13 +104,7 @@ export default function Badges() {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="h-48 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] animate-pulse" />
-            ))}
-          </div>
-        </div>
+        <GenericPageSkeleton />
       </AppLayout>
     );
   }
@@ -80,7 +136,7 @@ export default function Badges() {
             </Breadcrumb>
 
             <div className="mb-8">
-              <h1 className="text-2xl font-semibold text-[var(--gh-fg)] flex items-center gap-2">
+              <h1 className="text-2xl font-semibold text-[var(--gh-fg)] flex items-center gap-2" data-testid="page-title">
                 <Award className="w-6 h-6 text-[var(--gh-fg-muted)]" />
                 Achievements
               </h1>
@@ -90,7 +146,7 @@ export default function Badges() {
             </div>
 
             {/* Summary Card */}
-            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-6 mb-8">
+            <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-6 mb-8" data-testid="card-overall-progress">
               <div className="flex items-center justify-between gap-4 mb-2">
                 <span className="text-sm font-medium text-[var(--gh-fg)]">Overall Progress</span>
                 <span className="text-sm font-bold text-[var(--gh-fg)]">{stats?.percentage ?? 0}%</span>
@@ -120,6 +176,7 @@ export default function Badges() {
                 size="sm"
                 onClick={() => setSelectedCategory(null)}
                 className="border-b-2 rounded-none px-4 py-2 h-auto"
+                data-testid="filter-all"
               >
                 All Badges
               </Button>
@@ -138,61 +195,9 @@ export default function Badges() {
 
             {/* Badges Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              {filteredBadges.map((badgeProgress) => {
-                const badge = badgeProgress.achievement;
-                const isUnlocked = badgeProgress.isUnlocked;
-                const tier = badge.tier as keyof typeof tierColors;
-
-                return (
-                  <div
-                    key={badge.id}
-                    className={`bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-4 flex flex-col items-center text-center transition-all ${
-                      isUnlocked ? 'hover:scale-[1.02] hover:shadow-md hover:border-[var(--gh-border-strong)]' : 'opacity-60 grayscale-[0.5] hover:opacity-80'
-                    }`}
-                  >
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 ${
-                      isUnlocked ? (tierBg[tier] || 'bg-[var(--gh-canvas-subtle)]') : 'bg-[var(--gh-canvas-subtle)]'
-                    }`}>
-                      {isUnlocked ? (
-                        <Trophy className={`w-8 h-8 ${tierColors[tier] || 'text-[var(--gh-fg-muted)]'}`} />
-                      ) : (
-                        <Lock className="w-8 h-8 text-[var(--gh-fg-subtle)]" />
-                      )}
-                    </div>
-
-                    <h3 className="text-sm font-semibold text-[var(--gh-fg)] leading-snug mb-1 line-clamp-1">{badge.name}</h3>
-                    <p className="text-[10px] text-[var(--gh-fg-muted)] line-clamp-2 mb-3 h-6">{badge.description}</p>
-
-                    <div className="mt-auto pt-2 border-t border-[var(--gh-border-muted)] w-full flex flex-col gap-2">
-                      <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                        isUnlocked ? (tierColors[tier] || 'text-[var(--gh-fg-muted)]') : 'text-[var(--gh-fg-subtle)]'
-                      }`}>
-                        {badge.tier}
-                      </span>
-                      
-                      {isUnlocked && badgeProgress.unlockedAt && (
-                        <span className="text-[9px] text-[var(--gh-success-fg)] font-medium">
-                          Unlocked {new Date(badgeProgress.unlockedAt).toLocaleDateString()}
-                        </span>
-                      )}
-                      
-                      {!isUnlocked && badgeProgress.progress !== undefined && badgeProgress.target !== undefined && (
-                        <div className="w-full">
-                          <div className="flex justify-between gap-2 text-[9px] text-[var(--gh-fg-subtle)] mb-1">
-                            <span>{Math.round((badgeProgress.progress / badgeProgress.target) * 100)}%</span>
-                          </div>
-                          <div className="gh-progress h-1">
-                            <div 
-                              className="gh-progress-bar bg-[var(--gh-accent-emphasis)]" 
-                              style={{ width: `${(badgeProgress.progress / badgeProgress.target) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              {filteredBadges.map((badgeProgress) => (
+                <BadgeCard key={badgeProgress.achievement.id} badgeProgress={badgeProgress} />
+              ))}
             </div>
 
             {allBadges.length === 0 && (

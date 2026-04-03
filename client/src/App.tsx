@@ -32,6 +32,7 @@ import {
   registerRouteForPrefetch, 
   prefetchCriticalRoutes, 
 } from './lib/prefetch';
+import { warmCachesOnIdle } from './lib/queryClient';
 
 /**
  * Preload heavy modules in background using requestIdleCallback.
@@ -232,6 +233,7 @@ function FullApp() {
   useEffect(() => {
     preloadHeavyModules();
     prefetchCriticalRoutes();
+    warmCachesOnIdle(); // Prefetch static JSON during idle time
   }, []);
   
   return (

@@ -56,31 +56,56 @@ export async function executeCodeSandboxed(
           
           // SECURITY: Blocked globals that could be exploited
           // These are set to undefined in the execution scope
+          // Only block security-sensitive APIs, not standard JS built-ins
           const blockedGlobals = [
+            // Browser APIs that could be exploited
             'window', 'document', 'fetch', 'XMLHttpRequest', 
-            'WebSocket', 'Worker', 'importScripts', 'eval',
-            'Function', 'constructor', '__proto__', 'prototype',
+            'WebSocket', 'Worker', 'importScripts',
+            // Code execution risks
+            'eval', 'Function', 'constructor',
+            // Prototype pollution risks
+            '__proto__', 'prototype',
+            // Storage APIs - sensitive user data
             'localStorage', 'sessionStorage', 'indexedDB',
-            'location', 'navigator', 'history', 'crypto',
-            'atob', 'btoa', 'setTimeout', 'setInterval',
-            'Math', 'JSON', 'Array', 'Object', 'String', 'Number', 'Boolean',
-            'Date', 'RegExp', 'Error', 'Symbol', 'Map', 'Set', 'WeakMap', 'WeakSet',
-            'Promise', 'Proxy', 'Reflect'
+            // Navigation/history APIs
+            'location', 'navigator', 'history',
+            // Crypto APIs
+            'crypto',
+            // Encoding APIs that could be used for data exfiltration
+            'atob', 'btoa',
+            // Timer APIs - could be used for DoS
+            'setTimeout', 'setInterval', 'setImmediate'
           ];
+          
+          // Safe built-in globals that users NEED for coding challenges
+          // These are standard JavaScript built-ins that are safe to use
+          const allowedBuiltins = {
+            Math, JSON, Array, Object, String, Number, Boolean,
+            Date, RegExp, Error, Symbol, Map, Set, WeakMap, WeakSet,
+            Promise, Proxy, Reflect, Math, parseInt, parseFloat,
+            isNaN, isFinite, encodeURI, decodeURI, encodeURIComponent,
+            decodeURIComponent, Infinity, NaN, undefined
+          };
           
           const sandboxedCode = msg.data.code;
           
           // Build a safe function with blocked globals as parameters set to undefined
+          // and allowed built-ins as parameters with their actual values
+          const blockedParamNames = blockedGlobals;
+          const allowedParamNames = Object.keys(allowedBuiltins);
+          
           const safeFunction = new Function(
             'console',
-            ...blockedGlobals,
+            ...blockedParamNames,
+            ...allowedParamNames,
             '"use strict"; ' + sandboxedCode
           );
           
-          // Call with undefined for all blocked globals
+          // Call with undefined for blocked globals and actual values for allowed built-ins
           const result = safeFunction(
             console,
-            ...blockedGlobals.map(() => undefined)
+            ...blockedGlobals.map(() => undefined),
+            ...allowedParamNames.map(name => allowedBuiltins[name])
           );
           
           const outputStr = result !== undefined 

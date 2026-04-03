@@ -288,14 +288,27 @@ export function generateProgressiveQuiz(
  * Works with regular Question type (not just TestQuestion)
  * 
  * IMPORTANT: Uses Set to track selected question IDs to prevent duplicates
+ * 
+ * @param questions - Array of questions to select from
+ * @param count - Number of questions to select
+ * @param answerHistory - Optional array of previous answer results for adaptive difficulty
+ *                        Each entry should be { questionId, correct: boolean }
+ * 
+ * ADAPTIVE DIFFICULTY ALGORITHM:
+ * - First 2 questions: beginner/intermediate level (ease into test)
+ * - After 2+ answers: calculate recent accuracy from last 3 answers
+ * - If recent accuracy > 70%: increase difficulty level
+ * - If recent accuracy < 40%: decrease difficulty level
+ * - Otherwise: maintain current level
  */
 export function generateProgressiveSequence<T extends { 
   id: string; 
   question: string; 
   difficulty?: string;
-}>(
+ }>(
   questions: T[],
-  count: number = 20
+  count: number = 20,
+  answerHistory?: Array<{ questionId: string; correct: boolean }>
 ): T[] {
   const maxCount = Math.min(count, questions.length);
   if (maxCount === 0) return [];
@@ -303,7 +316,11 @@ export function generateProgressiveSequence<T extends {
   const selectedQuestions: T[] = [];
   const selectedIds = new Set<string>(); // Track selected question IDs to prevent duplicates
   let currentDifficulty: 'beginner' | 'intermediate' | 'advanced' = 'beginner';
-  let performanceHistory: boolean[] = [];
+  
+  // Use provided answer history for adaptive difficulty
+  const performanceHistory: boolean[] = answerHistory 
+    ? answerHistory.map(a => a.correct)
+    : [];
 
   // Helper to get available questions (not yet selected)
   const getAvailable = () => questions.filter(q => !selectedIds.has(q.id));
@@ -322,17 +339,23 @@ export function generateProgressiveSequence<T extends {
       const pool = easyQuestions.length > 0 ? easyQuestions : availableQuestions;
       nextQuestion = pool[Math.floor(Math.random() * pool.length)];
     } else {
-      // Calculate recent accuracy
-      const recentPerformance = performanceHistory.slice(-3);
+      // Calculate recent accuracy from actual performance data
+      const answeredCount = performanceHistory.length;
+      
+      // Use real performance data from answerHistory if provided
+      const recentPerformance = answerHistory 
+        ? answerHistory.slice(-3).map(a => a.correct)
+        : performanceHistory.slice(-3);
+      
       const recentAccuracy = recentPerformance.length > 0
         ? recentPerformance.filter(Boolean).length / recentPerformance.length
         : 0.5;
 
-      // Determine target difficulty
+      // Determine target difficulty based on actual performance
       const targetDifficulty = determineTargetDifficulty(
         currentDifficulty,
         recentAccuracy,
-        i
+        answeredCount + i
       );
       currentDifficulty = targetDifficulty;
 
@@ -365,9 +388,6 @@ export function generateProgressiveSequence<T extends {
     // Add to selected and mark as used
     selectedQuestions.push(nextQuestion);
     selectedIds.add(nextQuestion.id);
-
-    // Simulate performance for next selection (assume 60% success rate)
-    performanceHistory.push(Math.random() > 0.4);
   }
 
   return selectedQuestions;
