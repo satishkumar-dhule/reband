@@ -166,7 +166,7 @@ export default function ReviewSession() {
         }
 
         // Pre-load channels needed to resolve questions (parallel)
-        const channelsNeeded = [...new Set(dueCards.map(c => c.channel))];
+        const channelsNeeded = Array.from(new Set(dueCards.map(c => c.channel)));
         await Promise.all(channelsNeeded.map(ch => loadChannelQuestions(ch).catch(() => null)));
 
         // Resolve all SRS cards to their full questions (PARALLEL - no waterfall)

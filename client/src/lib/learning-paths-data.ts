@@ -79,7 +79,7 @@ export const curatedPaths: CuratedPath[] = [
     gradientTo: 'var(--gh-danger-fg)',
     gradientOpacity: 0.7,
     description: 'Infrastructure, CI/CD, and cloud platforms',
-    channels: ['devops', 'kubernetes', 'aws', 'terraform', 'docker'],
+    channels: ['devops', 'kubernetes', 'aws', 'terraform', 'sre'],
     difficulty: 'Advanced',
     duration: '4-8 months',
     totalQuestions: 420,

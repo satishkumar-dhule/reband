@@ -294,6 +294,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.14
         version: 4.2.2(vite@7.3.1(@types/node@20.19.37)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.3))
+      '@types/compression':
+        specifier: ^1.8.1
+        version: 1.8.1
       '@types/connect-pg-simple':
         specifier: ^7.0.3
         version: 7.0.3
@@ -2466,6 +2469,9 @@ packages:
 
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
+
+  '@types/compression@1.8.1':
+    resolution: {integrity: sha512-kCFuWS0ebDbmxs0AXYn6e2r2nrGAb5KwQhknjSPSPgJcGd8+HVSILlUyFhGqML2gk39HcG7D1ydW9/qpYkN00Q==}
 
   '@types/connect-pg-simple@7.0.3':
     resolution: {integrity: sha512-NGCy9WBlW2bw+J/QlLnFZ9WjoGs6tMo3LAut6mY4kK+XHzue//lpNVpAvYRpIwM969vBRAM2Re0izUvV6kt+NA==}
@@ -8224,6 +8230,11 @@ snapshots:
       '@types/deep-eql': 4.0.2
       assertion-error: 2.0.1
 
+  '@types/compression@1.8.1':
+    dependencies:
+      '@types/express': 4.17.21
+      '@types/node': 25.5.1
+
   '@types/connect-pg-simple@7.0.3':
     dependencies:
       '@types/express': 4.17.21
@@ -8232,7 +8243,7 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 20.19.37
+      '@types/node': 25.5.1
 
   '@types/d3-array@3.2.2': {}
 
@@ -8454,7 +8465,7 @@ snapshots:
 
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 20.19.37
+      '@types/node': 25.5.1
 
   '@types/serve-static@2.2.0':
     dependencies:

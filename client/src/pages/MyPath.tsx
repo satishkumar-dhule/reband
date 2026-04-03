@@ -3,7 +3,7 @@
  * Shows all custom paths created by the user + curated paths
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '../components/layout/AppLayout';
@@ -37,8 +37,8 @@ interface Certification {
 export default function MyPath() {
   const [, setLocation] = useLocation();
   const [customPaths, setCustomPaths] = useState<CustomPath[]>([]);
-  const [activePathId, setActivePathId] = useState<string | null>(null);
   const [certifications, setCertifications] = useState<Certification[]>([]);
+  const editModalRef = useRef<HTMLDivElement>(null);
   
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
@@ -56,14 +56,6 @@ export default function MyPath() {
       const saved = localStorage.getItem('customPaths');
       if (saved) {
         setCustomPaths(JSON.parse(saved));
-      }
-
-      // Load active paths (plural - array)
-      const activePaths = localStorage.getItem('activeLearningPaths');
-      if (activePaths) {
-        const pathIds = JSON.parse(activePaths);
-        // For now, just check if any path is active (we'll show badges for all)
-        setActivePathId(pathIds.length > 0 ? pathIds[0] : null);
       }
     } catch (e) {
       console.error('Failed to load paths:', e);
@@ -97,8 +89,9 @@ export default function MyPath() {
     }
   };
 
-  // Delete a custom path
+  // Delete a custom path with confirmation
   const deletePath = (pathId: string) => {
+    if (!window.confirm('Delete this path? This cannot be undone.')) return;
     const newPaths = customPaths.filter(p => p.id !== pathId);
     savePaths(newPaths);
 
@@ -118,22 +111,11 @@ export default function MyPath() {
   const togglePathActivation = (path: CustomPath) => {
     try {
       const currentPaths = JSON.parse(localStorage.getItem('activeLearningPaths') || '[]');
-      
-      let updatedPaths: string[];
-      if (currentPaths.includes(path.id)) {
-        // Deactivate - remove from array
-        updatedPaths = currentPaths.filter((id: string) => id !== path.id);
-      } else {
-        // Activate - add to array
-        updatedPaths = [...currentPaths, path.id];
-      }
-      
+      const updatedPaths: string[] = currentPaths.includes(path.id)
+        ? currentPaths.filter((id: string) => id !== path.id)
+        : [...currentPaths, path.id];
       localStorage.setItem('activeLearningPaths', JSON.stringify(updatedPaths));
-      
-      // Update local state to trigger re-render without page reload
-      setActivePathId(updatedPaths.length > 0 ? updatedPaths[0] : null);
-      
-      // Force update for custom paths array
+      // Force re-render
       setCustomPaths(prev => [...prev]);
     } catch (e) {
       console.error('Failed to toggle path:', e);
@@ -144,20 +126,11 @@ export default function MyPath() {
   const toggleCuratedPathActivation = (path: typeof curatedPaths[0]) => {
     try {
       const currentPaths = JSON.parse(localStorage.getItem('activeLearningPaths') || '[]');
-      
-      let updatedPaths: string[];
-      if (currentPaths.includes(path.id)) {
-        // Deactivate - remove from array
-        updatedPaths = currentPaths.filter((id: string) => id !== path.id);
-      } else {
-        // Activate - add to array
-        updatedPaths = [...currentPaths, path.id];
-      }
-      
+      const updatedPaths: string[] = currentPaths.includes(path.id)
+        ? currentPaths.filter((id: string) => id !== path.id)
+        : [...currentPaths, path.id];
       localStorage.setItem('activeLearningPaths', JSON.stringify(updatedPaths));
-      
-      // Update local state to trigger re-render without page reload
-      setActivePathId(updatedPaths.length > 0 ? updatedPaths[0] : null);
+      setCustomPaths(prev => [...prev]);
     } catch (e) {
       console.error('Failed to toggle curated path:', e);
     }
@@ -234,17 +207,32 @@ export default function MyPath() {
   };
 
   // Filter channels and certs by search
-  const filteredChannels = allChannelsConfig.filter(ch =>
+  const filteredChannels = useMemo(() => allChannelsConfig.filter(ch =>
     ch.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const filteredCerts = certifications.filter(cert =>
+  ), [searchQuery]);
+
+  const filteredCerts = useMemo(() => certifications.filter(cert =>
     cert.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ), [certifications, searchQuery]);
+
+  // Escape key + focus trap for edit modal
+  useEffect(() => {
+    if (!showEditModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setShowEditModal(false); setEditingPath(null); }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    setTimeout(() => {
+      const first = editModalRef.current?.querySelector<HTMLElement>('input, button');
+      first?.focus();
+    }, 50);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showEditModal]);
 
   return (
     <>
       <SEOHead
-        title="My Path - Custom Learning Journeys 🎯"
+        title="My Path - Custom Learning Journeys"
         description="View and manage your custom learning paths"
         canonical="https://open-interview.github.io/my-path"
       />
@@ -258,9 +246,13 @@ export default function MyPath() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 pb-safe"
-              onClick={() => setShowEditModal(false)}
+              onClick={() => { setShowEditModal(false); setEditingPath(null); }}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="edit-path-modal-title"
             >
               <motion.div
+                ref={editModalRef}
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
@@ -270,11 +262,11 @@ export default function MyPath() {
                 {/* Header */}
                 <div className="p-8 border-b border-border">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-3xl font-black">Edit Path</h2>
+                    <h2 id="edit-path-modal-title" className="text-3xl font-black">Edit Path</h2>
                     <IconButton
                       icon={<X className="w-5 h-5" />}
-                      aria-label="Close"
-                      onClick={() => setShowEditModal(false)}
+                      aria-label="Close dialog"
+                      onClick={() => { setShowEditModal(false); setEditingPath(null); }}
                       variant="ghost"
                       size="sm"
                     />
@@ -368,13 +360,21 @@ export default function MyPath() {
                 </div>
 
                 {/* Footer */}
-                <div className="p-8 border-t border-border">
+                <div className="p-8 border-t border-border flex gap-3">
+                  <Button
+                    onClick={() => { setShowEditModal(false); setEditingPath(null); }}
+                    variant="outline"
+                    size="lg"
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     onClick={saveEditedPath}
                     disabled={!editForm.name || (editForm.channels.length === 0 && editForm.certifications.length === 0)}
                     variant="primary"
                     size="lg"
-                    fullWidth
+                    className="flex-1"
                   >
                     Save Changes
                   </Button>

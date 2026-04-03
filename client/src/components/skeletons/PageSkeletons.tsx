@@ -1,4 +1,4 @@
-import { memo, ReactNode } from "react";
+import React, { memo, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -17,13 +17,14 @@ import { cn } from "@/lib/utils";
  * // Custom size
  * <Bone className="h-8 w-32" />
  */
-function Bone({ className }: { className?: string }) {
+function Bone({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <div
       className={cn(
         "rounded-md bg-[var(--gh-canvas-subtle)] animate-pulse",
         className
       )}
+      style={style}
     />
   );
 }

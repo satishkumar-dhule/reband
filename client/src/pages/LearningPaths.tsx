@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
@@ -30,12 +30,12 @@ interface CustomPath {
 
 export default function LearningPaths() {
   const [, setLocation] = useLocation();
-  const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [showCustom, setShowCustom] = useState(false);
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [certsLoading, setCertsLoading] = useState(true);
   const [certsError, setCertsError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'Beginner' | 'Intermediate' | 'Advanced'>('all');
+  const modalRef = useRef<HTMLDivElement>(null);
   
   // Custom path builder state
   const [customPath, setCustomPath] = useState<CustomPath>({
@@ -70,7 +70,6 @@ export default function LearningPaths() {
   }, []);
 
   const handleSelectPath = (pathId: string) => {
-    setSelectedPath(pathId);
     const path = curatedPaths.find(p => p.id === pathId);
     if (path) {
       try {
@@ -79,6 +78,7 @@ export default function LearningPaths() {
           currentPaths.push(pathId);
         }
         localStorage.setItem('activeLearningPaths', JSON.stringify(currentPaths));
+        toast({ title: 'Path Started', description: `"${path.name}" has been added to your active paths.` });
       } catch (e) {
         console.error('Failed to save path:', e);
       }
@@ -163,16 +163,33 @@ export default function LearningPaths() {
     }));
   };
 
-  const filteredPaths = curatedPaths.filter(path => 
-    activeTab === 'all' || path.difficulty === activeTab
-  );
+  const filteredPaths = useMemo(() => curatedPaths.filter(path => 
+    activeTab === 'all' || path.difficulty === activeTab || 
+    (activeTab === 'Beginner' && path.difficulty === 'Beginner Friendly')
+  ), [activeTab]);
 
-  const filteredChannels = allChannelsConfig.filter(ch =>
+  const filteredChannels = useMemo(() => allChannelsConfig.filter(ch =>
     ch.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const filteredCerts = certifications.filter(cert =>
+  ), [searchQuery]);
+
+  const filteredCerts = useMemo(() => certifications.filter(cert =>
     cert.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ), [certifications, searchQuery]);
+
+  // Trap focus and handle Escape in modal
+  useEffect(() => {
+    if (!showCustom) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') resetCustomPath();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    // Focus first focusable element
+    setTimeout(() => {
+      const first = modalRef.current?.querySelector<HTMLElement>('input, button');
+      first?.focus();
+    }, 50);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showCustom]);
 
   return (
     <>
@@ -233,7 +250,13 @@ export default function LearningPaths() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredPaths.map((path) => {
+              {filteredPaths.length === 0 ? (
+                <div className="col-span-full py-16 flex flex-col items-center justify-center text-[var(--gh-fg-muted)] bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md border-dashed">
+                  <Search className="w-10 h-10 mb-3 opacity-20" />
+                  <p className="font-semibold">No paths found for this difficulty</p>
+                  <Button variant="ghost" size="sm" className="mt-3" onClick={() => setActiveTab('all')}>Show all paths</Button>
+                </div>
+              ) : filteredPaths.map((path) => {
                 const Icon = path.icon;
                 const difficultyColor = 
                   path.difficulty === 'Beginner' ? 'bg-[var(--gh-diff-beginner-bg)] text-[var(--gh-diff-beginner)] border-[var(--gh-diff-beginner)]' :
@@ -265,18 +288,18 @@ export default function LearningPaths() {
                       {path.description}
                     </p>
 
-                    <div className="flex flex-wrap gap-1.5 mb-4">
+                    <ul className="flex flex-wrap gap-1.5 mb-4 list-none p-0 m-0" aria-label="Skills">
                       {path.skills.slice(0, 3).map(skill => (
-                        <span key={skill} className="bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] text-[var(--gh-fg-muted)] text-[10px] px-2 py-0.5 rounded-full">
+                        <li key={skill} className="bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] text-[var(--gh-fg-muted)] text-[10px] px-2 py-0.5 rounded-full">
                           {skill}
-                        </span>
+                        </li>
                       ))}
                       {path.skills.length > 3 && (
-                        <span className="text-[var(--gh-fg-subtle)] text-[10px] self-center">
+                        <li className="text-[var(--gh-fg-subtle)] text-[10px] self-center">
                           +{path.skills.length - 3} more
-                        </span>
+                        </li>
                       )}
-                    </div>
+                    </ul>
 
                     <div className="flex items-center justify-between pt-4 border-t border-[var(--gh-border-muted)]">
                       <div className="flex items-center gap-4 text-xs text-[var(--gh-fg-subtle)]">
@@ -304,25 +327,37 @@ export default function LearningPaths() {
               })}
             </div>
 
-            {/* Custom Path Modal (Simplified implementation for GitHub style) */}
+            {/* Custom Path Modal */}
             {showCustom && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm pb-safe">
-                <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-xl max-w-2xl w-full max-h-[90dvh] max-h-[90svh] flex flex-col pb-safe">
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm pb-safe"
+                onClick={resetCustomPath}
+                aria-modal="true"
+                role="dialog"
+                aria-labelledby="custom-path-modal-title"
+              >
+                <div
+                  ref={modalRef}
+                  className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-xl max-w-2xl w-full max-h-[90dvh] max-h-[90svh] flex flex-col pb-safe"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="p-4 border-b border-[var(--gh-border)] flex items-center justify-between">
-                    <h2 className="font-semibold">Create Custom Path</h2>
-                    <Button variant="ghost" size="sm" onClick={resetCustomPath}>
+                    <h2 id="custom-path-modal-title" className="font-semibold">Create Custom Path</h2>
+                    <Button variant="ghost" size="sm" onClick={resetCustomPath} aria-label="Close dialog">
                       <X className="w-5 h-5" />
                     </Button>
                   </div>
                   
                   <div className="p-6 overflow-y-auto momentum-scroll space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-[var(--gh-fg)] mb-2">Path Name</label>
-                      <Input 
+                      <label htmlFor="path-name-input" className="block text-sm font-medium text-[var(--gh-fg)] mb-2">Path Name</label>
+                      <Input
+                        id="path-name-input"
                         type="text"
                         placeholder="e.g., My Interview Prep"
                         value={customPath.name}
                         onChange={(e) => setCustomPath(prev => ({ ...prev, name: e.target.value }))}
+                        autoFocus
                       />
                     </div>
 
@@ -334,6 +369,7 @@ export default function LearningPaths() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10"
+                        aria-label="Search channels and certifications"
                       />
                     </div>
 
