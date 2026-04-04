@@ -577,16 +577,20 @@ function ChallengeView({
               </div>
             </div>
 
-            {/* Monaco editor */}
+            {/* Monaco editor — absolute inset-0 wrapper is required so CodeEditor's
+                h-full resolves against a concrete pixel height, not a flex-distributed
+                height (CSS height:100% doesn't resolve against flex-grow). */}
             <div className="flex-1 relative overflow-hidden min-h-0">
-              <CodeEditor
-                value={code}
-                onChange={setCode}
-                language={language}
-                onLanguageChange={setLanguage}
-                height="100%"
-                showToolbar={false}
-              />
+              <div className="absolute inset-0">
+                <CodeEditor
+                  value={code}
+                  onChange={setCode}
+                  language={language}
+                  onLanguageChange={setLanguage}
+                  height="100%"
+                  showToolbar={false}
+                />
+              </div>
             </div>
 
             {/* Test results */}

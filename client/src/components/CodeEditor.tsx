@@ -325,13 +325,13 @@ export function CodeEditor({
   };
 
   if (!EditorComponent) {
-    return <div className="overflow-hidden h-full">{editorLoadingFallback}</div>;
+    return <div className="absolute inset-0 overflow-hidden">{editorLoadingFallback}</div>;
   }
 
   return (
     <div 
       ref={containerRef}
-      className={`overflow-hidden h-full flex flex-col ${isFullscreen ? 'fixed inset-0 z-50 bg-background' : ''}`}
+      className={`overflow-hidden flex flex-col ${isFullscreen ? 'fixed inset-0 z-50 bg-background' : 'absolute inset-0'}`}
       data-testid="monaco-editor"
     >
       {showToolbar && !readOnly && (
