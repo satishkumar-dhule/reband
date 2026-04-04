@@ -147,10 +147,14 @@
   --gh-danger-hover: #ff7b72;
   
   /* Done (purple) */
-  --gh-done-fg: #bc8cff;
-  --gh-done-emphasis: #6e40c9;
-  --gh-done-subtle: #21003d;
-  --gh-done-hover: #d2a8ff;
+  --gh-done-fg: #a371f7;
+  --gh-done-emphasis: #8957e5;
+  --gh-done-subtle: #2ea043;
+  --gh-done-hover: #8a3ffc;
+  
+  /* Skeleton backgrounds - optimized for loading states */
+  --gh-skeleton-bg: #30363d;
+  --gh-skeleton-bg-dark: #21262d;
   
   /* Neutral */
   --gh-neutral-emphasis: #6e7681;

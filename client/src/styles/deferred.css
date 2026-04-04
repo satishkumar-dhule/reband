@@ -174,7 +174,7 @@
 .streak-glow { animation: streak-glow 2s ease-in-out infinite; }
 .float-particle { animation: float-up 3s ease-out infinite; }
 .timer-pulse { animation: timer-pulse 1s ease-in-out infinite; }
-.streak-legend { background: linear-gradient(135deg, #8b5cf6, #ec4899); animation: streak-glow 2s ease-in-out infinite; }
+.streak-legend { background: linear-gradient(135deg, var(--gh-pink-fg), var(--gh-pink-emphasis)); animation: streak-glow 2s ease-in-out infinite; }
 
 main { animation: fadeIn 0.2s ease-out; }
 
@@ -677,7 +677,7 @@ svg:has(.error-text) { display: none !important; }
 }
 
 .animated-gradient {
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background: linear-gradient(-45deg, var(--gh-attention-emphasis), var(--gh-danger-emphasis), var(--gh-accent-fg), var(--gh-success-fg));
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;
 }
@@ -690,15 +690,15 @@ svg:has(.error-text) { display: none !important; }
 .focus-ring:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 
 .skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--gh-skeleton-bg) 25%, var(--gh-skeleton-bg-dark) 50%, var(--gh-skeleton-bg) 75%);
   background-size: 200px 100%;
   animation: skeleton-loading 1.5s infinite;
 }
 
-.streak-starter { background: linear-gradient(135deg, #6b7280, #9ca3af); }
-.streak-rising { background: linear-gradient(135deg, #10b981, #34d399); }
-.streak-champion { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
-.streak-master { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.streak-starter { background: linear-gradient(135deg, var(--gh-neutral-muted), var(--gh-border)); }
+.streak-rising { background: linear-gradient(135deg, var(--gh-success-fg), var(--gh-success-emphasis)); }
+.streak-champion { background: linear-gradient(135deg, var(--gh-accent-fg), var(--gh-accent-emphasis)); }
+.streak-master { background: linear-gradient(135deg, var(--gh-attention-emphasis), var(--gh-danger-emphasis)); }
 
 .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
@@ -761,12 +761,12 @@ svg:has(.error-text) { display: none !important; }
 .button-3d:hover { transform: translateY(-2px) rotateX(5deg); }
 .button-3d:active { transform: translateY(0px) rotateX(0deg); }
 
-.dark-gradient { background: linear-gradient(135deg, #0f172a, #1e293b, #334155); }
+.dark-gradient { background: linear-gradient(135deg, var(--gh-canvas), var(--gh-canvas-subtle), var(--gh-canvas-inset)); }
 
 .custom-scrollbar-extreme::-webkit-scrollbar { width: 8px; }
-.custom-scrollbar-extreme::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 4px; }
-.custom-scrollbar-extreme::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 4px; }
-.custom-scrollbar-extreme::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+.custom-scrollbar-extreme::-webkit-scrollbar-track { background: var(--gh-canvas-subtle); border-radius: 4px; }
+.custom-scrollbar-extreme::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--gh-accent-fg), var(--gh-done-emphasis)); border-radius: 4px; }
+.custom-scrollbar-extreme::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, var(--gh-accent-hover), var(--gh-done-hover)); }
 
 .text-glow { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
 .text-gradient-extreme {

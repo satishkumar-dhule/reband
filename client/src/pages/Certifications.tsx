@@ -8,6 +8,7 @@ import { useLocation } from 'wouter';
 import { useQuery } from "@tanstack/react-query";
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
+import { SkipLink } from '@/components/unified/SkipLink';
 import { Input } from '../components/ui/input';
 import { CertificationsSkeleton } from '../components/skeletons/PageSkeletons';
 import {
@@ -154,6 +155,7 @@ export default function Certifications() {
         description="Practice for AWS, Azure, GCP, Kubernetes, and more certifications with mock exams and guided prep"
         canonical="https://open-interview.github.io/certifications"
       />
+      <SkipLink />
 
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">

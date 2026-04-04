@@ -5,10 +5,76 @@
  */
 
 import { motion } from 'framer-motion';
-import { Lock, Check } from 'lucide-react';
+import { Lock, Check, Star, Zap, Trophy, Target, Award, Flame, Shield, Crown, Gem, Rocket, Bookmark, Calendar, CheckCircle, Circle, Clock, DollarSign, Eye, Flag, GitBranch, Globe, Heart, Home, Info, Key, Layers, List, Map, Menu, MessageSquare, Music, Package, Palette, PenTool, Phone, Play, Plus, Power, Search, Server, Settings, Share2, ShoppingCart, Star as StarIcon, Table, Tag, Terminal, ThumbsUp, ToggleLeft, ToggleRight, Trash, TrendingUp, Truck, Type, Umbrella, Unlock, Upload, User, Users, Video, Volume2, VolumeX, Watch, Wifi, Wind, X, Zap as ZapIcon } from 'lucide-react';
 import { AchievementProgress, AchievementCategory } from '../../lib/achievements';
 import { getTierColor } from '../../lib/badges';
-import * as Icons from 'lucide-react';
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
+  star: StarIcon,
+  zap: ZapIcon,
+  trophy: Trophy,
+  target: Target,
+  award: Award,
+  flame: Flame,
+  shield: Shield,
+  crown: Crown,
+  gem: Gem,
+  rocket: Rocket,
+  bookmark: Bookmark,
+  calendar: Calendar,
+  'check-circle': CheckCircle,
+  circle: Circle,
+  clock: Clock,
+  'dollar-sign': DollarSign,
+  eye: Eye,
+  flag: Flag,
+  'git-branch': GitBranch,
+  globe: Globe,
+  heart: Heart,
+  home: Home,
+  info: Info,
+  key: Key,
+  layers: Layers,
+  list: List,
+  map: Map,
+  menu: Menu,
+  message: MessageSquare,
+  music: Music,
+  package: Package,
+  palette: Palette,
+  'pen-tool': PenTool,
+  phone: Phone,
+  play: Play,
+  plus: Plus,
+  power: Power,
+  search: Search,
+  server: Server,
+  settings: Settings,
+  share: Share2,
+  'shopping-cart': ShoppingCart,
+  table: Table,
+  tag: Tag,
+  terminal: Terminal,
+  'thumbs-up': ThumbsUp,
+  'toggle-left': ToggleLeft,
+  'toggle-right': ToggleRight,
+  trash: Trash,
+  'trending-up': TrendingUp,
+  truck: Truck,
+  type: Type,
+  umbrella: Umbrella,
+  unlock: Unlock,
+  upload: Upload,
+  user: User,
+  users: Users,
+  video: Video,
+  volume: Volume2,
+  'volume-x': VolumeX,
+  watch: Watch,
+  wifi: Wifi,
+  wind: Wind,
+  x: X,
+};
 
 // Category labels
 const CATEGORY_LABELS: Record<AchievementCategory, string> = {
@@ -55,10 +121,11 @@ export function AchievementCard({
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (pct / 100) * circumference;
   
-  // Get icon component
-  const IconComponent = (Icons as any)[achievement.icon.split('-').map((w: string) => 
+  // Get icon component from map
+  const iconName = achievement.icon.split('-').map((w: string) => 
     w.charAt(0).toUpperCase() + w.slice(1)
-  ).join('')] || Icons.Star;
+  ).join('');
+  const IconComponent = ICON_MAP[achievement.icon] || ICON_MAP[iconName] || StarIcon;
   
   const tierColor = getTierColor(achievement.tier);
   

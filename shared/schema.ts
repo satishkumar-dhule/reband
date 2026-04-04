@@ -225,6 +225,28 @@ export const insertUserSessionSchema = createInsertSchema(userSessions);
 export const insertLearningPathSchema = createInsertSchema(learningPaths);
 export const insertFlashcardSchema = createInsertSchema(flashcards);
 
+// Coding challenges table
+export const codingChallenges = sqliteTable("coding_challenges", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  difficulty: text("difficulty").notNull(), // easy, medium
+  category: text("category").notNull(),
+  tags: text("tags"), // JSON array
+  companies: text("companies"), // JSON array
+  starterCodeJs: text("starter_code_js"),
+  starterCodePy: text("starter_code_py"),
+  testCases: text("test_cases"), // JSON array
+  hints: text("hints"), // JSON array
+  solutionJs: text("solution_js"),
+  solutionPy: text("solution_py"),
+  complexityTime: text("complexity_time"),
+  complexitySpace: text("complexity_space"),
+  complexityExplanation: text("complexity_explanation"),
+  timeLimit: integer("time_limit").default(15),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
+});
+
 // Use Drizzle's built-in type inference instead of z.infer
 export type InsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;

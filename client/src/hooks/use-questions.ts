@@ -102,7 +102,9 @@ export function useQuestions(
       return;
     }
 
-    // Load from API
+    // Load from API with abort controller
+    const controller = new AbortController();
+
     loadChannelQuestions(channelId)
       .then(() => {
         // Capture filter values at promise resolution time
@@ -116,6 +118,8 @@ export function useQuestions(
         }
       })
       .catch((err: Error) => {
+        // Ignore abort errors - they're expected when component unmounts or request is superseded
+        if (err.name === 'AbortError') return;
         // Only update state if this is still the current request
         if (currentRequestId === requestIdRef.current) {
           setError(err);
@@ -128,6 +132,11 @@ export function useQuestions(
           setLoading(false);
         }
       });
+
+    // Cleanup - abort the request if component unmounts or dependencies change
+    return () => {
+      controller.abort();
+    };
   }, [channelId, subChannel, difficulty, company, shuffle, prioritizeUnvisited, sessionSeed]);
 
   const questionIds = useMemo(() => questions.map(q => q.id), [questions]);
@@ -178,6 +187,8 @@ export function useCompanies(channelId: string) {
       return;
     }
 
+    const controller = new AbortController();
+
     // Try cache first
     const cached = getCompaniesForChannel(channelId);
     if (cached.length > 0) {
@@ -186,14 +197,30 @@ export function useCompanies(channelId: string) {
       return;
     }
 
-    // Load from API
+    // Load from API with abort controller
+    setLoading(true);
     api.channels.getCompanies(channelId)
-      .then(setCompanies)
-      .catch((err: Error) => {
-        setError(err);
-        setCompanies([]);
+      .then((result) => {
+        if (!controller.signal.aborted) {
+          setCompanies(result);
+        }
       })
-      .finally(() => setLoading(false));
+      .catch((err: Error) => {
+        if (err.name === 'AbortError') return;
+        if (!controller.signal.aborted) {
+          setError(err);
+          setCompanies([]);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      controller.abort();
+    };
   }, [channelId]);
 
   return {

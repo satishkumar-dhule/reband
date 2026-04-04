@@ -14,6 +14,7 @@ import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use
 import type { Question } from '../types';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
 import { Button } from '@/components/unified/Button';
+import { SkipLink } from '@/components/unified/SkipLink';
 import { VoiceSkeleton } from '../components/skeletons/PageSkeletons';
 
 type PracticeMode = 'training' | 'interview';
@@ -278,6 +279,7 @@ export default function VoicePractice() {
   return (
     <AppLayout>
       <SEOHead title="Voice Practice | DevPrep" description="Practice your technical communication skills" />
+      <SkipLink />
       
       <div className="max-w-4xl mx-auto px-4 py-8" id="main-content">
         {/* Breadcrumb Navigation */}

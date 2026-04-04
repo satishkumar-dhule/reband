@@ -9,6 +9,7 @@ import {
   Plus, ChevronRight, Check, X, Search, Home, Clock, Trophy
 } from 'lucide-react';
 import { Button } from '@/components/unified/Button';
+import { SkipLink } from '@/components/unified/SkipLink';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 
@@ -198,6 +199,7 @@ export default function LearningPaths() {
         description="Curated learning paths for different tech careers"
         canonical="https://open-interview.github.io/learning-paths"
       />
+      <SkipLink />
 
       <AppLayout>
         <div className="bg-[var(--gh-canvas-subtle)] min-h-screen">

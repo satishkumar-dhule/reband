@@ -46,6 +46,17 @@ function invalidateChannelCache(): void {
   channelCache.clear();
 }
 
+// Safe JSON.parse wrapper to prevent crashes from malformed data
+function safeJsonParse<T>(value: string | null | undefined, fallback: T): T {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value) as T;
+  } catch (e) {
+    console.warn(`⚠️  Failed to parse JSON: ${e}, using fallback`);
+    return fallback;
+  }
+}
+
 // Helper: set aggressive HTTP cache headers for read-only API responses
 function setReadCache(res: any, maxAgeSeconds = 60, staleWhileRevalidate = 300) {
   res.set("Cache-Control", `public, max-age=${maxAgeSeconds}, stale-while-revalidate=${staleWhileRevalidate}`);
@@ -82,12 +93,12 @@ function parseQuestion(row: any) {
     explanation: row.explanation,
     diagram: row.diagram,
     difficulty: row.difficulty,
-    tags: row.tags ? JSON.parse(row.tags) : [],
+    tags: safeJsonParse(row.tags, []),
     channel: row.channel,
     subChannel: row.sub_channel,
     sourceUrl: row.source_url,
-    videos: row.videos ? JSON.parse(row.videos) : null,
-    companies: row.companies ? JSON.parse(row.companies) : null,
+    videos: safeJsonParse(row.videos, null),
+    companies: safeJsonParse(row.companies, null),
     eli5: row.eli5,
     lastUpdated: row.last_updated,
   };
@@ -320,14 +331,14 @@ export async function registerRoutes(
       description: row.description,
       difficulty: row.difficulty,
       category: row.category,
-      tags: row.tags ? JSON.parse(row.tags) : [],
-      companies: row.companies ? JSON.parse(row.companies) : [],
+      tags: safeJsonParse(row.tags, []),
+      companies: safeJsonParse(row.companies, []),
       starterCode: {
         javascript: row.starter_code_js || '',
         python: row.starter_code_py || '',
       },
-      testCases: row.test_cases ? JSON.parse(row.test_cases) : [],
-      hints: row.hints ? JSON.parse(row.hints) : [],
+      testCases: safeJsonParse(row.test_cases, []),
+      hints: safeJsonParse(row.hints, []),
       sampleSolution: {
         javascript: row.solution_js || '',
         python: row.solution_py || '',
@@ -470,11 +481,11 @@ export async function registerRoutes(
       eventSource: row.event_source,
       sourceName: row.source_name,
       changesSummary: row.changes_summary,
-      changedFields: row.changed_fields ? JSON.parse(row.changed_fields) : [],
-      beforeSnapshot: row.before_snapshot ? JSON.parse(row.before_snapshot) : null,
-      afterSnapshot: row.after_snapshot ? JSON.parse(row.after_snapshot) : null,
+      changedFields: safeJsonParse(row.changed_fields, []),
+      beforeSnapshot: safeJsonParse(row.before_snapshot, null),
+      afterSnapshot: safeJsonParse(row.after_snapshot, null),
       reason: row.reason,
-      metadata: row.metadata ? JSON.parse(row.metadata) : null,
+      metadata: safeJsonParse(row.metadata, null),
       createdAt: row.created_at,
     };
   }
@@ -736,10 +747,10 @@ export async function registerRoutes(
       estimatedHours: row.estimated_hours || 40,
       examCode: row.exam_code,
       officialUrl: row.official_url,
-      domains: row.domains ? JSON.parse(row.domains) : [],
-      channelMappings: row.channel_mappings ? JSON.parse(row.channel_mappings) : [],
-      tags: row.tags ? JSON.parse(row.tags) : [],
-      prerequisites: row.prerequisites ? JSON.parse(row.prerequisites) : [],
+      domains: safeJsonParse(row.domains, []),
+      channelMappings: safeJsonParse(row.channel_mappings, []),
+      tags: safeJsonParse(row.tags, []),
+      prerequisites: safeJsonParse(row.prerequisites, []),
       status: row.status || 'active',
       questionCount: row.question_count || 0,
       passingScore: row.passing_score || 70,
@@ -916,16 +927,16 @@ export async function registerRoutes(
       targetJobTitle: row.target_job_title,
       difficulty: row.difficulty,
       estimatedHours: row.estimated_hours,
-      questionIds: row.question_ids ? JSON.parse(row.question_ids) : [],
-      channels: row.channels ? JSON.parse(row.channels) : [],
-      tags: row.tags ? JSON.parse(row.tags) : [],
-      prerequisites: row.prerequisites ? JSON.parse(row.prerequisites) : [],
-      learningObjectives: row.learning_objectives ? JSON.parse(row.learning_objectives) : [],
-      milestones: row.milestones ? JSON.parse(row.milestones) : [],
+      questionIds: safeJsonParse(row.question_ids, []),
+      channels: safeJsonParse(row.channels, []),
+      tags: safeJsonParse(row.tags, []),
+      prerequisites: safeJsonParse(row.prerequisites, []),
+      learningObjectives: safeJsonParse(row.learning_objectives, []),
+      milestones: safeJsonParse(row.milestones, []),
       popularity: row.popularity || 0,
       completionRate: row.completion_rate || 0,
       averageRating: row.average_rating || 0,
-      metadata: row.metadata ? JSON.parse(row.metadata) : {},
+      metadata: safeJsonParse(row.metadata, {}),
       status: row.status,
       createdAt: row.created_at,
       lastUpdated: row.last_updated,
@@ -1305,7 +1316,7 @@ export async function registerRoutes(
           codeExample: row.code_example,
           mnemonic: row.mnemonic,
           difficulty: row.difficulty,
-          tags: row.tags ? JSON.parse(row.tags) : [],
+          tags: safeJsonParse(row.tags, []),
           category: row.category,
         }));
       });
@@ -1339,7 +1350,7 @@ export async function registerRoutes(
         description: row.description,
         channel: row.channel,
         difficulty: row.difficulty,
-        questionIds: row.question_ids ? JSON.parse(row.question_ids) : [],
+        questionIds: safeJsonParse(row.question_ids, []),
         totalQuestions: row.total_questions,
         estimatedMinutes: row.estimated_minutes,
       }));
@@ -1524,7 +1535,7 @@ export async function registerRoutes(
 
       const progress = result.rows.map((row: any) => ({
         channelId: row.channel_id,
-        completedQuestions: row.completed_items ? JSON.parse(row.completed_items) : [],
+        completedQuestions: safeJsonParse(row.completed_items, []),
         markedQuestions: [],
         lastVisitedIndex: 0,
       }));

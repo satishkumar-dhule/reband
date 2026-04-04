@@ -151,23 +151,57 @@ async function migrate() {
   });
   console.log("✅ Created user_sessions table");
 
+  // 7. coding_challenges - coding challenge problems with solutions
+  await client.execute({
+    sql: `CREATE TABLE IF NOT EXISTS coding_challenges (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      difficulty TEXT NOT NULL,
+      category TEXT NOT NULL,
+      tags TEXT,
+      companies TEXT,
+      starter_code_js TEXT,
+      starter_code_py TEXT,
+      test_cases TEXT,
+      hints TEXT,
+      solution_js TEXT,
+      solution_py TEXT,
+      complexity_time TEXT,
+      complexity_space TEXT,
+      complexity_explanation TEXT,
+      time_limit INTEGER DEFAULT 15,
+      created_at TEXT
+    )`,
+  });
+  console.log("✅ Created coding_challenges table");
+
   // Create indexes for performance
   console.log("\n📊 Creating indexes for performance...\n");
 
-  // questions indexes
-  await client.execute({
-    sql: `CREATE INDEX IF NOT EXISTS idx_questions_channel ON questions(channel)`,
-  });
-  await client.execute({
-    sql: `CREATE INDEX IF NOT EXISTS idx_questions_difficulty ON questions(difficulty)`,
-  });
-  await client.execute({
-    sql: `CREATE INDEX IF NOT EXISTS idx_questions_status ON questions(status)`,
-  });
-  await client.execute({
-    sql: `CREATE INDEX IF NOT EXISTS idx_questions_channel_status ON questions(channel, status)`,
-  });
-  console.log("✅ Created indexes on questions table");
+  // questions indexes (only if table exists)
+  try {
+    const questionsExists = await client.execute({
+      sql: "SELECT name FROM sqlite_master WHERE type='table' AND name='questions'"
+    });
+    if (questionsExists.rows.length > 0) {
+      await client.execute({
+        sql: `CREATE INDEX IF NOT EXISTS idx_questions_channel ON questions(channel)`,
+      });
+      await client.execute({
+        sql: `CREATE INDEX IF NOT EXISTS idx_questions_difficulty ON questions(difficulty)`,
+      });
+      await client.execute({
+        sql: `CREATE INDEX IF NOT EXISTS idx_questions_status ON questions(status)`,
+      });
+      await client.execute({
+        sql: `CREATE INDEX IF NOT EXISTS idx_questions_channel_status ON questions(channel, status)`,
+      });
+      console.log("✅ Created indexes on questions table");
+    }
+  } catch (e) {
+    console.log("⚠️  Skipped questions indexes (table not found)");
+  }
 
   // certifications indexes
   await client.execute({
@@ -216,6 +250,18 @@ async function migrate() {
     sql: `CREATE INDEX IF NOT EXISTS idx_question_history_created_at ON question_history(created_at)`,
   });
   console.log("✅ Created indexes on question_history table");
+
+  // coding_challenges indexes
+  await client.execute({
+    sql: `CREATE INDEX IF NOT EXISTS idx_coding_challenges_difficulty ON coding_challenges(difficulty)`,
+  });
+  await client.execute({
+    sql: `CREATE INDEX IF NOT EXISTS idx_coding_challenges_category ON coding_challenges(category)`,
+  });
+  await client.execute({
+    sql: `CREATE INDEX IF NOT EXISTS idx_coding_challenges_created_at ON coding_challenges(created_at)`,
+  });
+  console.log("✅ Created indexes on coding_challenges table");
 
   console.log("\n🎉 Migration completed successfully!\n");
 

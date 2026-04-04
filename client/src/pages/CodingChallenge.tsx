@@ -26,6 +26,7 @@ import { isPyodideReady } from '../lib/pyodide-runner';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../components/ui/select';
 import { Button } from '../components/unified/Button';
+import { SkipLink } from '@/components/unified/SkipLink';
 import { Input } from '../components/ui/input';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
@@ -609,6 +610,7 @@ export default function CodingChallenge() {
         title="Coding Challenges | DevPrep"
         description="Practice coding interview problems with instant feedback"
       />
+      <SkipLink />
       <div className="min-h-screen bg-[var(--gh-canvas-subtle)]">
 
         {/* ── Hero Header ──────────────────────────────────── */}
