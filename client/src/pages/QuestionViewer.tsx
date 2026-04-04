@@ -42,8 +42,9 @@ interface FlashcardItem {
   back: string;
   hint?: string;
   codeExample?: string;
+  mnemonic?: string;
   difficulty: string;
-  tags?: string | null;
+  tags?: string | string[] | null;
   category?: string | null;
   status?: string | null;
   createdAt?: string | null;
