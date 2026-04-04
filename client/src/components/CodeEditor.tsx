@@ -407,17 +407,19 @@ export function CodeEditor({
         </div>
       )}
 
-      <div className="flex-1 overflow-hidden min-h-0 relative">
-        <EditorComponent
-          height={editorHeight === '100%' ? '100%' : editorHeight}
-          language={language}
-          value={value}
-          onChange={handleChange}
-          onMount={handleEditorDidMount}
-          theme={isDark && themeReady ? 'vscode-dark-plus' : 'light'}
-          options={currentOptions}
-          loading={editorLoadingFallback}
-        />
+      <div className="flex-1 relative min-h-0 overflow-hidden">
+        <div className="absolute inset-0">
+          <EditorComponent
+            height="100%"
+            language={language}
+            value={value}
+            onChange={handleChange}
+            onMount={handleEditorDidMount}
+            theme={isDark && themeReady ? 'vscode-dark-plus' : 'light'}
+            options={currentOptions}
+            loading={editorLoadingFallback}
+          />
+        </div>
       </div>
     </div>
   );

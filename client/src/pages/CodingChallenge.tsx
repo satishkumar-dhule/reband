@@ -561,7 +561,9 @@ export default function CodingChallenge() {
                     value={code}
                     onChange={setCode}
                     language={language}
+                    onLanguageChange={setLanguage}
                     height="100%"
+                    showToolbar={false}
                   />
                 </div>
 
