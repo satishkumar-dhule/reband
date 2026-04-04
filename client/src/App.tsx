@@ -119,6 +119,7 @@ const BotActivity = lazy(() => import("@/pages/BotActivity"));
 const TrainingMode = lazy(() => import("@/pages/TrainingMode"));
 const About = lazy(() => import("@/pages/About"));
 const WhatsNew = lazy(() => import("@/pages/WhatsNew"));
+const PathDetail = lazy(() => import("@/pages/PathDetail"));
 
 /**
  * OnboardingGuard — no longer forces users through onboarding.
@@ -160,6 +161,7 @@ const CertificationExamRoute = S(CertificationExam, CertificationsSkeleton);
 const TestsRoute = S(Tests, GenericPageSkeleton);
 const TestSessionRoute = S(TestSession, GenericPageSkeleton);
 const MyPathRoute = S(MyPath, GenericPageSkeleton);
+const PathDetailRoute = S(PathDetail, GenericPageSkeleton);
 const OnboardingRoute = S(Onboarding, GenericPageSkeleton);
 const AboutRoute = S(About, GenericPageSkeleton);
 const WhatsNewRoute = S(WhatsNew, GenericPageSkeleton);
@@ -205,6 +207,7 @@ function MinimalApp() {
       <Route path="/tests" component={TestsRoute} />
       <Route path="/test/:channelId" component={TestSessionRoute} />
       <Route path="/my-path" component={MyPathRoute} />
+      <Route path="/path/:id" component={PathDetailRoute} />
 
       {/* Public-only route */}
       <Route path="/onboarding" component={OnboardingRoute} />

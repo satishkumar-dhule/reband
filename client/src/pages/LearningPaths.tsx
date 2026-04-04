@@ -79,12 +79,11 @@ export default function LearningPaths() {
           currentPaths.push(pathId);
         }
         localStorage.setItem('activeLearningPaths', JSON.stringify(currentPaths));
-        toast({ title: 'Path Started', description: `"${path.name}" has been added to your active paths.` });
       } catch (e) {
         console.error('Failed to save path:', e);
       }
     }
-    setLocation('/');
+    setLocation(`/path/${pathId}`);
   };
 
   const resetCustomPath = () => {
@@ -135,7 +134,7 @@ export default function LearningPaths() {
       });
 
       resetCustomPath();
-      setLocation('/');
+      setLocation(`/path/${pathId}`);
     } catch (e) {
       console.error('Failed to save custom path:', e);
       toast({
