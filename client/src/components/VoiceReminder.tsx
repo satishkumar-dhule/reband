@@ -25,7 +25,7 @@ export function VoiceReminder() {
         <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 backdrop-blur-lg border border-emerald-500/30 rounded-xl p-4 shadow-xl">
           <button
             onClick={dismissVoiceReminder}
-            className="absolute top-2 right-2 p-1 hover:bg-white/10 rounded-full transition-colors"
+            className="absolute top-2 right-2 p-1 hover:bg-[var(--gh-neutral-subtle)] rounded-full transition-colors"
           >
             <X className="w-4 h-4 text-muted-foreground" />
           </button>

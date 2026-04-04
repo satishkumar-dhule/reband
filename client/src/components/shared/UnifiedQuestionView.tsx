@@ -354,7 +354,7 @@ export function UnifiedQuestionView({
                     'touch-manipulation select-none flex-1 max-w-[200px]',
                     internalShowAnswer
                       ? `${config.accentClass} text-white ${config.glow}`
-                      : 'border-[var(--gh-border-default)] text-[var(--gh-fg-default)] hover:bg-[var(--gh-canvas-inset)]'
+                      : 'border-[var(--gh-border)] text-[var(--gh-fg-default)] hover:bg-[var(--gh-canvas-inset)]'
                   )}
                 >
                   {internalShowAnswer ? (

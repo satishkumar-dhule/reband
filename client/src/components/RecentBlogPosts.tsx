@@ -60,17 +60,17 @@ export function RecentBlogPosts({ limit = 3, className = '' }: RecentBlogPostsPr
   if (isLoading) {
     return (
       <section className={`mb-3 ${className}`}>
-        <div className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden backdrop-blur-sm">
-          <div className="px-4 py-3 border-b border-white/10">
+        <div className="bg-[var(--gh-canvas-subtle)] rounded-2xl border border-[var(--gh-border)] overflow-hidden">
+          <div className="px-4 py-3 border-b border-[var(--gh-border)]">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-green-500 dark:text-green-400" />
-              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">From the Blog</span>
+              <span className="text-xs font-bold text-[var(--gh-fg-muted)] uppercase tracking-wider">From the Blog</span>
             </div>
           </div>
           <div className="p-3 space-y-2">
             {[...Array(limit)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-20 bg-white/5 rounded-xl" />
+                <div className="h-20 bg-[var(--gh-canvas)] rounded-xl" />
               </div>
             ))}
           </div>
@@ -91,13 +91,13 @@ export function RecentBlogPosts({ limit = 3, className = '' }: RecentBlogPostsPr
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden backdrop-blur-sm"
+        className="bg-[var(--gh-canvas-subtle)] rounded-2xl border border-[var(--gh-border)] overflow-hidden"
       >
         {/* Header */}
-        <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+        <div className="px-4 py-3 border-b border-[var(--gh-border)] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-green-500 dark:text-green-400" />
-            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-[var(--gh-fg-muted)] uppercase tracking-wider">
               From the Blog
             </span>
           </div>
@@ -124,7 +124,7 @@ export function RecentBlogPosts({ limit = 3, className = '' }: RecentBlogPostsPr
               transition={{ delay: idx * 0.1 }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="block p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-green-500/30 dark:hover:border-green-400/30 transition-all group"
+              className="block p-4 rounded-xl bg-[var(--gh-canvas)] hover:bg-[var(--gh-neutral-subtle)] border border-[var(--gh-border)] hover:border-green-500/30 dark:hover:border-green-400/30 transition-all group"
             >
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-cyan-500/20 dark:from-green-400/20 dark:to-cyan-400/20 border border-green-500/30 dark:border-green-400/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -134,7 +134,7 @@ export function RecentBlogPosts({ limit = 3, className = '' }: RecentBlogPostsPr
                   <h4 className="text-sm font-bold leading-snug line-clamp-2 group-hover:text-green-500 dark:group-hover:text-green-400 transition-colors mb-1">
                     {post.title}
                   </h4>
-                  <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400 group-hover:text-cyan-500 dark:group-hover:text-cyan-400 transition-colors">
+                  <div className="flex items-center gap-1 text-[10px] text-[var(--gh-fg-muted)] group-hover:text-cyan-500 dark:group-hover:text-cyan-400 transition-colors">
                     <span className="font-semibold">Read article</span>
                     <ExternalLink className="w-3 h-3" />
                   </div>
@@ -145,7 +145,7 @@ export function RecentBlogPosts({ limit = 3, className = '' }: RecentBlogPostsPr
         </div>
 
         {/* Footer CTA */}
-        <div className="px-4 py-3 border-t border-white/10 bg-gradient-to-r from-green-500/5 to-cyan-500/5 dark:from-green-400/5 dark:to-cyan-400/5">
+        <div className="px-4 py-3 border-t border-[var(--gh-border)] bg-gradient-to-r from-green-500/5 to-cyan-500/5 dark:from-green-400/5 dark:to-cyan-400/5">
           <a
             href={blogBaseUrl}
             target="_blank"

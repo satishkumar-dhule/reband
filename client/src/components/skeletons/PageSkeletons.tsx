@@ -43,13 +43,13 @@ function Bone({ className, style }: { className?: string; style?: React.CSSPrope
 const AppShell = memo(function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen bg-[var(--gh-canvas-default)]">
-      <aside className="hidden lg:flex w-56 shrink-0 flex-col border-r border-[var(--gh-border-default)] bg-[var(--gh-canvas-default)] p-3 gap-1">
+      <aside className="hidden lg:flex w-56 shrink-0 flex-col border-r border-[var(--gh-border)] bg-[var(--gh-canvas-default)] p-3 gap-1">
         {Array.from({ length: 10 }).map((_, i) => (
           <Bone key={i} className="h-8 w-full" />
         ))}
       </aside>
       <div className="flex flex-col flex-1 min-w-0">
-        <header className="h-14 border-b border-[var(--gh-border-default)] px-4 flex items-center gap-3 shrink-0">
+        <header className="h-14 border-b border-[var(--gh-border)] px-4 flex items-center gap-3 shrink-0">
           <Bone className="h-7 w-32" />
           <Bone className="h-7 flex-1 max-w-xs" />
           <Bone className="h-7 w-7 ml-auto rounded-full" />
@@ -101,7 +101,7 @@ export const ChannelsSkeleton = memo(function ChannelsSkeleton() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="border border-[var(--gh-border-default)] rounded-lg p-4 space-y-3">
+            <div key={i} className="border border-[var(--gh-border)] rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-3">
                 <Bone className="h-9 w-9 rounded-md shrink-0" />
                 <div className="flex-1 space-y-1.5">
@@ -129,7 +129,7 @@ export const QuestionViewerSkeleton = memo(function QuestionViewerSkeleton() {
           <Bone className="h-4 w-4 rounded-full" />
           <Bone className="h-4 w-32" />
         </div>
-        <div className="border border-[var(--gh-border-default)] rounded-xl p-6 space-y-5">
+        <div className="border border-[var(--gh-border)] rounded-xl p-6 space-y-5">
           <div className="flex items-center justify-between gap-3">
             <Bone className="h-5 w-24 rounded-full" />
             <Bone className="h-5 w-16 rounded-full" />
@@ -170,7 +170,7 @@ export const CodingSkeleton = memo(function CodingSkeleton() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="border border-[var(--gh-border-default)] rounded-lg p-4 space-y-3">
+            <div key={i} className="border border-[var(--gh-border)] rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <Bone className="h-5 w-40" />
                 <Bone className="h-5 w-16 rounded-full" />
@@ -196,7 +196,7 @@ export const StatsSkeleton = memo(function StatsSkeleton() {
         <Bone className="h-8 w-40" />
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="border border-[var(--gh-border-default)] rounded-lg p-4 space-y-2">
+            <div key={i} className="border border-[var(--gh-border)] rounded-lg p-4 space-y-2">
               <Bone className="h-4 w-3/4" />
               <Bone className="h-8 w-1/2" />
             </div>
@@ -222,7 +222,7 @@ export const ReviewSkeleton = memo(function ReviewSkeleton() {
           <Bone className="h-7 w-24 rounded-full" />
         </div>
         <Bone className="h-2 w-full rounded-full" />
-        <div className="border border-[var(--gh-border-default)] rounded-xl p-6 space-y-5">
+        <div className="border border-[var(--gh-border)] rounded-xl p-6 space-y-5">
           <div className="space-y-2.5">
             <Bone className="h-6 w-full" />
             <Bone className="h-6 w-4/5" />
@@ -254,7 +254,7 @@ export const GenericPageSkeleton = memo(function GenericPageSkeleton() {
         </div>
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="border border-[var(--gh-border-default)] rounded-lg p-4 space-y-2">
+            <div key={i} className="border border-[var(--gh-border)] rounded-lg p-4 space-y-2">
               <Bone className="h-5 w-2/3" />
               <Bone className="h-4 w-full" />
               <Bone className="h-4 w-5/6" />
@@ -298,7 +298,7 @@ export const CertificationsSkeleton = memo(function CertificationsSkeleton() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="border border-[var(--gh-border-default)] rounded-lg p-5 space-y-4">
+            <div key={i} className="border border-[var(--gh-border)] rounded-lg p-5 space-y-4">
               <Bone className="h-10 w-10 rounded-lg" />
               <div className="space-y-1.5">
                 <Bone className="h-5 w-3/4" />
@@ -326,7 +326,7 @@ export const ProfileSkeleton = memo(function ProfileSkeleton() {
           </div>
         </div>
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="border border-[var(--gh-border-default)] rounded-lg p-5 space-y-3">
+          <div key={i} className="border border-[var(--gh-border)] rounded-lg p-5 space-y-3">
             <Bone className="h-5 w-32" />
             <Bone className="h-9 w-full rounded-md" />
             <Bone className="h-9 w-full rounded-md" />

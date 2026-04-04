@@ -156,7 +156,7 @@ export default function PathDetail() {
       ? 'text-[var(--gh-attention-fg)] bg-[var(--gh-attention-subtle)] border-[var(--gh-attention-muted)]'
       : path.difficulty === 'Advanced'
       ? 'text-[var(--gh-danger-fg)] bg-[var(--gh-danger-subtle)] border-[var(--gh-danger-muted)]'
-      : 'text-[var(--gh-fg-muted)] bg-[var(--gh-canvas-subtle)] border-[var(--gh-border-default)]';
+      : 'text-[var(--gh-fg-muted)] bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)]';
 
   return (
     <>
@@ -194,10 +194,10 @@ export default function PathDetail() {
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-[var(--gh-canvas-default)] border border-[var(--gh-border-default)] rounded-md p-6 mb-6"
+              className="bg-[var(--gh-canvas-default)] border border-[var(--gh-border)] rounded-md p-6 mb-6"
             >
               <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 rounded-md bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border-default)] text-[var(--gh-accent-fg)] shrink-0">
+                <div className="p-3 rounded-md bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] text-[var(--gh-accent-fg)] shrink-0">
                   <Icon className="w-6 h-6" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -242,7 +242,7 @@ export default function PathDetail() {
                     {overallTotal > 0 && ` · ${overallPct}%`}
                   </span>
                 </div>
-                <div className="h-2 bg-[var(--gh-border-default)] rounded-full overflow-hidden">
+                <div className="h-2 bg-[var(--gh-border)] rounded-full overflow-hidden">
                   <motion.div
                     className="h-full rounded-full bg-[var(--gh-accent-emphasis)]"
                     initial={{ width: 0 }}
@@ -274,7 +274,7 @@ export default function PathDetail() {
                   className={`bg-[var(--gh-canvas-default)] border rounded-md p-4 transition-colors ${
                     ch.done
                       ? 'border-[var(--gh-success-muted)]'
-                      : 'border-[var(--gh-border-default)] hover:border-[var(--gh-accent-fg)]'
+                      : 'border-[var(--gh-border)] hover:border-[var(--gh-accent-fg)]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -283,7 +283,7 @@ export default function PathDetail() {
                       {ch.done ? (
                         <CheckCircle2 className="w-5 h-5 text-[var(--gh-success-fg)]" />
                       ) : (
-                        <Circle className="w-5 h-5 text-[var(--gh-border-default)]" />
+                        <Circle className="w-5 h-5 text-[var(--gh-border)]" />
                       )}
                     </div>
 
@@ -307,7 +307,7 @@ export default function PathDetail() {
                       )}
 
                       {/* Progress bar */}
-                      <div className="h-1.5 bg-[var(--gh-border-default)] rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-[var(--gh-border)] rounded-full overflow-hidden">
                         <motion.div
                           className={`h-full rounded-full ${ch.done ? 'bg-[var(--gh-success-fg)]' : 'bg-[var(--gh-accent-emphasis)]'}`}
                           initial={{ width: 0 }}

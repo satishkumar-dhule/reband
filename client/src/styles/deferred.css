@@ -547,7 +547,7 @@ main { animation: fadeIn 0.2s ease-out; }
   line-height: 1.6;
 }
 .prose blockquote {
-  border-left: 4px solid var(--gh-border-default, var(--gh-border));
+  border-left: 4px solid var(--gh-border, var(--gh-border));
   padding: 0 16px;
   color: var(--gh-fg-muted);
   margin: 0 0 16px 0;

@@ -86,21 +86,21 @@ function CodeBlock({ code, language }: { code: string; language?: string }) {
   };
 
   return (
-    <div className="mt-4 rounded-lg overflow-hidden border border-[var(--gh-border-default)] bg-[#0d1117]">
-      <div className="flex items-center justify-between px-4 py-2 bg-[#161b22] border-b border-[var(--gh-border-default)]">
+    <div className="mt-4 rounded-lg overflow-hidden border border-[var(--gh-border)] bg-[var(--gh-canvas-inset)]">
+      <div className="flex items-center justify-between px-4 py-2 bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border)]">
         <div className="flex items-center gap-2">
           <Code className="w-3.5 h-3.5 text-[var(--gh-fg-muted)]" />
           <span className="text-xs font-mono text-[var(--gh-fg-muted)]">{language || 'code'}</span>
         </div>
         <button
           onClick={copy}
-          className="text-xs text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] transition-colors px-2 py-0.5 rounded border border-transparent hover:border-[var(--gh-border-default)]"
+          className="text-xs text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] transition-colors px-2 py-0.5 rounded border border-transparent hover:border-[var(--gh-border)]"
         >
           {copied ? 'Copied!' : 'Copy'}
         </button>
       </div>
       <pre className="p-4 text-sm overflow-x-auto scrollbar-hide">
-        <code className="text-[#e6edf3] font-mono leading-relaxed whitespace-pre-wrap break-words">{code}</code>
+        <code className="text-[var(--gh-fg)] font-mono leading-relaxed whitespace-pre-wrap break-words">{code}</code>
       </pre>
     </div>
   );
@@ -113,7 +113,7 @@ function DifficultyBadge({ difficulty }: { difficulty?: string }) {
     intermediate: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
     advanced: 'bg-red-500/15 text-red-400 border-red-500/30',
   };
-  const cls = map[difficulty.toLowerCase()] || 'bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] border-[var(--gh-border-default)]';
+  const cls = map[difficulty.toLowerCase()] || 'bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] border-[var(--gh-border)]';
   return (
     <span className={cn('px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border', cls)}>
       {difficulty}
@@ -129,7 +129,7 @@ function StatsBar({ progress, total }: { progress: Record<string, CardProgress>;
   const pct = total > 0 ? Math.round((seen / total) * 100) : 0;
 
   return (
-    <div className="rounded-xl border border-[var(--gh-border-default)] bg-[var(--gh-canvas)] overflow-hidden">
+    <div className="rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas)] overflow-hidden">
       <div className="px-4 pt-4 pb-3">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-semibold uppercase tracking-wider text-[var(--gh-fg-muted)]">Progress</span>
@@ -163,14 +163,14 @@ function StatsBar({ progress, total }: { progress: Record<string, CardProgress>;
           )}
         </div>
       </div>
-      <div className="grid grid-cols-4 border-t border-[var(--gh-border-default)]">
+      <div className="grid grid-cols-4 border-t border-[var(--gh-border)]">
         {[
           { label: 'Total', value: total, icon: BookOpen, color: 'text-[var(--gh-fg-muted)]' },
           { label: 'Mastered', value: mastered, icon: Star, color: 'text-emerald-400' },
           { label: 'Learning', value: learning, icon: TrendingUp, color: 'text-blue-400' },
           { label: 'Review', value: needsWork, icon: XCircle, color: 'text-orange-400' },
         ].map((stat, i) => (
-          <div key={stat.label} className={cn('flex flex-col items-center py-3 gap-0.5', i > 0 && 'border-l border-[var(--gh-border-default)]')}>
+          <div key={stat.label} className={cn('flex flex-col items-center py-3 gap-0.5', i > 0 && 'border-l border-[var(--gh-border)]')}>
             <stat.icon className={cn('w-3.5 h-3.5', stat.color)} />
             <span className="text-base font-bold text-[var(--gh-fg)]">{stat.value}</span>
             <span className="text-[9px] uppercase tracking-wider text-[var(--gh-fg-muted)]">{stat.label}</span>
@@ -197,7 +197,7 @@ function KeyboardHint({ show }: { show: boolean }) {
             { key: '1–4', action: 'Rate' },
           ].map(({ key, action }) => (
             <div key={key} className="flex items-center gap-1.5">
-              <kbd className="px-1.5 py-0.5 rounded border border-[var(--gh-border-default)] bg-[var(--gh-canvas-subtle)] font-mono text-[9px] text-[var(--gh-fg-muted)]">
+              <kbd className="px-1.5 py-0.5 rounded border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] font-mono text-[9px] text-[var(--gh-fg-muted)]">
                 {key}
               </kbd>
               <span>{action}</span>
@@ -325,7 +325,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
   if (flashcards.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
-        <div className="w-14 h-14 rounded-full bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border-default)] flex items-center justify-center">
+        <div className="w-14 h-14 rounded-full bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] flex items-center justify-center">
           <BookOpen className="w-6 h-6 text-[var(--gh-fg-muted)]" />
         </div>
         <div>
@@ -354,7 +354,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
               'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-all',
               shuffled
                 ? 'bg-[var(--gh-accent-subtle)] border-[var(--gh-accent-emphasis)] text-[var(--gh-accent-fg)]'
-                : 'border-[var(--gh-border-default)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)]'
+                : 'border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)]'
             )}
             data-testid="button-shuffle"
           >
@@ -376,7 +376,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowKeyboard(s => !s)}
-            className="p-1.5 rounded-md border border-[var(--gh-border-default)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] transition-all"
+            className="p-1.5 rounded-md border border-[var(--gh-border)] text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] transition-all"
             title="Keyboard shortcuts"
           >
             <Keyboard className="w-3.5 h-3.5" />
@@ -394,7 +394,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
         <button
           onClick={goPrev}
           disabled={currentIndex === 0}
-          className="flex-shrink-0 w-9 h-9 rounded-lg border border-[var(--gh-border-default)] flex items-center justify-center text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="flex-shrink-0 w-9 h-9 rounded-lg border border-[var(--gh-border)] flex items-center justify-center text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           data-testid="button-prev-card"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -413,7 +413,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
                 className={cn(
                   'h-2 flex-1 rounded-full transition-all min-w-[4px]',
                   isCurrent ? 'h-3 ring-1 ring-offset-1 ring-[var(--gh-accent-fg)] ring-offset-[var(--gh-canvas)]' : '',
-                  !p?.seen ? 'bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border-default)]' :
+                  !p?.seen ? 'bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)]' :
                   p.rating === 'easy' ? 'bg-emerald-500' :
                   p.rating === 'good' ? 'bg-blue-400' :
                   p.rating === 'hard' ? 'bg-amber-400' :
@@ -432,7 +432,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
         <button
           onClick={goNext}
           disabled={currentIndex === flashcards.length - 1}
-          className="flex-shrink-0 w-9 h-9 rounded-lg border border-[var(--gh-border-default)] flex items-center justify-center text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="flex-shrink-0 w-9 h-9 rounded-lg border border-[var(--gh-border)] flex items-center justify-center text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           data-testid="button-next-card"
         >
           <ChevronRight className="w-4 h-4" />
@@ -454,7 +454,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
         <div className="flex items-center gap-2">
           {currentCard?.difficulty && <DifficultyBadge difficulty={currentCard.difficulty} />}
           {currentCard?.category && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] border border-[var(--gh-border-default)]">
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] border border-[var(--gh-border)]">
               {currentCard.category}
             </span>
           )}
@@ -492,7 +492,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
                   style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
                   className={cn(
                     'w-full rounded-2xl border p-8 flex flex-col',
-                    'bg-[var(--gh-canvas)] border-[var(--gh-border-default)]',
+                    'bg-[var(--gh-canvas)] border-[var(--gh-border)]',
                     'shadow-[0_4px_24px_rgba(0,0,0,0.08)]',
                     isFlipped ? 'absolute inset-0 pointer-events-none' : 'relative'
                   )}
@@ -545,7 +545,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
                       <motion.div
                         animate={{ y: [0, 3, 0] }}
                         transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-                        className="text-xs text-[var(--gh-fg-muted)] flex items-center gap-1.5 border border-dashed border-[var(--gh-border-default)] px-4 py-2 rounded-full"
+                        className="text-xs text-[var(--gh-fg-muted)] flex items-center gap-1.5 border border-dashed border-[var(--gh-border)] px-4 py-2 rounded-full"
                       >
                         <span className="text-[var(--gh-accent-fg)]">Space</span>
                         <span>or click to reveal answer</span>
@@ -565,7 +565,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
                   }}
                   className={cn(
                     'w-full rounded-2xl border p-8 flex flex-col',
-                    'bg-[var(--gh-canvas-inset)] border-[var(--gh-border-default)]',
+                    'bg-[var(--gh-canvas-inset)] border-[var(--gh-border)]',
                     'shadow-[0_4px_24px_rgba(0,0,0,0.12)]',
                   )}
                 >
@@ -573,7 +573,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
                     <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Answer</span>
                     <button
                       onClick={(e) => { e.stopPropagation(); flipCard(); }}
-                      className="flex items-center gap-1 text-xs text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] px-2 py-1 rounded-md hover:bg-[var(--gh-canvas-subtle)] border border-transparent hover:border-[var(--gh-border-default)] transition-all"
+                      className="flex items-center gap-1 text-xs text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] px-2 py-1 rounded-md hover:bg-[var(--gh-canvas-subtle)] border border-transparent hover:border-[var(--gh-border)] transition-all"
                     >
                       <RotateCcw className="w-3 h-3" />
                       Flip back
@@ -617,7 +617,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
                     return tags.length > 0 ? (
                       <div className="mt-4 flex flex-wrap gap-1.5">
                         {tags.map(tag => (
-                          <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] border border-[var(--gh-border-default)]">
+                          <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] border border-[var(--gh-border)]">
                             {tag}
                           </span>
                         ))}
@@ -662,7 +662,7 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
                   >
                     <span className={cn('text-lg font-bold', cfg.textColor)}>{cfg.emoji}</span>
                     <span className={cn('text-xs font-semibold', cfg.textColor)}>{cfg.label}</span>
-                    <kbd className="text-[9px] px-1 rounded bg-white/10 text-white/50 font-mono">{cfg.shortcut}</kbd>
+                    <kbd className="text-[9px] px-1 rounded bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] border border-[var(--gh-border)] font-mono">{cfg.shortcut}</kbd>
                   </motion.button>
                 );
               })}

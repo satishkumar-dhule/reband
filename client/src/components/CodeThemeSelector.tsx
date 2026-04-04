@@ -56,7 +56,7 @@ export function CodeThemeSelector({ variant = 'dropdown', showAutoOption = true 
         </Button>
 
         {isOpen && (
-          <div className="absolute right-0 top-full mt-1 z-50 bg-[var(--gh-popover)] border border-[var(--gh-border-default)] rounded-lg shadow-lg overflow-hidden min-w-[180px]">
+          <div className="absolute right-0 top-full mt-1 z-50 bg-[var(--gh-popover)] border border-[var(--gh-border)] rounded-lg shadow-lg overflow-hidden min-w-[180px]">
             <CompactThemeList
               currentTheme={codeTheme}
               onSelect={handleSelect}

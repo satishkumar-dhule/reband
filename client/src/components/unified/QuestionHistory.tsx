@@ -351,7 +351,7 @@ function HistoryItem({ record, isFirst }: HistoryItemProps) {
       {/* Header - Always visible */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 p-3 text-left hover:bg-white/5 transition-colors"
+        className="w-full flex items-center gap-3 p-3 text-left hover:bg-[var(--gh-neutral-subtle)] transition-colors"
       >
         {/* Event Icon */}
         <div className={`w-8 h-8 rounded-lg ${config.bg} border ${config.border} flex items-center justify-center flex-shrink-0`}>

@@ -710,7 +710,7 @@ export function GenZHomePage() {
                                       whileHover={{ scale: 1.05 }}
                                       whileTap={{ scale: 0.95 }}
                                       onClick={() => setLocation(`/channel/${channel}`)}
-                                      className="px-2 md:px-3 py-0.5 md:py-1 bg-muted hover:bg-white/20 rounded-full text-[10px] md:text-xs font-semibold transition-all"
+                                      className="px-2 md:px-3 py-0.5 md:py-1 bg-muted hover:bg-[var(--gh-neutral-subtle)] rounded-full text-[10px] md:text-xs font-semibold transition-all"
                                     >
                                       {channel}
                                     </motion.button>
