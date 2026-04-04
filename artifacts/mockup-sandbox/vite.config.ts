@@ -48,8 +48,12 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
+      "react": path.resolve(import.meta.dirname, "../../node_modules/react"),
+      "react-dom": path.resolve(import.meta.dirname, "../../node_modules/react-dom"),
+      "react/jsx-runtime": path.resolve(import.meta.dirname, "../../node_modules/react/jsx-runtime"),
+      "react/jsx-dev-runtime": path.resolve(import.meta.dirname, "../../node_modules/react/jsx-dev-runtime"),
     },
-    dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
+    dedupe: ["react", "react-dom"],
   },
   root: path.resolve(import.meta.dirname),
   build: {
