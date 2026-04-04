@@ -109,6 +109,18 @@ export async function initBotTables() {
   } catch (e) {
     // Column already exists
   }
+
+  // Migrate bot_runs table — add columns that may be missing from older schemas
+  const botRunsMigrations = [
+    `ALTER TABLE bot_runs ADD COLUMN items_processed INTEGER DEFAULT 0`,
+    `ALTER TABLE bot_runs ADD COLUMN items_created INTEGER DEFAULT 0`,
+    `ALTER TABLE bot_runs ADD COLUMN items_updated INTEGER DEFAULT 0`,
+    `ALTER TABLE bot_runs ADD COLUMN items_deleted INTEGER DEFAULT 0`,
+    `ALTER TABLE bot_runs ADD COLUMN summary TEXT`,
+  ];
+  for (const sql of botRunsMigrations) {
+    try { await db.execute(sql); } catch (e) { /* column already exists */ }
+  }
   
   // Create indexes for faster lookups
   try {

@@ -587,11 +587,12 @@ export async function generateUnifiedId(prefix = 'q') {
     .substring(0, 10) || 'q';
   
   // Get the max numeric ID to avoid fetching all IDs
+  // +2 skips both the prefix characters AND the hyphen separator (e.g. "q-" = 2 chars)
   const result = await dbClient.execute({
     sql: `SELECT MAX(CAST(SUBSTR(id, ?) AS INTEGER)) as max_num 
           FROM questions 
           WHERE id LIKE ?`,
-    args: [safePrefix.length + 1, `${safePrefix}-%`]
+    args: [safePrefix.length + 2, `${safePrefix}-%`]
   });
   
   const maxNum = result.rows[0]?.max_num || 0;
