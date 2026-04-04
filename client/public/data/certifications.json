@@ -1,1 +1,233 @@
-[]
+[
+  {
+    "id": "aws-saa",
+    "name": "AWS Solutions Architect Associate",
+    "provider": "AWS",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "aws-sap",
+    "name": "AWS Solutions Architect Professional",
+    "provider": "AWS",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "aws-dva",
+    "name": "AWS Developer Associate",
+    "provider": "AWS",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "aws-sysops",
+    "name": "AWS SysOps Administrator",
+    "provider": "AWS",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "aws-devops-pro",
+    "name": "AWS DevOps Engineer Professional",
+    "provider": "AWS",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "aws-data-engineer",
+    "name": "AWS Data Engineer Associate",
+    "provider": "AWS",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "aws-ml-specialty",
+    "name": "AWS Machine Learning Specialty",
+    "provider": "AWS",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "aws-security-specialty",
+    "name": "AWS Security Specialty",
+    "provider": "AWS",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "aws-ai-practitioner",
+    "name": "AWS AI Practitioner",
+    "provider": "AWS",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "cka",
+    "name": "CKA - Kubernetes Administrator",
+    "provider": "CNCF",
+    "icon": "box",
+    "category": "kubernetes"
+  },
+  {
+    "id": "ckad",
+    "name": "CKAD - Kubernetes Developer",
+    "provider": "CNCF",
+    "icon": "box",
+    "category": "kubernetes"
+  },
+  {
+    "id": "cks",
+    "name": "CKS - Kubernetes Security",
+    "provider": "CNCF",
+    "icon": "box",
+    "category": "kubernetes"
+  },
+  {
+    "id": "kcna",
+    "name": "KCNA - Kubernetes Cloud Native",
+    "provider": "CNCF",
+    "icon": "box",
+    "category": "kubernetes"
+  },
+  {
+    "id": "terraform-associate",
+    "name": "Terraform Associate",
+    "provider": "HashiCorp",
+    "icon": "layers",
+    "category": "infrastructure"
+  },
+  {
+    "id": "vault-associate",
+    "name": "Vault Associate",
+    "provider": "HashiCorp",
+    "icon": "lock",
+    "category": "infrastructure"
+  },
+  {
+    "id": "gcp-cloud-engineer",
+    "name": "GCP Associate Cloud Engineer",
+    "provider": "Google",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "gcp-cloud-architect",
+    "name": "GCP Professional Cloud Architect",
+    "provider": "Google",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "gcp-data-engineer",
+    "name": "GCP Professional Data Engineer",
+    "provider": "Google",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "gcp-ml-engineer",
+    "name": "GCP Professional ML Engineer",
+    "provider": "Google",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "azure-fundamentals",
+    "name": "Azure Fundamentals (AZ-900)",
+    "provider": "Microsoft",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "azure-administrator",
+    "name": "Azure Administrator (AZ-104)",
+    "provider": "Microsoft",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "azure-developer",
+    "name": "Azure Developer (AZ-204)",
+    "provider": "Microsoft",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "azure-solutions-architect",
+    "name": "Azure Solutions Architect (AZ-305)",
+    "provider": "Microsoft",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "azure-devops-engineer",
+    "name": "Azure DevOps Engineer (AZ-400)",
+    "provider": "Microsoft",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "azure-ai-engineer",
+    "name": "Azure AI Engineer (AI-102)",
+    "provider": "Microsoft",
+    "icon": "cloud",
+    "category": "cloud"
+  },
+  {
+    "id": "linux-foundation-sysadmin",
+    "name": "Linux Foundation Sysadmin (LFCS)",
+    "provider": "Linux Foundation",
+    "icon": "terminal",
+    "category": "linux"
+  },
+  {
+    "id": "rhcsa",
+    "name": "Red Hat Certified System Admin",
+    "provider": "Red Hat",
+    "icon": "terminal",
+    "category": "linux"
+  },
+  {
+    "id": "docker-dca",
+    "name": "Docker Certified Associate",
+    "provider": "Docker",
+    "icon": "box",
+    "category": "containers"
+  },
+  {
+    "id": "databricks-data-engineer",
+    "name": "Databricks Data Engineer Associate",
+    "provider": "Databricks",
+    "icon": "database",
+    "category": "data"
+  },
+  {
+    "id": "snowflake-core",
+    "name": "Snowflake SnowPro Core",
+    "provider": "Snowflake",
+    "icon": "database",
+    "category": "data"
+  },
+  {
+    "id": "comptia-security-plus",
+    "name": "CompTIA Security+",
+    "provider": "CompTIA",
+    "icon": "shield",
+    "category": "security"
+  },
+  {
+    "id": "cissp",
+    "name": "CISSP",
+    "provider": "ISC2",
+    "icon": "shield",
+    "category": "security"
+  },
+  {
+    "id": "tensorflow-developer",
+    "name": "TensorFlow Developer Certificate",
+    "provider": "Google",
+    "icon": "brain",
+    "category": "ml"
+  }
+]

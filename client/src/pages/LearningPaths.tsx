@@ -429,7 +429,7 @@ export default function LearningPaths() {
                     <Button variant="outline" onClick={resetCustomPath}>Cancel</Button>
                     <Button 
                       variant="primary"
-                      disabled={!customPath.name || customPath.channels.length === 0}
+                      disabled={!customPath.name || (customPath.channels.length === 0 && customPath.certifications.length === 0)}
                       onClick={handleCreateCustomPath}
                     >
                       Create Path
