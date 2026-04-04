@@ -298,3 +298,10 @@ Last Updated: 2026-04-03
 - **Route Prefetching**: Hover-based prefetch system in client/src/lib/prefetch.ts
 - **GitHub Management**: New agents for issue/PR/repo management in .opencode/agents/
 - **Import Fix**: react-syntax-highlighter uses default export (not `{ Prism as SyntaxHighlighter }`)
+
+### Recent Changes (v2.3.0)
+- **Security**: CSP + security headers middleware added to server/index.ts (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy)
+- **XSS Fix**: PagefindSearch.tsx fallback uses `textContent` (no raw innerHTML injection)
+- **Profile+Stats Merge**: Profile page now includes full stats (streak, XP, level, channel breakdown, recent activity). /stats redirects to /profile.
+- **Component Extraction**: `client/src/components/coding/` — DiffBadge, LiveTimer, TestOutputPanel, ChallengeCard extracted from CodingChallenge.tsx
+- **Unit Tests Added**: `credits.test.ts` (20 cases), `coding-challenges.test.ts` (15 cases)

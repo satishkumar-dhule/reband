@@ -16,10 +16,9 @@ const NAV_ITEMS = [
   { icon: Mic,       label: "Voice",           path: "/voice-interview" },
   { icon: Code,      label: "Coding",          path: "/coding" },
   { icon: RotateCcw, label: "Review",          path: "/review" },
-  { icon: BarChart2, label: "Stats",           path: "/stats" },
   { icon: Bookmark,  label: "Saved",           path: "/bookmarks" },
   { icon: Map,       label: "Paths",           path: "/learning-paths" },
-  { icon: User,      label: "Profile",         path: "/profile" },
+  { icon: User,      label: "Profile & Stats", path: "/profile" },
 ] as const;
 
 type NavItemType = (typeof NAV_ITEMS)[number];

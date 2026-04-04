@@ -61,6 +61,48 @@ app.use(compression({
   },
 }));
 
+// Security headers — Content Security Policy and other hardening
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const isDev = process.env.NODE_ENV !== "production";
+
+  // Content-Security-Policy
+  // - default-src 'self': only load resources from same origin by default
+  // - script-src allows 'unsafe-inline' only in dev (Vite HMR requires it)
+  // - style-src 'unsafe-inline' needed for CSS-in-JS and Tailwind
+  // - img-src allows data: URIs (avatars, chart images) and external URLs
+  // - connect-src allows Replit dev proxy and API calls
+  const scriptSrc = isDev
+    ? `'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net`
+    : `'self' 'unsafe-inline' https://cdn.jsdelivr.net`;
+
+  res.setHeader("Content-Security-Policy", [
+    `default-src 'self'`,
+    `script-src ${scriptSrc}`,
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+    `font-src 'self' https://fonts.gstatic.com data:`,
+    `img-src 'self' data: blob: https:`,
+    `connect-src 'self' ws: wss: https:`,
+    `worker-src 'self' blob:`,
+    `object-src 'none'`,
+    `base-uri 'self'`,
+    `form-action 'self'`,
+    `frame-ancestors 'none'`,
+  ].join("; "));
+
+  // Prevent MIME-type sniffing
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  // Prevent clickjacking
+  res.setHeader("X-Frame-Options", "DENY");
+  // Strict XSS protection for older browsers
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  // Only send referrer for same-origin requests
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  // Disable browser features not needed by the app
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+
+  next();
+});
+
 app.use(
   express.json({
     verify: (req, _res, buf) => {

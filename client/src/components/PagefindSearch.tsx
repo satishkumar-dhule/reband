@@ -22,9 +22,8 @@ function SafeHTML({ html }: { html: string }) {
         });
         ref.current.innerHTML = clean;
       } else {
-        // Fallback: strip script tags (less secure but functional)
-        const stripped = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-        ref.current.innerHTML = stripped;
+        // Fallback: render as plain text only — no HTML injection risk
+        ref.current.textContent = html;
       }
     }
   }, [html]);

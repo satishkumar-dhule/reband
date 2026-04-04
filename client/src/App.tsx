@@ -89,7 +89,7 @@ function registerRoutesForPrefetching() {
   registerRouteForPrefetch('/voice-session', () => import('@/pages/VoiceSession'));
   registerRouteForPrefetch('/coding', () => import('@/pages/CodingChallenge'));
   registerRouteForPrefetch('/review', () => import('@/pages/ReviewSession'));
-  registerRouteForPrefetch('/stats', () => import('@/pages/Stats'));
+  registerRouteForPrefetch('/profile', () => import('@/pages/Profile'));
   registerRouteForPrefetch('/learning-paths', () => import('@/pages/LearningPaths'));
   registerRouteForPrefetch('/badges', () => import('@/pages/Badges'));
   registerRouteForPrefetch('/certifications', () => import('@/pages/Certifications'));
@@ -127,6 +127,13 @@ const PathDetail = lazy(() => import("@/pages/PathDetail"));
  */
 function OnboardingGuard({ children }: { children: ReactNode }) {
   return <>{children}</>;
+}
+
+/** Redirect /stats → /profile (stats merged into profile page) */
+function StatsRedirect() {
+  const [, nav] = useLocation();
+  useEffect(() => { nav('/profile'); }, [nav]);
+  return null;
 }
 
 /** Wrap a lazy component with its own Suspense + per-route skeleton. */
@@ -196,7 +203,7 @@ function MinimalApp() {
 
       {/* Protected routes */}
       <Route path="/review" component={ReviewSessionRoute} />
-      <Route path="/stats" component={StatsRoute} />
+      <Route path="/stats" component={StatsRedirect} />
       <Route path="/bookmarks" component={BookmarksRoute} />
       <Route path="/profile" component={ProfileRoute} />
       <Route path="/learning-paths" component={LearningPathsRoute} />
