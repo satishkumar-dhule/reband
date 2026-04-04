@@ -19,7 +19,7 @@ const OPENCODE =
   "/home/runner/workspace/.config/npm/node_global/bin/opencode";
 const API_BASE = "http://localhost:5000";
 const MIN_CARDS = parseInt(
-  process.argv.find((a) => a.startsWith("--min="))?.split("=")[1] ?? "10"
+  process.argv.find((a) => a.startsWith("--min="))?.split("=")[1] ?? "100"
 );
 const SINGLE_CHANNEL = process.argv
   .find((a) => a.startsWith("--channel="))
