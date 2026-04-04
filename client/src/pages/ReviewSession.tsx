@@ -15,12 +15,8 @@ import type { Question } from '../types';
 
 // Lazy-load heavy dependencies to reduce initial bundle size (~150KB savings)
 // EnhancedMermaid uses named export, so wrap it
-const EnhancedMermaid = lazy(() => 
-  import('../components/EnhancedMermaid').then(m => ({ default: m.EnhancedMermaid as unknown as React.ComponentType<any> }))
-);
-const ReactMarkdown = lazy(() => 
-  import('react-markdown').then(m => ({ default: m.default as unknown as React.ComponentType<any> }))
-);
+const EnhancedMermaid = lazy(() => import('../components/EnhancedMermaid'));
+const ReactMarkdown = lazy(() => import('react-markdown'));
 
 // Skeleton fallback for lazy components
 function ComponentSkeleton() {
