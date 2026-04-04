@@ -52,8 +52,12 @@ interface FlashcardItem {
 }
 
 // Lazy-load heavy components to reduce initial bundle size
-const GenZAnswerPanel = lazy(() => import('../components/question/GenZAnswerPanel'));
-const FlashcardsTab = lazy(() => import('../components/FlashcardsTab'));
+const GenZAnswerPanel = lazy(() =>
+  import('../components/question/GenZAnswerPanel').then(m => ({ default: m.GenZAnswerPanel }))
+);
+const FlashcardsTab = lazy(() =>
+  import('../components/FlashcardsTab').then(m => ({ default: m.FlashcardsTab }))
+);
 
 export default function QuestionViewer() {
   const [location, setLocation] = useLocation();

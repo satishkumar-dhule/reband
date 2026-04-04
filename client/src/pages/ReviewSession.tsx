@@ -15,7 +15,9 @@ import type { Question } from '../types';
 
 // Lazy-load heavy dependencies to reduce initial bundle size (~150KB savings)
 // EnhancedMermaid uses named export, so wrap it
-const EnhancedMermaid = lazy(() => import('../components/EnhancedMermaid'));
+const EnhancedMermaid = lazy(() =>
+  import('../components/EnhancedMermaid').then(m => ({ default: m.EnhancedMermaid }))
+);
 const ReactMarkdown = lazy(() => import('react-markdown'));
 
 // Skeleton fallback for lazy components
@@ -91,7 +93,7 @@ function MarkdownRenderer({ content }: { content: string }) {
       <ReactMarkdown
         remarkPlugins={[remarkGfmPlugin]}
         components={{
-          code({ className, children }: { className?: string; children: React.ReactNode }) {
+          code({ className, children }: { className?: string; children?: React.ReactNode }) {
             const match = /language-(\w+)/.exec(className || '');
             const isInline = !match && !String(children).includes('\n');
             if (isInline) {
@@ -113,10 +115,10 @@ function MarkdownRenderer({ content }: { content: string }) {
               </div>
             );
           },
-          p: ({ children }: { children: React.ReactNode }) => <p className="mb-3 text-[var(--gh-fg-muted)]">{children}</p>,
-          strong: ({ children }: { children: React.ReactNode }) => <strong className="font-semibold text-[var(--gh-fg)]">{children}</strong>,
-          ul: ({ children }: { children: React.ReactNode }) => <ul className="list-disc pl-4 mb-3 space-y-1">{children}</ul>,
-          li: ({ children }: { children: React.ReactNode }) => <li className="text-[var(--gh-fg-muted)]">{children}</li>,
+          p: ({ children }: { children?: React.ReactNode }) => <p className="mb-3 text-[var(--gh-fg-muted)]">{children}</p>,
+          strong: ({ children }: { children?: React.ReactNode }) => <strong className="font-semibold text-[var(--gh-fg)]">{children}</strong>,
+          ul: ({ children }: { children?: React.ReactNode }) => <ul className="list-disc pl-4 mb-3 space-y-1">{children}</ul>,
+          li: ({ children }: { children?: React.ReactNode }) => <li className="text-[var(--gh-fg-muted)]">{children}</li>,
         }}
       >
         {preprocessMarkdown(content)}

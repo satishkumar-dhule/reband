@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import React from 'react';
 import { useLocation, useParams } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
