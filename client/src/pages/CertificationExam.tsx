@@ -136,7 +136,7 @@ const ExamTimer = memo(function ExamTimer({ isActive, initialTime, onTimeUp }: E
   const isLowTime = timeLeft <= 60;
 
   return (
-    <span className={`font-mono text-sm ${isLowTime ? 'text-red-500 animate-pulse' : 'text-muted-foreground'}`}>
+    <span className={`font-mono text-sm ${isLowTime ? 'text-[var(--gh-danger-fg)] animate-pulse' : 'text-muted-foreground'}`}>
       {formatTime(timeLeft)}
     </span>
   );
@@ -178,8 +178,8 @@ const ExamSidebar = memo(function ExamSidebar({
             onClick={() => onGoToQuestion(i)}
             className={`w-full p-2 rounded-lg text-sm font-medium transition-all ${
               variant === 'primary' ? 'bg-primary text-primary-foreground' :
-              variant === 'success' ? 'bg-green-500/20 text-green-500' :
-              variant === 'danger' ? 'bg-red-500/20 text-red-500' :
+              variant === 'success' ? 'bg-[var(--gh-success-fg)]/10 text-[var(--gh-success-fg)]' :
+              variant === 'danger' ? 'bg-[var(--gh-danger-fg)]/10 text-[var(--gh-danger-fg)]' :
               'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
           >
@@ -831,10 +831,10 @@ function ActiveExam({
 
               <div className="mt-4 flex gap-4 text-xs text-muted-foreground justify-center">
                 <span className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded bg-green-500/20" /> Correct
+                  <div className="w-3 h-3 rounded bg-[var(--gh-success-fg)]/20" /> Correct
                 </span>
                 <span className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded bg-red-500/20" /> Wrong
+                  <div className="w-3 h-3 rounded bg-[var(--gh-danger-fg)]/20" /> Wrong
                 </span>
                 <span className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded bg-muted" /> Unanswered
@@ -880,9 +880,9 @@ function ActiveExam({
             {currentQuestion.domain.replace(/-/g, ' ')}
           </span>
           <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-            currentQuestion.difficulty === 'beginner' ? 'bg-green-500/10 text-green-500' :
-            currentQuestion.difficulty === 'intermediate' ? 'bg-yellow-500/10 text-yellow-500' :
-            'bg-red-500/10 text-red-500'
+            currentQuestion.difficulty === 'beginner' ? 'bg-[var(--gh-success-fg)]/10 text-[var(--gh-success-fg)]' :
+            currentQuestion.difficulty === 'intermediate' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400' :
+            'bg-[var(--gh-danger-fg)]/10 text-[var(--gh-danger-fg)]'
           }`}>
             {currentQuestion.difficulty}
           </span>
@@ -924,8 +924,8 @@ function ActiveExam({
               >
                 <div className="flex items-start gap-3">
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                    showResult && isCorrect ? 'border-green-500 bg-green-500' :
-                    showResult && isSelected && !isCorrect ? 'border-red-500 bg-red-500' :
+                    showResult && isCorrect ? 'border-[var(--gh-success-fg)] bg-[var(--gh-success-fg)]' :
+                    showResult && isSelected && !isCorrect ? 'border-[var(--gh-danger-fg)] bg-[var(--gh-danger-fg)]' :
                     isSelected ? 'border-primary bg-primary' :
                     'border-muted-foreground/30'
                   }`}>
@@ -1087,7 +1087,7 @@ function ResultsScreen({
                 stroke="currentColor"
                 strokeWidth="8"
                 strokeDasharray={`${results.percentage * 3.52} 352`}
-                className={results.passed ? 'text-green-500' : 'text-red-500'}
+                className={results.passed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -1135,7 +1135,7 @@ function ResultsScreen({
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-muted-foreground">{domain.name}</span>
                       <span className={`font-medium ${
-                        domainResult.percentage >= 70 ? 'text-green-500' : 'text-red-500'
+                        domainResult.percentage >= 70 ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'
                       }`}>
                         {domainResult.correct}/{domainResult.total} ({domainResult.percentage}%)
                       </span>
@@ -1143,7 +1143,7 @@ function ResultsScreen({
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all ${
-                          domainResult.percentage >= 70 ? 'bg-green-500' : 'bg-red-500'
+                          domainResult.percentage >= 70 ? 'bg-[var(--gh-success-fg)]' : 'bg-[var(--gh-danger-fg)]'
                         }`}
                         style={{ width: `${domainResult.percentage}%` }}
                       />

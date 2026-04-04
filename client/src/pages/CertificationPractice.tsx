@@ -820,6 +820,12 @@ export default function CertificationPractice() {
             >
               <span className="flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Practice{totalQuestions > 0 ? ` (${totalQuestions})` : ''}</span>
             </button>
+            <button
+              onClick={() => setLocation(`/certification/${certificationId}/exam`)}
+              className="px-3 py-2 text-xs font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5" /> Mock Exam</span>
+            </button>
           </div>
         </div>
 
@@ -852,6 +858,33 @@ export default function CertificationPractice() {
               ))}
             </div>
 
+            {/* Domain / Topic Breakdown */}
+            {certification.channelMappings && certification.channelMappings.length > 0 && (
+              <div className="p-4 bg-card border border-border rounded-xl">
+                <h3 className="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                  <Target className="w-4 h-4 text-primary" /> Exam Topic Breakdown
+                </h3>
+                <div className="space-y-2.5">
+                  {certification.channelMappings.map((mapping) => (
+                    <div key={mapping.channelId} className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground capitalize w-28 shrink-0 truncate">
+                        {mapping.channelId.replace(/-/g, ' ')}
+                      </span>
+                      <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full transition-all"
+                          style={{ width: `${mapping.weight}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-semibold text-foreground w-8 text-right shrink-0">
+                        {mapping.weight}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Prerequisites */}
             {prerequisites.length > 0 && (
               <div className="p-4 bg-card border border-border rounded-xl">
@@ -870,21 +903,54 @@ export default function CertificationPractice() {
               </div>
             )}
 
-            {/* Official resource */}
-            {(certification as any).officialUrl && (
-              <div className="p-3 bg-card border border-border rounded-xl">
-                <h3 className="text-sm font-semibold mb-2">Official Resources</h3>
+            {/* Study Resources */}
+            <div className="p-4 bg-card border border-border rounded-xl">
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4 text-primary" /> Study Resources
+              </h3>
+              <div className="space-y-2">
+                {certification.officialUrl && (
+                  <a
+                    href={certification.officialUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-primary hover:underline"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    Official {certification.provider} Exam Page
+                  </a>
+                )}
                 <a
-                  href={(certification as any).officialUrl}
+                  href={`https://www.reddit.com/search/?q=${encodeURIComponent(certification.name + ' study guide')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-primary hover:underline"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  Official {certification.provider} Exam Page
+                  <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                  Community Study Discussions
                 </a>
+                <a
+                  href={`https://github.com/search?q=${encodeURIComponent(certification.name + ' study')}&type=repositories`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                  GitHub Study Repos &amp; Notes
+                </a>
+                {certification.examCode && (
+                  <a
+                    href={`https://www.google.com/search?q=${encodeURIComponent(certification.examCode + ' free study guide')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-primary hover:underline"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    Free Study Guides for {certification.examCode}
+                  </a>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Action buttons */}
             <div className="flex flex-col sm:flex-row gap-2 pt-2">

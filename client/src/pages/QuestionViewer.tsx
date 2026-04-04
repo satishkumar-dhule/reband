@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo, lazy, Suspense } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useLocation, useRoute, Link } from 'wouter';
 import { getChannel } from '../lib/data';
 import { useQuestionsWithPrefetch, useSubChannels, useCompaniesWithCounts } from '../hooks/use-questions';
@@ -479,9 +480,14 @@ export default function QuestionViewer() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col lg:flex-row gap-6">
+        <PanelGroup
+          direction="horizontal"
+          autoSaveId="question-viewer-panels"
+          className="panel-group-responsive max-w-7xl mx-auto w-full px-4 py-6"
+        >
           {/* Main Content (Left) */}
-          <div className="flex-1 min-w-0 space-y-6">
+          <Panel defaultSize={65} minSize={40} className="min-w-0">
+          <div className="space-y-6 lg:pr-3">
             {activeMainTab === 'questions' && (
               <>
             {/* Question Card */}
@@ -695,9 +701,13 @@ export default function QuestionViewer() {
               </div>
             )}
           </div>
+          </Panel>
+
+          <PanelResizeHandle className="hidden lg:flex items-center justify-center w-1.5 mx-0.5 bg-[var(--gh-border)] hover:bg-[var(--gh-accent-fg)]/50 cursor-col-resize transition-colors rounded-full" />
 
           {/* Sidebar (Right) */}
-          <aside className="w-full lg:w-80 space-y-6">
+          <Panel defaultSize={35} minSize={20} maxSize={50}>
+          <aside className="space-y-6 lg:pl-3">
             {/* Channel Info */}
             <div className="gh-card overflow-hidden">
               <div className="bg-[var(--gh-canvas-subtle)] px-4 py-3 border-b border-[var(--gh-border)]">
@@ -796,7 +806,8 @@ export default function QuestionViewer() {
 
             <VoiceReminder />
           </aside>
-        </div>
+          </Panel>
+        </PanelGroup>
       </div>
       
       <UnifiedSearch 

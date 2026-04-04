@@ -159,3 +159,10 @@
 .animate-slide-up {
   animation: slide-up 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* Responsive PanelGroup: stack vertically on mobile */
+@media (max-width: 1023px) {
+  .panel-group-responsive[data-panel-group-direction="horizontal"] {
+    flex-direction: column !important;
+  }
+}

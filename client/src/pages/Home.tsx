@@ -50,26 +50,18 @@ function useApiChannels() {
   });
 }
 
-// Isolated CreditsChip component to prevent re-renders of entire page on balance change
-const CreditsChip = React.memo(function CreditsChip() {
+// Isolated CreditsRow — a compact row for the stats sidebar instead of a full card
+const CreditsRow = React.memo(function CreditsRow() {
   const { balance } = useCredits();
   return (
-    <section className="gh-card p-4">
-      <div className="flex items-center gap-2">
-        <Coins className="w-4 h-4 text-[var(--gh-attention-fg)]" />
-        <h2 className="text-sm font-semibold text-[var(--gh-fg)]">{t('home.credits')}</h2>
-      </div>
-      <div className="mt-3 text-center">
-        <p className="text-2xl font-bold text-[var(--gh-fg)]">{balance.toLocaleString()}</p>
-        <p className="text-xs text-[var(--gh-fg-muted)]">{t('home.credits.available')}</p>
-      </div>
-      <Link 
-        href="/profile" 
-        className="block mt-3 text-xs text-center text-[var(--gh-accent-fg)] hover:underline"
-      >
+    <div className="flex items-center gap-2 py-2">
+      <Coins className="w-4 h-4 shrink-0 text-[var(--gh-attention-fg)]" />
+      <span className="text-sm text-[var(--gh-fg)] font-medium">{balance.toLocaleString()}</span>
+      <span className="text-sm text-[var(--gh-fg-muted)] flex-1">{t('home.credits')}</span>
+      <Link href="/profile" className="text-xs text-[var(--gh-accent-fg)] hover:underline shrink-0">
         {t('home.credits.view')}
       </Link>
-    </section>
+    </div>
   );
 });
 
@@ -352,14 +344,14 @@ export default function Home() {
             <p className="text-[var(--gh-fg-muted)] mt-1">{today}</p>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-6">
             {/* ── Main column ── */}
-            <div className="flex-1 min-w-0 space-y-8">
+            <div className="flex-1 min-w-0 space-y-6">
 
-              {/* Quick actions */}
+              {/* Quick actions — compact toolbar on desktop, card grid on mobile */}
               <section>
-                <h2 className="text-sm font-semibold text-[var(--gh-fg)] mb-4">{t('home.quickActions')}</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <h2 className="text-sm font-semibold text-[var(--gh-fg)] mb-3">{t('home.quickActions')}</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {quickActions.map((action) => {
                     const Icon = action.icon;
                     return (
@@ -367,13 +359,13 @@ export default function Home() {
                         key={action.path}
                         variant="outline"
                         onClick={() => setLocation(action.path)}
-                        className="flex flex-col items-start gap-2 p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] hover:bg-[var(--gh-canvas-inset)] text-left transition-colors"
+                        className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] hover:bg-[var(--gh-canvas-inset)] text-left transition-colors h-auto"
                         data-testid={`action-${action.path.replace("/", "")}`}
                       >
-                        <Icon className="w-5 h-5 text-[var(--gh-accent-fg)]" strokeWidth={2} />
-                        <div>
-                          <div className="text-sm font-semibold text-[var(--gh-fg)]">{action.label}</div>
-                          <div className="text-xs text-[var(--gh-fg-muted)] mt-0.5">{action.desc}</div>
+                        <Icon className="w-4 h-4 text-[var(--gh-accent-fg)] shrink-0" strokeWidth={2} />
+                        <div className="min-w-0">
+                          <div className="text-xs font-semibold text-[var(--gh-fg)] truncate">{action.label}</div>
+                          <div className="text-[10px] text-[var(--gh-fg-muted)] truncate hidden sm:block">{action.desc}</div>
                         </div>
                       </Button>
                     );
@@ -436,12 +428,9 @@ export default function Home() {
             {/* ── Right sidebar ── */}
             <div className="hidden lg:block w-72 shrink-0 space-y-6">
 
-              {/* Credits card - isolated to prevent re-renders on balance change */}
-              <CreditsChip />
-
-              {/* Stats card */}
+              {/* Stats card — includes credits balance inline */}
               <section className="gh-card p-4">
-                <h2 className="text-sm font-semibold text-[var(--gh-fg)] mb-4">{t('home.stats.yourProgress')}</h2>
+                <h2 className="text-sm font-semibold text-[var(--gh-fg)] mb-3">{t('home.stats.yourProgress')}</h2>
                 <div className="divide-y divide-[var(--gh-border-muted)]">
                   <StatBadge
                     icon={CheckCircle2}
@@ -467,10 +456,12 @@ export default function Home() {
                     value={streak || "—"}
                     color="text-[var(--gh-attention-fg)]"
                   />
+                  {/* Credits row — inline, no extra card */}
+                  <CreditsRow />
                 </div>
 
                 {/* Progress bar */}
-                <div className="mt-4 pt-4 border-t border-[var(--gh-border-muted)]">
+                <div className="mt-3 pt-3 border-t border-[var(--gh-border-muted)]">
                   <div className="flex items-center justify-between text-xs text-[var(--gh-fg-muted)] mb-2">
                     <span>{t('home.stats.totalCompletion')}</span>
                     <span className="font-medium text-[var(--gh-fg)]">{overallProgress}%</span>
