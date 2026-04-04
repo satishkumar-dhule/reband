@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import {
   Home, BookOpen, Mic, Code, RotateCcw, BarChart2,
-  Bookmark, User, Map, Search, Menu, X, Brain,
+  Bookmark, User, Map, Search, Menu, X, Brain, Award,
 } from "lucide-react";
 import { ThemeToggle } from "../ThemeToggle";
 import { UnifiedSearch } from "../UnifiedSearch";
@@ -10,15 +10,16 @@ import { cn } from "@/lib/utils";
 import { MobileBottomNav } from "./UnifiedNav";
 
 const NAV_ITEMS = [
-  { icon: Home,      label: "Home",     path: "/" },
-  { icon: BookOpen,  label: "Channels", path: "/channels" },
-  { icon: Mic,       label: "Voice",    path: "/voice-interview" },
-  { icon: Code,      label: "Coding",   path: "/coding" },
-  { icon: RotateCcw, label: "Review",   path: "/review" },
-  { icon: BarChart2, label: "Stats",    path: "/stats" },
-  { icon: Bookmark,  label: "Saved",    path: "/bookmarks" },
-  { icon: Map,       label: "Paths",    path: "/learning-paths" },
-  { icon: User,      label: "Profile",  path: "/profile" },
+  { icon: Home,      label: "Home",            path: "/" },
+  { icon: BookOpen,  label: "Channels",        path: "/channels" },
+  { icon: Award,     label: "Certifications",  path: "/certifications" },
+  { icon: Mic,       label: "Voice",           path: "/voice-interview" },
+  { icon: Code,      label: "Coding",          path: "/coding" },
+  { icon: RotateCcw, label: "Review",          path: "/review" },
+  { icon: BarChart2, label: "Stats",           path: "/stats" },
+  { icon: Bookmark,  label: "Saved",           path: "/bookmarks" },
+  { icon: Map,       label: "Paths",           path: "/learning-paths" },
+  { icon: User,      label: "Profile",         path: "/profile" },
 ] as const;
 
 type NavItemType = (typeof NAV_ITEMS)[number];
@@ -47,7 +48,11 @@ function NavItem({ item, active, onClick }: { item: NavItemType; active: boolean
 function SidebarNav({ onClose }: { onClose?: () => void }) {
   const [location] = useLocation();
   const isActive = useCallback(
-    (path: string) => path === "/" ? location === "/" : location.startsWith(path),
+    (path: string) => {
+      if (path === "/") return location === "/";
+      if (path === "/certifications") return location.startsWith("/certifications") || location.startsWith("/certification/");
+      return location.startsWith(path);
+    },
     [location]
   );
   return (

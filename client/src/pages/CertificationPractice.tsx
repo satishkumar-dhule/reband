@@ -4,7 +4,8 @@
  * Includes embedded mini-tests with glassmorphism effects
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useLocation, useRoute } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -30,7 +31,8 @@ import {
   ChevronLeft, ChevronRight, Award, ExternalLink,
   Check, ArrowLeft, Info, X, AlertTriangle, Coins, Zap,
   SkipForward, Lock, Unlock, CheckCircle, XCircle, RefreshCw,
-  ChevronDown, ChevronUp, Lightbulb
+  ChevronDown, ChevronUp, Lightbulb, BookOpen, Clock, Target,
+  Sparkles, ListChecks, GraduationCap
 } from 'lucide-react';
 
 const SKIP_TEST_PENALTY = 50;
@@ -60,6 +62,7 @@ export default function CertificationPractice() {
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [mobileView, setMobileView] = useState<'question' | 'answer'>('question');
   const [showInfo, setShowInfo] = useState(false);
+  const [mainView, setMainView] = useState<'overview' | 'practice'>('overview');
   const [markedQuestions, setMarkedQuestions] = useState<Set<string>>(new Set());
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
@@ -502,7 +505,7 @@ export default function CertificationPractice() {
 
                   return (
                     <div key={q.id} className={`border rounded-xl overflow-hidden ${
-                      answer?.isCorrect ? 'border-[var(--gh-success-fg,#16a34a)]/30' : 'border-[var(--gh-danger-fg,#dc2626)]/30'
+                      answer?.isCorrect ? 'border-green-500/30' : 'border-red-500/30'
                     }`}>
                       <Button
                         variant="ghost"
@@ -510,9 +513,9 @@ export default function CertificationPractice() {
                         className="w-full justify-start gap-3 text-left"
                       >
                         {answer?.isCorrect ? (
-                          <CheckCircle className="w-5 h-5 text-[var(--gh-success-fg,#16a34a)] flex-shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
                         ) : (
-                          <XCircle className="w-5 h-5 text-[var(--gh-danger-fg,#dc2626)] flex-shrink-0" />
+                          <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
                         )}
                         <span className="flex-1 text-sm line-clamp-1">{q.question}</span>
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -527,19 +530,19 @@ export default function CertificationPractice() {
                             className="overflow-hidden border-t border-border/50"
                           >
                             <div className="p-3 space-y-2 text-sm">
-                              <div className={`p-2 rounded ${answer?.isCorrect ? 'bg-[var(--gh-success-subtle,#dcfce7)]/10' : 'bg-[var(--gh-danger-subtle,#fee2e2)]/10'}`}>
+                              <div className={`p-2 rounded ${answer?.isCorrect ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
                                 <span className="text-xs text-muted-foreground">Your answer: </span>
-                                <span className={answer?.isCorrect ? 'text-[var(--gh-success-fg,#16a34a)]' : 'text-[var(--gh-danger-fg,#dc2626)]'}>{selectedOption?.text}</span>
+                                <span className={answer?.isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>{selectedOption?.text}</span>
                               </div>
                               {!answer?.isCorrect && (
-                                <div className="p-2 rounded bg-[var(--gh-success-subtle,#dcfce7)]/10">
+                                <div className="p-2 rounded bg-green-500/10">
                                   <span className="text-xs text-muted-foreground">Correct: </span>
-                                  <span className="text-[var(--gh-success-fg,#16a34a)]">{correctOption?.text}</span>
+                                  <span className="text-green-600 dark:text-green-400">{correctOption?.text}</span>
                                 </div>
                               )}
                               {q.explanation && (
-                                <div className="p-2 rounded bg-[var(--gh-accent-subtle,#dbeafe)]/10 flex gap-2">
-                                  <Lightbulb className="w-4 h-4 text-[var(--gh-accent-fg,#2563eb)] flex-shrink-0 mt-0.5" />
+                                <div className="p-2 rounded bg-blue-500/10 flex gap-2">
+                                  <Lightbulb className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                                   <span className="text-muted-foreground">{q.explanation}</span>
                                 </div>
                               )}
@@ -794,8 +797,119 @@ export default function CertificationPractice() {
           </div>
         </header>
 
+        {/* View Tabs */}
+        <div className="border-b border-border bg-background">
+          <div className="max-w-7xl mx-auto px-3 flex items-center gap-1">
+            <button
+              onClick={() => setMainView('overview')}
+              className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors ${
+                mainView === 'overview'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <span className="flex items-center gap-1.5"><ListChecks className="w-3.5 h-3.5" /> Overview</span>
+            </button>
+            <button
+              onClick={() => setMainView('practice')}
+              className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors ${
+                mainView === 'practice'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <span className="flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Practice{totalQuestions > 0 ? ` (${totalQuestions})` : ''}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Overview Panel */}
+        {mainView === 'overview' && (
+          <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+            {/* Cert summary */}
+            <div className="flex items-start gap-3 p-4 bg-card border border-border rounded-xl">
+              <Award className="w-8 h-8 text-primary shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <h2 className="font-semibold text-base">{certification.name}</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">{certification.provider}{certification.examCode ? ` · ${certification.examCode}` : ''}</p>
+                <p className="text-sm text-muted-foreground mt-2">{certification.description}</p>
+              </div>
+            </div>
+
+            {/* Exam stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[
+                { icon: Sparkles, label: 'Questions', value: totalQuestions > 0 ? String(totalQuestions) : 'Soon' },
+                { icon: Clock, label: 'Study Time', value: `${certification.estimatedHours}h` },
+                { icon: Target, label: 'Difficulty', value: certification.difficulty },
+                { icon: GraduationCap, label: 'Category', value: certification.category },
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="p-3 bg-card border border-border rounded-lg text-center">
+                  <Icon className="w-4 h-4 text-primary mx-auto mb-1" />
+                  <p className="text-xs text-muted-foreground">{label}</p>
+                  <p className="text-sm font-semibold capitalize">{value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Prerequisites */}
+            {prerequisites.length > 0 && (
+              <div className="p-4 bg-card border border-border rounded-xl">
+                <h3 className="text-sm font-semibold mb-2 flex items-center gap-1.5">
+                  <ListChecks className="w-4 h-4 text-primary" /> Prerequisites
+                </h3>
+                <div className="space-y-2">
+                  {prerequisites.map((prereq) => (
+                    <div key={prereq.id} className="flex items-center gap-2 text-sm">
+                      <Award className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <span className="text-muted-foreground">{prereq.name}</span>
+                      <span className="text-xs text-muted-foreground">({prereq.provider})</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Official resource */}
+            {(certification as any).officialUrl && (
+              <div className="p-3 bg-card border border-border rounded-xl">
+                <h3 className="text-sm font-semibold mb-2">Official Resources</h3>
+                <a
+                  href={(certification as any).officialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Official {certification.provider} Exam Page
+                </a>
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+              <button
+                onClick={() => setMainView('practice')}
+                disabled={totalQuestions === 0}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <BookOpen className="w-4 h-4" />
+                {totalQuestions > 0 ? `Start Practice (${totalQuestions} questions)` : 'Questions Coming Soon'}
+              </button>
+              <button
+                onClick={() => setLocation(`/certification/${certificationId}/exam`)}
+                disabled={totalQuestions === 0}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Zap className="w-4 h-4" />
+                Mock Exam
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Collapsible Info - More compact */}
-        {showInfo && (
+        {mainView === 'practice' && showInfo && (
           <div className="bg-muted/30 border-b border-border px-3 py-2">
             <div className="max-w-7xl mx-auto flex items-center justify-between text-[10px]">
               <div className="flex items-center gap-4">
@@ -811,32 +925,39 @@ export default function CertificationPractice() {
           </div>
         )}
 
-        {/* Content */}
-        {loading ? (
+        {/* Content - only shown in practice view */}
+        {mainView === 'practice' && loading ? (
           <div className="flex items-center justify-center h-[60vh]">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : error ? (
+        ) : mainView === 'practice' && error ? (
           <div className="flex items-center justify-center h-[60vh] text-center">
             <div><p className="text-red-500 mb-2">{error}</p><Button variant="primary" size="sm" onClick={() => window.location.reload()}>Retry</Button></div>
           </div>
-        ) : totalQuestions === 0 ? (
+        ) : mainView === 'practice' && totalQuestions === 0 ? (
           <ComingSoon 
             type="certification"
             name={certification.name}
             redirectTo="/certifications"
             redirectDelay={5000}
           />
-        ) : (
+        ) : mainView === 'practice' ? (
           <>
-            {/* Desktop - Optimized split layout */}
+            {/* Desktop - Resizable split layout */}
             <div className="hidden lg:flex h-[calc(100vh-100px)]">
-              <div className="w-[40%] border-r border-border overflow-y-auto momentum-scroll">
-                {currentQuestion && <QuestionPanel question={currentQuestion} questionNumber={currentIndex + 1} totalQuestions={totalQuestions} isMarked={isMarked} isCompleted={isCompleted} onToggleMark={toggleMark} timerEnabled={false} timeLeft={0} />}
-              </div>
-              <div className="w-[60%] overflow-y-auto momentum-scroll">
-                {currentQuestion && <AnswerPanel question={currentQuestion} isCompleted={isCompleted} />}
-              </div>
+              <PanelGroup direction="horizontal" autoSaveId={`cert-practice-panels-${certificationId}`} className="w-full">
+                <Panel defaultSize={40} minSize={25} maxSize={65}>
+                  <div className="h-full overflow-y-auto momentum-scroll border-r border-border">
+                    {currentQuestion && <QuestionPanel question={currentQuestion} questionNumber={currentIndex + 1} totalQuestions={totalQuestions} isMarked={isMarked} isCompleted={isCompleted} onToggleMark={toggleMark} timerEnabled={false} timeLeft={0} />}
+                  </div>
+                </Panel>
+                <PanelResizeHandle className="w-1.5 bg-border hover:bg-primary/40 active:bg-primary/60 transition-colors cursor-col-resize" />
+                <Panel defaultSize={60} minSize={30}>
+                  <div className="h-full overflow-y-auto momentum-scroll">
+                    {currentQuestion && <AnswerPanel question={currentQuestion} isCompleted={isCompleted} />}
+                  </div>
+                </Panel>
+              </PanelGroup>
             </div>
 
             {/* Mobile */}
@@ -874,7 +995,7 @@ export default function CertificationPractice() {
               </div>
             </div>
           </>
-        )}
+        ) : null}
       </div>
     </>
   );
