@@ -305,3 +305,32 @@ Last Updated: 2026-04-03
 - **Profile+Stats Merge**: Profile page now includes full stats (streak, XP, level, channel breakdown, recent activity). /stats redirects to /profile.
 - **Component Extraction**: `client/src/components/coding/` — DiffBadge, LiveTimer, TestOutputPanel, ChallengeCard extracted from CodingChallenge.tsx
 - **Unit Tests Added**: `credits.test.ts` (20 cases), `coding-challenges.test.ts` (15 cases)
+
+---
+
+## Data Pipeline Scripts (opencode agents)
+
+All pipeline scripts follow the same pattern:
+1. Build a detailed prompt describing the DB insert task
+2. Invoke `opencode run --agent <skill-name> <prompt>`
+3. The agent generates a TypeScript seed script, runs it, verifies counts, cleans up
+
+| Script | Issue | Skill | DB Table |
+|--------|-------|-------|----------|
+| `scripts/generate-questions-pipeline.ts` | #60 | `content-question-expert` | `questions` |
+| `scripts/generate-flashcards-pipeline.ts` | #61 | `content-flashcard-expert` | `flashcards` |
+| `scripts/generate-voice-sessions-pipeline.ts` | #62 | `content-voice-expert` | `voice_sessions` |
+| `scripts/generate-learning-paths-pipeline.ts` | #63 | `content-learning-path-expert` | `learning_paths` |
+| `scripts/generate-certifications-pipeline.ts` | #64 | `content-certification-expert` | `certifications` + `questions` |
+
+### New skill added
+- `.agents/skills/content-learning-path-expert/SKILL.md` — defines path types, output structure, milestone rules, company-specific guidelines
+
+### Common CLI flags
+All pipelines support:
+- `--min=N` — skip channels/certs already at N items (default varies per script)
+- `--channel=X` / `--cert=X` / `--type=X` — run for a single target only
+
+### Prerequisites
+- Dev server must be running on port 5000: `npm run dev`
+- opencode CLI at `/home/runner/workspace/.config/npm/node_global/bin/opencode`
