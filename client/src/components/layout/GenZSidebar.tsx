@@ -5,32 +5,27 @@
 
 import { useLocation } from 'wouter';
 import { motion, useReducedMotion } from 'framer-motion';
-import { useCredits } from '../../context/CreditsContext';
 import {
-  Home, BookOpen, Award, Mic, Code, Target, Zap,
-  BarChart2, Trophy, Bookmark, Flame, Sparkles, Brain, Coins
+  Home, BookOpen, Award, Mic, Code, Target,
+  BarChart2, Bookmark, Flame, Brain
 } from 'lucide-react';
 
 const navItems = [
   { icon: Home, label: 'Home', path: '/', section: 'main' },
   { icon: BookOpen, label: 'Channels', path: '/channels', section: 'learn' },
   { icon: Award, label: 'Certifications', path: '/certifications', section: 'learn' },
-  { icon: Brain, label: 'My Path', path: '/my-path', section: 'learn', badge: 'NEW' },
-  { icon: Mic, label: 'Voice', path: '/voice-interview', section: 'practice', credits: '+10' },
+  { icon: Brain, label: 'My Path', path: '/my-path', section: 'learn' },
+  { icon: Mic, label: 'Voice', path: '/voice-interview', section: 'practice' },
   { icon: Code, label: 'Coding', path: '/coding', section: 'practice' },
   { icon: Target, label: 'Tests', path: '/tests', section: 'practice' },
   { icon: Flame, label: 'Review', path: '/review', section: 'practice' },
   { icon: BarChart2, label: 'Stats', path: '/stats', section: 'progress' },
-  { icon: Trophy, label: 'Badges', path: '/badges', section: 'progress' },
   { icon: Bookmark, label: 'Saved', path: '/bookmarks', section: 'progress' },
 ];
 
 export function GenZSidebar() {
   const [location, setLocation] = useLocation();
-  const { balance, formatCredits } = useCredits();
   const prefersReducedMotion = useReducedMotion();
-
-  const level = Math.floor(balance / 100);
 
   const handleNavKeyDown = (e: React.KeyboardEvent, path: string) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -41,8 +36,8 @@ export function GenZSidebar() {
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-background border-r border-border flex flex-col z-50 hidden lg:flex">
-      {/* Logo - Clickable to go home */}
-      <button 
+      {/* Logo */}
+      <button
         onClick={() => setLocation('/')}
         onKeyDown={(e) => handleNavKeyDown(e, '/')}
         aria-label="Go to home"
@@ -59,38 +54,12 @@ export function GenZSidebar() {
         </div>
       </button>
 
-      {/* Stats Bar */}
-      <div className="p-4 border-b border-border space-y-2">
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-2">
-            <Flame className="w-4 h-4 text-orange-500" />
-            <span className="text-muted-foreground">Streak</span>
-          </div>
-          <span className="font-bold text-foreground">0</span>
-        </div>
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-muted-foreground">XP</span>
-          </div>
-          <span className="font-bold text-foreground">{balance}</span>
-        </div>
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-purple-400" />
-            <span className="text-muted-foreground">Level</span>
-          </div>
-          <span className="font-bold text-foreground">{level}</span>
-        </div>
-      </div>
-
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-4 space-y-6">
-        {/* Home - Special */}
+        {/* Home */}
         {navItems.filter(item => item.section === 'main').map((item) => {
           const isActive = item.path === "/" ? location === "/" : location.startsWith(item.path);
           const Icon = item.icon;
-          
           return (
             <motion.button
               key={item.path}
@@ -119,7 +88,6 @@ export function GenZSidebar() {
             {navItems.filter(item => item.section === 'learn').map((item) => {
               const isActive = location === item.path;
               const Icon = item.icon;
-              
               return (
                 <motion.button
                   key={item.path}
@@ -137,11 +105,6 @@ export function GenZSidebar() {
                 >
                   <Icon className="w-5 h-5" strokeWidth={2} />
                   <span className="font-semibold">{item.label}</span>
-                  {item.badge && (
-                    <span className="ml-auto px-2 py-0.5 bg-primary text-primary-foreground text-xs font-bold rounded-full">
-                      {item.badge}
-                    </span>
-                  )}
                 </motion.button>
               );
             })}
@@ -155,7 +118,6 @@ export function GenZSidebar() {
             {navItems.filter(item => item.section === 'practice').map((item) => {
               const isActive = location === item.path;
               const Icon = item.icon;
-              
               return (
                 <motion.button
                   key={item.path}
@@ -173,11 +135,6 @@ export function GenZSidebar() {
                 >
                   <Icon className="w-5 h-5" strokeWidth={2} />
                   <span className="font-semibold">{item.label}</span>
-                  {item.credits && (
-                    <span className="ml-auto px-2 py-0.5 bg-amber-500/20 text-amber-500 text-xs font-bold rounded-full">
-                      {item.credits}
-                    </span>
-                  )}
                 </motion.button>
               );
             })}
@@ -191,7 +148,6 @@ export function GenZSidebar() {
             {navItems.filter(item => item.section === 'progress').map((item) => {
               const isActive = location === item.path;
               const Icon = item.icon;
-              
               return (
                 <motion.button
                   key={item.path}
@@ -215,25 +171,6 @@ export function GenZSidebar() {
           </div>
         </div>
       </nav>
-
-      {/* Credits Footer */}
-      <motion.button
-        whileHover={prefersReducedMotion ? undefined : {}}
-        whileTap={prefersReducedMotion ? undefined : {}}
-        onClick={() => setLocation('/profile')}
-        onKeyDown={(e) => handleNavKeyDown(e, '/profile')}
-        tabIndex={0}
-        aria-label="View profile and credits"
-        className="m-4 p-4 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-[16px] flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-      >
-        <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-yellow-500 rounded-full flex items-center justify-center">
-          <Coins className="w-5 h-5 text-primary-foreground" strokeWidth={2.5} />
-        </div>
-        <div className="flex-1 text-left">
-          <div className="text-xs text-muted-foreground">Credits</div>
-          <div className="font-bold text-foreground">{formatCredits(balance)}</div>
-        </div>
-      </motion.button>
     </aside>
   );
 }

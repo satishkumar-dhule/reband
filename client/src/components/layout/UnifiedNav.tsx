@@ -18,7 +18,7 @@ import {
   Mic,
   BarChart3,
   Code,
-  Coins,
+
   ChevronRight,
   ChevronLeft,
   Target,
@@ -67,7 +67,7 @@ const learnSubNav: NavItem[] = [
 
 // Practice section - Active learning modes
 const practiceSubNav: NavItem[] = [
-  { id: 'voice', label: 'Voice Interview', icon: Mic, path: '/voice-interview', badge: '+10', description: 'AI mock interviews' },
+  { id: 'voice', label: 'Voice Interview', icon: Mic, path: '/voice-interview', description: 'AI mock interviews' },
   { id: 'tests', label: 'Quick Tests', icon: Target, path: '/tests', description: 'Timed challenges' },
   { id: 'coding', label: 'Coding', icon: Code, path: '/coding', description: 'Code challenges' },
   { id: 'review', label: 'SRS Review', icon: Flame, path: '/review', description: 'Spaced repetition' },
@@ -76,9 +76,9 @@ const practiceSubNav: NavItem[] = [
 // Progress section - Track achievements
 const progressSubNav: NavItem[] = [
   { id: 'stats', label: 'Statistics', icon: BarChart3, path: '/stats', description: 'Your progress' },
-  { id: 'badges', label: 'Badges', icon: Trophy, path: '/badges', description: 'Achievements' },
+  
   { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, path: '/bookmarks', description: 'Saved questions' },
-  { id: 'profile', label: 'Profile', icon: User, path: '/profile', description: 'Settings & credits' },
+  { id: 'profile', label: 'Profile', icon: User, path: '/profile', description: 'Settings' },
   { id: 'about', label: 'About', icon: Info, path: '/about', description: 'About Open-Interview' },
 ];
 
@@ -87,7 +87,7 @@ function getActiveSection(location: string): string {
   if (location === '/learning-paths' || location.startsWith('/learning-paths/')) return 'paths';
   if (location === '/channels' || location.startsWith('/channel/') || location === '/certifications' || location.startsWith('/certification/') || location === '/my-path') return 'learn';
   if (location.startsWith('/voice') || location.startsWith('/test') || location.startsWith('/coding') || location === '/review') return 'practice';
-  if (location === '/stats' || location === '/badges' || location === '/bookmarks' || location === '/profile') return 'progress';
+  if (location === '/stats' || location === '/bookmarks' || location === '/profile') return 'progress';
   if (location === '/bot-activity') return 'bots';
   return 'home';
 }
@@ -99,7 +99,6 @@ function getActiveSection(location: string): string {
 
 export function MobileBottomNav() {
   const [location, setLocation] = useLocation();
-  const { balance, formatCredits } = useCredits();
   const { preferences } = useUserPreferences();
   const [showMenu, setShowMenu] = useState<string | null>(null);
   
@@ -511,7 +510,6 @@ interface DesktopSidebarProps {
 
 export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
   const [location, setLocation] = useLocation();
-  const { balance, formatCredits } = useCredits();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const { preferences } = useUserPreferences();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -658,32 +656,6 @@ export function DesktopSidebar({ onSearchClick }: DesktopSidebarProps) {
         {progressSubNav.map(item => <NavItemComponent key={item.id} item={item} isActive={getIsActive(item.path)} isCollapsed={isCollapsed} />)}
       </nav>
 
-      {/* Credits Footer */}
-      <div className={cn("p-2 border-t border-border", isCollapsed && "p-1")}>
-        <button
-          onClick={() => setLocation('/profile')}
-          aria-label="View credits"
-          className={cn(
-            "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors overflow-hidden",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
-            isCollapsed && "justify-center px-1.5"
-          )}
-          style={{
-            background: 'hsl(45 100% 50% / 0.1)',
-            border: '1px solid hsl(45 100% 50% / 0.2)'
-          }}
-        >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shrink-0">
-            <Coins className="w-4 h-4 text-white" />
-          </div>
-          {!isCollapsed && (
-            <div className="flex-1 text-left min-w-0">
-              <div className="text-[10px] text-muted-foreground">Credits</div>
-              <div className="text-sm font-bold truncate" style={{ color: 'hsl(45 100% 60%)' }}>{formatCredits(balance)}</div>
-            </div>
-          )}
-        </button>
-      </div>
     </aside>
   );
 }
@@ -700,7 +672,6 @@ interface UnifiedMobileHeaderProps {
 
 export function UnifiedMobileHeader({ title, showBack, onSearchClick }: UnifiedMobileHeaderProps) {
   const [, setLocation] = useLocation();
-  const { balance, formatCredits } = useCredits();
 
   return (
     <header 
@@ -753,21 +724,6 @@ export function UnifiedMobileHeader({ title, showBack, onSearchClick }: UnifiedM
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
-          {/* Credits - Gold Pill */}
-          <button
-            onClick={() => setLocation('/profile')}
-            aria-label="View credits"
-            className="flex items-center gap-1 px-2 py-1.5 rounded-[10px] transition-colors min-h-[36px] touch-manipulation"
-style={{
-               background: 'var(--gh-attention-emphasis) / 0.15',
-               border: '1px solid hsl(45 100% 50% / 0.25)'
-             }}
-            type="button"
-          >
-            <Coins className="w-3.5 h-3.5" strokeWidth={2.5} style={{ color: 'hsl(45 100% 60%)' }} />
-            <span className="text-xs font-bold" style={{ color: 'hsl(45 100% 60%)' }}>{formatCredits(balance)}</span>
-          </button>
-
           {/* Search */}
           <button
             onClick={onSearchClick}

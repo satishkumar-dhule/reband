@@ -2,11 +2,10 @@ import { ReactNode, useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
 import {
   Home, BookOpen, Mic, Code, RotateCcw, BarChart2,
-  Bookmark, Award, User, Map, Search, Menu, X, Brain,
+  Bookmark, User, Map, Search, Menu, X, Brain,
 } from "lucide-react";
 import { ThemeToggle } from "../ThemeToggle";
 import { UnifiedSearch } from "../UnifiedSearch";
-import { useCredits } from "@/context/CreditsContext";
 import { cn } from "@/lib/utils";
 import { MobileBottomNav } from "./UnifiedNav";
 
@@ -19,7 +18,6 @@ const NAV_ITEMS = [
   { icon: BarChart2, label: "Stats",    path: "/stats" },
   { icon: Bookmark,  label: "Saved",    path: "/bookmarks" },
   { icon: Map,       label: "Paths",    path: "/learning-paths" },
-  { icon: Award,     label: "Badges",   path: "/badges" },
   { icon: User,      label: "Profile",  path: "/profile" },
 ] as const;
 
@@ -73,7 +71,6 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [, setLocation] = useLocation();
-  const { balance, formatCredits } = useCredits();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -149,14 +146,6 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
         </button>
 
         <div className="flex-1" />
-
-        {/* Credits */}
-        <div className="hidden sm:flex items-center gap-1.5 text-xs">
-          <span className="font-semibold" style={{ color: "var(--gh-blue)" }}>
-            {formatCredits(balance)}
-          </span>
-          <span className="text-muted-foreground">credits</span>
-        </div>
 
         {/* Theme toggle */}
         <ThemeToggle />

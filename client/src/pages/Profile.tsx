@@ -1,106 +1,115 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useLocation, Link } from 'wouter';
+import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'wouter';
 import { AppLayout } from '../components/layout/AppLayout';
 import { SEOHead } from '../components/SEOHead';
 import { useUserPreferences } from '../context/UserPreferencesContext';
-import { useCredits } from '../context/CreditsContext';
+import { allChannelsConfig } from '../lib/channels-config';
 import {
-  User, Settings, Target, 
-  Award, BookOpen,
-  Mail, Link as LinkIcon, MapPin, Twitter,
-  ChevronLeft, Home, Coins, Gift, History, Mic
+  User, Settings, Target, BookOpen, Home,
+  BarChart2, CheckCircle2, Layers
 } from 'lucide-react';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
-import { Button, IconButton } from '@/components/unified/Button';
-import { Input } from '@/components/ui/input';
+import {
+  Breadcrumb, BreadcrumbList, BreadcrumbItem,
+  BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator
+} from '../components/ui/breadcrumb';
 import { Switch } from '@/components/ui/switch';
 
-// Unified progress storage key for O(1) access
-const ALL_PROGRESS_KEY = 'allProgress';
+// ── Real data helpers (localStorage only) ─────────────────────────────────────
 
-/**
- * Get total completed questions count using O(1) localStorage access.
- * Uses allProgress key if available, otherwise falls back to indexing progress-*.
- */
 function getTotalCompleted(): number {
   try {
-    // Try unified key first (O(1))
-    const allProgress = localStorage.getItem(ALL_PROGRESS_KEY);
+    const allProgress = localStorage.getItem('allProgress');
     if (allProgress) {
       const progress = JSON.parse(allProgress);
-      // progress is { channelId: Set<string> } or array
-      if (Array.isArray(progress)) {
-        return progress.length;
-      }
+      if (Array.isArray(progress)) return progress.length;
       if (typeof progress === 'object') {
         return Object.values(progress).reduce((acc: number, ids: unknown) => {
           if (Array.isArray(ids)) return acc + ids.length;
-          if (ids instanceof Set) return acc + ids.size;
           return acc;
         }, 0);
       }
     }
-
-    // Fallback: build index from progress-* keys (O(N) but only on first access)
-    const allCompletedIds = new Set<string>();
-    const indexKey = 'progress-index';
-    const indexStr = localStorage.getItem(indexKey);
-
-    if (indexStr) {
-      // Use pre-built index - O(K) where K = number of channels with progress
-      const channelIds = indexStr.split(',').filter(Boolean);
-      for (const channelId of channelIds) {
+    // Fallback: scan progress-* keys
+    const allIds = new Set<string>();
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('progress-') && !key.startsWith('progress-index')) {
         try {
-          const ids: string[] = JSON.parse(localStorage.getItem(`progress-${channelId}`) || '[]');
-          ids.forEach(id => allCompletedIds.add(id));
-        } catch {
-          // skip malformed entry
-        }
+          const ids: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+          ids.forEach(id => allIds.add(id));
+        } catch { /* skip */ }
       }
-    } else {
-      // Scan all keys - O(N) but caches result
-      const indexedChannels: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key?.startsWith('progress-') && !key.startsWith('progress-index')) {
-          const channelId = key.replace('progress-', '');
-          indexedChannels.push(channelId);
-          try {
-            const ids: string[] = JSON.parse(localStorage.getItem(key) || '[]');
-            ids.forEach(id => allCompletedIds.add(id));
-          } catch {
-            // skip malformed entry
-          }
-        }
-      }
-      // Cache the index for future access
-      localStorage.setItem(indexKey, indexedChannels.join(','));
     }
-
-    return allCompletedIds.size;
+    return allIds.size;
   } catch {
     return 0;
   }
 }
 
-// Move achievements outside component - constant data doesn't need to be recreated
-const achievements = [
-  { id: 1, name: 'First Steps', desc: 'Complete your first question', icon: '🌟', achieved: true },
-  { id: 2, name: 'Quick Learner', desc: 'Complete 10 questions', icon: '⚡', achieved: true },
-  { id: 3, name: 'On Fire', desc: '7 day streak', icon: '🔥', achieved: true },
-  { id: 4, name: 'Dedicated', desc: '30 day streak', icon: '💎', achieved: false },
-  { id: 5, name: 'Master', desc: 'Complete all questions', icon: '👑', achieved: false },
-  { id: 6, name: 'Perfect Week', desc: '7 days in a row', icon: '🎯', achieved: false },
-];
+interface ChannelProgress {
+  channelId: string;
+  name: string;
+  completed: number;
+}
 
-const learningHistory = [
-  { id: 1, channel: 'JavaScript', questions: 45, total: 100, lastActive: '2 hours ago' },
-  { id: 2, channel: 'React', questions: 32, total: 80, lastActive: '1 day ago' },
-  { id: 3, channel: 'TypeScript', questions: 28, total: 60, lastActive: '3 days ago' },
-  { id: 4, channel: 'Node.js', questions: 15, total: 90, lastActive: '1 week ago' },
-];
+function getRealChannelProgress(): ChannelProgress[] {
+  const results: ChannelProgress[] = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('progress-') && !key.startsWith('progress-index')) {
+        const channelId = key.replace('progress-', '');
+        try {
+          const ids: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+          if (ids.length > 0) {
+            const config = allChannelsConfig.find(c => c.id === channelId);
+            results.push({
+              channelId,
+              name: config?.name ?? channelId,
+              completed: ids.length,
+            });
+          }
+        } catch { /* skip */ }
+      }
+    }
+  } catch { /* skip */ }
+  return results.sort((a, b) => b.completed - a.completed);
+}
 
-// Isolated PreferencesPanel component - prevents preference toggles from re-rendering achievements
+function getFlashcardProgress(): number {
+  let total = 0;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('flashcards-v2-progress-')) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key) || '{}');
+          total += Object.values(data).filter((p: unknown) => (p as { seen?: boolean }).seen).length;
+        } catch { /* skip */ }
+      }
+    }
+  } catch { /* skip */ }
+  return total;
+}
+
+// ── Sub-components ─────────────────────────────────────────────────────────────
+
+interface StatCardProps {
+  icon: React.ReactNode;
+  label: string;
+  value: number | string;
+}
+
+function StatCard({ icon, label, value }: StatCardProps) {
+  return (
+    <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex flex-col items-center gap-1 text-center">
+      <div className="text-[var(--gh-fg-muted)]">{icon}</div>
+      <div className="text-2xl font-bold text-[var(--gh-fg)]">{value}</div>
+      <div className="text-xs text-[var(--gh-fg-muted)]">{label}</div>
+    </div>
+  );
+}
+
 interface PreferencesPanelProps {
   preferences: {
     shuffleQuestions?: boolean;
@@ -120,45 +129,42 @@ function PreferencesPanel({
 }: PreferencesPanelProps) {
   return (
     <section className="pt-8 border-t border-[var(--gh-border)]">
-      <h2 className="text-xl font-semibold text-[var(--gh-fg)] mb-6 flex items-center gap-2">
-        <Settings className="w-5 h-5" />
+      <h2 className="text-base font-semibold text-[var(--gh-fg)] mb-4 flex items-center gap-2">
+        <Settings className="w-4 h-4" />
         Preferences
       </h2>
-      
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Shuffle Questions</h3>
             <p className="text-xs text-[var(--gh-fg-muted)]">Randomize question order</p>
           </div>
           <Switch
-            checked={preferences.shuffleQuestions}
+            checked={!!preferences.shuffleQuestions}
             onCheckedChange={toggleShuffleQuestions}
             aria-label="Toggle shuffle questions"
             data-testid="switch-shuffle-questions"
           />
         </div>
-
         <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Prioritize Unvisited</h3>
             <p className="text-xs text-[var(--gh-fg-muted)]">Show new questions first</p>
           </div>
           <Switch
-            checked={preferences.prioritizeUnvisited}
+            checked={!!preferences.prioritizeUnvisited}
             onCheckedChange={togglePrioritizeUnvisited}
             aria-label="Toggle prioritize unvisited"
             data-testid="switch-prioritize-unvisited"
           />
         </div>
-
         <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Hide Certifications</h3>
             <p className="text-xs text-[var(--gh-fg-muted)]">Hide certification paths</p>
           </div>
           <Switch
-            checked={preferences.hideCertifications}
+            checked={!!preferences.hideCertifications}
             onCheckedChange={toggleHideCertifications}
             aria-label="Toggle hide certifications"
             data-testid="switch-hide-certifications"
@@ -169,84 +175,36 @@ function PreferencesPanel({
   );
 }
 
+// ── Main page ──────────────────────────────────────────────────────────────────
+
 export default function Profile() {
-  const [, setLocation] = useLocation();
   const { preferences, toggleShuffleQuestions, togglePrioritizeUnvisited, toggleHideCertifications } = useUserPreferences();
-  const { balance, state: creditsState, history, onRedeemCoupon, config } = useCredits();
   const [totalCompleted, setTotalCompleted] = useState(0);
+  const [channelProgress, setChannelProgress] = useState<ChannelProgress[]>([]);
+  const [flashcardsDone, setFlashcardsDone] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [couponCode, setCouponCode] = useState('');
-  const [couponMessage, setCouponMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    // Use O(1) unified progress access instead of O(N) localStorage loop
-    const completed = getTotalCompleted();
-    setTotalCompleted(completed);
+    setTotalCompleted(getTotalCompleted());
+    setChannelProgress(getRealChannelProgress());
+    setFlashcardsDone(getFlashcardProgress());
     setIsLoading(false);
   }, []);
 
-  // Memoize achievedCount to prevent recalculation on every render
-  const achievedCount = useMemo(
-    () => achievements.filter(a => a.achieved).length,
-    []
-  );
-
-  // Memoize level calculation
-  const level = useMemo(() => Math.floor(balance / 100), [balance]);
-
-  // Memoize the preferences toggle functions to prevent unnecessary re-renders
   const handleShuffleToggle = useCallback(() => toggleShuffleQuestions(), [toggleShuffleQuestions]);
   const handlePrioritizeToggle = useCallback(() => togglePrioritizeUnvisited(), [togglePrioritizeUnvisited]);
   const handleHideCertToggle = useCallback(() => toggleHideCertifications(), [toggleHideCertifications]);
 
-  const handleCouponSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    if (isSubmitting) return;
-    if (!couponCode.trim()) {
-      setCouponMessage({ type: 'error', text: 'Please enter a coupon code' });
-      return;
-    }
-    setIsSubmitting(true);
-    const result = onRedeemCoupon(couponCode);
-    setCouponMessage({
-      type: result.success ? 'success' : 'error',
-      text: result.message
-    });
-    if (result.success) {
-      setCouponCode('');
-    }
-    setIsSubmitting(false);
-    setTimeout(() => setCouponMessage(null), 3000);
-  }, [couponCode, isSubmitting, onRedeemCoupon]);
-
-  // Loading skeleton
   if (isLoading) {
     return (
       <>
-        <SEOHead
-          title="Profile - DevPrep"
-          description="Your learning profile and achievements"
-          canonical="https://open-interview.github.io/profile"
-        />
+        <SEOHead title="Profile - DevPrep" description="Your learning profile and progress" canonical="/profile" />
         <AppLayout>
           <div className="bg-[var(--gh-canvas-subtle)] min-h-screen">
-            <div className="max-w-[1280px] mx-auto px-4 py-8">
-              <div className="animate-pulse space-y-6">
-                <div className="flex gap-8">
-                  {/* Sidebar skeleton */}
-                  <div className="w-72 space-y-4">
-                    <div className="aspect-square rounded-full bg-[var(--gh-canvas)] border border-[var(--gh-border)]" />
-                    <div className="h-8 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded w-3/4" />
-                    <div className="h-6 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded w-1/2" />
-                  </div>
-                  {/* Main content skeleton */}
-                  <div className="flex-1 space-y-6">
-                    <div className="h-48 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md" />
-                    <div className="h-64 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md" />
-                  </div>
-                </div>
-              </div>
+            <div className="max-w-3xl mx-auto px-4 py-8 animate-pulse space-y-6">
+              <div className="h-6 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded w-48" />
+              <div className="h-32 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md" />
+              <div className="h-64 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md" />
             </div>
           </div>
         </AppLayout>
@@ -254,18 +212,16 @@ export default function Profile() {
     );
   }
 
+  const channelsWorkedOn = channelProgress.length;
+
   return (
     <>
-      <SEOHead
-        title="Profile - DevPrep"
-        description="Your learning profile and achievements"
-        canonical="https://open-interview.github.io/profile"
-      />
-
+      <SEOHead title="Profile - DevPrep" description="Your learning profile and progress" canonical="/profile" />
       <AppLayout>
         <div className="bg-[var(--gh-canvas-subtle)] min-h-screen" id="main-content">
-          <div className="max-w-[1280px] mx-auto px-4 py-8">
-            {/* Breadcrumb Navigation */}
+          <div className="max-w-3xl mx-auto px-4 py-8">
+
+            {/* Breadcrumb */}
             <Breadcrumb className="mb-6">
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -281,225 +237,100 @@ export default function Profile() {
               </BreadcrumbList>
             </Breadcrumb>
 
-            <div className="flex flex-col md:flex-row gap-8">
-              
-              {/* Left Sidebar */}
-              <div className="w-full md:w-72 flex-shrink-0">
-                <div className="relative group mb-4">
-                  <div className="w-full aspect-square rounded-full border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-center overflow-hidden">
-                    <User className="w-1/2 h-1/2 text-[var(--gh-fg-muted)]" />
-                  </div>
-                  <IconButton
-                    icon={<Settings className="w-4 h-4 text-[var(--gh-fg-muted)]" />}
-                    aria-label="Settings"
-                    size="sm"
-                    rounded="full"
-                    className="absolute bottom-4 right-4"
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-16 h-16 rounded-full border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-center flex-shrink-0">
+                <User className="w-8 h-8 text-[var(--gh-fg-muted)]" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold text-[var(--gh-fg)]">My Progress</h1>
+                <p className="text-sm text-[var(--gh-fg-muted)]">
+                  Stats are tracked locally in your browser — no account needed.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-8">
+
+              {/* Stats overview */}
+              <section>
+                <h2 className="text-base font-semibold text-[var(--gh-fg)] mb-3 flex items-center gap-2">
+                  <BarChart2 className="w-4 h-4" />
+                  Overview
+                </h2>
+                <div className="grid grid-cols-3 gap-3">
+                  <StatCard
+                    icon={<CheckCircle2 className="w-5 h-5" />}
+                    label="Questions answered"
+                    value={totalCompleted}
+                  />
+                  <StatCard
+                    icon={<Layers className="w-5 h-5" />}
+                    label="Channels studied"
+                    value={channelsWorkedOn}
+                  />
+                  <StatCard
+                    icon={<BookOpen className="w-5 h-5" />}
+                    label="Flashcards reviewed"
+                    value={flashcardsDone}
                   />
                 </div>
+              </section>
 
-                <div className="mb-6">
-                  <h1 className="text-2xl font-semibold text-[var(--gh-fg)]" data-testid="text-username">User_{level}</h1>
-                  <p className="text-xl text-[var(--gh-fg-muted)] font-light">Dev Enthusiast</p>
-                </div>
+              {/* Per-channel progress */}
+              <section>
+                <h2 className="text-base font-semibold text-[var(--gh-fg)] mb-3 flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Channel Progress
+                </h2>
 
-                <Button variant="secondary" className="w-full mb-6" data-testid="button-edit-profile">
-                  Edit profile
-                </Button>
-
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center gap-2 text-sm text-[var(--gh-fg)]">
-                    <Award className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                    <span className="font-semibold">{level}</span>
-                    <span className="text-[var(--gh-fg-muted)]">level</span>
-                    <span className="mx-1">·</span>
-                    <span className="font-semibold">{balance.toLocaleString()}</span>
-                    <span className="text-[var(--gh-fg-muted)]">XP</span>
+                {channelProgress.length === 0 ? (
+                  <div className="p-8 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-center">
+                    <BookOpen className="w-8 h-8 text-[var(--gh-fg-muted)] mx-auto mb-3" />
+                    <p className="text-sm font-medium text-[var(--gh-fg)]">No questions answered yet</p>
+                    <p className="text-xs text-[var(--gh-fg-muted)] mt-1">
+                      Visit any channel and start answering questions — your progress will show up here.
+                    </p>
+                    <Link href="/" className="inline-block mt-4 text-xs text-[var(--gh-accent-fg)] hover:underline">
+                      Browse channels →
+                    </Link>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-[var(--gh-fg)]">
-                    <Target className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                    <span className="font-semibold">{totalCompleted}</span>
-                    <span className="text-[var(--gh-fg-muted)]">completed</span>
-                  </div>
-                </div>
-
-                {/* Credits Section */}
-                <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] mb-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Coins className="w-4 h-4 text-[var(--gh-attention-fg)]" />
-                    <span className="text-sm font-semibold text-[var(--gh-fg)]">{balance.toLocaleString()} Credits</span>
-                  </div>
-                  <p className="text-xs text-[var(--gh-fg-muted)] mb-3">
-                    Earned: {creditsState.totalEarned.toLocaleString()} · Spent: {creditsState.totalSpent.toLocaleString()}
-                  </p>
-
-                  {/* How to earn */}
-                  <div className="bg-[var(--gh-canvas)] rounded-lg p-2 mb-3">
-                    <h4 className="text-xs font-semibold text-[var(--gh-attention-fg)] mb-1 flex items-center gap-1">
-                      <Mic className="w-3 h-3" /> Earn Credits
-                    </h4>
-                    <div className="space-y-0.5 text-xs text-[var(--gh-fg-muted)]">
-                      <div className="flex justify-between">
-                        <span>Voice interview attempt</span>
-                        <span className="text-[var(--gh-success-fg)]">+{config.VOICE_ATTEMPT}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Successful interview</span>
-                        <span className="text-[var(--gh-success-fg)]">+{config.VOICE_SUCCESS_BONUS} bonus</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>View question</span>
-                        <span className="text-[var(--gh-danger-fg)]">-{config.QUESTION_VIEW_COST}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Coupon Redemption */}
-                  <form onSubmit={handleCouponSubmit}>
-                    <h4 className="text-xs font-semibold mb-1 flex items-center gap-1">
-                      <Gift className="w-3 h-3" /> Redeem Coupon
-                    </h4>
-                    <div className="flex gap-1">
-                      <label htmlFor="coupon-code" className="sr-only">Coupon code</label>
-                      <Input
-                        id="coupon-code"
-                        type="text"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        placeholder="Enter code"
-                        className="flex-1 text-xs"
-                      />
-                      <Button
-                        type="submit"
-                        variant="primary"
-                        size="sm"
-                        loading={isSubmitting}
+                ) : (
+                  <div className="space-y-2">
+                    {channelProgress.map((item) => (
+                      <Link
+                        key={item.channelId}
+                        href={`/channel/${item.channelId}`}
+                        className="block p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] hover:border-[var(--gh-accent-fg)] transition-colors group"
+                        data-testid={`channel-progress-${item.channelId}`}
                       >
-                        Apply
-                      </Button>
-                    </div>
-                    {couponMessage && (
-                      <p className={`text-xs mt-1 ${couponMessage.type === 'success' ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}`}>
-                        {couponMessage.text}
-                      </p>
-                    )}
-                  </form>
-
-                  {/* Transaction History */}
-                  {history.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-[var(--gh-border)]">
-                      <h4 className="text-xs font-semibold mb-2 flex items-center gap-1">
-                        <History className="w-3 h-3" /> Recent Activity
-                      </h4>
-                      <div className="space-y-1 max-h-24 overflow-y-auto">
-                        {history.slice(0, 5).map((tx) => (
-                          <div key={tx.id} className="flex justify-between text-xs">
-                            <span className="text-[var(--gh-fg-muted)] truncate flex-1">{tx.description}</span>
-                            <span className={tx.amount > 0 ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}>
-                              {tx.amount > 0 ? '+' : ''}{tx.amount}
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-8 h-8 rounded-md bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] flex items-center justify-center flex-shrink-0">
+                              <BookOpen className="w-4 h-4 text-[var(--gh-accent-fg)]" />
+                            </div>
+                            <span className="text-sm font-medium text-[var(--gh-fg)] group-hover:text-[var(--gh-accent-fg)] transition-colors truncate">
+                              {item.name}
                             </span>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-6 border-t border-[var(--gh-border)] space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-[var(--gh-fg)]">
-                    <MapPin className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                    <span>Global</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-[var(--gh-fg)]">
-                    <Mail className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                    <span className="text-[var(--gh-accent-fg)] hover:underline cursor-pointer">user@example.com</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-[var(--gh-fg)]">
-                    <LinkIcon className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                    <span className="text-[var(--gh-accent-fg)] hover:underline cursor-pointer">devprep.io</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-[var(--gh-fg)]">
-                    <Twitter className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                    <span className="text-[var(--gh-accent-fg)] hover:underline cursor-pointer">@devprep</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Content */}
-              <div className="flex-1 min-w-0">
-                <nav className="flex gap-4 border-b border-[var(--gh-border)] mb-6 overflow-x-auto">
-                  <Button variant="primary" size="sm" className="border-b-2 border-[var(--gh-accent-fg)] rounded-none bg-transparent text-[var(--gh-fg)] hover:bg-transparent">
-                    Overview
-                  </Button>
-                  <Button variant="ghost" size="sm" className="rounded-none text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]">
-                    Learning Paths
-                  </Button>
-                  <Button variant="ghost" size="sm" className="rounded-none text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]">
-                    Achievements
-                    <span className="bg-[var(--gh-neutral-subtle)] text-[var(--gh-fg-muted)] text-xs px-2 py-0.5 rounded-full">{achievedCount}</span>
-                  </Button>
-                </nav>
-
-                <div className="space-y-8">
-                  {/* Achievements Grid */}
-                  <section>
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-base font-semibold text-[var(--gh-fg)]">Achievements</h2>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                      {achievements.map((achievement) => (
-                        <div 
-                          key={achievement.id}
-                          className={`p-3 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-center transition-all ${achievement.achieved ? 'opacity-100 hover:scale-[1.02] hover:shadow-md' : 'opacity-40 grayscale'}`}
-                          data-testid={`achievement-${achievement.id}`}
-                        >
-                          <div className="text-2xl mb-1">{achievement.icon}</div>
-                          <div className="text-xs font-semibold text-[var(--gh-fg)] truncate">{achievement.name}</div>
+                          <span className="text-sm font-semibold text-[var(--gh-fg)] flex-shrink-0">
+                            {item.completed} <span className="text-[var(--gh-fg-muted)] font-normal text-xs">answered</span>
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                  </section>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </section>
 
-                  {/* Learning History */}
-                  <section>
-                    <h2 className="text-base font-semibold text-[var(--gh-fg)] mb-4">Learning History</h2>
-                    <div className="space-y-3">
-                      {learningHistory.map((item) => (
-                        <div key={item.id} className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] hover:border-[var(--gh-accent-fg)] transition-all group">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-md bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] flex items-center justify-center">
-                                <BookOpen className="w-4 h-4 text-[var(--gh-accent-fg)]" />
-                              </div>
-                              <div>
-                                <h3 className="text-sm font-semibold text-[var(--gh-accent-fg)] group-hover:underline cursor-pointer">{item.channel}</h3>
-                                <p className="text-xs text-[var(--gh-fg-muted)]">Updated {item.lastActive}</p>
-                              </div>
-                            </div>
-                            <div className="text-xs font-medium text-[var(--gh-fg-muted)]">
-                              {item.questions} / {item.total} questions
-                            </div>
-                          </div>
-                          <div className="gh-progress">
-                            <div 
-                              className="gh-progress-bar" 
-                              style={{ width: `${(item.questions / item.total) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
+              {/* Preferences */}
+              <PreferencesPanel
+                preferences={preferences}
+                toggleShuffleQuestions={handleShuffleToggle}
+                togglePrioritizeUnvisited={handlePrioritizeToggle}
+                toggleHideCertifications={handleHideCertToggle}
+              />
 
-                  {/* Settings Section - Isolated PreferencesPanel */}
-                  <PreferencesPanel
-                    preferences={preferences}
-                    toggleShuffleQuestions={handleShuffleToggle}
-                    togglePrioritizeUnvisited={handlePrioritizeToggle}
-                    toggleHideCertifications={handleHideCertToggle}
-                  />
-                </div>
-              </div>
             </div>
           </div>
         </div>
