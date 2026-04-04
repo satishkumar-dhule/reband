@@ -103,7 +103,7 @@ const TestOutputPanel = React.memo(function TestOutputPanel({
 
   return (
     <div className={cn(
-      'border-t border-[var(--gh-border-default)] flex flex-col bg-[var(--gh-canvas)] transition-all duration-300 shrink-0',
+      'border-t border-[var(--gh-border)] flex flex-col bg-[var(--gh-canvas)] transition-all duration-300 shrink-0',
       isExpanded ? 'h-[38vh] min-h-[160px] max-h-[55vh]' : 'h-11'
     )}>
       {/* Header */}
@@ -192,7 +192,7 @@ const TestOutputPanel = React.memo(function TestOutputPanel({
                     </div>
 
                     {/* I/O Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[var(--gh-border-default)]/30 text-xs font-mono">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[var(--gh-border)]/30 text-xs font-mono">
                       {[
                         { label: 'Input', val: tc?.input },
                         { label: 'Expected', val: tc?.expectedOutput },
@@ -306,24 +306,24 @@ function ChallengeView({
       <div className="flex flex-col h-screen bg-[var(--gh-canvas-subtle)]">
 
         {/* ── Top Bar ─────────────────────────────────────────── */}
-        <header className="h-12 flex items-center justify-between px-4 border-b border-[var(--gh-border-default)] bg-[var(--gh-canvas)] shrink-0 gap-3">
+        <header className="h-12 flex items-center justify-between px-4 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)] shrink-0 gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={onBack}
-              className="flex items-center gap-1.5 text-xs text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] px-2 py-1.5 rounded-md hover:bg-white/6 transition-all shrink-0"
+              className="flex items-center gap-1.5 text-xs text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] px-2 py-1.5 rounded-md hover:bg-[var(--gh-neutral-subtle)] transition-all shrink-0"
               data-testid="button-back"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               Back
             </button>
 
-            <div className="w-px h-4 bg-[var(--gh-border-default)]" />
+            <div className="w-px h-4 bg-[var(--gh-border)]" />
 
             <div className="flex items-center gap-2 min-w-0">
               <span className={cn('w-2 h-2 rounded-full shrink-0', isSolved ? 'bg-emerald-400' : 'bg-amber-400')} />
               <h1 className="text-sm font-semibold text-[var(--gh-fg)] truncate">{challenge.title}</h1>
               <DiffBadge d={challenge.difficulty} />
-              <span className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--gh-border-default)] text-[var(--gh-fg-muted)] bg-[var(--gh-canvas-subtle)] hidden sm:inline">
+              <span className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--gh-border)] text-[var(--gh-fg-muted)] bg-[var(--gh-canvas-subtle)] hidden sm:inline">
                 {challenge.category}
               </span>
             </div>
@@ -331,10 +331,10 @@ function ChallengeView({
 
           <div className="flex items-center gap-2 shrink-0">
             <LiveTimer startTime={startTime} />
-            <div className="w-px h-4 bg-[var(--gh-border-default)]" />
+            <div className="w-px h-4 bg-[var(--gh-border)]" />
 
             {/* Language tabs */}
-            <div className="flex items-center bg-[var(--gh-canvas-inset)] border border-[var(--gh-border-default)] rounded-md overflow-hidden">
+            <div className="flex items-center bg-[var(--gh-canvas-inset)] border border-[var(--gh-border)] rounded-md overflow-hidden">
               {(['javascript', 'python'] as Language[]).map(lang => (
                 <button
                   key={lang}
@@ -343,7 +343,7 @@ function ChallengeView({
                     'px-3 py-1 text-xs font-medium transition-all',
                     language === lang
                       ? 'bg-[var(--gh-accent-fg)] text-white'
-                      : 'text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-white/4'
+                      : 'text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-neutral-subtle)]'
                   )}
                   data-testid={`button-lang-${lang}`}
                 >
@@ -372,7 +372,7 @@ function ChallengeView({
         </header>
 
         {/* ── Mobile Tab Switch ─────────────────────────────── */}
-        <div className="lg:hidden flex border-b border-[var(--gh-border-default)] bg-[var(--gh-canvas)] shrink-0">
+        <div className="lg:hidden flex border-b border-[var(--gh-border)] bg-[var(--gh-canvas)] shrink-0">
           {['Description', 'Code Editor'].map((label, i) => {
             const active = i === 0 ? showDesc : !showDesc;
             return (
@@ -395,7 +395,7 @@ function ChallengeView({
 
           {/* LEFT: Problem Description */}
           <div className={cn(
-            'lg:w-[42%] lg:border-r border-[var(--gh-border-default)] flex flex-col bg-[var(--gh-canvas-subtle)] min-h-0',
+            'lg:w-[42%] lg:border-r border-[var(--gh-border)] flex flex-col bg-[var(--gh-canvas-subtle)] min-h-0',
             showDesc ? 'flex' : 'hidden lg:flex'
           )}>
             <ScrollArea className="flex-1">
@@ -405,7 +405,7 @@ function ChallengeView({
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <DiffBadge d={challenge.difficulty} />
-                    <span className="text-[10px] px-2 py-0.5 rounded border border-[var(--gh-border-default)] text-[var(--gh-fg-muted)]">
+                    <span className="text-[10px] px-2 py-0.5 rounded border border-[var(--gh-border)] text-[var(--gh-fg-muted)]">
                       {challenge.category}
                     </span>
                     {isSolved && (
@@ -421,7 +421,7 @@ function ChallengeView({
                     <div className="flex flex-wrap items-center gap-1.5">
                       <Building2 className="w-3.5 h-3.5 text-[var(--gh-fg-muted)]" />
                       {challenge.companies.map(c => (
-                        <span key={c} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border-default)] text-[var(--gh-fg-muted)]">
+                        <span key={c} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] text-[var(--gh-fg-muted)]">
                           {c}
                         </span>
                       ))}
@@ -447,7 +447,7 @@ function ChallengeView({
                       { label: 'Time', val: challenge.complexity.time },
                       { label: 'Space', val: challenge.complexity.space },
                     ].map(({ label, val }) => (
-                      <div key={label} className="px-3 py-2.5 rounded-lg bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border-default)]">
+                      <div key={label} className="px-3 py-2.5 rounded-lg bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)]">
                         <p className="text-[9px] font-bold uppercase tracking-wider text-[var(--gh-fg-muted)] mb-0.5">{label} Complexity</p>
                         <p className="text-sm font-mono font-semibold text-[var(--gh-fg)]">{val}</p>
                       </div>
@@ -469,19 +469,19 @@ function ChallengeView({
                     <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--gh-fg-muted)] mb-3">Examples</h3>
                     <div className="space-y-3">
                       {challenge.testCases.filter(tc => !tc.isHidden).map((ex, i) => (
-                        <div key={ex.id} className="rounded-lg border border-[var(--gh-border-default)] overflow-hidden bg-[var(--gh-canvas-inset)]">
-                          <div className="px-3 py-1.5 bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border-default)]">
+                        <div key={ex.id} className="rounded-lg border border-[var(--gh-border)] overflow-hidden bg-[var(--gh-canvas-inset)]">
+                          <div className="px-3 py-1.5 bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border)]">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--gh-fg-muted)]">Example {i + 1}</span>
                             {ex.description && <span className="text-[10px] text-[var(--gh-fg-muted)] ml-2">— {ex.description}</span>}
                           </div>
                           <div className="p-3 grid grid-cols-2 gap-2 text-xs font-mono">
                             <div>
                               <span className="text-[var(--gh-fg-muted)] font-sans text-[9px] uppercase font-bold">Input</span>
-                              <div className="mt-1 p-2 bg-[var(--gh-canvas-subtle)] rounded border border-[var(--gh-border-default)] text-[var(--gh-fg)]">{ex.input}</div>
+                              <div className="mt-1 p-2 bg-[var(--gh-canvas-subtle)] rounded border border-[var(--gh-border)] text-[var(--gh-fg)]">{ex.input}</div>
                             </div>
                             <div>
                               <span className="text-[var(--gh-fg-muted)] font-sans text-[9px] uppercase font-bold">Output</span>
-                              <div className="mt-1 p-2 bg-[var(--gh-canvas-subtle)] rounded border border-[var(--gh-border-default)] text-emerald-300">{ex.expectedOutput}</div>
+                              <div className="mt-1 p-2 bg-[var(--gh-canvas-subtle)] rounded border border-[var(--gh-border)] text-emerald-300">{ex.expectedOutput}</div>
                             </div>
                           </div>
                         </div>
@@ -495,7 +495,7 @@ function ChallengeView({
                   <div>
                     <button
                       onClick={() => setShowHints(!showHints)}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-[var(--gh-border-default)] hover:border-amber-500/40 hover:bg-amber-500/6 transition-all group"
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-[var(--gh-border)] hover:border-amber-500/40 hover:bg-amber-500/6 transition-all group"
                     >
                       <span className="flex items-center gap-2 text-sm font-semibold text-amber-400">
                         <Lightbulb className="w-4 h-4" />
@@ -519,7 +519,7 @@ function ChallengeView({
                                 initial={{ opacity: 0, x: 10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -10 }}
-                                className="text-sm text-amber-200/80 leading-relaxed"
+                                className="text-sm text-[var(--gh-attention-fg)] leading-relaxed"
                               >
                                 {challenge.hints[hintIndex]}
                               </motion.p>
@@ -551,7 +551,7 @@ function ChallengeView({
             !showDesc ? 'flex' : 'hidden lg:flex'
           )}>
             {/* Editor toolbar */}
-            <div className="h-10 flex items-center justify-between px-3 border-b border-[var(--gh-border-default)] bg-[var(--gh-canvas)] shrink-0">
+            <div className="h-10 flex items-center justify-between px-3 border-b border-[var(--gh-border)] bg-[var(--gh-canvas)] shrink-0">
               <div className="flex items-center gap-2">
                 <Code className="w-3.5 h-3.5 text-[var(--gh-fg-muted)]" />
                 <span className="text-xs font-medium text-[var(--gh-fg-muted)] uppercase tracking-wider">
@@ -561,7 +561,7 @@ function ChallengeView({
               <div className="flex items-center gap-1">
                 <button
                   onClick={copyCode}
-                  className="flex items-center gap-1.5 px-2 py-1 rounded text-xs text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-white/6 transition-all"
+                  className="flex items-center gap-1.5 px-2 py-1 rounded text-xs text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-neutral-subtle)] transition-all"
                   data-testid="button-copy-code"
                 >
                   {copied ? <><Check className="w-3 h-3 text-emerald-400" />Copied!</> : <><Copy className="w-3 h-3" />Copy</>}
@@ -609,7 +609,7 @@ function ChallengeView({
 
         {/* ── Success Modal ──────────────────────────────────── */}
         <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-          <DialogContent size="lg" className="bg-[var(--gh-canvas)] border-[var(--gh-border-default)] text-center">
+          <DialogContent size="lg" className="bg-[var(--gh-canvas)] border-[var(--gh-border)] text-center">
             <DialogHeader>
               <div className="flex justify-center mb-4">
                 <div className="relative">
@@ -627,7 +627,7 @@ function ChallengeView({
               </DialogDescription>
             </DialogHeader>
 
-            <div className="flex justify-center gap-8 py-6 my-2 rounded-xl bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border-default)]">
+            <div className="flex justify-center gap-8 py-6 my-2 rounded-xl bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)]">
               {[
                 { label: 'Time', val: (() => { const e = Math.floor((Date.now() - startTime) / 1000); return `${Math.floor(e/60)}:${String(e%60).padStart(2,'0')}`; })() },
                 { label: 'Tests', val: `${testResults.length}/${testResults.length}` },
@@ -670,7 +670,7 @@ function ChallengeCard({ challenge, solved, onClick }: {
         'group relative cursor-pointer rounded-xl border overflow-hidden transition-all',
         solved
           ? 'border-emerald-500/25 bg-[var(--gh-canvas-subtle)]'
-          : 'border-[var(--gh-border-default)] bg-[var(--gh-canvas-subtle)] hover:border-[var(--gh-accent-fg)]/50',
+          : 'border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] hover:border-[var(--gh-accent-fg)]/50',
       )}
     >
       {/* Solved glow */}
@@ -684,7 +684,7 @@ function ChallengeCard({ challenge, solved, onClick }: {
           <div className="flex items-center gap-2">
             <div className={cn(
               'w-8 h-8 rounded-lg flex items-center justify-center border',
-              solved ? 'bg-emerald-500/12 border-emerald-500/30' : 'bg-[var(--gh-canvas-subtle)] border-[var(--gh-border-default)]'
+              solved ? 'bg-emerald-500/12 border-emerald-500/30' : 'bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)]'
             )}>
               {solved
                 ? <CheckCircle className="w-4 h-4 text-emerald-400" />
@@ -708,7 +708,7 @@ function ChallengeCard({ challenge, solved, onClick }: {
         </p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-[var(--gh-border-default)]/50">
+        <div className="flex items-center justify-between pt-3 border-t border-[var(--gh-border)]/50">
           <div className="flex items-center gap-3">
             {/* Tags */}
             {challenge.tags?.slice(0, 2).map(t => (
@@ -890,7 +890,7 @@ export default function CodingChallenge() {
       <div className="min-h-screen bg-[var(--gh-canvas-subtle)]">
 
         {/* ── Hero Header ──────────────────────────────────── */}
-        <div className="relative bg-[var(--gh-canvas)] border-b border-[var(--gh-border-default)] overflow-hidden">
+        <div className="relative bg-[var(--gh-canvas)] border-b border-[var(--gh-border)] overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[var(--gh-accent-subtle)]/30 via-transparent to-transparent pointer-events-none" />
           <div className="relative max-w-7xl mx-auto px-6 py-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -917,7 +917,7 @@ export default function CodingChallenge() {
                 </button>
                 <button
                   onClick={() => startRandom()}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--gh-border-default)] text-sm font-semibold text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] transition-all"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--gh-border)] text-sm font-semibold text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] transition-all"
                   data-testid="button-random-challenge"
                 >
                   <Zap className="w-4 h-4 text-amber-400" /> Random
@@ -933,8 +933,8 @@ export default function CodingChallenge() {
                 { label: 'Avg Time', value: `${Math.floor(stats.averageTime / 60)}m`, icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/10' },
                 { label: 'Total', value: challenges.length, icon: BarChart2, color: 'text-[var(--gh-fg-muted)]', bg: 'bg-[var(--gh-canvas-subtle)]' },
               ].map((s, i) => (
-                <div key={i} className="rounded-xl border border-[var(--gh-border-default)] bg-[var(--gh-canvas)] p-4 flex items-center gap-3">
-                  <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center border border-[var(--gh-border-default)]', s.bg)}>
+                <div key={i} className="rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas)] p-4 flex items-center gap-3">
+                  <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center border border-[var(--gh-border)]', s.bg)}>
                     <s.icon className={cn('w-5 h-5', s.color)} />
                   </div>
                   <div>
@@ -952,7 +952,7 @@ export default function CodingChallenge() {
                   <span>Overall progress</span>
                   <span className="font-semibold">{solvedIds.size}/{challenges.length} solved ({Math.round((solvedIds.size / challenges.length) * 100)}%)</span>
                 </div>
-                <div className="h-2 bg-[var(--gh-canvas-subtle)] rounded-full overflow-hidden border border-[var(--gh-border-default)]">
+                <div className="h-2 bg-[var(--gh-canvas-subtle)] rounded-full overflow-hidden border border-[var(--gh-border)]">
                   <motion.div
                     className="h-full bg-emerald-500 rounded-full"
                     initial={{ width: 0 }}
@@ -981,7 +981,7 @@ export default function CodingChallenge() {
             </div>
 
             {/* Difficulty filter */}
-            <div className="flex items-center gap-1 p-1 bg-[var(--gh-canvas)] border border-[var(--gh-border-default)] rounded-lg">
+            <div className="flex items-center gap-1 p-1 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-lg">
               {(['all', 'easy', 'medium'] as const).map(d => (
                 <button
                   key={d}
@@ -1036,7 +1036,7 @@ export default function CodingChallenge() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-44 rounded-xl border border-[var(--gh-border-default)] bg-[var(--gh-canvas)] animate-pulse" />
+                  <div key={i} className="h-44 rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas)] animate-pulse" />
                 ))
               : filtered.length > 0
                 ? filtered.map((c, i) => (
@@ -1054,7 +1054,7 @@ export default function CodingChallenge() {
                     </motion.div>
                   ))
                 : (
-                  <div className="col-span-full py-20 flex flex-col items-center text-[var(--gh-fg-muted)] bg-[var(--gh-canvas)] border border-dashed border-[var(--gh-border-default)] rounded-xl">
+                  <div className="col-span-full py-20 flex flex-col items-center text-[var(--gh-fg-muted)] bg-[var(--gh-canvas)] border border-dashed border-[var(--gh-border)] rounded-xl">
                     <Search className="w-12 h-12 mb-4 opacity-20" />
                     <h3 className="text-lg font-bold mb-1">No challenges found</h3>
                     <p className="text-sm">Try adjusting your search or filters.</p>
