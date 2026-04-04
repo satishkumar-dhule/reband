@@ -184,6 +184,7 @@ export interface CodingChallenge {
   difficulty: Difficulty;
   category: string;
   tags: string[]; // e.g., ['array', 'hash-map', 'two-pointers']
+  companies?: string[];
   starterCode: Record<Language, string>;
   testCases: TestCase[];
   hints: string[];
