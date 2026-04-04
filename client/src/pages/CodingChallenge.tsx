@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import React from 'react';
 import { useLocation, useParams } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -303,10 +303,10 @@ function ChallengeView({
   return (
     <AppLayout fullWidth hideNav>
       <SEOHead title={`${challenge.title} | Coding Challenge`} description={challenge.description} />
-      <div className="flex flex-col h-screen bg-[#0d1117]">
+      <div className="flex flex-col h-screen bg-[var(--gh-canvas-subtle)]">
 
         {/* ── Top Bar ─────────────────────────────────────────── */}
-        <header className="h-12 flex items-center justify-between px-4 border-b border-[var(--gh-border-default)] bg-[#161b22] shrink-0 gap-3">
+        <header className="h-12 flex items-center justify-between px-4 border-b border-[var(--gh-border-default)] bg-[var(--gh-canvas)] shrink-0 gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={onBack}
@@ -372,7 +372,7 @@ function ChallengeView({
         </header>
 
         {/* ── Mobile Tab Switch ─────────────────────────────── */}
-        <div className="lg:hidden flex border-b border-[var(--gh-border-default)] bg-[#161b22] shrink-0">
+        <div className="lg:hidden flex border-b border-[var(--gh-border-default)] bg-[var(--gh-canvas)] shrink-0">
           {['Description', 'Code Editor'].map((label, i) => {
             const active = i === 0 ? showDesc : !showDesc;
             return (
@@ -395,7 +395,7 @@ function ChallengeView({
 
           {/* LEFT: Problem Description */}
           <div className={cn(
-            'lg:w-[42%] lg:border-r border-[var(--gh-border-default)] flex flex-col bg-[#0d1117] min-h-0',
+            'lg:w-[42%] lg:border-r border-[var(--gh-border-default)] flex flex-col bg-[var(--gh-canvas-subtle)] min-h-0',
             showDesc ? 'flex' : 'hidden lg:flex'
           )}>
             <ScrollArea className="flex-1">
@@ -477,11 +477,11 @@ function ChallengeView({
                           <div className="p-3 grid grid-cols-2 gap-2 text-xs font-mono">
                             <div>
                               <span className="text-[var(--gh-fg-muted)] font-sans text-[9px] uppercase font-bold">Input</span>
-                              <div className="mt-1 p-2 bg-[#0d1117] rounded border border-[var(--gh-border-default)] text-[var(--gh-fg)]">{ex.input}</div>
+                              <div className="mt-1 p-2 bg-[var(--gh-canvas-subtle)] rounded border border-[var(--gh-border-default)] text-[var(--gh-fg)]">{ex.input}</div>
                             </div>
                             <div>
                               <span className="text-[var(--gh-fg-muted)] font-sans text-[9px] uppercase font-bold">Output</span>
-                              <div className="mt-1 p-2 bg-[#0d1117] rounded border border-[var(--gh-border-default)] text-emerald-300">{ex.expectedOutput}</div>
+                              <div className="mt-1 p-2 bg-[var(--gh-canvas-subtle)] rounded border border-[var(--gh-border-default)] text-emerald-300">{ex.expectedOutput}</div>
                             </div>
                           </div>
                         </div>
@@ -547,11 +547,11 @@ function ChallengeView({
 
           {/* RIGHT: Editor + Results */}
           <div className={cn(
-            'flex-1 flex flex-col min-h-0 bg-[#0d1117]',
+            'flex-1 flex flex-col min-h-0 bg-[var(--gh-canvas-subtle)]',
             !showDesc ? 'flex' : 'hidden lg:flex'
           )}>
             {/* Editor toolbar */}
-            <div className="h-10 flex items-center justify-between px-3 border-b border-[var(--gh-border-default)] bg-[#161b22] shrink-0">
+            <div className="h-10 flex items-center justify-between px-3 border-b border-[var(--gh-border-default)] bg-[var(--gh-canvas)] shrink-0">
               <div className="flex items-center gap-2">
                 <Code className="w-3.5 h-3.5 text-[var(--gh-fg-muted)]" />
                 <span className="text-xs font-medium text-[var(--gh-fg-muted)] uppercase tracking-wider">
@@ -609,7 +609,7 @@ function ChallengeView({
 
         {/* ── Success Modal ──────────────────────────────────── */}
         <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-          <DialogContent size="lg" className="bg-[#161b22] border-[var(--gh-border-default)] text-center">
+          <DialogContent size="lg" className="bg-[var(--gh-canvas)] border-[var(--gh-border-default)] text-center">
             <DialogHeader>
               <div className="flex justify-center mb-4">
                 <div className="relative">
@@ -669,8 +669,8 @@ function ChallengeCard({ challenge, solved, onClick }: {
       className={cn(
         'group relative cursor-pointer rounded-xl border overflow-hidden transition-all',
         solved
-          ? 'border-emerald-500/25 bg-[#0d1117]'
-          : 'border-[var(--gh-border-default)] bg-[#0d1117] hover:border-[var(--gh-accent-fg)]/50',
+          ? 'border-emerald-500/25 bg-[var(--gh-canvas-subtle)]'
+          : 'border-[var(--gh-border-default)] bg-[var(--gh-canvas-subtle)] hover:border-[var(--gh-accent-fg)]/50',
       )}
     >
       {/* Solved glow */}
