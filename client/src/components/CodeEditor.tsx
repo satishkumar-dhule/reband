@@ -407,7 +407,7 @@ export function CodeEditor({
         </div>
       )}
 
-      <div className="flex-1 overflow-hidden min-h-0">
+      <div className="flex-1 overflow-hidden min-h-0 relative">
         <EditorComponent
           height={editorHeight === '100%' ? '100%' : editorHeight}
           language={language}
