@@ -9,6 +9,18 @@
  * ============================================================
  */
 
+// ─── Page-level layout primitives ────────────────────────────────────────────
+
+export {
+  PageContainer,
+  PageHeader,
+  SectionHeader,
+  LoadingSpinner,
+  SearchInput,
+  GhStatCard,
+  IconLabel,
+} from '@/components/ui/page';
+
 // ─── Shadcn / Radix Primitives ────────────────────────────────────────────────
 
 export { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';

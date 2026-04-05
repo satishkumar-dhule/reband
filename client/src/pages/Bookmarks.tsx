@@ -1,21 +1,21 @@
-import { useState, useMemo, Suspense } from 'react';
+import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AppLayout } from '@/lib/ui';
-import { SEOHead } from '@/lib/ui';
+import {
+  AppLayout, SEOHead, GenericPageSkeleton, Button, IconButton,
+  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
+  Select, SelectTrigger, SelectContent, SelectItem, SelectValue,
+  PageContainer, PageHeader, LoadingSpinner,
+} from '@/lib/ui';
 import { loadChannelQuestions } from '../lib/questions-loader';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { ProgressStorage } from '../services/storage.service';
 import { STORAGE_KEYS } from '../lib/constants';
-import { GenericPageSkeleton } from '@/lib/ui';
 import type { Question } from '../types';
 import {
   Bookmark, Trash2, ChevronRight, Filter,
   CheckCircle, Building2, X, BookOpen, Home
 } from 'lucide-react';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
-import { Button, IconButton } from '@/lib/ui';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/lib/ui';
 
 interface BookmarkedQuestion extends Question {
   channelId: string;
@@ -118,11 +118,7 @@ export default function Bookmarks() {
       <>
         <SEOHead title="Bookmarks - DevPrep" description="View and manage your bookmarked interview questions" />
         <AppLayout>
-          <div className="bg-[var(--gh-canvas-subtle)] min-h-screen">
-            <div className="max-w-5xl mx-auto px-4 py-6 lg:px-8">
-              <GenericPageSkeleton />
-            </div>
-          </div>
+          <PageContainer maxWidth="5xl"><GenericPageSkeleton /></PageContainer>
         </AppLayout>
       </>
     );
@@ -130,44 +126,38 @@ export default function Bookmarks() {
 
   return (
     <>
-      <SEOHead
-        title="Bookmarks - DevPrep"
-        description="View and manage your bookmarked interview questions"
-      />
+      <SEOHead title="Bookmarks - DevPrep" description="View and manage your bookmarked interview questions" />
       <AppLayout>
-        <div className="bg-[var(--gh-canvas-subtle)] min-h-screen" id="main-content">
-          <div className="max-w-5xl mx-auto px-4 py-6 lg:px-8">
-            {/* Breadcrumb Navigation */}
-            <Breadcrumb className="mb-6">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/" className="flex items-center gap-1">
-                    <Home className="w-3.5 h-3.5" />
-                    Home
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Bookmarks</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+        <PageContainer maxWidth="5xl" id="main-content">
+          {/* Breadcrumb */}
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/" className="flex items-center gap-1">
+                  <Home className="w-3.5 h-3.5" /> Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Bookmarks</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
-            {/* Header */}
-            <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
-              <div>
-                <h1 className="text-2xl font-semibold text-[var(--gh-fg)] flex items-center gap-2">
-                  <Bookmark className="w-6 h-6 text-[var(--gh-fg-muted)]" />
-                  Bookmarks
-                  <span className="ml-2 gh-label gh-label-gray px-2 py-0.5 rounded-full text-xs">
-                    {bookmarkedQuestions.length}
-                  </span>
-                </h1>
-                <p className="text-sm text-[var(--gh-fg-muted)] mt-1">
-                  Saved questions for your interview preparation
-                </p>
-              </div>
-            </div>
+          {/* Header */}
+          <PageHeader
+            title={
+              <span className="flex items-center gap-2">
+                <Bookmark className="w-6 h-6 text-[var(--gh-fg-muted)]" />
+                Bookmarks
+                <span className="gh-label gh-label-gray px-2 py-0.5 rounded-full text-xs">
+                  {bookmarkedQuestions.length}
+                </span>
+              </span>
+            }
+            subtitle="Saved questions for your interview preparation"
+            className="mb-6"
+          />
 
             {/* Filters & Content Card */}
             <div className="gh-card overflow-hidden">

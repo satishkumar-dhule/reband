@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'wouter';
-import { AppLayout } from '@/lib/ui';
-import { SEOHead } from '@/lib/ui';
+import {
+  AppLayout, SEOHead, Switch,
+  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
+  PageContainer, SectionHeader, GhStatCard, LoadingSpinner,
+} from '@/lib/ui';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useGlobalStats } from '../hooks/use-progress';
 import { useCredits } from '../context/CreditsContext';
@@ -9,36 +12,26 @@ import { useChannelStats } from '../hooks/use-stats';
 import { allChannelsConfig } from '../lib/channels-config';
 import { channels } from '../lib/data';
 import {
-  User, Settings, Target, BookOpen, Home,
-  BarChart2, CheckCircle2, Layers, Trophy, Flame,
-  Zap, Clock, CheckCircle, Boxes, ChartLine, GitBranch,
-  Binary, Puzzle, Calculator, Cpu, Terminal, Layout,
-  Server, Database, Infinity, Activity, Box, Cloud,
-  Workflow, Brain, Sparkles, MessageCircle, Eye,
-  FileText, Code, Shield, Network, Smartphone, Gauge,
-  Users, Lock, type LucideIcon
+  User, Settings, Target, BookOpen, Home, BarChart2,
+  CheckCircle2, Layers, Trophy, Flame, Zap, Clock,
+  CheckCircle, Boxes, ChartLine, GitBranch, Binary, Puzzle,
+  Calculator, Cpu, Terminal, Layout, Server, Database,
+  Infinity, Activity, Box, Cloud, Workflow, Brain, Sparkles,
+  MessageCircle, Eye, FileText, Code, Shield, Network,
+  Smartphone, Gauge, Users, Lock, type LucideIcon,
 } from 'lucide-react';
-import {
-  Breadcrumb, BreadcrumbList, BreadcrumbItem,
-  BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator
-} from '@/lib/ui';
-import { Switch } from '@/lib/ui';
 
-// ── Icon map for channel icons ─────────────────────────────────────────────────
 const iconMap: Record<string, LucideIcon> = {
-  'boxes': Boxes, 'chart-line': ChartLine, 'git-branch': GitBranch,
-  'binary': Binary, 'puzzle': Puzzle, 'git-merge': GitBranch,
-  'calculator': Calculator, 'cpu': Cpu, 'terminal': Terminal,
-  'layout': Layout, 'server': Server, 'database': Database,
-  'infinity': Infinity, 'activity': Activity, 'box': Box,
-  'cloud': Cloud, 'layers': Layers, 'workflow': Workflow,
-  'brain': Brain, 'sparkles': Sparkles, 'message-circle': MessageCircle,
-  'eye': Eye, 'file-text': FileText, 'code': Code, 'shield': Shield,
-  'network': Network, 'smartphone': Smartphone, 'check-circle': CheckCircle,
-  'gauge': Gauge, 'users': Users, 'lock': Lock,
+  'boxes': Boxes, 'chart-line': ChartLine, 'git-branch': GitBranch, 'binary': Binary,
+  'puzzle': Puzzle, 'git-merge': GitBranch, 'calculator': Calculator, 'cpu': Cpu,
+  'terminal': Terminal, 'layout': Layout, 'server': Server, 'database': Database,
+  'infinity': Infinity, 'activity': Activity, 'box': Box, 'cloud': Cloud, 'layers': Layers,
+  'workflow': Workflow, 'brain': Brain, 'sparkles': Sparkles, 'message-circle': MessageCircle,
+  'eye': Eye, 'file-text': FileText, 'code': Code, 'shield': Shield, 'network': Network,
+  'smartphone': Smartphone, 'check-circle': CheckCircle, 'gauge': Gauge, 'users': Users,
+  'lock': Lock,
 };
 
-// ── Module-level cache for localStorage progress ───────────────────────────────
 const progressCache = new Map<string, string[]>();
 
 function readLocalStorageProgress(channelId: string): string[] {
@@ -52,7 +45,6 @@ function readLocalStorageProgress(channelId: string): string[] {
 
 function clearProgressCache() { progressCache.clear(); }
 
-// ── Real data helpers (localStorage only) ─────────────────────────────────────
 function getTotalCompleted(): number {
   try {
     const allProgress = localStorage.getItem('allProgress');
@@ -118,18 +110,7 @@ function getFlashcardProgress(): number {
   return total;
 }
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
-interface StatCardProps { icon: React.ReactNode; label: string; value: number | string; }
-
-function StatCard({ icon, label, value }: StatCardProps) {
-  return (
-    <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex flex-col items-center gap-1 text-center hover:scale-[1.02] hover:shadow-md transition-all duration-200 cursor-default">
-      <div className="text-[var(--gh-fg-muted)]">{icon}</div>
-      <div className="text-2xl font-bold text-[var(--gh-fg)]">{value}</div>
-      <div className="text-xs text-[var(--gh-fg-muted)]">{label}</div>
-    </div>
-  );
-}
+// ── Preferences panel ─────────────────────────────────────────────────────────
 
 interface PreferencesPanelProps {
   preferences: { shuffleQuestions?: boolean; prioritizeUnvisited?: boolean; hideCertifications?: boolean; };
@@ -141,38 +122,28 @@ interface PreferencesPanelProps {
 function PreferencesPanel({ preferences, toggleShuffleQuestions, togglePrioritizeUnvisited, toggleHideCertifications }: PreferencesPanelProps) {
   return (
     <section className="pt-8 border-t border-[var(--gh-border)]">
-      <h2 className="text-base font-semibold text-[var(--gh-fg)] mb-4 flex items-center gap-2">
-        <Settings className="w-4 h-4" />
-        Preferences
-      </h2>
+      <SectionHeader title="Preferences" icon={<Settings className="w-4 h-4" />} as="h2" />
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Shuffle Questions</h3>
-            <p className="text-xs text-[var(--gh-fg-muted)]">Randomize question order</p>
+        {[
+          { label: 'Shuffle Questions', desc: 'Randomize question order', checked: !!preferences.shuffleQuestions, onChange: toggleShuffleQuestions, testId: 'switch-shuffle-questions' },
+          { label: 'Prioritize Unvisited', desc: 'Show new questions first', checked: !!preferences.prioritizeUnvisited, onChange: togglePrioritizeUnvisited, testId: 'switch-prioritize-unvisited' },
+          { label: 'Hide Certifications', desc: 'Hide certification paths', checked: !!preferences.hideCertifications, onChange: toggleHideCertifications, testId: 'switch-hide-certifications' },
+        ].map(({ label, desc, checked, onChange, testId }) => (
+          <div key={label} className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--gh-fg)]">{label}</h3>
+              <p className="text-xs text-[var(--gh-fg-muted)]">{desc}</p>
+            </div>
+            <Switch checked={checked} onCheckedChange={onChange} aria-label={`Toggle ${label}`} data-testid={testId} />
           </div>
-          <Switch checked={!!preferences.shuffleQuestions} onCheckedChange={toggleShuffleQuestions} aria-label="Toggle shuffle questions" data-testid="switch-shuffle-questions" />
-        </div>
-        <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Prioritize Unvisited</h3>
-            <p className="text-xs text-[var(--gh-fg-muted)]">Show new questions first</p>
-          </div>
-          <Switch checked={!!preferences.prioritizeUnvisited} onCheckedChange={togglePrioritizeUnvisited} aria-label="Toggle prioritize unvisited" data-testid="switch-prioritize-unvisited" />
-        </div>
-        <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-semibold text-[var(--gh-fg)]">Hide Certifications</h3>
-            <p className="text-xs text-[var(--gh-fg-muted)]">Hide certification paths</p>
-          </div>
-          <Switch checked={!!preferences.hideCertifications} onCheckedChange={toggleHideCertifications} aria-label="Toggle hide certifications" data-testid="switch-hide-certifications" />
-        </div>
+        ))}
       </div>
     </section>
   );
 }
 
-// ── Main page ──────────────────────────────────────────────────────────────────
+// ── Main page ─────────────────────────────────────────────────────────────────
+
 export default function Profile() {
   const { preferences, toggleShuffleQuestions, togglePrioritizeUnvisited, toggleHideCertifications } = useUserPreferences();
   const { stats } = useGlobalStats();
@@ -192,9 +163,8 @@ export default function Profile() {
   }, []);
 
   useEffect(() => {
-    const handleStorage = () => clearProgressCache();
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener('storage', clearProgressCache);
+    return () => window.removeEventListener('storage', clearProgressCache);
   }, []);
 
   const handleShuffleToggle = useCallback(() => toggleShuffleQuestions(), [toggleShuffleQuestions]);
@@ -224,16 +194,9 @@ export default function Profile() {
       else break;
     }
 
-    const recent = [...stats]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 5);
+    const recent = [...stats].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
 
-    return {
-      streak: currentStreak,
-      level: Math.floor(balance / 100),
-      moduleProgress: modProgress,
-      recentActivity: recent,
-    };
+    return { streak: currentStreak, level: Math.floor(balance / 100), moduleProgress: modProgress, recentActivity: recent };
   }, [stats, channelStats, balance]);
 
   if (isLoading || channelStatsLoading) {
@@ -241,222 +204,184 @@ export default function Profile() {
       <>
         <SEOHead title="Profile & Stats - DevPrep" description="Your learning profile and progress" canonical="/profile" />
         <AppLayout>
-          <div className="bg-[var(--gh-canvas-subtle)] min-h-screen">
-            <div className="max-w-3xl mx-auto px-4 py-8 animate-pulse space-y-6">
-              <div className="h-6 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded w-48" />
-              <div className="h-32 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md" />
-              <div className="h-64 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md" />
-            </div>
-          </div>
+          <PageContainer maxWidth="3xl" py="py-8">
+            <LoadingSpinner fullPage label="Loading profile…" />
+          </PageContainer>
         </AppLayout>
       </>
     );
   }
 
-  const channelsWorkedOn = channelProgress.length;
-
   return (
     <>
       <SEOHead title="Profile & Stats - DevPrep" description="Your learning profile and progress" canonical="/profile" />
       <AppLayout>
-        <div className="bg-[var(--gh-canvas-subtle)] min-h-screen" id="main-content">
-          <div className="max-w-3xl mx-auto px-4 py-8">
+        <PageContainer maxWidth="3xl" py="py-8" id="main-content">
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/" className="flex items-center gap-1">
+                  <Home className="w-3.5 h-3.5" /> Home
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Profile & Stats</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
-            <Breadcrumb className="mb-6">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/" className="flex items-center gap-1">
-                    <Home className="w-3.5 h-3.5" />
-                    Home
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Profile & Stats</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-
-            {/* Header */}
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 rounded-full border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-center flex-shrink-0">
-                <User className="w-8 h-8 text-[var(--gh-fg-muted)]" />
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold text-[var(--gh-fg)]">My Profile & Stats</h1>
-                <p className="text-sm text-[var(--gh-fg-muted)]">
-                  Stats are tracked locally in your browser — no account needed.
-                </p>
-              </div>
+          {/* User header */}
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-16 h-16 rounded-full border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-center flex-shrink-0">
+              <User className="w-8 h-8 text-[var(--gh-fg-muted)]" />
             </div>
-
-            <div className="space-y-8">
-
-              {/* Quick overview row */}
-              <section>
-                <h2 className="text-base font-semibold text-[var(--gh-fg)] mb-3 flex items-center gap-2">
-                  <BarChart2 className="w-4 h-4" />
-                  Overview
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <StatCard icon={<CheckCircle2 className="w-5 h-5" />} label="Questions answered" value={totalCompleted} />
-                  <StatCard icon={<Layers className="w-5 h-5" />} label="Channels studied" value={channelsWorkedOn} />
-                  <StatCard icon={<BookOpen className="w-5 h-5" />} label="Flashcards reviewed" value={flashcardsDone} />
-                  <StatCard icon={<Flame className="w-5 h-5 text-[var(--gh-attention-fg)]" />} label="Day streak" value={streak} />
-                </div>
-              </section>
-
-              {/* XP & Level row */}
-              <section>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center gap-3 hover:shadow-sm transition-shadow">
-                    <Zap className="w-5 h-5 text-[var(--gh-accent-fg)] flex-shrink-0" />
-                    <div>
-                      <div className="text-xs text-[var(--gh-fg-muted)]">Total XP</div>
-                      <div className="text-xl font-bold text-[var(--gh-fg)]">{balance.toLocaleString()}</div>
-                    </div>
-                  </div>
-                  <div className="p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center gap-3 hover:shadow-sm transition-shadow">
-                    <Trophy className="w-5 h-5 text-[var(--gh-attention-fg)] flex-shrink-0" />
-                    <div>
-                      <div className="text-xs text-[var(--gh-fg-muted)]">Level</div>
-                      <div className="text-xl font-bold text-[var(--gh-fg)]">{level}</div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* Channel breakdown with progress bars */}
-              {moduleProgress.length > 0 && (
-                <section>
-                  <h2 className="text-base font-semibold text-[var(--gh-fg)] mb-3 flex items-center gap-2">
-                    <Target className="w-4 h-4" />
-                    Channel Breakdown
-                  </h2>
-                  <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-sm overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border)]">
-                          <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--gh-fg-muted)]">Channel</th>
-                          <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--gh-fg-muted)]">Progress</th>
-                          <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--gh-fg-muted)] text-right">Done</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[var(--gh-border)]">
-                        {moduleProgress.map(mod => {
-                          const ChannelIcon = iconMap[mod.icon] || Boxes;
-                          return (
-                            <tr key={mod.id} className="hover:bg-[var(--gh-canvas-subtle)] transition-colors">
-                              <td className="px-4 py-3">
-                                <div className="flex items-center gap-2">
-                                  <ChannelIcon className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                                  <span className="text-sm font-medium text-[var(--gh-fg)]">{mod.name}</span>
-                                </div>
-                              </td>
-                              <td className="px-4 py-3 min-w-[140px]">
-                                <div className="flex items-center gap-3">
-                                  <div className="flex-1 h-2 bg-[var(--gh-canvas-inset)] border border-[var(--gh-border-muted)] rounded-full overflow-hidden">
-                                    <div className="h-full bg-[var(--gh-success-emphasis)] transition-all duration-500" style={{ width: `${mod.pct}%` }} />
-                                  </div>
-                                  <span className="text-xs font-medium text-[var(--gh-fg-muted)] w-8">{mod.pct}%</span>
-                                </div>
-                              </td>
-                              <td className="px-4 py-3 text-sm text-[var(--gh-fg-muted)] text-right">
-                                {mod.completed} / {mod.total}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </section>
-              )}
-
-              {/* Per-channel quick links */}
-              <section>
-                <h2 className="text-base font-semibold text-[var(--gh-fg)] mb-3 flex items-center gap-2">
-                  <Target className="w-4 h-4" />
-                  Channel Progress
-                </h2>
-                {channelProgress.length === 0 ? (
-                  <div className="p-8 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-center">
-                    <BookOpen className="w-8 h-8 text-[var(--gh-fg-muted)] mx-auto mb-3" />
-                    <p className="text-sm font-medium text-[var(--gh-fg)]">No questions answered yet</p>
-                    <p className="text-xs text-[var(--gh-fg-muted)] mt-1">
-                      Visit any channel and start answering questions — your progress will show up here.
-                    </p>
-                    <Link href="/" className="inline-block mt-4 text-xs text-[var(--gh-accent-fg)] hover:underline">
-                      Browse channels →
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {channelProgress.map(item => (
-                      <Link
-                        key={item.channelId}
-                        href={`/channel/${item.channelId}`}
-                        className="block p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] hover:border-[var(--gh-accent-fg)] transition-colors group"
-                        data-testid={`channel-progress-${item.channelId}`}
-                      >
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-8 h-8 rounded-md bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] flex items-center justify-center flex-shrink-0">
-                              <BookOpen className="w-4 h-4 text-[var(--gh-accent-fg)]" />
-                            </div>
-                            <span className="text-sm font-medium text-[var(--gh-fg)] group-hover:text-[var(--gh-accent-fg)] transition-colors truncate">
-                              {item.name}
-                            </span>
-                          </div>
-                          <span className="text-sm font-semibold text-[var(--gh-fg)] flex-shrink-0">
-                            {item.completed} <span className="text-[var(--gh-fg-muted)] font-normal text-xs">answered</span>
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </section>
-
-              {/* Recent Activity */}
-              {recentActivity.length > 0 && (
-                <section>
-                  <h2 className="text-base font-semibold text-[var(--gh-fg)] mb-3 flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    Recent Activity
-                  </h2>
-                  <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-sm divide-y divide-[var(--gh-border)]">
-                    {recentActivity.map((activity, idx) => (
-                      <div key={idx} className="px-4 py-3 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] flex items-center justify-center">
-                            <BarChart2 className="w-4 h-4 text-[var(--gh-accent-fg)]" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-[var(--gh-fg)]">Study Session</p>
-                            <p className="text-xs text-[var(--gh-fg-muted)]">{activity.date}</p>
-                          </div>
-                        </div>
-                        <div className="text-xs font-medium text-[var(--gh-success-fg)] bg-[var(--gh-success-subtle)] px-2 py-0.5 rounded-full border border-[var(--gh-success-fg)]/20">
-                          Check-in
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Preferences */}
-              <PreferencesPanel
-                preferences={preferences}
-                toggleShuffleQuestions={handleShuffleToggle}
-                togglePrioritizeUnvisited={handlePrioritizeToggle}
-                toggleHideCertifications={handleHideCertToggle}
-              />
-
+            <div>
+              <h1 className="text-xl font-semibold text-[var(--gh-fg)]">My Profile & Stats</h1>
+              <p className="text-sm text-[var(--gh-fg-muted)]">Stats are tracked locally in your browser — no account needed.</p>
             </div>
           </div>
-        </div>
+
+          <div className="space-y-8">
+
+            {/* Overview stats */}
+            <section>
+              <SectionHeader title="Overview" icon={<BarChart2 className="w-4 h-4" />} as="h2" className="mb-3" />
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <GhStatCard label="Questions answered" value={totalCompleted} icon={<CheckCircle2 className="w-5 h-5" />} />
+                <GhStatCard label="Channels studied" value={channelProgress.length} icon={<Layers className="w-5 h-5" />} />
+                <GhStatCard label="Flashcards reviewed" value={flashcardsDone} icon={<BookOpen className="w-5 h-5" />} />
+                <GhStatCard label="Day streak" value={streak} icon={<Flame className="w-5 h-5 text-[var(--gh-attention-fg)]" />} />
+              </div>
+            </section>
+
+            {/* XP & Level */}
+            <section>
+              <div className="grid grid-cols-2 gap-3">
+                <GhStatCard label="Total XP" value={balance.toLocaleString()} icon={<Zap className="w-5 h-5 text-[var(--gh-accent-fg)]" />} />
+                <GhStatCard label="Level" value={level} icon={<Trophy className="w-5 h-5 text-[var(--gh-attention-fg)]" />} />
+              </div>
+            </section>
+
+            {/* Channel breakdown table */}
+            {moduleProgress.length > 0 && (
+              <section>
+                <SectionHeader title="Channel Breakdown" icon={<Target className="w-4 h-4" />} as="h2" className="mb-3" />
+                <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-sm overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-[var(--gh-canvas-subtle)] border-b border-[var(--gh-border)]">
+                        {['Channel', 'Progress', 'Done'].map((h, i) => (
+                          <th key={h} className={`px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--gh-fg-muted)]${i === 2 ? ' text-right' : ''}`}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--gh-border)]">
+                      {moduleProgress.map(mod => {
+                        const ChannelIcon = iconMap[mod.icon] || Boxes;
+                        return (
+                          <tr key={mod.id} className="hover:bg-[var(--gh-canvas-subtle)] transition-colors">
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                <ChannelIcon className="w-4 h-4 text-[var(--gh-fg-muted)]" />
+                                <span className="text-sm font-medium text-[var(--gh-fg)]">{mod.name}</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 min-w-[140px]">
+                              <div className="flex items-center gap-3">
+                                <div className="flex-1 h-2 bg-[var(--gh-canvas-inset)] border border-[var(--gh-border-muted)] rounded-full overflow-hidden">
+                                  <div className="h-full bg-[var(--gh-success-emphasis)] transition-all duration-500" style={{ width: `${mod.pct}%` }} />
+                                </div>
+                                <span className="text-xs font-medium text-[var(--gh-fg-muted)] w-8">{mod.pct}%</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-[var(--gh-fg-muted)] text-right">{mod.completed} / {mod.total}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            )}
+
+            {/* Channel progress quick links */}
+            <section>
+              <SectionHeader title="Channel Progress" icon={<Target className="w-4 h-4" />} as="h2" className="mb-3" />
+              {channelProgress.length === 0 ? (
+                <div className="p-8 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] text-center">
+                  <BookOpen className="w-8 h-8 text-[var(--gh-fg-muted)] mx-auto mb-3" />
+                  <p className="text-sm font-medium text-[var(--gh-fg)]">No questions answered yet</p>
+                  <p className="text-xs text-[var(--gh-fg-muted)] mt-1">
+                    Visit any channel and start answering questions — your progress will show up here.
+                  </p>
+                  <Link href="/" className="inline-block mt-4 text-xs text-[var(--gh-accent-fg)] hover:underline">
+                    Browse channels →
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {channelProgress.map(item => (
+                    <Link
+                      key={item.channelId}
+                      href={`/channel/${item.channelId}`}
+                      className="block p-4 rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas)] hover:border-[var(--gh-accent-fg)] transition-colors group"
+                      data-testid={`channel-progress-${item.channelId}`}
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-8 h-8 rounded-md bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] flex items-center justify-center flex-shrink-0">
+                            <BookOpen className="w-4 h-4 text-[var(--gh-accent-fg)]" />
+                          </div>
+                          <span className="text-sm font-medium text-[var(--gh-fg)] group-hover:text-[var(--gh-accent-fg)] transition-colors truncate">
+                            {item.name}
+                          </span>
+                        </div>
+                        <span className="text-sm font-semibold text-[var(--gh-fg)] flex-shrink-0">
+                          {item.completed} <span className="text-[var(--gh-fg-muted)] font-normal text-xs">answered</span>
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Recent Activity */}
+            {recentActivity.length > 0 && (
+              <section>
+                <SectionHeader title="Recent Activity" icon={<Clock className="w-4 h-4" />} as="h2" className="mb-3" />
+                <div className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-sm divide-y divide-[var(--gh-border)]">
+                  {recentActivity.map((activity, idx) => (
+                    <div key={idx} className="px-4 py-3 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] flex items-center justify-center">
+                          <BarChart2 className="w-4 h-4 text-[var(--gh-accent-fg)]" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-[var(--gh-fg)]">Study Session</p>
+                          <p className="text-xs text-[var(--gh-fg-muted)]">{activity.date}</p>
+                        </div>
+                      </div>
+                      <div className="text-xs font-medium text-[var(--gh-success-fg)] bg-[var(--gh-success-subtle)] px-2 py-0.5 rounded-full border border-[var(--gh-success-fg)]/20">
+                        Check-in
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Preferences */}
+            <PreferencesPanel
+              preferences={preferences}
+              toggleShuffleQuestions={handleShuffleToggle}
+              togglePrioritizeUnvisited={handlePrioritizeToggle}
+              toggleHideCertifications={handleHideCertToggle}
+            />
+
+          </div>
+        </PageContainer>
       </AppLayout>
     </>
   );
