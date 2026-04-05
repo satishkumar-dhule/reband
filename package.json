@@ -67,7 +67,7 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "PORT=5000 NODE_ENV=development pnpm tsx server/index.ts",
+    "dev": "PORT=5000 NODE_ENV=development ./node_modules/.bin/tsx server/index.ts",
     "dev:vite": "vite dev --port 5001",
     "dev:server": "NODE_ENV=development ./node_modules/.bin/tsx server/index.ts",
     "build": "vite build",

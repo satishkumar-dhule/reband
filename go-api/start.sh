@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 
 API_DIR="$(cd "$(dirname "$0")" && pwd)"
 BINARY="$API_DIR/bin/devprep-api"
@@ -17,7 +16,10 @@ fi
 if [ ! -f "$BINARY" ] || [ "$API_DIR/main.go" -nt "$BINARY" ]; then
   echo "[go-api] building..."
   mkdir -p "$API_DIR/bin"
-  cd "$API_DIR" && "$GO_BIN" build -o bin/devprep-api . 2>&1
+  if ! cd "$API_DIR" && "$GO_BIN" build -o bin/devprep-api . 2>&1; then
+    echo "[go-api] build failed — skipping go-api startup (main app will continue)"
+    exit 0
+  fi
   echo "[go-api] build complete"
 fi
 

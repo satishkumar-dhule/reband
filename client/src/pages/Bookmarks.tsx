@@ -290,8 +290,7 @@ export default function Bookmarks() {
                 </div>
               )}
             </div>
-          </div>
-        </div>
+        </PageContainer>
       </AppLayout>
     </>
   );
