@@ -176,6 +176,78 @@ npm run build:static
 - GitHub Actions `deploy-app.yml` builds and deploys to both environments
 - Verification steps ensure content integrity and rollback capability
 
+## Go API Service
+
+A high-performance Go API service lives in `go-api/` and auto-starts alongside the Node.js server.
+
+| Property | Value |
+|----------|-------|
+| Port | 3001 (external: 6000) |
+| Runtime | Go 1.23 (`/home/runner/go/bin/go`) |
+| DB driver | `modernc.org/sqlite` (pure Go, no CGO) |
+| Router | `github.com/go-chi/chi/v5` |
+| Binary | `go-api/bin/devprep-api` |
+| Auto-rebuild | If source is newer than binary |
+
+### Endpoints — `GET /api/v1/*`
+
+| Endpoint | Description | Query Params |
+|----------|-------------|-------------|
+| `GET /health` | Health check | — |
+| `GET /api/v1/channels` | All channels + counts | — |
+| `GET /api/v1/stats` | Questions per channel/difficulty | — |
+| `GET /api/v1/questions` | Paginated questions | `channel`, `sub_channel`, `difficulty`, `search`, `page`, `page_size` |
+| `GET /api/v1/questions/random` | Random question | `channel`, `difficulty` |
+| `GET /api/v1/questions/{id}` | Single question | — |
+| `GET /api/v1/channels/{id}/subchannels` | Subchannels for a channel | — |
+| `GET /api/v1/channels/{id}/companies` | Companies mentioned in channel | — |
+| `GET /api/v1/coding/challenges` | Paginated coding challenges | `difficulty`, `category`, `page`, `page_size` |
+| `GET /api/v1/coding/challenges/{id}` | Single challenge | — |
+| `GET /api/v1/coding/random` | Random challenge | `difficulty` |
+| `GET /api/v1/coding/stats` | Challenge stats | — |
+| `GET /api/v1/flashcards` | Paginated flashcards | `channel`, `difficulty`, `page`, `page_size` |
+| `GET /api/v1/flashcards/{channelId}` | Flashcards for channel | — |
+| `GET /api/v1/voice-sessions` | Voice practice sessions | `channel`, `difficulty`, `page`, `page_size` |
+| `GET /api/v1/certifications` | Paginated certifications | `category`, `difficulty`, `page`, `page_size` |
+| `GET /api/v1/certifications/{id}` | Single certification | — |
+| `GET /api/v1/learning-paths` | Paginated learning paths | `path_type`, `difficulty`, `company`, `job_title`, `page`, `page_size` |
+| `GET /api/v1/learning-paths/{id}` | Single learning path | — |
+
+### Response format (paginated endpoints)
+```json
+{
+  "data": [...],
+  "total": 322,
+  "page": 1,
+  "pageSize": 50,
+  "totalPages": 7,
+  "hasNext": true,
+  "hasPrev": false
+}
+```
+
+### Directory layout
+```
+go-api/
+  main.go              Routes + server entry point
+  start.sh             Auto-build + launch script
+  go.mod / go.sum      Module dependencies
+  bin/devprep-api      Compiled binary
+  db/db.go             SQLite connection pool (read-only WAL mode)
+  models/models.go     Response structs + JSONRaw type
+  middleware/          CORS, logger, in-memory LRU cache
+  handlers/
+    questions.go       /questions, /channels, /stats
+    challenges.go      /coding/*
+    flashcards.go      /flashcards
+    certifications.go  /certifications
+    learning_paths.go  /learning-paths
+    voice_sessions.go  /voice-sessions
+    util.go            Shared helpers
+```
+
+---
+
 ## Architecture Rules (Iron Laws)
 
 1. **Static-first**: NO backend API. Pure static SPA on GitHub Pages

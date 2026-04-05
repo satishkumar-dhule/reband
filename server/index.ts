@@ -5,6 +5,37 @@ import { registerAuthRoutes } from "./src/auth-routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { ensureTablesExist } from "./db-init";
+import { spawn } from "child_process";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirnameServer = path.dirname(fileURLToPath(import.meta.url));
+
+function startGoAPI() {
+  const goApiDir = path.resolve(__dirnameServer, "..", "go-api");
+  const startScript = path.join(goApiDir, "start.sh");
+  const goPort = process.env.GO_API_PORT || "3001";
+
+  const child = spawn("bash", [startScript], {
+    env: {
+      ...process.env,
+      GO_API_PORT: goPort,
+      DATABASE_PATH: path.resolve(__dirnameServer, "..", "local.db"),
+    },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+  child.stdout.on("data", (d: Buffer) => process.stdout.write(`[go-api] ${d}`));
+  child.stderr.on("data", (d: Buffer) => process.stderr.write(`[go-api] ${d}`));
+  child.on("exit", (code: number | null) => {
+    if (code !== 0 && code !== null) {
+      console.error(`[go-api] exited with code ${code} — restarting in 3s`);
+      setTimeout(startGoAPI, 3000);
+    }
+  });
+
+  console.log(`[go-api] started on port ${goPort}`);
+}
 
 // Suppress Vite's non-fatal "Failed to parse JSON file" noise that comes from
 // application/ld+json inline scripts in index.html being processed by the JSON plugin.
@@ -177,6 +208,7 @@ app.use((req, res, next) => {
     () => {
       log(`serving on port ${port}`);
       startKeepAlive();
+      startGoAPI();
     },
   );
 
