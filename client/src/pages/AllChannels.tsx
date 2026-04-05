@@ -1,24 +1,26 @@
 /**
- * All Channels Page - GitHub UI
+ * All Channels Page
+ * Same page structure as Certifications: header + filters + identical card grid
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import {
   AppLayout, SEOHead, SkipLink, ChannelsSkeleton, Button,
-  PageContainer, PageHeader, SearchInput, EmptyState,
+  PageHeader, SearchInput, EmptyState,
 } from '@/lib/ui';
 import { allChannelsConfig, ChannelConfig } from '../lib/channels-config';
 import { useChannelStats } from '../hooks/use-stats';
 import { useDebounce, useProgress } from '../hooks';
 import {
   Box, Terminal, Layout, Server, Database, Infinity, Activity, Cloud, Layers,
-  Brain, Eye, FileText, Code, Shield, Network, Monitor, Smartphone, CheckCircle,
+  Brain, Eye, FileText, Code, Shield, Network, Monitor, Smartphone,
   Zap, Gauge, Users, MessageCircle, Calculator, Cpu, GitBranch, Binary, Puzzle,
-  GitMerge, Workflow, Award, Search,
+  GitMerge, Workflow, Award, Search, CheckCircle,
 } from 'lucide-react';
+import { Badge } from '@/lib/ui';
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, React.ElementType> = {
   'boxes': Box, 'chart-line': Gauge, 'git-branch': GitBranch, 'binary': Binary,
   'puzzle': Puzzle, 'git-merge': GitMerge, 'calculator': Calculator, 'cpu': Cpu,
   'terminal': Terminal, 'layout': Layout, 'server': Server, 'database': Database,
@@ -26,13 +28,14 @@ const iconMap: Record<string, any> = {
   'workflow': Workflow, 'brain': Brain, 'message-circle': MessageCircle, 'eye': Eye,
   'file-text': FileText, 'code': Code, 'shield': Shield, 'network': Network,
   'monitor': Monitor, 'smartphone': Smartphone, 'check-circle': CheckCircle,
-  'zap': Zap, 'gauge': Gauge, 'users': Users, 'award': Award,
+  'zap': Zap, 'gauge': Gauge, 'users': Users, 'award': Award, 'sparkles': Zap,
 };
 
 const categoryLabels: Record<string, string> = {
   frontend: 'Frontend', backend: 'Backend', cloud: 'Cloud', data: 'Data',
   security: 'Security', ai: 'AI/ML', fundamentals: 'Fundamentals',
-  certification: 'Certification', testing: 'Testing', management: 'Management', mobile: 'Mobile',
+  engineering: 'Engineering', certification: 'Cert', testing: 'Testing',
+  management: 'Management', mobile: 'Mobile',
 };
 
 export function AllChannels() {
@@ -47,10 +50,14 @@ export function AllChannels() {
     [stats],
   );
 
+  // Derive categories from config
   const categories = useMemo(() => {
     const cats = new Set<string>();
     allChannelsConfig.forEach(c => cats.add(c.category));
-    return Array.from(cats).sort();
+    return Array.from(cats).sort().map(id => ({
+      id,
+      name: categoryLabels[id] ?? id.charAt(0).toUpperCase() + id.slice(1),
+    }));
   }, []);
 
   const filteredChannels = useMemo(() => allChannelsConfig.filter(ch => {
@@ -63,24 +70,24 @@ export function AllChannels() {
     <>
       <SkipLink />
       <AppLayout>
-        <SEOHead title="All Topics | DevPrep" description="Explore all interview topics and learning paths." />
+        <SEOHead title="Topics | DevPrep" description="Explore all interview topics and learning paths." />
 
-        {/* Header bar */}
+        {/* ── Page Header ── */}
         <div className="bg-card border-b border-border">
-          <div className="max-w-7xl mx-auto px-4 py-8 md:px-8">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
             <PageHeader
               title="Explore Topics"
-              subtitle="Browse our collection of curated interview topics and certifications."
+              subtitle={`${filteredChannels.length} topic${filteredChannels.length !== 1 ? 's' : ''} · curated interview prep`}
               actions={
                 <SearchInput
                   placeholder="Search topics..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  containerClassName="w-full md:w-80"
+                  containerClassName="w-full md:w-72"
                   data-testid="input-search-channels"
                 />
               }
-              className="mb-6"
+              className="mb-5"
             />
 
             {/* Category filters */}
@@ -91,32 +98,32 @@ export function AllChannels() {
                 size="sm"
                 data-testid="button-filter-all"
               >
-                All Topics
+                All
               </Button>
               {categories.map(cat => (
                 <Button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  variant={selectedCategory === cat ? 'primary' : 'ghost'}
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+                  variant={selectedCategory === cat.id ? 'primary' : 'ghost'}
                   size="sm"
-                  data-testid={`button-filter-${cat}`}
+                  data-testid={`button-filter-${cat.id}`}
                 >
-                  {categoryLabels[cat] || cat}
+                  {cat.name}
                 </Button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="max-w-7xl mx-auto px-4 py-8 md:px-8">
+        {/* ── Grid ── */}
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
           {loading ? (
             <ChannelsSkeleton />
           ) : error ? (
             <EmptyState
               icon={<Zap className="w-10 h-10" />}
               title="Failed to load topics"
-              description={error.message || 'Something went wrong while loading the topics.'}
+              description={error.message || 'Something went wrong loading topics.'}
               action={
                 <Button onClick={() => window.location.reload()} variant="danger" size="sm">
                   Try again
@@ -138,10 +145,14 @@ export function AllChannels() {
             <EmptyState
               icon={<Search className="w-10 h-10" />}
               title="No topics found"
-              description="Try adjusting your search or filters to find what you're looking for."
+              description="Try adjusting your search or filters."
               action={
-                <Button onClick={() => { setSearchQuery(''); setSelectedCategory(null); }} variant="outline" size="sm">
-                  Clear all filters
+                <Button
+                  onClick={() => { setSearchQuery(''); setSelectedCategory(null); }}
+                  variant="outline"
+                  size="sm"
+                >
+                  Clear filters
                 </Button>
               }
             />
@@ -162,47 +173,74 @@ interface ChannelCardProps {
 function ChannelCard({ channel, questionCount }: ChannelCardProps) {
   const [, setLocation] = useLocation();
   const { completed } = useProgress(channel.id);
-
   const progress = questionCount > 0 ? Math.round((completed.length / questionCount) * 100) : 0;
   const Icon = iconMap[channel.icon] || Box;
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setLocation(`/channel/${channel.id}`); }
-  }, [setLocation, channel.id]);
+  const catLabel = categoryLabels[channel.category] ?? channel.category;
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => setLocation(`/channel/${channel.id}`)}
-      onKeyDown={handleKeyDown}
-      className="group bg-card border border-border rounded-md p-4 hover:border-primary hover:shadow-sm transition-all cursor-pointer flex flex-col h-full text-left w-full"
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setLocation(`/channel/${channel.id}`); } }}
+      className="group flex flex-col p-4 bg-card border border-border rounded-md hover-elevate transition-all cursor-pointer"
       data-testid={`card-channel-${channel.id}`}
       aria-label={`${channel.name}: ${questionCount} questions, ${progress}% completed`}
     >
-      <div className="flex items-start justify-between gap-2 mb-3">
-        <div className="p-2 bg-muted rounded-md border border-border-muted group-hover:border-primary transition-colors">
-          <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+      {/* Card Header */}
+      <div className="flex items-start gap-3 mb-3">
+        <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+          <Icon className="w-4 h-4 text-primary" strokeWidth={2} />
         </div>
-        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border-muted">
-          {categoryLabels[channel.category] || channel.category}
-        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-semibold leading-tight">{channel.name}</h3>
+        </div>
+        <Badge className="text-[10px] shrink-0 capitalize bg-muted text-muted-foreground border-0">
+          {catLabel}
+        </Badge>
       </div>
 
-      <h3 className="font-semibold text-foreground group-hover:text-primary mb-1">{channel.name}</h3>
-      <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-grow">{channel.description}</p>
+      {/* Description */}
+      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{channel.description}</p>
 
-      <div className="mt-auto pt-4 border-t border-border-muted">
-        <div className="flex justify-between items-center gap-2 text-xs mb-1.5">
-          <span className="text-muted-foreground">{questionCount} questions</span>
-          {progress > 0 && <span className="font-medium text-muted-foreground">{progress}%</span>}
-        </div>
+      {/* Stats */}
+      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+        <span className="flex items-center gap-1">
+          <span className="w-3 h-3 rounded-full bg-primary/20 inline-flex items-center justify-center">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+          </span>
+          {questionCount > 0 ? `${questionCount} questions` : 'Coming soon'}
+        </span>
         {progress > 0 && (
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div className="h-full bg-primary rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-          </div>
+          <span className="text-muted-foreground">{progress}% done</span>
         )}
       </div>
-    </button>
+
+      {/* Progress bar */}
+      {progress > 0 && (
+        <div className="mt-auto">
+          <div className="h-1 bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* CTA */}
+      <div className="mt-auto pt-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full"
+          tabIndex={-1}
+          data-testid={`button-open-${channel.id}`}
+        >
+          {progress > 0 ? 'Continue' : 'Start practicing'}
+        </Button>
+      </div>
+    </div>
   );
 }
 
