@@ -34,7 +34,7 @@ Free technical interview prep app — swipe learning, voice practice, spaced rep
 
 | Fix | Description |
 |-----|-------------|
-| Dev script | Uses `./node_modules/.bin/tsx server/index.ts` (not `npx tsx` — avoids interactive download prompt) |
+| Dev script | Uses `pnpm tsx server/index.ts` with `PORT=5000` — matches the workflow's `waitForPort = 5000` |
 | React deduplication | `resolve.dedupe` + absolute aliases in vite.config.ts prevent duplicate React instances |
 | wouter Router | Explicit `<Router>` wrapper added in FullApp (App.tsx) required for wouter v3 |
 | JSON-LD noise | `process.stderr` filter suppresses Vite's non-fatal inline JSON parse warnings in dev |

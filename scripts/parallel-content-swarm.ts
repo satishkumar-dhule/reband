@@ -1,17 +1,23 @@
 #!/usr/bin/env npx tsx
 /**
- * DevPrep Content Generation Swarm
+ * DevPrep Content Generation Swarm — Parallel Edition
  *
- * Runs N opencode agents in parallel writing directly to local.db.
- * No running server required.
+ * Spawns at least 5 subagents per session, with multiple parallel sessions
+ * for maximum throughput writing directly to local.db.
+ *
+ * Features:
+ *   • Minimum 5 parallel agents launched immediately per batch
+ *   • Multiple concurrent sessions (configurable --sessions)
+ *   • Session-based work distribution with automatic scaling
+ *   • Real-time dashboard with progress tracking
  *
  * Pipelines:
  *   questions (40 channels) · certifications (8) · flashcards (9)
  *   voice sessions (6)      · learning paths (4)
  *
  * Usage:
- *   npx tsx scripts/parallel-content-swarm.ts
- *   npx tsx scripts/parallel-content-swarm.ts --workers=10
+ *   npx tsx scripts/parallel-content-swarm.ts           # 5 workers, 1 session
+ *   npx tsx scripts/parallel-content-swarm.ts --workers=10 --sessions=3
  *   npx tsx scripts/parallel-content-swarm.ts --type=questions
  *   npx tsx scripts/parallel-content-swarm.ts --type=flashcards --channel=algorithms
  *   npx tsx scripts/parallel-content-swarm.ts --dry-run
@@ -27,18 +33,20 @@ import * as path         from "path";
 const arg  = (flag: string) => process.argv.find(a => a.startsWith(`${flag}=`))?.split("=")[1];
 const flag = (f: string)    => process.argv.includes(f);
 
-const MAX_WORKERS  = Math.min(30, Math.max(1, parseInt(arg("--workers") ?? "5")));
-const FILTER_TYPE  = arg("--type");
-const FILTER_CH    = arg("--channel");
-const DRY_RUN      = flag("--dry-run");
-const LOAD_LIMIT   = parseFloat(arg("--max-load") ?? "3.0"); // pause spawning above this
+const MAX_WORKERS   = Math.min(30, Math.max(5, parseInt(arg("--workers") ?? "5"))); // min 5
+const SESSIONS      = Math.max(1, parseInt(arg("--sessions") ?? "1")); // parallel sessions
+const FILTER_TYPE   = arg("--type");
+const FILTER_CH     = arg("--channel");
+const DRY_RUN       = flag("--dry-run");
+const LOAD_LIMIT    = parseFloat(arg("--max-load") ?? "3.0");
+const MIN_PARALLEL  = 5; // guaranteed minimum parallel agents per batch
+const BATCH_DELAY_MS = 500; // micro-delay between batch spawns
 
 const OPENCODE     = "/home/runner/workspace/.config/npm/node_global/bin/opencode";
 const DB_PATH      = path.resolve(process.cwd(), "local.db");
-const TIMEOUT_MS   = 6 * 60 * 1000;   // 6 min per agent
-const POLL_MS      = 5_000;            // DB poll interval
-const RENDER_MS    = 600;              // dashboard refresh
-const STAGGER_MS   = 2_000;           // delay between agent starts
+const TIMEOUT_MS   = 6 * 60 * 1000;
+const POLL_MS      = 5_000;
+const RENDER_MS    = 600;
 
 // ─── ANSI ─────────────────────────────────────────────────────────────────────
 const C = {
@@ -588,54 +596,6 @@ async function waitForCapacity() {
   }
 }
 
-async function runAgent(agent: Agent): Promise<void> {
-  const slot     = nextSlot();
-  agent.slot     = slot;
-  agent.status   = "running";
-  agent.startedAt = Date.now();
-
-  agent.baseline = await dbCount(agent.task.countSql, agent.task.countArgs);
-  agent.current  = agent.baseline;
-
-  const prompt = agent.task.buildPrompt();
-
-  let pollTimer: ReturnType<typeof setInterval>|null = null;
-  pollTimer = setInterval(async () => {
-    const n = await dbCount(agent.task.countSql, agent.task.countArgs);
-    agent.current   = n;
-    agent.generated = Math.max(0, n - agent.baseline);
-  }, POLL_MS);
-
-  await new Promise<void>(resolve => {
-    const child = spawn(OPENCODE, ["run", "--agent", agent.task.agent, prompt], {
-      stdio: ["ignore","pipe","pipe"],
-    });
-
-    const timer = setTimeout(()=>child.kill("SIGTERM"), TIMEOUT_MS);
-
-    child.on("close", async () => {
-      clearTimeout(timer);
-      if (pollTimer) clearInterval(pollTimer);
-      const final = await dbCount(agent.task.countSql, agent.task.countArgs);
-      agent.current   = final;
-      agent.generated = Math.max(0, final - agent.baseline);
-      agent.status    = agent.generated > 0 ? "done" : "failed";
-      agent.endedAt   = Date.now();
-      activeSlots.delete(slot);
-      resolve();
-    });
-
-    child.on("error", () => {
-      clearTimeout(timer);
-      if (pollTimer) clearInterval(pollTimer);
-      agent.status  = "failed";
-      agent.endedAt = Date.now();
-      activeSlots.delete(slot);
-      resolve();
-    });
-  });
-}
-
 // ─── Cleanup ──────────────────────────────────────────────────────────────────
 function cleanupTempFiles() {
   try {
@@ -672,10 +632,11 @@ async function main() {
     agents.push({ task, status: n >= task.minNeeded ? "skipped" : "pending",
       slot:0, baseline:n, current:n, generated:0 });
   }
-  const active = agents.filter(a=>a.status==="pending");
-  process.stdout.write(`\r  ${C.g}✓${C.r} ${agents.filter(a=>a.status==="skipped").length} already satisfied — ${C.b}${active.length} tasks to run${C.r} with ${C.b}${MAX_WORKERS} workers${C.r}\n\n`);
+  const pendingAgents = agents.filter(a=>a.status==="pending");
+  process.stdout.write(`\r  ${C.g}✓${C.r} ${agents.filter(a=>a.status==="skipped").length} already satisfied — ${C.b}${pendingAgents.length} tasks${C.r}\n`);
+  console.log(`  ${C.b}${SESSIONS} sessions${C.r} × ${C.b}${MAX_WORKERS} workers${C.r} = ${C.g}${SESSIONS * MAX_WORKERS} max parallel${C.r}\n`);
 
-  if (active.length === 0) {
+  if (pendingAgents.length === 0) {
     console.log(`${C.g}All content already meets minimum thresholds. Nothing to do.${C.r}\n`);
     db.close(); process.exit(0);
   }
@@ -683,13 +644,13 @@ async function main() {
   // Dry run
   if (DRY_RUN) {
     console.log(`${C.y}DRY RUN — tasks that would execute:${C.r}`);
-    active.forEach(a => console.log(`  ${C.d}·${C.r} ${a.task.type}/${a.task.label}`));
+    pendingAgents.forEach(a => console.log(`  ${C.d}·${C.r} ${a.task.type}/${a.task.label}`));
     console.log(); db.close(); process.exit(0);
   }
 
-  // Warn if high worker count
-  if (MAX_WORKERS > 10) {
-    console.log(`${C.y}⚠ Running ${MAX_WORKERS} workers. Monitor system load — use --workers=5 if the machine struggles.${C.r}\n`);
+  // Warn if high concurrency
+  if (MAX_WORKERS * SESSIONS > 15) {
+    console.log(`${C.y}⚠ High concurrency: ${MAX_WORKERS * SESSIONS} parallel agents. Monitor system load.${C.r}\n`);
     await new Promise(r => setTimeout(r, 2000));
   }
 
@@ -702,30 +663,119 @@ async function main() {
   const renderTimer = setInterval(renderDashboard, RENDER_MS);
   renderDashboard();
 
-  // Process active tasks with staggered concurrency
-  let ptr = 0;
-  const inFlight: Promise<void>[] = [];
+  // ── Launch parallel sessions ────────────────────────────────────────────────
+  // Distribute pending agents across sessions
+  const sessionQueues: Agent[][] = Array.from({ length: SESSIONS }, () => []);
+  
+  // Shuffle for even distribution across sessions
+  const shuffled = [...pendingAgents].sort(() => Math.random() - 0.5);
+  shuffled.forEach((agent, i) => {
+    sessionQueues[i % SESSIONS].push(agent);
+  });
 
-  async function pump() {
-    while (ptr < agents.length) {
-      const agent = agents[ptr++];
-      if (agent.status === "skipped") continue;
+  const sessionPromises: Promise<void>[] = [];
 
-      // Wait for a free slot and acceptable load
-      await waitForCapacity();
+  // ── Phase 1: Launch minimum 5 agents immediately (or all if < 5) ────────────
+  const initialBatch: Agent[] = [];
+  const remaining: Agent[] = [];
 
-      // Stagger starts to avoid burst spawning
-      if (inFlight.length > 0) await new Promise(r => setTimeout(r, STAGGER_MS));
-
-      const p: Promise<void> = runAgent(agent).finally(() => {
-        inFlight.splice(inFlight.indexOf(p), 1);
-      });
-      inFlight.push(p);
+  if (pendingAgents.length <= MIN_PARALLEL) {
+    // Less than MIN_PARALLEL tasks - launch all immediately
+    initialBatch.push(...pendingAgents);
+  } else {
+    // Take MIN_PARALLEL agents for immediate launch, rest go to queue
+    for (let i = 0; i < pendingAgents.length; i++) {
+      if (i < MIN_PARALLEL) {
+        initialBatch.push(pendingAgents[i]);
+      } else {
+        remaining.push(pendingAgents[i]);
+      }
     }
-    await Promise.all(inFlight);
   }
 
-  await pump();
+  console.log(`  ${C.g}Launching ${C.b}${initialBatch.length} agents immediately${C.r}…`);
+
+  // Launch initial batch in parallel
+  const initialPromises: Promise<void>[] = [];
+  for (const agent of initialBatch) {
+    const slot = nextSlot();
+    agent.slot = slot;
+    agent.status = "running";
+    agent.startedAt = Date.now();
+    agent.baseline = await dbCount(agent.task.countSql, agent.task.countArgs);
+    agent.current = agent.baseline;
+
+    const pollTimer = setInterval(async () => {
+      const n = await dbCount(agent.task.countSql, agent.task.countArgs);
+      agent.current = n;
+      agent.generated = Math.max(0, n - agent.baseline);
+    }, POLL_MS);
+
+    const p = new Promise<void>((resolve) => {
+      runAgentAsyncWithResolve(agent, slot, pollTimer, resolve);
+    });
+    initialPromises.push(p);
+  }
+
+  // ── Phase 2: While initial batch runs, queue remaining agents ───────────────
+  // Re-distribute remaining agents to session queues
+  const updatedQueues: Agent[][] = Array.from({ length: SESSIONS }, () => []);
+  remaining.forEach((agent, i) => {
+    updatedQueues[i % SESSIONS].push(agent);
+  });
+
+  // Launch session handlers for remaining work
+  for (let i = 0; i < SESSIONS; i++) {
+    if (updatedQueues[i].length === 0) continue;
+
+    const activeSet = new Set<Agent>();
+    const sessionQueue = updatedQueues[i];
+
+    const sessionPromise = (async () => {
+      while (sessionQueue.length > 0) {
+        // Wait for capacity
+        while (activeSlots.size >= MAX_WORKERS || systemOverloaded()) {
+          await new Promise(r => setTimeout(r, 500));
+        }
+
+        const agent = sessionQueue.shift();
+        if (!agent) break;
+
+        activeSet.add(agent);
+        const slot = nextSlot();
+        agent.slot = slot;
+        agent.status = "running";
+        agent.startedAt = Date.now();
+        agent.baseline = await dbCount(agent.task.countSql, agent.task.countArgs);
+        agent.current = agent.baseline;
+
+        const pollTimer = setInterval(async () => {
+          const n = await dbCount(agent.task.countSql, agent.task.countArgs);
+          agent.current = n;
+          agent.generated = Math.max(0, n - agent.baseline);
+        }, POLL_MS);
+
+        await new Promise<void>((resolve) => {
+          runAgentAsyncWithResolve(agent, slot, pollTimer, resolve);
+          // Don't await - let it run concurrently
+          setTimeout(() => {
+            activeSet.delete(agent);
+          }, 100);
+        });
+      }
+
+      // Wait for remaining in this session
+      while (activeSet.size > 0) {
+        await new Promise(r => setTimeout(r, 500));
+      }
+    })();
+
+    sessionPromises.push(sessionPromise);
+  }
+
+  // Wait for all initial + session work to complete
+  await Promise.all([...initialPromises, ...sessionPromises]);
+
   clearInterval(renderTimer);
   renderDashboard();
   cleanupTempFiles();
@@ -746,6 +796,40 @@ async function main() {
     agents.filter(a=>a.status==="failed").forEach(a => console.log(`  ✗ ${a.task.type}/${a.task.label}`));
     console.log(); process.exit(1);
   }
+}
+
+function runAgentAsyncWithResolve(
+  agent: Agent,
+  slot: number,
+  pollTimer: ReturnType<typeof setInterval> | null,
+  resolve: () => void
+): void {
+  const child = spawn(OPENCODE, ["run", "--agent", agent.task.agent, agent.task.buildPrompt()], {
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+  const timer = setTimeout(() => child.kill("SIGTERM"), TIMEOUT_MS);
+
+  child.on("close", async () => {
+    clearTimeout(timer);
+    if (pollTimer) clearInterval(pollTimer);
+    const final = await dbCount(agent.task.countSql, agent.task.countArgs);
+    agent.current = final;
+    agent.generated = Math.max(0, final - agent.baseline);
+    agent.status = agent.generated > 0 ? "done" : "failed";
+    agent.endedAt = Date.now();
+    activeSlots.delete(slot);
+    resolve();
+  });
+
+  child.on("error", () => {
+    clearTimeout(timer);
+    if (pollTimer) clearInterval(pollTimer);
+    agent.status = "failed";
+    agent.endedAt = Date.now();
+    activeSlots.delete(slot);
+    resolve();
+  });
 }
 
 main();
