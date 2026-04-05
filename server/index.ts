@@ -4,6 +4,7 @@ import { registerRoutes } from "./routes";
 import { registerAuthRoutes } from "./src/auth-routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import { ensureTablesExist } from "./db-init";
 
 // Suppress Vite's non-fatal "Failed to parse JSON file" noise that comes from
 // application/ld+json inline scripts in index.html being processed by the JSON plugin.
@@ -140,6 +141,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Ensure all DB tables exist before serving any requests
+  await ensureTablesExist();
+
   await registerRoutes(httpServer, app);
   await registerAuthRoutes(httpServer, app);
 
