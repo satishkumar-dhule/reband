@@ -5,8 +5,8 @@
 
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { PreferencesStorage, OnboardingStorage } from '../services/storage.service';
 import { getRecommendedChannelsFromManifest } from '../lib/channels-manifest';
@@ -15,7 +15,7 @@ import {
   ArrowRight, ArrowLeft, Check, Code, Server, Layout, Database,
   Cloud, Brain, Target, Rocket, BookOpen, Zap, ChevronRight, Trophy, Sparkles, Star
 } from 'lucide-react';
-import { Button } from '@/components/unified/Button';
+import { Button } from '@/lib/ui';
 
 interface Role {
   id: string;

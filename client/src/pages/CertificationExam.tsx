@@ -19,10 +19,10 @@ import {
   CertificationDomain,
   CertificationExamConfig,
 } from '../lib/certification-questions';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
 import { useCredits } from '../context/CreditsContext';
-import { SEOHead } from '../components/SEOHead';
-import { Button, IconButton } from '@/components/unified/Button';
+import { SEOHead } from '@/lib/ui';
+import { Button, IconButton } from '@/lib/ui';
 import {
   ArrowLeft, Award, Target, CheckCircle, XCircle,
   ChevronRight, ChevronLeft, Lightbulb, BarChart3,

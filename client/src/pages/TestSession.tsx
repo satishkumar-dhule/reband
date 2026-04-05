@@ -9,16 +9,16 @@ import {
   ArrowLeft, ArrowRight, CheckCircle, XCircle, Trophy,
   Home, Check, X, Zap
 } from 'lucide-react';
-import { SEOHead } from '../components/SEOHead';
-import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrapper';
-import { GenZCard, GenZButton, GenZProgress, GenZTimer } from '../components/genz';
-import { Button } from '@/components/unified/Button';
+import { SEOHead } from '@/lib/ui';
+import { DesktopSidebarWrapper } from '@/lib/ui';
+import { GenZCard, GenZButton, GenZProgress, GenZTimer } from '@/lib/ui';
+import { Button } from '@/lib/ui';
 import {
   Test, TestQuestion, getTestForChannel, getSessionQuestions,
   calculateScore, saveTestAttempt, TestAttempt, getTestProgress,
   getChannelTheme, checkTestExpiration
 } from '../lib/tests';
-import { mascotEvents } from '../components/PixelMascot';
+import { mascotEvents } from '@/lib/ui';
 
 type SessionState = 'loading' | 'ready' | 'in-progress' | 'review' | 'completed';
 

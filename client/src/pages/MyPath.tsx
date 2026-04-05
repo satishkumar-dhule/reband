@@ -6,12 +6,12 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
 import { allChannelsConfig, getChannelName } from '../lib/channels-config';
 import { curatedPaths } from '../lib/learning-paths-data';
-import { Button, IconButton, MotionButton } from '@/components/unified/Button';
-import { Input } from '@/components/ui/input';
+import { Button, IconButton, MotionButton } from '@/lib/ui';
+import { Input } from '@/lib/ui';
 import {
   Plus, Trash2, Edit, ChevronRight, Brain, Check, Target, Clock, Sparkles, Award,
   X, Search

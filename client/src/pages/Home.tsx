@@ -7,17 +7,17 @@ import {
   Clock, BookMarked, Activity, Brain, Award,
   Circle, Star, GitFork, AlertCircle, Coins
 } from "lucide-react";
-import { AppLayout } from "../components/layout/AppLayout";
-import { SEOHead } from "@/components/SEOHead";
-import { SkipLink } from "@/components/unified/SkipLink";
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
+import { SkipLink } from '@/lib/ui';
 import { allChannelsConfig } from "../lib/channels-config";
 import { cn } from "../lib/utils";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "../components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/lib/ui';
 import { useCredits } from "../context/CreditsContext";
 import { useUserPreferences } from "../context/UserPreferencesContext";
 import { useAchievementContext } from "../context/AchievementContext";
-import { Button } from "@/components/unified/Button";
-import { HomeSkeleton } from "@/components/skeletons/PageSkeletons";
+import { Button } from '@/lib/ui';
+import { HomeSkeleton } from '@/lib/ui';
 import { t } from "@/lib/i18n";
 
 // Lazy-load ContributionGrid to not block initial paint

@@ -9,13 +9,13 @@ import {
   GitBranch, Layers, Monitor, Smartphone, Server, Lock
 } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate, useReducedMotion } from 'framer-motion';
-import { SEOHead } from '../components/SEOHead';
-import { AppLayout } from '../components/layout/AppLayout';
+import { SEOHead } from '@/lib/ui';
+import { AppLayout } from '@/lib/ui';
 import { trackEasterEggUnlocked } from '../hooks/use-analytics';
 import { getAllQuestions, channels } from '../lib/data';
 import { cn } from '../lib/utils';
-import { Button, MotionButton, IconButton } from '@/components/unified/Button';
-import { Input } from '@/components/ui/input';
+import { Button, MotionButton, IconButton } from '@/lib/ui';
+import { Input } from '@/lib/ui';
 
 // Animated counter component
 function AnimatedCounter({ value, duration = 2 }: { value: number; duration?: number }) {

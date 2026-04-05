@@ -9,13 +9,13 @@ import {
   Sparkles, Lock, Unlock, Filter, BarChart2, Timer,
   ChevronLeft, Hash, Star
 } from 'lucide-react';
-import { SEOHead } from '../components/SEOHead';
-import { AppLayout } from '../components/layout/AppLayout';
-import { CodeEditor } from '../components/CodeEditor';
-import { DiffBadge, diffColor } from '../components/coding/DiffBadge';
-import { LiveTimer } from '../components/coding/LiveTimer';
-import { TestOutputPanel } from '../components/coding/TestOutputPanel';
-import { ChallengeCard } from '../components/coding/ChallengeCard';
+import { SEOHead } from '@/lib/ui';
+import { AppLayout } from '@/lib/ui';
+import { CodeEditor } from '@/lib/ui';
+import { DiffBadge, diffColor } from '@/lib/ui';
+import { LiveTimer } from '@/lib/ui';
+import { TestOutputPanel } from '@/lib/ui';
+import { ChallengeCard } from '@/lib/ui';
 import {
   CodingChallenge as Challenge, Language, TestResult,
   getAllChallengesAsync, getChallengeById, getRandomChallenge,
@@ -23,15 +23,15 @@ import {
   getCodingStats, getSolvedChallengeIds, ComplexityAnalysis,
 } from '../lib/coding-challenges';
 import { isPyodideReady } from '../lib/pyodide-runner';
-import { ScrollArea } from '../components/ui/scroll-area';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../components/ui/select';
-import { Button } from '../components/unified/Button';
-import { SkipLink } from '@/components/unified/SkipLink';
-import { Input } from '../components/ui/input';
+import { ScrollArea } from '@/lib/ui';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/lib/ui';
+import { Button } from '@/lib/ui';
+import { SkipLink } from '@/lib/ui';
+import { Input } from '@/lib/ui';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogDescription, DialogFooter,
-} from '../components/ui/dialog';
+} from '@/lib/ui';
 import { cn } from '../lib/utils';
 
 // ─── Constants ───────────────────────────────────────────────

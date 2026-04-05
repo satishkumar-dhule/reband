@@ -6,16 +6,16 @@ import {
   Clock, TrendingUp, Award, Lock, ChevronLeft, Volume2, Trophy,
   Info, MessageSquare, Brain, BarChart3, ChevronRight, Share2, Bookmark
 } from 'lucide-react';
-import { SEOHead } from '../components/SEOHead';
+import { SEOHead } from '@/lib/ui';
 import { loadChannelQuestions } from '../lib/questions-loader';
 import { useCredits } from '../context/CreditsContext';
 import { useAchievementContext } from '../context/AchievementContext';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
-import { CreditsDisplay } from '../components/CreditsDisplay';
-import { AppLayout } from '../components/layout/AppLayout';
-import { Button } from '../components/unified/Button';
-import { VoiceSkeleton } from '../components/skeletons/PageSkeletons';
+import { CreditsDisplay } from '@/lib/ui';
+import { AppLayout } from '@/lib/ui';
+import { Button } from '@/lib/ui';
+import { VoiceSkeleton } from '@/lib/ui';
 import {
   type VoiceSession,
   type SessionState,

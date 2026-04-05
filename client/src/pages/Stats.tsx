@@ -1,11 +1,11 @@
 import { useMemo, useEffect, useState, useCallback } from 'react';
-import { AppLayout } from '../components/layout/AppLayout';
+import { AppLayout } from '@/lib/ui';
 import { useGlobalStats } from '../hooks/use-progress';
 import { useCredits } from '../context/CreditsContext';
 import { channels } from '../lib/data';
 import { useChannelStats } from '../hooks/use-stats';
-import { SEOHead } from '../components/SEOHead';
-import { StatsSkeleton } from '../components/skeletons/PageSkeletons';
+import { SEOHead } from '@/lib/ui';
+import { StatsSkeleton } from '@/lib/ui';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -13,7 +13,7 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator
-} from '../components/ui/breadcrumb';
+} from '@/lib/ui';
 import {
   Trophy,
   Flame,

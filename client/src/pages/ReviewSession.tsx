@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useLocation } from 'wouter';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
 import { useCredits } from '../context/CreditsContext';
-import { ListenButton } from '../components/ListenButton';
-import { Button } from '../components/unified/Button';
+import { ListenButton } from '@/lib/ui';
+import { Button } from '@/lib/ui';
 import {
   Brain, ChevronLeft, Eye, Flame, Sparkles, Zap, Check, RotateCcw, BookOpen, ArrowRight
 } from 'lucide-react';

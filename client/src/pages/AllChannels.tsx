@@ -5,15 +5,15 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useLocation } from 'wouter';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
-import { SkipLink } from '@/components/unified/SkipLink';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
+import { SkipLink } from '@/lib/ui';
 import { allChannelsConfig, ChannelConfig } from '../lib/channels-config';
 import { useChannelStats } from '../hooks/use-stats';
 import { useDebounce, useProgress } from '../hooks';
-import { ChannelsSkeleton } from '../components/skeletons/PageSkeletons';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/unified/Button';
+import { ChannelsSkeleton } from '@/lib/ui';
+import { Input } from '@/lib/ui';
+import { Button } from '@/lib/ui';
 import {
   Search, Box, Terminal, Layout, Server, Database, Infinity, Activity, Cloud, Layers,
   Brain, Eye, FileText, Code, Shield, Network, Monitor, Smartphone, CheckCircle,

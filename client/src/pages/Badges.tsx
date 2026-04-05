@@ -1,13 +1,13 @@
 import { useState, useMemo, memo } from 'react';
 import { useLocation } from 'wouter';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
 import { useAchievements } from '../hooks/use-achievements';
 import { AchievementProgress } from '../lib/achievements';
 import { Trophy, Lock, Award, Home } from 'lucide-react';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
-import { Button } from '@/components/unified/Button';
-import { GenericPageSkeleton } from '@/components/skeletons/PageSkeletons';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
+import { Button } from '@/lib/ui';
+import { GenericPageSkeleton } from '@/lib/ui';
 
 const tierColors: Record<string, string> = {
   bronze: 'text-[var(--gh-tier-bronze)]',

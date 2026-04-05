@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'wouter';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useGlobalStats } from '../hooks/use-progress';
 import { useCredits } from '../context/CreditsContext';
@@ -21,8 +21,8 @@ import {
 import {
   Breadcrumb, BreadcrumbList, BreadcrumbItem,
   BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator
-} from '../components/ui/breadcrumb';
-import { Switch } from '@/components/ui/switch';
+} from '@/lib/ui';
+import { Switch } from '@/lib/ui';
 
 // ── Icon map for channel icons ─────────────────────────────────────────────────
 const iconMap: Record<string, LucideIcon> = {

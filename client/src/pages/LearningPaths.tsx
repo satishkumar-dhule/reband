@@ -1,16 +1,16 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
 import { allChannelsConfig } from '../lib/channels-config';
 import { curatedPaths } from '../lib/learning-paths-data';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
 import {
   Plus, ChevronRight, Check, X, Search, Home, Clock, Trophy
 } from 'lucide-react';
-import { Button } from '@/components/unified/Button';
-import { SkipLink } from '@/components/unified/SkipLink';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/lib/ui';
+import { SkipLink } from '@/lib/ui';
+import { Input } from '@/lib/ui';
 import { toast } from '@/hooks/use-toast';
 
 // Certification type

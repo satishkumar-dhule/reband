@@ -12,7 +12,7 @@ import { motion, HTMLMotionProps } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success';
-export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'icon';
 export type ButtonRounded = 'default' | 'lg' | 'full';
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
@@ -42,7 +42,8 @@ const sizeClasses: Record<ButtonSize, string> = {
   sm: 'px-3 py-[3px] text-xs',
   md: 'px-4 py-[5px] text-sm',
   lg: 'px-5 py-[9px] text-base',
-  xl: 'px-8 py-4 text-lg'
+  xl: 'px-8 py-4 text-lg',
+  icon: 'p-0 h-9 w-9 text-sm'
 };
 
 const roundedClasses: Record<ButtonRounded, string> = {
@@ -196,12 +197,13 @@ interface IconButtonProps extends Omit<ButtonProps, 'children'> {
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   ({ icon, size = 'md', rounded = 'default', className = '', ...props }, ref) => {
-    const sizeMap = {
+    const sizeMap: Record<ButtonSize, string> = {
       xs: 'w-6 h-6',
       sm: 'w-8 h-8',
       md: 'w-10 h-10',
       lg: 'w-12 h-12',
-      xl: 'w-14 h-14'
+      xl: 'w-14 h-14',
+      icon: 'w-9 h-9'
     };
 
     return (

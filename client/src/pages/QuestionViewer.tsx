@@ -6,16 +6,16 @@ import { useQuestionsWithPrefetch, useSubChannels, useCompaniesWithCounts } from
 import { useProgress, trackActivity } from '../hooks/use-progress';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useAchievementContext } from '../context/AchievementContext';
-import { SEOHead } from '../components/SEOHead';
-import { UnifiedSearch } from '../components/UnifiedSearch';
-import { VoiceReminder } from '../components/VoiceReminder';
+import { SEOHead } from '@/lib/ui';
+import { UnifiedSearch } from '@/lib/ui';
+import { VoiceReminder } from '@/lib/ui';
 import { Haptics } from '../lib/haptics';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SkipLink } from '@/components/unified/SkipLink';
-import { Button, IconButton } from '@/components/unified/Button';
-import { QuestionViewerSkeleton, ReviewSkeleton } from '@/components/skeletons/PageSkeletons';
+import { AppLayout } from '@/lib/ui';
+import { SkipLink } from '@/lib/ui';
+import { Button, IconButton } from '@/lib/ui';
+import { QuestionViewerSkeleton, ReviewSkeleton } from '@/lib/ui';
 import {
   getCard, recordReview, addToSRS,
   getMasteryLabel, getMasteryColor,
@@ -32,7 +32,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/lib/ui';
 import { cn } from '../lib/utils';
 
 // Flashcard shape compatible with FlashcardsTab component

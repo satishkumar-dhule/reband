@@ -5,10 +5,10 @@ import {
   Sparkles, Plus, RefreshCw, Rocket, Calendar,
   ChevronDown, ChevronUp, Layers, Rss, Loader2
 } from 'lucide-react';
-import { SEOHead } from '../components/SEOHead';
-import { AppLayout } from '../components/layout/AppLayout';
+import { SEOHead } from '@/lib/ui';
+import { AppLayout } from '@/lib/ui';
 import { defaultChangelog, fetchChangelog, type ChangelogData, type ChangelogEntry } from '../lib/changelog';
-import { Button, IconButton } from '@/components/unified/Button';
+import { Button, IconButton } from '@/lib/ui';
 
 const typeConfig = {
   added: { icon: Plus, color: 'text-green-400', bg: 'bg-green-500/20', label: 'New Questions' },

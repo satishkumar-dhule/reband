@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { Home, Search, ArrowLeft, AlertCircle, Compass } from 'lucide-react';
-import { Button } from '@/components/unified/Button';
+import { Button } from '@/lib/ui';
 
 export default function NotFound() {
   const [, setLocation] = useLocation();

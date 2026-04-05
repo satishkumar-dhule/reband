@@ -6,10 +6,10 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
-import { Button } from '@/components/unified/Button';
-import { Input } from '@/components/ui/input';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
+import { Button } from '@/lib/ui';
+import { Input } from '@/lib/ui';
 import { 
   Test, loadTests, getAllTestProgress, getTestStats,
   checkAndExpireTests

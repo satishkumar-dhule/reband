@@ -1,21 +1,21 @@
 import { useState, useMemo, Suspense } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
 import { loadChannelQuestions } from '../lib/questions-loader';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { ProgressStorage } from '../services/storage.service';
 import { STORAGE_KEYS } from '../lib/constants';
-import { GenericPageSkeleton } from '../components/skeletons/PageSkeletons';
+import { GenericPageSkeleton } from '@/lib/ui';
 import type { Question } from '../types';
 import {
   Bookmark, Trash2, ChevronRight, Filter,
   CheckCircle, Building2, X, BookOpen, Home
 } from 'lucide-react';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
-import { Button, IconButton } from '../components/unified/Button';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../components/ui/select';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
+import { Button, IconButton } from '@/lib/ui';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/lib/ui';
 
 interface BookmarkedQuestion extends Question {
   channelId: string;

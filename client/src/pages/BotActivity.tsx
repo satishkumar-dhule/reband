@@ -16,11 +16,11 @@ import {
   ExternalLink, Code, HelpCircle, Mic, Home
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SEOHead } from "../components/SEOHead";
-import { AppLayout } from "../components/layout/AppLayout";
-import { MetricCard } from "../components/unified";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "../components/ui/breadcrumb";
-import { Button, IconButton } from "../components/unified/Button";
+import { SEOHead } from '@/lib/ui';
+import { AppLayout } from '@/lib/ui';
+import { MetricCard } from '@/lib/ui';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
+import { Button, IconButton } from '@/lib/ui';
 import { cn } from "../lib/utils";
 
 // Types

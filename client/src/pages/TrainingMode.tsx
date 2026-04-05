@@ -18,14 +18,14 @@ import {
   CheckCircle, BookOpen, Sparkles, Trophy,
   Clock, Award, TrendingUp, Volume2
 } from 'lucide-react';
-import { SEOHead } from '../components/SEOHead';
-import { Button, IconButton } from '../components/unified/Button';
+import { SEOHead } from '@/lib/ui';
+import { Button, IconButton } from '@/lib/ui';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { ChannelService } from '../services/api.service';
 import { useVoiceRecording } from '../hooks/use-voice-recording';
-import { RecordingPanel } from '../components/unified/RecordingPanel';
-import { QuestionHistoryIcon } from '../components/unified/QuestionHistory';
-import { DesktopSidebarWrapper } from '../components/layout/DesktopSidebarWrapper';
+import { RecordingPanel } from '@/lib/ui';
+import { QuestionHistoryIcon } from '@/lib/ui';
+import { DesktopSidebarWrapper } from '@/lib/ui';
 import type { Question } from '../types';
 
 interface KeyPhrase {

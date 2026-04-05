@@ -6,11 +6,11 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery } from "@tanstack/react-query";
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
-import { SkipLink } from '@/components/unified/SkipLink';
-import { Input } from '../components/ui/input';
-import { CertificationsSkeleton } from '../components/skeletons/PageSkeletons';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
+import { SkipLink } from '@/lib/ui';
+import { Input } from '@/lib/ui';
+import { CertificationsSkeleton } from '@/lib/ui';
 import {
   Search, Award, Clock, ChevronRight, Sparkles, Check, Plus,
   Cloud, Shield, Database, Brain, Code, Users, Box, Terminal, Server, Cpu,

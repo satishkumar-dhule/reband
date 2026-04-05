@@ -30,6 +30,32 @@ Free technical interview prep app — swipe learning, voice practice, spaced rep
 | Search | Pagefind (static search index) |
 | Package manager | pnpm (monorepo) |
 
+---
+
+## Component Library (`client/src/lib/ui.ts`)
+
+**Single source of truth for all UI components.** Every page must import components from `@/lib/ui` only.
+
+```ts
+import { Button, Card, AppLayout, SEOHead, ... } from '@/lib/ui';
+```
+
+The library re-exports:
+- **Shadcn/Radix primitives** — Button, Card, Input, Select, Dialog, Tabs, etc.
+- **Layout** — AppLayout, MobileHeader, TopBar, DesktopSidebarWrapper
+- **Unified design-system** — UnifiedCard, ProgressBar, DifficultyBadge, EmptyState, MetricCard, etc.
+- **Shared** — UnifiedAnswerPanel, UnifiedQuestionPanel, UnifiedProgressBar, VirtualizedList
+- **Skeletons** — GenericPageSkeleton, HomeSkeleton, QuestionViewerSkeleton, etc.
+- **Feature components** — SEOHead, CodeBlock, CodeEditor, AnswerPanel, QuestionPanel, etc.
+- **Coding** — ChallengeCard, DiffBadge, LiveTimer, TestOutputPanel
+- **Gen Z** — GenZCard, GenZButton, GenZProgress, GenZTimer
+
+**To add a new component:** export it from `client/src/lib/ui.ts` first, then import it in your page.
+
+**Naming note:** shadcn's `Card`/`CardHeader`/`CardFooter` use their natural names. Unified Card variants are prefixed (`UnifiedCard`, `UnifiedCardHeader`, `UnifiedCardFooter`).
+
+---
+
 ## Replit-Specific Configuration
 
 | Fix | Description |

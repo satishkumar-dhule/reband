@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { AppLayout } from '../components/layout/AppLayout';
-import { SEOHead } from '../components/SEOHead';
+import { AppLayout } from '@/lib/ui';
+import { SEOHead } from '@/lib/ui';
 import { curatedPaths } from '../lib/learning-paths-data';
 import { allChannelsConfig } from '../lib/channels-config';
-import { Button } from '@/components/unified/Button';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
+import { Button } from '@/lib/ui';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
 import {
   Home, ChevronRight, Clock, Trophy, CheckCircle2, Circle,
   BookOpen, RotateCcw, ArrowRight, Layers

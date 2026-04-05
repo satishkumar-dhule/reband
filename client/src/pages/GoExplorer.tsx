@@ -6,16 +6,16 @@ import {
   ChevronLeft, ChevronRight, Search, X, Loader2, Zap, Database,
   SlidersHorizontal, Hash, ArrowUpRight, Code2, Star
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from '@/lib/ui';
+import { Button } from '@/lib/ui';
+import { Input } from '@/lib/ui';
+import { Card, CardContent, CardHeader, CardTitle } from '@/lib/ui';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+} from '@/lib/ui';
 import {
   Tabs, TabsContent, TabsList, TabsTrigger,
-} from "@/components/ui/tabs";
+} from '@/lib/ui';
 
 // ─── API helpers ───────────────────────────────────────────────────────────
 const BASE = "/go-api/api/v1";
@@ -431,7 +431,7 @@ function CertificationsTab() {
     queryFn: () => apiFetch(`${BASE}/certifications?${params}`),
   });
 
-  const categories = [...new Set((data?.data ?? []).map(c => c.category).filter(Boolean))];
+  const categories = Array.from(new Set((data?.data ?? []).map(c => c.category).filter(Boolean)));
 
   return (
     <div className="space-y-4">

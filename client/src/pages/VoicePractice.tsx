@@ -6,16 +6,16 @@ import {
   Target, Clock, TrendingUp, Star, Crown, Lock, Play,
   MessageSquare, Brain, BarChart3, Flame, Waves, AlertCircle, Info, Home
 } from 'lucide-react';
-import { SEOHead } from '../components/SEOHead';
-import { AppLayout } from '../components/layout/AppLayout';
+import { SEOHead } from '@/lib/ui';
+import { AppLayout } from '@/lib/ui';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { loadChannelQuestions } from '../lib/questions-loader';
 import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import type { Question } from '../types';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
-import { Button } from '@/components/unified/Button';
-import { SkipLink } from '@/components/unified/SkipLink';
-import { VoiceSkeleton } from '../components/skeletons/PageSkeletons';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
+import { Button } from '@/lib/ui';
+import { SkipLink } from '@/lib/ui';
+import { VoiceSkeleton } from '@/lib/ui';
 
 type PracticeMode = 'training' | 'interview';
 type RecordingState = 'idle' | 'recording' | 'recorded';

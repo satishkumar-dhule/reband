@@ -12,13 +12,13 @@ import {
   getCertificationById, 
   getPrerequisiteCertifications,
 } from '../lib/certifications-config';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '../components/ui/breadcrumb';
-import { Button, IconButton } from '@/components/unified/Button';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
+import { Button, IconButton } from '@/lib/ui';
 import { useCredits } from '../context/CreditsContext';
-import { SEOHead } from '../components/SEOHead';
-import { QuestionPanel } from '../components/QuestionPanel';
-import { AnswerPanel } from '../components/AnswerPanel';
-import { ComingSoon } from '../components/ComingSoon';
+import { SEOHead } from '@/lib/ui';
+import { QuestionPanel } from '@/lib/ui';
+import { AnswerPanel } from '@/lib/ui';
+import { ComingSoon } from '@/lib/ui';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
 import { useSwipe } from '../hooks/use-swipe';
