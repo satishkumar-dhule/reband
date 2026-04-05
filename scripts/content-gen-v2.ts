@@ -43,10 +43,14 @@ const FILTER_TYPE   = arg("--type");
 const FILTER_CH     = arg("--channel");
 const MAX_RETRIES   = Math.max(0, parseInt(arg("--retry")   ?? "1"));
 const LOAD_LIMIT    = parseFloat(arg("--max-load")  ?? "3.0");
+const MODEL_OVERRIDE= arg("--model");           // e.g. --model=anthropic/claude-opus-4-5
 const DRY_RUN       = flag("--dry-run");
 const FORCE         = flag("--force");
 const STRATEGY_MODE = flag("--strategy");
 const SHOW_REPORT   = flag("--report");
+
+// Minimum items below which a channel is considered a "gap" (auto-detect mode)
+const LOW_THRESHOLD = parseInt(arg("--low-threshold") ?? "5");
 
 const OPENCODE    = "/home/runner/workspace/.config/npm/node_global/bin/opencode";
 const DB_PATH     = path.resolve(process.cwd(), "local.db");
@@ -82,6 +86,55 @@ async function dbRows<T = any>(sql: string, args: any[] = []): Promise<T[]> {
     const r = await db.execute({ sql, args });
     return r.rows as unknown as T[];
   } catch { return []; }
+}
+
+// ─── JSON helpers (ported from reference) ────────────────────────────────────
+function extractJson(raw: string): string {
+  // 1. Named fenced blocks (```json / ```ts / ```js)
+  const fenceRe = /```(?:json|typescript|ts|js|javascript)?\s*\n([\s\S]*?)```/g;
+  let best: string | null = null;
+  let m: RegExpExecArray | null;
+  while ((m = fenceRe.exec(raw)) !== null) {
+    if (!best || m[1].length > best.length) best = m[1];
+  }
+  if (best) return best.trim();
+  // 2. Any fenced block
+  const any = raw.match(/```\s*\n([\s\S]*?)```/);
+  if (any) return any[1].trim();
+  // 3. Bare JSON array or object
+  const bareArr = raw.match(/(\[[\s\S]*?\])/);
+  if (bareArr) return bareArr[1];
+  const bareObj = raw.match(/(\{[\s\S]*?\})/);
+  if (bareObj) return bareObj[1];
+  return raw.trim();
+}
+
+function tryParseJson<T = any>(str: string): T | null {
+  try { return JSON.parse(str) as T; }
+  catch { return null; }
+}
+
+// ─── Language helpers (channel → code language) ────────────────────────────
+function getLanguageForChannel(channelId: string): string {
+  const map: Record<string, string> = {
+    frontend: "typescript", backend: "typescript", "react-native": "typescript",
+    algorithms: "python", "dynamic-programming": "python", "data-structures": "python",
+    "bit-manipulation": "python", "math-logic": "python",
+    python: "python", ios: "swift", android: "kotlin",
+    database: "sql", linux: "bash", unix: "bash",
+    terraform: "hcl", kubernetes: "yaml", devops: "bash",
+    security: "typescript", networking: "bash",
+  };
+  return map[channelId] ?? "typescript";
+}
+
+function getExtension(channelId: string): string {
+  const lang = getLanguageForChannel(channelId);
+  const ext: Record<string, string> = {
+    typescript: "ts", python: "py", swift: "swift",
+    kotlin: "kt", sql: "sql", bash: "sh", hcl: "tf", yaml: "yaml",
+  };
+  return ext[lang] ?? "ts";
 }
 
 // ─── Generation logs table (created on first run) ─────────────────────────────
@@ -131,14 +184,24 @@ async function scoreQuality(type: ContentType, channel: string, since: string): 
       const total = await dbCount(
         "SELECT COUNT(*) FROM questions WHERE channel=? AND created_at>=?", [channel, since]);
       if (total === 0) return { score: 0, details: "no rows" };
+      // Field completeness
       const withExpl = await dbCount(
-        "SELECT COUNT(*) FROM questions WHERE channel=? AND created_at>=? AND explanation IS NOT NULL AND length(explanation)>100",
+        "SELECT COUNT(*) FROM questions WHERE channel=? AND created_at>=? AND explanation IS NOT NULL AND length(explanation)>300",
         [channel, since]);
       const withEli5 = await dbCount(
-        "SELECT COUNT(*) FROM questions WHERE channel=? AND created_at>=? AND eli5 IS NOT NULL",
+        "SELECT COUNT(*) FROM questions WHERE channel=? AND created_at>=? AND eli5 IS NOT NULL AND length(eli5)>10",
         [channel, since]);
-      const score = (withExpl + withEli5) / (total * 2);
-      return { score, details: `${withExpl}/${total} with explanation, ${withEli5}/${total} with eli5` };
+      const withCode = await dbCount(
+        "SELECT COUNT(*) FROM questions WHERE channel=? AND created_at>=? AND explanation LIKE '%```%'",
+        [channel, since]);
+      // Placeholder pollution check
+      const polluted = await dbCount(
+        "SELECT COUNT(*) FROM questions WHERE channel=? AND created_at>=? AND (question LIKE '%REPLACE%' OR question LIKE '%TODO%' OR explanation LIKE '%placeholder%')",
+        [channel, since]);
+      const raw = (withExpl*2 + withEli5 + withCode*2) / (total * 5);
+      const penalty = polluted / total * 0.5;
+      const score = Math.max(0, Math.min(1, raw - penalty));
+      return { score, details: `${withExpl}/${total} long-expl, ${withCode}/${total} code, ${withEli5}/${total} eli5${polluted>0?`, ${polluted} polluted`:""}` };
     }
     if (type === "flashcards") {
       const total = await dbCount(
@@ -150,14 +213,28 @@ async function scoreQuality(type: ContentType, channel: string, since: string): 
       const withHint = await dbCount(
         "SELECT COUNT(*) FROM flashcards WHERE channel=? AND created_at>=? AND hint IS NOT NULL",
         [channel, since]);
-      const score = 0.5 + (withCode + withHint) / (total * 4);
-      return { score, details: `${withCode}/${total} with code, ${withHint}/${total} with hint` };
+      const withMnemonic = await dbCount(
+        "SELECT COUNT(*) FROM flashcards WHERE channel=? AND created_at>=? AND mnemonic IS NOT NULL",
+        [channel, since]);
+      // back field should have bullet structure (- or 1.)
+      const withBullets = await dbCount(
+        "SELECT COUNT(*) FROM flashcards WHERE channel=? AND created_at>=? AND (back LIKE '%\\n-%' OR back LIKE '%\\n1.%' OR back LIKE '- %')",
+        [channel, since]);
+      const polluted = await dbCount(
+        "SELECT COUNT(*) FROM flashcards WHERE channel=? AND created_at>=? AND (front LIKE '%REPLACE%' OR back LIKE '%TODO%')",
+        [channel, since]);
+      const raw = 0.4 + (withCode + withHint + withMnemonic + withBullets) / (total * 8);
+      const score = Math.max(0, Math.min(1, raw - (polluted / total * 0.4)));
+      return { score, details: `${withCode}/${total} code, ${withHint}/${total} hint, ${withMnemonic}/${total} mnemonic, ${withBullets}/${total} bullets` };
     }
     if (type === "voice") {
       const total = await dbCount(
         "SELECT COUNT(*) FROM voice_sessions WHERE channel=? AND created_at>=?", [channel, since]);
-      const score = total > 0 ? 0.8 : 0;
-      return { score, details: `${total} sessions` };
+      const withDesc = await dbCount(
+        "SELECT COUNT(*) FROM voice_sessions WHERE channel=? AND created_at>=? AND description IS NOT NULL AND length(description)>30",
+        [channel, since]);
+      const score = total > 0 ? 0.5 + (withDesc / total) * 0.5 : 0;
+      return { score, details: `${total} sessions, ${withDesc}/${total} with description` };
     }
     if (type === "certifications") {
       const total = await dbCount(
@@ -396,8 +473,8 @@ SHAPE per item:
   id: crypto.randomUUID(),
   question: "specific realistic question ending with ?",
   answer: "2-4 sentence TL;DR — concrete, no filler",
-  explanation: "300-500 word markdown with ## headings and at least one code block",
-  eli5: "1-2 sentences, zero jargon, child-friendly analogy",
+  explanation: "300-500 word markdown with ## headings and at least one ${getLanguageForChannel(ch.id)} code block (use \`\`\`${getLanguageForChannel(ch.id)} ... \`\`\`)",
+  eli5: "1-2 sentences, zero jargon, child-friendly analogy using everyday objects",
   difficulty: "beginner"|"intermediate"|"advanced",
   tags: JSON.stringify(["${ch.id}","subtopic"]),
   channel: "${ch.id}",
@@ -407,10 +484,11 @@ SHAPE per item:
 
 CONTEXT: ${ch.ctx}
 QUALITY RULES:
-- Each explanation MUST include a code block (\`\`\`language ... \`\`\`)
+- Each explanation MUST include a \`\`\`${getLanguageForChannel(ch.id)}\`\`\` code block (filename: example.${getExtension(ch.id)})
 - Use different sub-channels across the ${n} questions
 - Mix difficulty: ~30% beginner, ~50% intermediate, ~20% advanced
-- No duplicate questions; do not repeat questions already common online
+- No placeholders (REPLACE THIS, TODO, etc.) — every field must be fully written
+- No duplicate questions; avoid questions already common in generic interview guides
 
 Run: npx tsx ${seed}
 Cleanup: rm -f ${seed}`;
@@ -474,10 +552,29 @@ async function main() {
 main().catch(e=>{console.error(e.message);process.exit(1);});
 \`\`\`
 
-SHAPE: { id: crypto.randomUUID(), channel: "${ch.id}", front: "≤15 words, ends with ?", back: "60-150 words — direct answer first, elaboration second", hint: "1-sentence memory aid or null", codeExample: "short runnable snippet or null", mnemonic: "catchy trick phrase or null", difficulty: "beginner"|"intermediate"|"advanced", tags: JSON.stringify(["${ch.id}","subtopic"]), category: "<one of: ${ch.cats.join(", ")}>", createdAt: new Date().toISOString() }
+SHAPE:
+{
+  id: crypto.randomUUID(),
+  channel: "${ch.id}",
+  front: "≤15 words, ends with ? — concise and specific",
+  back: "MUST use bullet list format: '- **Term**: explanation\\n- Second point\\n- Third point' (60-150 words, NO prose paragraphs)",
+  hint: "1-sentence memory aid — guides without revealing the answer, or null",
+  codeExample: "short runnable ${getLanguageForChannel(ch.id)} snippet demonstrating the concept, or null",
+  mnemonic: "catchy short memory trick (e.g. acronym, rhyme) or null",
+  difficulty: "beginner"|"intermediate"|"advanced",
+  tags: JSON.stringify(["${ch.id}","subtopic"]),
+  category: "<one of: ${ch.cats.join(", ")}>",
+  createdAt: new Date().toISOString(),
+}
 
 CONTEXT: ${ch.ctx}
-QUALITY RULES: ${n} unique cards, add codeExample for ≥50% of cards, 30/50/20 difficulty split, mnemonic for advanced cards.
+QUALITY RULES:
+- back field MUST use markdown bullets (- item) or numbered list (1. item) — never prose paragraphs
+- Add codeExample (${getLanguageForChannel(ch.id)}) for ≥50% of cards
+- Add mnemonic for all advanced cards
+- 30/50/20 difficulty split across the ${n} cards
+- No placeholders (REPLACE THIS, TODO, etc.)
+- commonConfusion note (optional): one sentence about a common misconception — append as a hint if present
 
 Run: npx tsx ${seed}
 Cleanup: rm -f ${seed}`;
@@ -570,29 +667,39 @@ async function buildStrategyPlan(queue: Task[]): Promise<Task[]> {
     countMap[`${r.type}:${r.channel}`] = Number(r.cnt) || 0;
   }
 
+  // Also pull average quality scores from generation_logs for richer context
+  const qualRows = await dbRows<{ type: string; ch: string; avg_gen: number }>(
+    "SELECT type, channel AS ch, AVG(generated) AS avg_gen FROM generation_logs GROUP BY type, channel"
+  );
+  const qualMap: Record<string, number> = {};
+  for (const r of qualRows) qualMap[`${r.type}:${r.ch}`] = Number(r.avg_gen) || 0;
+
   const state = queue.map(t => ({
     id: t.id, type: t.type, label: t.label,
     current: countMap[`${t.type}:${t.label}`] ?? 0,
     minNeeded: t.minNeeded,
+    lowThreshold: LOW_THRESHOLD,
+    avgGeneratedPerRun: +(qualMap[`${t.type}:${t.label}`] ?? 0).toFixed(1),
   }));
 
   const stateJson = JSON.stringify(state, null, 2);
-  const seed = `scripts/.tmp-strategy-${Date.now()}.ts`;
 
-  const prompt = `You are the Strategy Agent for DevPrep.
+  const prompt = `You are the Strategy Agent for DevPrep, an AI-powered developer interview prep platform.
 
-Analyze the content database state below and produce a prioritised list of task IDs to run.
+Analyze the content database state and produce a prioritised list of task IDs to run.
 
-Current state (id, type, label, current count, minNeeded):
+## Current State
+Each entry: id, type, label, current count, minNeeded, lowThreshold, avgGeneratedPerRun
 ${stateJson}
 
-Rules:
-1. Prioritise tasks where current < minNeeded (gaps first)
-2. Among those, order by: lowest current count → highest priority
-3. Tasks where current >= minNeeded are still valid but lower priority
-4. Include ALL pending task IDs — just reorder them
+## Prioritisation Rules
+1. Tasks where current < lowThreshold are CRITICAL gaps — run first
+2. Tasks where current < minNeeded are GAPS — run second
+3. Balance content types — do not over-index on one type
+4. Channels with low avgGeneratedPerRun may be harder — consider spreading them out
+5. Include ALL task IDs — just reorder them by priority
 
-Return ONLY a JSON array of task IDs in priority order, wrapped in a json code fence:
+Return ONLY a JSON array of task IDs in priority order in a json code fence:
 \`\`\`json
 ["task-id-1","task-id-2",...]
 \`\`\``;
@@ -601,21 +708,18 @@ Return ONLY a JSON array of task IDs in priority order, wrapped in a json code f
 
   let raw = "";
   try {
-    raw = await runOpencode(prompt, seed);
+    raw = await runOpencode(prompt);
   } catch (e: any) {
     console.warn(`${C.y}  Strategy agent failed (${e.message}), using default priority order${C.r}`);
     return queue;
   }
 
-  const match = raw.match(/```json\s*([\s\S]*?)```/);
-  if (!match) {
-    console.warn(`${C.y}  Strategy agent returned no valid JSON, using default order${C.r}`);
-    return queue;
-  }
+  // Use proper extractJson + tryParseJson helpers
+  const jsonStr = extractJson(raw);
+  const ids = tryParseJson<string[]>(jsonStr);
 
-  let ids: string[] = [];
-  try { ids = JSON.parse(match[1].trim()); } catch {
-    console.warn(`${C.y}  Strategy JSON parse failed, using default order${C.r}`);
+  if (!Array.isArray(ids) || ids.length === 0) {
+    console.warn(`${C.y}  Strategy agent returned invalid plan, using default order${C.r}`);
     return queue;
   }
 
@@ -628,16 +732,38 @@ Return ONLY a JSON array of task IDs in priority order, wrapped in a json code f
   return reordered;
 }
 
-// Run opencode agent and return stdout
-function runOpencode(prompt: string, seedPath?: string): Promise<string> {
+// Run opencode agent and return stdout (used by strategy agent only)
+// Matches the reference's pattern: --dir for isolation, exit-code check, model override
+function runOpencode(prompt: string, modelOverride?: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    const child = spawn(OPENCODE, ["run", "--agent", "content-question-expert", prompt], {
+    const workDir = path.resolve(process.cwd(), ".opencode-strategy-tmp");
+    fs.mkdirSync(workDir, { recursive: true });
+
+    const args = ["run", "--dir", workDir];
+    const model = modelOverride ?? MODEL_OVERRIDE;
+    if (model) args.push("--model", model);
+    args.push(prompt);
+
+    const child = spawn(OPENCODE, args, {
+      env: { ...process.env },
       stdio: ["ignore","pipe","pipe"],
     });
+
     const timer = setTimeout(() => { child.kill("SIGTERM"); reject(new Error("timeout")); }, TIMEOUT_MS);
-    let out = "";
-    child.stdout?.on("data", (d: Buffer) => { out += d.toString(); });
-    child.on("close", () => { clearTimeout(timer); resolve(out); });
+
+    let stdout = "";
+    let stderr = "";
+    child.stdout?.on("data", (d: Buffer) => { stdout += d.toString(); });
+    child.stderr?.on("data", (d: Buffer) => { stderr += d.toString(); });
+
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      if (code !== 0 && stdout.trim().length === 0) {
+        reject(new Error(`opencode exited ${code}: ${stderr.slice(0, 400)}`));
+      } else {
+        resolve(stdout);
+      }
+    });
     child.on("error", (e) => { clearTimeout(timer); reject(e); });
   });
 }
