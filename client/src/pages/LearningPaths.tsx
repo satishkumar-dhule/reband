@@ -38,6 +38,7 @@ export default function LearningPaths() {
   const [activeTab, setActiveTab] = useState<'all' | 'Beginner' | 'Intermediate' | 'Advanced'>('all');
   type TabValue = 'all' | 'Beginner' | 'Intermediate' | 'Advanced';
   const modalRef = useRef<HTMLDivElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Custom path builder state
   const [customPath, setCustomPath] = useState<CustomPath>({
@@ -91,10 +92,13 @@ export default function LearningPaths() {
     setCustomPath({ name: '', channels: [], certifications: [] });
     setSearchQuery('');
     setShowCustom(false);
+    setIsSubmitting(false);
   };
 
   const handleCreateCustomPath = () => {
-    if (!customPath.name || (customPath.channels.length === 0 && customPath.certifications.length === 0)) {
+    if (isSubmitting) return;
+    
+    if (!customPath.name.trim() || (customPath.channels.length === 0 && customPath.certifications.length === 0)) {
       toast({
         title: 'Missing Information',
         description: 'Please add a name and select at least one channel or certification',
@@ -103,11 +107,13 @@ export default function LearningPaths() {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       const pathId = `custom-${Date.now()}`;
       const newPath = {
         id: pathId,
-        name: customPath.name,
+        name: customPath.name.trim(),
         channels: customPath.channels,
         certifications: customPath.certifications,
         createdAt: new Date().toISOString()
@@ -143,6 +149,8 @@ export default function LearningPaths() {
         description: 'Failed to save custom path. Please try again.',
         variant: 'destructive'
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -428,13 +436,13 @@ export default function LearningPaths() {
                   </div>
 
                   <div className="p-4 border-t border-[var(--gh-border)] flex justify-end gap-3">
-                    <Button variant="outline" onClick={resetCustomPath}>Cancel</Button>
+                    <Button variant="outline" onClick={resetCustomPath} disabled={isSubmitting}>Cancel</Button>
                     <Button 
                       variant="primary"
-                      disabled={!customPath.name || (customPath.channels.length === 0 && customPath.certifications.length === 0)}
+                      disabled={isSubmitting || !customPath.name.trim() || (customPath.channels.length === 0 && customPath.certifications.length === 0)}
                       onClick={handleCreateCustomPath}
                     >
-                      Create Path
+                      {isSubmitting ? 'Creating...' : 'Create Path'}
                     </Button>
                   </div>
                 </div>
