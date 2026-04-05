@@ -428,40 +428,44 @@ function buildQueue(): Task[] {
     }
   }
   if (!FILTER_TYPE || FILTER_TYPE === "certifications") {
+    const CERT_TARGET = 15;
     for (const c of CERTIFICATIONS) {
       tasks.push({
         id: "cert-" + c.id, type: "certifications", label: c.id, agent: "content-certification-expert",
-        buildPrompt: () => buildCertPrompt(c, 15),
-        countSql: "SELECT COUNT(*) FROM questions WHERE channel=?", countArgs: [c.maps[0]], minNeeded: 15
+        buildPrompt: () => buildCertPrompt(c, GENERATE_BATCH),
+        countSql: "SELECT COUNT(*) FROM questions WHERE channel=?", countArgs: [c.maps[0]], minNeeded: CERT_TARGET
       });
     }
   }
   if (!FILTER_TYPE || FILTER_TYPE === "flashcards") {
+    const FLASH_TARGET = 20;
     for (const ch of F_CHANNELS) {
       if (FILTER_CH && ch.id !== FILTER_CH) continue;
       tasks.push({
         id: "flash-" + ch.id, type: "flashcards", label: ch.id, agent: "content-flashcard-expert",
-        buildPrompt: () => buildFlashPrompt(ch, 20),
-        countSql: "SELECT COUNT(*) FROM flashcards WHERE channel=?", countArgs: [ch.id], minNeeded: 20
+        buildPrompt: () => buildFlashPrompt(ch, GENERATE_BATCH),
+        countSql: "SELECT COUNT(*) FROM flashcards WHERE channel=?", countArgs: [ch.id], minNeeded: FLASH_TARGET
       });
     }
   }
   if (!FILTER_TYPE || FILTER_TYPE === "voice") {
+    const VOICE_TARGET = 10;
     for (const ch of V_CHANNELS) {
       if (FILTER_CH && ch.id !== FILTER_CH) continue;
       tasks.push({
         id: "voice-" + ch.id, type: "voice", label: ch.id, agent: "content-voice-expert",
-        buildPrompt: () => buildVoicePrompt(ch, 5),
-        countSql: "SELECT COUNT(*) FROM voice_sessions WHERE channel=?", countArgs: [ch.id], minNeeded: 5
+        buildPrompt: () => buildVoicePrompt(ch, GENERATE_BATCH),
+        countSql: "SELECT COUNT(*) FROM voice_sessions WHERE channel=?", countArgs: [ch.id], minNeeded: VOICE_TARGET
       });
     }
   }
   if (!FILTER_TYPE || FILTER_TYPE === "paths") {
+    const PATH_TARGET = 5;
     for (const b of P_BATCHES) {
       tasks.push({
         id: "path-" + b.type, type: "paths", label: b.type, agent: "content-learning-path-expert",
-        buildPrompt: () => buildPathPrompt(b, Math.min(b.items.length, 5)),
-        countSql: "SELECT COUNT(*) FROM learning_paths WHERE path_type=?", countArgs: [b.type], minNeeded: 5
+        buildPrompt: () => buildPathPrompt(b, GENERATE_BATCH),
+        countSql: "SELECT COUNT(*) FROM learning_paths WHERE path_type=?", countArgs: [b.type], minNeeded: PATH_TARGET
       });
     }
   }
