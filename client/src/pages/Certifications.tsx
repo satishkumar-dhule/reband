@@ -1,21 +1,20 @@
 /**
  * Certifications Page
- * Compact, consistent design — efficient use of space
+ * DB-driven: categories, certs, and question counts all from /api/certifications
  */
 
 import { useState, useMemo, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery } from "@tanstack/react-query";
-import { AppLayout } from '@/lib/ui';
-import { SEOHead } from '@/lib/ui';
-import { SkipLink } from '@/lib/ui';
-import { Input } from '@/lib/ui';
-import { CertificationsSkeleton } from '@/lib/ui';
+import {
+  AppLayout, SEOHead, SkipLink, Input, Button, Badge,
+  CertificationsSkeleton, EmptyState,
+} from '@/lib/ui';
 import {
   Search, Award, Clock, ChevronRight, Sparkles, Check, Plus,
-  Cloud, Shield, Database, Brain, Code, Users, Box, Terminal, Server, Cpu,
-  Layers, Network, GitBranch, Loader2, Target, AlertTriangle, RefreshCw,
-  BookOpen, Zap, TrendingUp
+  Cloud, Shield, Database, Brain, Code, Users, Box, Terminal,
+  Server, Cpu, Layers, Network, GitBranch, Target, AlertTriangle,
+  RefreshCw, BookOpen, Zap,
 } from 'lucide-react';
 
 interface Certification {
@@ -27,46 +26,56 @@ interface Certification {
   color: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   category: string;
-  estimatedHours: number;
+  estimated_hours?: number;
+  estimatedHours?: number;
+  exam_code?: string;
   examCode?: string;
-  questionCount: number;
-  passingScore: number;
-  examDuration: number;
+  question_count?: number;
+  questionCount?: number;
+  passing_score?: number;
+  passingScore?: number;
+  exam_duration?: number;
+  examDuration?: number;
 }
 
-const iconMap: Record<string, any> = {
-  'cloud': Cloud,
-  'shield': Shield,
-  'database': Database,
-  'brain': Brain,
-  'code': Code,
-  'users': Users,
-  'box': Box,
-  'terminal': Terminal,
-  'server': Server,
-  'cpu': Cpu,
-  'layers': Layers,
-  'network': Network,
-  'infinity': GitBranch,
-  'award': Award,
+const iconMap: Record<string, React.ElementType> = {
+  cloud: Cloud,
+  shield: Shield,
+  database: Database,
+  brain: Brain,
+  code: Code,
+  users: Users,
+  box: Box,
+  terminal: Terminal,
+  server: Server,
+  cpu: Cpu,
+  layers: Layers,
+  network: Network,
+  infinity: GitBranch,
+  'git-branch': GitBranch,
+  award: Award,
 };
 
-const categories = [
-  { id: 'cloud', name: 'Cloud' },
-  { id: 'devops', name: 'DevOps' },
-  { id: 'security', name: 'Security' },
-  { id: 'data', name: 'Data' },
-  { id: 'ai', name: 'AI & ML' },
-  { id: 'development', name: 'Development' },
-  { id: 'management', name: 'Management' },
-];
-
-const difficultyColors: Record<string, string> = {
-  beginner: 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950',
-  intermediate: 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950',
-  advanced: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950',
-  expert: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950',
+const difficultyConfig: Record<string, { label: string; variant: 'outline' | 'secondary' | 'default'; className: string }> = {
+  beginner: { label: 'Beginner', variant: 'outline', className: 'text-green-600 dark:text-green-400 border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-950' },
+  intermediate: { label: 'Intermediate', variant: 'outline', className: 'text-yellow-600 dark:text-yellow-400 border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-950' },
+  advanced: { label: 'Advanced', variant: 'outline', className: 'text-orange-600 dark:text-orange-400 border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-950' },
+  expert: { label: 'Expert', variant: 'outline', className: 'text-red-600 dark:text-red-400 border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950' },
 };
+
+const categoryLabels: Record<string, string> = {
+  cloud: 'Cloud',
+  devops: 'DevOps',
+  security: 'Security',
+  data: 'Data',
+  ai: 'AI & ML',
+  development: 'Development',
+  management: 'Management',
+};
+
+function getCertField<T>(cert: Certification, snake: keyof Certification, camel: keyof Certification): T {
+  return ((cert[camel] ?? cert[snake]) as T);
+}
 
 function useCertifications() {
   return useQuery<Certification[]>({
@@ -117,6 +126,18 @@ export default function Certifications() {
     });
   }, []);
 
+  // Derive categories dynamically from data
+  const categories = useMemo(() => {
+    const seen = new Set<string>();
+    for (const cert of certifications) {
+      if (cert.category) seen.add(cert.category);
+    }
+    return Array.from(seen).sort().map(id => ({
+      id,
+      name: categoryLabels[id] ?? id.charAt(0).toUpperCase() + id.slice(1),
+    }));
+  }, [certifications]);
+
   const filteredCerts = useMemo(() => certifications.filter(cert => {
     const q = searchQuery.toLowerCase();
     const matchesSearch = cert.name.toLowerCase().includes(q) ||
@@ -139,12 +160,9 @@ export default function Certifications() {
             <h2 className="font-semibold mb-1">Failed to load certifications</h2>
             <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : 'Unknown error'}</p>
           </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium"
-          >
-            <RefreshCw className="w-4 h-4" /> Try Again
-          </button>
+          <Button variant="outline" onClick={() => window.location.reload()} icon={<RefreshCw className="w-4 h-4" />}>
+            Try Again
+          </Button>
         </div>
       </AppLayout>
     );
@@ -162,18 +180,18 @@ export default function Certifications() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
 
-          {/* ── Page Header ─────────────────────── */}
+          {/* Page Header */}
           <div className="mb-4">
             <h1 className="text-xl font-bold flex items-center gap-2">
               <Award className="w-5 h-5 text-primary" />
               Certifications
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              {filteredCerts.length} certifications · practice exams &amp; guided prep
+              {filteredCerts.length} certification{filteredCerts.length !== 1 ? 's' : ''} · practice exams &amp; guided prep
             </p>
           </div>
 
-          {/* ── Search + Filters ────────────────── */}
+          {/* Search + Category Filters */}
           <div className="flex flex-col sm:flex-row gap-2 mb-4">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
@@ -184,58 +202,61 @@ export default function Certifications() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 h-9 text-sm"
+                data-testid="input-search-certifications"
               />
             </div>
 
             <div className="flex flex-wrap gap-1.5">
-              <button
+              <Button
+                size="sm"
+                variant={!selectedCategory ? 'primary' : 'ghost'}
                 onClick={() => setSelectedCategory(null)}
-                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                  !selectedCategory
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
+                data-testid="filter-category-all"
               >
                 All
-              </button>
+              </Button>
               {categories.map((cat) => (
-                <button
+                <Button
                   key={cat.id}
+                  size="sm"
+                  variant={selectedCategory === cat.id ? 'primary' : 'ghost'}
                   onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                    selectedCategory === cat.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
+                  data-testid={`filter-category-${cat.id}`}
                 >
                   {cat.name}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
 
-          {/* ── Certifications Grid ──────────────── */}
+          {/* Empty State */}
           {filteredCerts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center min-h-[40vh] gap-2 text-center">
-              <Search className="w-8 h-8 text-muted-foreground/40" />
-              <h3 className="font-semibold">No certifications found</h3>
-              <p className="text-sm text-muted-foreground">Try a different search or category</p>
-            </div>
+            <EmptyState
+              icon={<Search className="w-8 h-8" />}
+              title="No certifications found"
+              description="Try a different search term or category filter"
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredCerts.map((cert) => {
                 const IconComponent = iconMap[cert.icon] || Award;
                 const isStarted = startedCerts.has(cert.id);
+                const questionCount = getCertField<number>(cert, 'question_count', 'questionCount') ?? 0;
+                const passingScore = getCertField<number>(cert, 'passing_score', 'passingScore') ?? 70;
+                const examDuration = getCertField<number>(cert, 'exam_duration', 'examDuration') ?? 90;
+                const examCode = getCertField<string>(cert, 'exam_code', 'examCode');
                 const completedCount = getProgress(cert.id);
-                const progressPct = cert.questionCount > 0
-                  ? Math.min(100, Math.round((completedCount / cert.questionCount) * 100))
+                const progressPct = questionCount > 0
+                  ? Math.min(100, Math.round((completedCount / questionCount) * 100))
                   : 0;
-                const hasQuestions = cert.questionCount > 0;
+                const hasQuestions = questionCount > 0;
+                const diff = difficultyConfig[cert.difficulty] ?? difficultyConfig.intermediate;
 
                 return (
                   <div
                     key={cert.id}
                     className="group flex flex-col p-4 bg-card border border-border rounded-xl hover-elevate transition-all"
+                    data-testid={`card-certification-${cert.id}`}
                   >
                     {/* Card Header */}
                     <div className="flex items-start gap-3 mb-3">
@@ -245,13 +266,13 @@ export default function Certifications() {
                       <div className="min-w-0 flex-1">
                         <p className="text-xs text-muted-foreground truncate">{cert.provider}</p>
                         <h3 className="text-sm font-semibold leading-tight line-clamp-2">{cert.name}</h3>
-                        {cert.examCode && (
-                          <p className="text-xs text-muted-foreground mt-0.5">{cert.examCode}</p>
+                        {examCode && (
+                          <p className="text-xs text-muted-foreground mt-0.5">{examCode}</p>
                         )}
                       </div>
-                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded capitalize shrink-0 ${difficultyColors[cert.difficulty] ?? ''}`}>
-                        {cert.difficulty}
-                      </span>
+                      <Badge className={`text-[10px] capitalize shrink-0 ${diff.className}`}>
+                        {diff.label}
+                      </Badge>
                     </div>
 
                     {/* Description */}
@@ -261,19 +282,19 @@ export default function Certifications() {
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
                       <span className="flex items-center gap-1">
                         <Sparkles className="w-3 h-3 text-primary" />
-                        {cert.questionCount > 0 ? `${cert.questionCount} Q` : 'Coming soon'}
+                        {hasQuestions ? `${questionCount} Q` : 'Coming soon'}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3 text-primary" />
-                        {cert.examDuration}m
+                        {examDuration}m
                       </span>
                       <span className="flex items-center gap-1">
                         <Target className="w-3 h-3 text-primary" />
-                        {cert.passingScore}% pass
+                        {passingScore}% pass
                       </span>
                     </div>
 
-                    {/* Progress bar (only when started and has questions) */}
+                    {/* Progress bar */}
                     {isStarted && hasQuestions && (
                       <div className="mb-3">
                         <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
@@ -293,42 +314,47 @@ export default function Certifications() {
                     <div className="flex items-center gap-2 mt-auto">
                       {hasQuestions ? (
                         <>
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="flex-1"
                             onClick={() => navigate(`/certification/${cert.id}`)}
-                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors"
+                            icon={<BookOpen className="w-3.5 h-3.5" />}
                             data-testid={`button-practice-${cert.id}`}
                           >
-                            <BookOpen className="w-3.5 h-3.5" />
                             Practice
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            className="flex-1"
                             onClick={() => navigate(`/certification/${cert.id}/exam`)}
-                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium transition-colors hover:bg-primary/90"
+                            icon={<Zap className="w-3.5 h-3.5" />}
                             data-testid={`button-mock-exam-${cert.id}`}
                           >
-                            <Zap className="w-3.5 h-3.5" />
                             Mock Exam
-                          </button>
+                          </Button>
                         </>
                       ) : (
-                        <div className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-muted text-muted-foreground text-xs font-medium">
-                          <Clock className="w-3.5 h-3.5" />
-                          Questions Coming Soon
-                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex-1"
+                          disabled
+                          icon={<Clock className="w-3.5 h-3.5" />}
+                        >
+                          Coming Soon
+                        </Button>
                       )}
 
-                      <button
+                      <Button
+                        variant={isStarted ? 'success' : 'ghost'}
+                        size="sm"
                         onClick={() => toggleStarted(cert.id)}
                         title={isStarted ? 'Remove from started' : 'Mark as started'}
-                        className={`w-8 h-8 flex items-center justify-center rounded-md transition-colors shrink-0 ${
-                          isStarted
-                            ? 'bg-green-100 dark:bg-green-950 text-green-600 dark:text-green-400'
-                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                        }`}
+                        icon={isStarted ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
                         data-testid={`button-toggle-started-${cert.id}`}
-                      >
-                        {isStarted ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-                      </button>
+                      />
                     </div>
                   </div>
                 );

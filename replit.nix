@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.openai
     pkgs.nettools
     pkgs.xorg.libXft
     pkgs.xorg.fontmiscmisc
