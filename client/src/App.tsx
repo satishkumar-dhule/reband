@@ -96,9 +96,29 @@ function registerRoutesForPrefetching() {
   registerRouteForPrefetch('/tests', () => import('@/pages/Tests'));
 }
 
-const Home = lazy(() => import("@/pages/Home"));
-const Channels = lazy(() => import("@/pages/AllChannels"));
-const QuestionViewer = lazy(() => import("@/pages/QuestionViewer"));
+/**
+ * Retry wrapper for lazy imports.
+ * If a dynamic import fails (e.g. during server restart / HMR),
+ * retry once. If the retry also fails, force a full page reload
+ * so the browser fetches the latest module from the server.
+ */
+function lazyWithRetry<T extends ComponentType<any>>(
+  importFn: () => Promise<{ default: T }>
+) {
+  return lazy(() =>
+    importFn().catch(() =>
+      importFn().catch(() => {
+        // Both attempts failed — reload to clear stale module cache
+        window.location.reload();
+        return importFn();
+      })
+    )
+  );
+}
+
+const Home = lazyWithRetry(() => import("@/pages/Home"));
+const Channels = lazyWithRetry(() => import("@/pages/AllChannels"));
+const QuestionViewer = lazyWithRetry(() => import("@/pages/QuestionViewer"));
 const VoicePractice = lazy(() => import("@/pages/VoicePractice"));
 const VoiceSession = lazy(() => import("@/pages/VoiceSession"));
 const Stats = lazy(() => import("@/pages/Stats"));
