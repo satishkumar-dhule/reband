@@ -1,19 +1,16 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { AppLayout } from '@/lib/ui';
-import { SEOHead } from '@/lib/ui';
+import {
+  AppLayout, SEOHead, SkipLink, Button, Badge,
+  PageHeader, EmptyState, Input,
+} from '@/lib/ui';
 import { allChannelsConfig } from '../lib/channels-config';
 import { curatedPaths } from '../lib/learning-paths-data';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
-import {
-  Plus, ChevronRight, Check, X, Search, Home, Clock, Trophy
-} from 'lucide-react';
-import { Button } from '@/lib/ui';
-import { SkipLink } from '@/lib/ui';
-import { Input } from '@/lib/ui';
+import { Plus, ChevronRight, Check, X, Search, Clock, Trophy } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
-// Certification type
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface Certification {
   id: string;
   name: string;
@@ -22,12 +19,21 @@ interface Certification {
   category: string;
 }
 
-// Custom path type
 interface CustomPath {
   name: string;
   channels: string[];
   certifications: string[];
 }
+
+// ─── Difficulty badge config ──────────────────────────────────────────────────
+
+const difficultyClass: Record<string, string> = {
+  Beginner:     'text-green-700  dark:text-green-400  border-green-200  dark:border-green-800  bg-green-50  dark:bg-green-950/40',
+  Intermediate: 'text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/40',
+  Advanced:     'text-red-700    dark:text-red-400    border-red-200    dark:border-red-800    bg-red-50    dark:bg-red-950/40',
+};
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LearningPaths() {
   const [, setLocation] = useLocation();
@@ -39,419 +45,302 @@ export default function LearningPaths() {
   type TabValue = 'all' | 'Beginner' | 'Intermediate' | 'Advanced';
   const modalRef = useRef<HTMLDivElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Custom path builder state
-  const [customPath, setCustomPath] = useState<CustomPath>({
-    name: '',
-    channels: [],
-    certifications: []
-  });
+  const [customPath, setCustomPath] = useState<CustomPath>({ name: '', channels: [], certifications: [] });
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Load certifications — use the API in dev, static JSON in production
   useEffect(() => {
     async function loadCerts() {
       setCertsLoading(true);
       setCertsError(null);
       try {
-        const url = import.meta.env.DEV
-          ? '/api/certifications'
-          : (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/data/certifications.json';
-        const response = await fetch(url);
-        if (response.ok) {
-          const data = await response.json();
-          setCertifications(data);
-        } else {
-          setCertsError('Failed to load certifications');
-        }
-      } catch (e) {
-        setCertsError('Failed to load certifications');
-        console.error('Failed to load certifications:', e);
-      } finally {
-        setCertsLoading(false);
-      }
+        const res = await fetch('/api/certifications');
+        if (res.ok) setCertifications(await res.json());
+        else setCertsError('Failed to load certifications');
+      } catch { setCertsError('Failed to load certifications'); }
+      finally { setCertsLoading(false); }
     }
     loadCerts();
   }, []);
 
   const handleSelectPath = (pathId: string) => {
-    const path = curatedPaths.find(p => p.id === pathId);
-    if (path) {
-      try {
-        const currentPaths = JSON.parse(localStorage.getItem('activeLearningPaths') || '[]');
-        if (!currentPaths.includes(pathId)) {
-          currentPaths.push(pathId);
-        }
-        localStorage.setItem('activeLearningPaths', JSON.stringify(currentPaths));
-      } catch (e) {
-        console.error('Failed to save path:', e);
-      }
-    }
+    try {
+      const current: string[] = JSON.parse(localStorage.getItem('activeLearningPaths') || '[]');
+      if (!current.includes(pathId)) current.push(pathId);
+      localStorage.setItem('activeLearningPaths', JSON.stringify(current));
+    } catch {}
     setLocation(`/path/${pathId}`);
   };
 
-  const resetCustomPath = () => {
+  const resetCustomPath = useCallback(() => {
     setCustomPath({ name: '', channels: [], certifications: [] });
     setSearchQuery('');
     setShowCustom(false);
     setIsSubmitting(false);
-  };
+  }, []);
 
   const handleCreateCustomPath = () => {
     if (isSubmitting) return;
-    
     if (!customPath.name.trim() || (customPath.channels.length === 0 && customPath.certifications.length === 0)) {
-      toast({
-        title: 'Missing Information',
-        description: 'Please add a name and select at least one channel or certification',
-        variant: 'destructive'
-      });
+      toast({ title: 'Missing Information', description: 'Add a name and select at least one topic.', variant: 'destructive' });
       return;
     }
-
     setIsSubmitting(true);
-
     try {
       const pathId = `custom-${Date.now()}`;
-      const newPath = {
-        id: pathId,
-        name: customPath.name.trim(),
-        channels: customPath.channels,
-        certifications: customPath.certifications,
-        createdAt: new Date().toISOString()
-      };
-
-      const existingPaths = JSON.parse(localStorage.getItem('customPaths') || '[]');
-      const updatedPaths = [...existingPaths, newPath];
-      localStorage.setItem('customPaths', JSON.stringify(updatedPaths));
-
-      const currentPaths = JSON.parse(localStorage.getItem('activeLearningPaths') || '[]');
-      if (!currentPaths.includes(pathId)) {
-        currentPaths.push(pathId);
-      }
-      localStorage.setItem('activeLearningPaths', JSON.stringify(currentPaths));
-      
-      localStorage.setItem('customLearningPath', JSON.stringify({
-        name: newPath.name,
-        channels: newPath.channels,
-        certifications: newPath.certifications
-      }));
-
-      toast({
-        title: 'Path Created',
-        description: `"${customPath.name}" has been created successfully`,
-      });
-
+      const saved: CustomPath[] = JSON.parse(localStorage.getItem('customLearningPaths') || '[]');
+      saved.push({ ...customPath, name: customPath.name.trim() });
+      localStorage.setItem('customLearningPaths', JSON.stringify(saved));
+      const active: string[] = JSON.parse(localStorage.getItem('activeLearningPaths') || '[]');
+      active.push(pathId);
+      localStorage.setItem('activeLearningPaths', JSON.stringify(active));
+      toast({ title: 'Path Created', description: `"${customPath.name.trim()}" is ready to start.` });
       resetCustomPath();
-      setLocation(`/path/${pathId}`);
-    } catch (e) {
-      console.error('Failed to save custom path:', e);
-      toast({
-        title: 'Error',
-        description: 'Failed to save custom path. Please try again.',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    } catch { toast({ title: 'Error', description: 'Could not save path.', variant: 'destructive' }); }
+    finally { setIsSubmitting(false); }
   };
 
-  const toggleChannel = (channelId: string) => {
-    setCustomPath(prev => ({
-      ...prev,
-      channels: prev.channels.includes(channelId)
-        ? prev.channels.filter(c => c !== channelId)
-        : [...prev.channels, channelId]
-    }));
-  };
+  const toggleChannel = (id: string) =>
+    setCustomPath(p => ({ ...p, channels: p.channels.includes(id) ? p.channels.filter(c => c !== id) : [...p.channels, id] }));
+  const toggleCertification = (id: string) =>
+    setCustomPath(p => ({ ...p, certifications: p.certifications.includes(id) ? p.certifications.filter(c => c !== id) : [...p.certifications, id] }));
 
-  const toggleCertification = (certId: string) => {
-    setCustomPath(prev => ({
-      ...prev,
-      certifications: prev.certifications.includes(certId)
-        ? prev.certifications.filter(c => c !== certId)
-        : [...prev.certifications, certId]
-    }));
-  };
+  const filteredPaths = useMemo(() =>
+    activeTab === 'all' ? curatedPaths : curatedPaths.filter(p => p.difficulty === activeTab),
+    [activeTab]
+  );
 
-  const filteredPaths = useMemo(() => curatedPaths.filter(path => 
-    activeTab === 'all' || path.difficulty === activeTab || 
-    (activeTab === 'Beginner' && path.difficulty === 'Beginner Friendly')
-  ), [activeTab]);
+  const filteredChannels = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    return allChannelsConfig.filter(ch => ch.name.toLowerCase().includes(q) || ch.id.toLowerCase().includes(q));
+  }, [searchQuery]);
 
-  const filteredChannels = useMemo(() => allChannelsConfig.filter(ch =>
-    ch.name.toLowerCase().includes(searchQuery.toLowerCase())
-  ), [searchQuery]);
+  const filteredCerts = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    return certifications.filter(c => c.name.toLowerCase().includes(q) || c.provider.toLowerCase().includes(q));
+  }, [certifications, searchQuery]);
 
-  const filteredCerts = useMemo(() => certifications.filter(cert =>
-    cert.name.toLowerCase().includes(searchQuery.toLowerCase())
-  ), [certifications, searchQuery]);
-
-  // Trap focus and handle Escape in modal
+  // Close modal on Escape
   useEffect(() => {
     if (!showCustom) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') resetCustomPath();
-    };
+    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') resetCustomPath(); };
     document.addEventListener('keydown', handleKeyDown);
-    // Focus first focusable element
-    setTimeout(() => {
-      const first = modalRef.current?.querySelector<HTMLElement>('input, button');
-      first?.focus();
-    }, 50);
+    setTimeout(() => { modalRef.current?.querySelector<HTMLElement>('[autofocus]')?.focus(); }, 50);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showCustom]);
+  }, [showCustom, resetCustomPath]);
 
   return (
     <>
       <SEOHead
-        title="Learning Paths - DevPrep"
+        title="Learning Paths | DevPrep"
         description="Curated learning paths for different tech careers"
-        canonical="https://open-interview.github.io/learning-paths"
       />
       <SkipLink />
 
       <AppLayout>
-        <div className="bg-[var(--gh-canvas-subtle)] min-h-screen">
-          <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8">
-            <Breadcrumb className="mb-4">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/">
-                    <Home className="w-3.5 h-3.5 mr-1" />
-                    Home
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Learning Paths</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+        {/* ── Page Header — same shell as AllChannels / Certifications ── */}
+        <div className="bg-card border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+            <PageHeader
+              title="Learning Paths"
+              subtitle="Curated journeys to help you master specific domains"
+              actions={
+                <Button variant="primary" onClick={() => setShowCustom(true)} icon={<Plus className="w-4 h-4" />}>
+                  Create Custom Path
+                </Button>
+              }
+              className="mb-5"
+            />
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-              <div>
-                <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">Learning Paths</h1>
-                <p className="text-[var(--gh-fg-muted)]">Curated journeys designed to help you master specific domains.</p>
-              </div>
-              <Button 
-                variant="primary"
-                onClick={() => setShowCustom(true)}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Custom Path
-              </Button>
-            </div>
-
-            <div className="flex border-b border-[var(--gh-border)] mb-6 overflow-x-auto gap-2">
-              {['all', 'Beginner', 'Intermediate', 'Advanced'].map((tab) => (
+            {/* Difficulty filter — same pattern as AllChannels */}
+            <div className="flex flex-wrap gap-2">
+              {(['all', 'Beginner', 'Intermediate', 'Advanced'] as const).map(tab => (
                 <Button
                   key={tab}
-                  variant="ghost"
                   size="sm"
+                  variant={activeTab === tab ? 'primary' : 'ghost'}
                   onClick={() => setActiveTab(tab as TabValue)}
-                  className={`border-b-2 rounded-none ${
-                    activeTab === tab
-                      ? 'border-[var(--gh-accent-fg)] text-[var(--gh-fg)]'
-                      : 'border-transparent text-[var(--gh-fg-muted)]'
-                  }`}
+                  data-testid={`filter-tab-${tab}`}
                 >
                   {tab === 'all' ? 'All Paths' : tab}
                 </Button>
               ))}
             </div>
+          </div>
+        </div>
 
+        {/* ── Grid ── */}
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+          {filteredPaths.length === 0 ? (
+            <EmptyState
+              icon={<Search className="w-10 h-10" />}
+              title="No paths found"
+              description="Try a different difficulty filter."
+              action={<Button variant="outline" size="sm" onClick={() => setActiveTab('all')}>Show all</Button>}
+            />
+          ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredPaths.length === 0 ? (
-                <div className="col-span-full py-16 flex flex-col items-center justify-center text-[var(--gh-fg-muted)] bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md border-dashed">
-                  <Search className="w-10 h-10 mb-3 opacity-20" />
-                  <p className="font-semibold">No paths found for this difficulty</p>
-                  <Button variant="ghost" size="sm" className="mt-3" onClick={() => setActiveTab('all')}>Show all paths</Button>
-                </div>
-              ) : filteredPaths.map((path) => {
+              {filteredPaths.map(path => {
                 const Icon = path.icon;
-                const difficultyColor = 
-                  path.difficulty === 'Beginner' ? 'bg-[var(--gh-diff-beginner-bg)] text-[var(--gh-diff-beginner)] border-[var(--gh-diff-beginner)]' :
-                  path.difficulty === 'Intermediate' ? 'bg-[var(--gh-diff-intermediate-bg)] text-[var(--gh-diff-intermediate)] border-[var(--gh-diff-intermediate)]' :
-                  'bg-[var(--gh-diff-advanced-bg)] text-[var(--gh-diff-advanced)] border-[var(--gh-diff-advanced)]';
-
                 return (
-                  <div 
+                  <div
                     key={path.id}
-                    className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md p-5 flex flex-col hover:border-[var(--gh-accent-fg)] hover:scale-[1.02] transition-all duration-200 group"
+                    className="group bg-card border border-border rounded-md p-5 flex flex-col hover-elevate transition-all"
+                    data-testid={`card-path-${path.id}`}
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-md bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] text-[var(--gh-accent-fg)] group-hover:bg-[var(--gh-accent-subtle)] transition-colors">
-                          <Icon className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-[var(--gh-fg)] group-hover:text-[var(--gh-accent-fg)] transition-colors">
-                            {path.name}
-                          </h3>
-                          <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${difficultyColor}`}>
-                            {path.difficulty}
-                          </div>
-                        </div>
+                    {/* Card header */}
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                        <Icon className="w-4 h-4 text-primary" />
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm leading-tight">{path.name}</h3>
+                      </div>
+                      <Badge className={`text-[10px] capitalize shrink-0 ${difficultyClass[path.difficulty] ?? ''}`}>
+                        {path.difficulty}
+                      </Badge>
                     </div>
 
-                    <p className="text-sm text-[var(--gh-fg-muted)] mb-4 flex-1">
-                      {path.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground mb-3 flex-1">{path.description}</p>
 
-                    <ul className="flex flex-wrap gap-1.5 mb-4 list-none p-0 m-0" aria-label="Skills">
+                    {/* Skills */}
+                    <ul className="flex flex-wrap gap-1.5 mb-4 list-none p-0 m-0">
                       {path.skills.slice(0, 3).map(skill => (
-                        <li key={skill} className="bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border)] text-[var(--gh-fg-muted)] text-[10px] px-2 py-0.5 rounded-full">
+                        <li key={skill} className="bg-muted text-muted-foreground text-[10px] px-2 py-0.5 rounded-full">
                           {skill}
                         </li>
                       ))}
                       {path.skills.length > 3 && (
-                        <li className="text-[var(--gh-fg-subtle)] text-[10px] self-center">
-                          +{path.skills.length - 3} more
-                        </li>
+                        <li className="text-[10px] text-muted-foreground self-center">+{path.skills.length - 3} more</li>
                       )}
                     </ul>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-[var(--gh-border-muted)]">
-                      <div className="flex items-center gap-4 text-xs text-[var(--gh-fg-subtle)]">
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          {path.duration}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Trophy className="w-3.5 h-3.5" />
-                          {path.totalQuestions} questions
-                        </div>
+                    {/* Footer */}
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{path.duration}</span>
+                        <span className="flex items-center gap-1"><Trophy className="w-3.5 h-3.5" />{path.totalQuestions} questions</span>
                       </div>
-                      <Button 
+                      <Button
                         size="sm"
                         variant="outline"
                         onClick={() => handleSelectPath(path.id)}
-                        className="h-8 text-xs border-[var(--gh-border)] hover:bg-[var(--gh-canvas-inset)]"
+                        icon={<ChevronRight className="w-3.5 h-3.5" />}
+                        iconPosition="right"
+                        data-testid={`button-start-path-${path.id}`}
                       >
-                        Start Path
-                        <ChevronRight className="w-3 h-3 ml-1" />
+                        Start
                       </Button>
                     </div>
                   </div>
                 );
               })}
             </div>
+          )}
+        </div>
 
-            {/* Custom Path Modal */}
-            {showCustom && (
-              <div
-                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm pb-safe"
-                onClick={resetCustomPath}
-                aria-modal="true"
-                role="dialog"
-                aria-labelledby="custom-path-modal-title"
-              >
-                <div
-                  ref={modalRef}
-                  className="bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md shadow-xl max-w-2xl w-full max-h-[90dvh] max-h-[90svh] flex flex-col pb-safe"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="p-4 border-b border-[var(--gh-border)] flex items-center justify-between">
-                    <h2 id="custom-path-modal-title" className="font-semibold">Create Custom Path</h2>
-                    <Button variant="ghost" size="sm" onClick={resetCustomPath} aria-label="Close dialog">
-                      <X className="w-5 h-5" />
-                    </Button>
-                  </div>
-                  
-                  <div className="p-6 overflow-y-auto momentum-scroll space-y-6">
-                    <div>
-                      <label htmlFor="path-name-input" className="block text-sm font-medium text-[var(--gh-fg)] mb-2">Path Name</label>
-                      <Input
-                        id="path-name-input"
-                        type="text"
-                        placeholder="e.g., My Interview Prep"
-                        value={customPath.name}
-                        onChange={(e) => setCustomPath(prev => ({ ...prev, name: e.target.value }))}
-                        autoFocus
-                      />
-                    </div>
+        {/* ── Custom Path Modal ── */}
+        {showCustom && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={resetCustomPath}
+            aria-modal="true"
+            role="dialog"
+            aria-labelledby="custom-path-modal-title"
+          >
+            <div
+              ref={modalRef}
+              className="bg-card border border-border rounded-md shadow-xl max-w-2xl w-full max-h-[90dvh] flex flex-col"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Modal header */}
+              <div className="p-4 border-b border-border flex items-center justify-between">
+                <h2 id="custom-path-modal-title" className="font-semibold">Create Custom Path</h2>
+                <Button variant="ghost" size="sm" onClick={resetCustomPath} aria-label="Close dialog" icon={<X className="w-4 h-4" />} />
+              </div>
 
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--gh-fg-muted)] pointer-events-none" />
-                      <Input 
-                        type="text"
-                        placeholder="Search topics..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
-                        aria-label="Search channels and certifications"
-                      />
-                    </div>
+              {/* Modal body */}
+              <div className="p-5 overflow-y-auto space-y-5 flex-1">
+                <div>
+                  <label htmlFor="path-name-input" className="block text-sm font-medium mb-1.5">Path Name</label>
+                  <Input
+                    id="path-name-input"
+                    placeholder="e.g., My Interview Prep"
+                    value={customPath.name}
+                    onChange={e => setCustomPath(p => ({ ...p, name: e.target.value }))}
+                    autoFocus
+                  />
+                </div>
 
-                    <div>
-                      <h3 className="text-sm font-semibold mb-3">Select Channels ({customPath.channels.length})</h3>
-                      <div className="grid grid-cols-2 gap-2">
-                        {filteredChannels.slice(0, 10).map(ch => (
-                          <Button
-                            key={ch.id}
-                            onClick={() => toggleChannel(ch.id)}
-                            variant={customPath.channels.includes(ch.id) ? 'primary' : 'outline'}
-                            size="sm"
-                            className="justify-between"
-                          >
-                            {ch.name}
-                            {customPath.channels.includes(ch.id) && <Check className="w-3.5 h-3.5" />}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="Search topics..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                    aria-label="Search channels and certifications"
+                  />
+                </div>
 
-                    <div>
-                      <h3 className="text-sm font-semibold mb-3">Select Certifications ({customPath.certifications.length})</h3>
-                      {certsLoading ? (
-                        <div className="flex items-center justify-center py-8 text-[var(--gh-fg-muted)]">
-                          <div className="animate-spin w-5 h-5 border-2 border-[var(--gh-border)] border-t-[var(--gh-accent-fg)] rounded-full mr-2" />
-                          Loading certifications...
-                        </div>
-                      ) : certsError ? (
-                        <div className="text-[var(--gh-danger-fg)] text-sm py-4">
-                          {certsError}
-                        </div>
-                      ) : certifications.length === 0 ? (
-                        <div className="text-[var(--gh-fg-muted)] text-sm py-4">
-                          No certifications available
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-2 gap-2">
-                          {filteredCerts.slice(0, 10).map(cert => (
-                            <Button
-                              key={cert.id}
-                              onClick={() => toggleCertification(cert.id)}
-                              variant={customPath.certifications.includes(cert.id) ? 'primary' : 'outline'}
-                              size="sm"
-                              className="justify-between"
-                            >
-                              {cert.name}
-                              {customPath.certifications.includes(cert.id) && <Check className="w-3.5 h-3.5" />}
-                            </Button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-4 border-t border-[var(--gh-border)] flex justify-end gap-3">
-                    <Button variant="outline" onClick={resetCustomPath} disabled={isSubmitting}>Cancel</Button>
-                    <Button 
-                      variant="primary"
-                      disabled={isSubmitting || !customPath.name.trim() || (customPath.channels.length === 0 && customPath.certifications.length === 0)}
-                      onClick={handleCreateCustomPath}
-                    >
-                      {isSubmitting ? 'Creating...' : 'Create Path'}
-                    </Button>
+                <div>
+                  <h3 className="text-sm font-semibold mb-2">Channels ({customPath.channels.length})</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {filteredChannels.slice(0, 10).map(ch => (
+                      <Button
+                        key={ch.id}
+                        onClick={() => toggleChannel(ch.id)}
+                        variant={customPath.channels.includes(ch.id) ? 'primary' : 'outline'}
+                        size="sm"
+                        className="justify-between"
+                      >
+                        <span className="truncate">{ch.name}</span>
+                        {customPath.channels.includes(ch.id) && <Check className="w-3.5 h-3.5 shrink-0" />}
+                      </Button>
+                    ))}
                   </div>
                 </div>
+
+                <div>
+                  <h3 className="text-sm font-semibold mb-2">Certifications ({customPath.certifications.length})</h3>
+                  {certsLoading ? (
+                    <p className="text-sm text-muted-foreground py-4">Loading certifications…</p>
+                  ) : certsError ? (
+                    <p className="text-sm text-destructive py-4">{certsError}</p>
+                  ) : filteredCerts.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-4">No certifications available</p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {filteredCerts.slice(0, 10).map(cert => (
+                        <Button
+                          key={cert.id}
+                          onClick={() => toggleCertification(cert.id)}
+                          variant={customPath.certifications.includes(cert.id) ? 'primary' : 'outline'}
+                          size="sm"
+                          className="justify-between"
+                        >
+                          <span className="truncate">{cert.name}</span>
+                          {customPath.certifications.includes(cert.id) && <Check className="w-3.5 h-3.5 shrink-0" />}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+
+              {/* Modal footer */}
+              <div className="p-4 border-t border-border flex justify-end gap-3">
+                <Button variant="outline" onClick={resetCustomPath} disabled={isSubmitting}>Cancel</Button>
+                <Button
+                  variant="primary"
+                  disabled={isSubmitting || !customPath.name.trim() || (customPath.channels.length === 0 && customPath.certifications.length === 0)}
+                  onClick={handleCreateCustomPath}
+                >
+                  {isSubmitting ? 'Creating…' : 'Create Path'}
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </AppLayout>
     </>
   );
