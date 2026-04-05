@@ -413,13 +413,17 @@ function buildPathPrompt(batch: typeof P_BATCHES[0], n: number): string {
 function buildQueue(): Task[] {
   const tasks: Task[] = [];
 
+  // Target per channel - generate to reach this number
+  const TARGET_PER_CHANNEL = 20; // 20 questions per channel minimum
+  const GENERATE_BATCH = 5;     // Generate 5 at a time
+
   if (!FILTER_TYPE || FILTER_TYPE === "questions") {
     for (const ch of Q_CHANNELS) {
       if (FILTER_CH && ch.id !== FILTER_CH) continue;
       tasks.push({
         id: "q-" + ch.id, type: "questions", label: ch.id, agent: "content-question-expert",
-        buildPrompt: () => buildQPrompt(ch, 5),
-        countSql: "SELECT COUNT(*) FROM questions WHERE channel=?", countArgs: [ch.id], minNeeded: 5
+        buildPrompt: () => buildQPrompt(ch, GENERATE_BATCH),
+        countSql: "SELECT COUNT(*) FROM questions WHERE channel=?", countArgs: [ch.id], minNeeded: TARGET_PER_CHANNEL
       });
     }
   }
