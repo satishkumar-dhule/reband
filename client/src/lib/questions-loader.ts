@@ -288,26 +288,34 @@ export function prefetchRelatedChannels(currentChannel: string): void {
   toPrefetch.forEach(channelId => {
     prefetchedChannels.add(channelId);
 
-    // Queue with bounded concurrency
+    // Queue with bounded concurrency — always load via the data layer
+    // (api.service.ts routes this to /api/* in dev, /data/*.json in production)
     prefetchQueue.push(() => loadChannelQuestions(channelId));
     runNextPrefetch();
 
-    // Also use link prefetch for browser-native background loading
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.href = `${DATA_BASE}/${channelId}.json`;
-    link.as = 'fetch';
-    link.crossOrigin = 'anonymous';
-    document.head.appendChild(link);
+    // Browser-native link prefetch hint — only useful in production where
+    // static JSON files exist at /data/. In development the Express API serves
+    // channel data, so skip the hint to avoid 404 noise.
+    if (!import.meta.env.DEV) {
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = `${DATA_BASE}/${channelId}.json`;
+      link.as = 'fetch';
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    }
   });
 }
 
 /**
- * Preload a specific channel's data (higher priority than prefetch)
+ * Preload a specific channel's data (higher priority than prefetch).
+ * In production, adds a <link rel="preload"> hint for the static JSON file.
+ * In development, the hint is skipped — the Express API serves channel data.
  */
 export function preloadChannel(channelId: string): void {
   if (typeof window === 'undefined') return;
   if (channelQuestionsCache.has(channelId)) return;
+  if (import.meta.env.DEV) return; // API serves this in dev; no static file to hint
 
   const link = document.createElement('link');
   link.rel = 'preload';

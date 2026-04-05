@@ -48,14 +48,16 @@ export default function LearningPaths() {
   });
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Load certifications
+  // Load certifications — use the API in dev, static JSON in production
   useEffect(() => {
     async function loadCerts() {
       setCertsLoading(true);
       setCertsError(null);
       try {
-        const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
-        const response = await fetch(`${basePath}data/certifications.json`);
+        const url = import.meta.env.DEV
+          ? '/api/certifications'
+          : (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/data/certifications.json';
+        const response = await fetch(url);
         if (response.ok) {
           const data = await response.json();
           setCertifications(data);

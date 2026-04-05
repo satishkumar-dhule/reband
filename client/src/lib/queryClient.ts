@@ -232,11 +232,15 @@ export function prefetchChannelOnIdle(channelId: string, priority = false): void
 /**
  * Combined cache warming on app idle.
  * Call this once when the app mounts to warm all caches.
+ * Static JSON prefetch is skipped in development — data comes from the Express API there.
  */
 export function warmCachesOnIdle(): void {
-  // First prefetch all static metadata (fast, ~10KB total)
-  prefetchAllStaticJson();
-  
-  // Pre-warm Monaco editor for coding challenges
+  // Static JSON only exists in the production / GitHub Pages build.
+  // In dev mode the Express API serves all data, so skip the /data/ prefetch.
+  if (!import.meta.env.DEV) {
+    prefetchAllStaticJson();
+  }
+
+  // Pre-warm Monaco editor for coding challenges (always safe)
   prewarmMonacoEditor();
 }

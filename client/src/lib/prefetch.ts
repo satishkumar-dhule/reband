@@ -87,18 +87,20 @@ export function prefetchCriticalRoutes(): void {
         prefetchRoute(route);
       });
 
-      // Prefetch static JSON data files for certifications and learning paths
-      // These are used by multiple pages and benefit from early prefetching
-      const staticDataFiles = ['certifications.json', 'learning-paths.json'];
-      const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/data/';
-      
-      staticDataFiles.forEach(file => {
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.as = 'fetch';
-        link.href = `${basePath}${file}`;
-        document.head.appendChild(link);
-      });
+      // In production (static build), prefetch JSON data files for certifications
+      // and learning paths. In development the Express API serves this data, so
+      // skip the /data/ hints to avoid noisy 404s.
+      if (!import.meta.env.DEV) {
+        const staticDataFiles = ['certifications.json', 'learning-paths.json'];
+        const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/data/';
+        staticDataFiles.forEach(file => {
+          const link = document.createElement('link');
+          link.rel = 'prefetch';
+          link.as = 'fetch';
+          link.href = `${basePath}${file}`;
+          document.head.appendChild(link);
+        });
+      }
 
       // Pre-warm Monaco editor for coding challenge page
       // This loads Monaco during idle time, improving perceived performance

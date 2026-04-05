@@ -69,13 +69,15 @@ const difficultyColors: Record<string, string> = {
 };
 
 function useCertifications() {
-  const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
   return useQuery<Certification[]>({
     queryKey: ['certifications'],
     staleTime: Infinity,
     gcTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const response = await fetch(`${basePath}data/certifications.json`);
+      const url = import.meta.env.DEV
+        ? '/api/certifications'
+        : (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/data/certifications.json';
+      const response = await fetch(url);
       if (!response.ok) throw new Error(`Failed to fetch certifications (${response.status})`);
       const data = await response.json();
       if (!Array.isArray(data)) throw new Error('Invalid certifications data');
