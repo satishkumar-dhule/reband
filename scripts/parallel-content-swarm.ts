@@ -102,47 +102,97 @@ interface Agent {
 }
 
 // ─── Content definitions ──────────────────────────────────────────────────────
+// 66 question channels + certifications
 const Q_CHANNELS = [
-  { id:"algorithms", ctx:"Sorting, searching, graph traversal, DP, greedy. Always include Big-O.", sub:["sorting","searching","graph-algorithms","divide-conquer"] },
-  { id:"data-structures", ctx:"Arrays, linked lists, stacks, queues, trees, heaps, hash tables, tries.", sub:["trees","hash-tables","graphs","linked-lists","heaps"] },
-  { id:"complexity-analysis", ctx:"Big O/Theta/Omega, amortized analysis, Master theorem, recurrences.", sub:["big-o-notation","amortized-analysis","recurrence-relations"] },
+  // CS Fundamentals
+  { id:"data-structures", ctx:"Arrays, linked lists, stacks, queues, trees, heaps, hash tables, tries.", sub:["trees","hash-tables","linked-lists","heaps","arrays"] },
+  { id:"complexity-analysis", ctx:"Big O/Theta/Omega, amortized analysis, Master theorem, recurrences.", sub:["big-o-notation","amortized-analysis","recurrence-relations","complexity"] },
   { id:"dynamic-programming", ctx:"Memoization vs tabulation. Fibonacci, Knapsack, LCS, Coin Change, Edit Distance.", sub:["memoization","tabulation","classic-problems","optimization"] },
   { id:"bit-manipulation", ctx:"AND/OR/XOR/shift. Power of 2, count bits, bit masking, swap without temp.", sub:["bitwise-operators","bit-tricks","bit-masking"] },
-  { id:"design-patterns", ctx:"Creational, Structural, Behavioral patterns with real-world use cases.", sub:["creational","structural","behavioral"] },
+  { id:"design-patterns", ctx:"Creational, Structural, Behavioral patterns with real-world use cases.", sub:["creational","structural","behavioral","solid"] },
   { id:"concurrency", ctx:"Threads, race conditions, deadlocks, mutexes, semaphores, async/await.", sub:["threads","deadlocks","synchronization","async-patterns"] },
   { id:"math-logic", ctx:"Probability, combinatorics, number theory, discrete math, logic puzzles.", sub:["probability","combinatorics","number-theory","logic-puzzles"] },
   { id:"low-level", ctx:"Stack vs heap, pointers, CPU cache, virtual memory, paging, system calls.", sub:["memory-management","cpu-cache","virtual-memory","system-calls"] },
+  
+  // Algorithms & Data
+  { id:"algorithms", ctx:"Sorting, searching, graph traversal, DP, greedy. Always include Big-O.", sub:["sorting","searching","graph-algorithms","divide-conquer","greedy"] },
+  { id:"graphs", ctx:"BFS, DFS, Dijkstra, MST, topological sort, cycle detection.", sub:["bfs-dfs","shortest-path","mst","topological-sort"] },
+  { id:"trees", ctx:"Binary trees, BST, AVL, Red-Black, tries, segment trees, B-trees.", sub:["binary-trees","balanced-trees","tries","segment-tree"] },
+  { id:"heaps", ctx:"Min/Max heap, priority queue, heap sort, median maintenance.", sub:["heap-operations","priority-queue","heap-sort"] },
+  { id:"sorting", ctx:"Quick sort, merge sort, heap sort, counting sort, radix sort, stability.", sub:["comparison-sorts","non-comparison-sorts","stable-sort"] },
+  { id:"searching", ctx:"Binary search, interpolation search, exponential search, 2D search.", sub:["binary-search","variants","2d-search"] },
+  
+  // Engineering
   { id:"system-design", ctx:"Design scalable distributed systems. Requirements, capacity, caching, queues.", sub:["distributed-systems","caching","databases","api-design","scalability"] },
-  { id:"frontend", ctx:"React hooks, virtual DOM, event loop, closures, CSS, Core Web Vitals, TypeScript.", sub:["react","javascript","css","browser-internals","performance"] },
+  { id:"distributed-systems", ctx:"Consensus, replication, partitioning, CAP theorem, consistency models.", sub:["consensus","replication","consistency","cap-theorem"] },
+  { id:"frontend", ctx:"React hooks, virtual DOM, event loop, closures, CSS, Core Web Vitals.", sub:["react","javascript","css","browser-internals","performance"] },
   { id:"backend", ctx:"REST API, JWT/OAuth2, caching, message queues, microservices, error handling.", sub:["api-design","authentication","caching","microservices","databases"] },
-  { id:"database", ctx:"SQL joins, indexing, ACID, isolation levels, query optimisation, NoSQL vs SQL.", sub:["sql","indexing","transactions","query-optimization","nosql"] },
-  { id:"devops", ctx:"CI/CD, Docker, Kubernetes, Terraform, monitoring, blue-green/canary deploys.", sub:["ci-cd","docker","kubernetes","iac","monitoring"] },
-  { id:"sre", ctx:"SLIs, SLOs, error budgets, toil, incident response, chaos engineering.", sub:["slos-slas","incident-response","observability","chaos-engineering"] },
-  { id:"kubernetes", ctx:"Pods, ReplicaSets, Deployments, Services, Ingress, ConfigMaps, RBAC, HPA.", sub:["pods","services","config","scaling","storage"] },
-  { id:"aws", ctx:"EC2, S3, RDS, DynamoDB, Lambda, VPC, IAM, CloudFormation, ECS/EKS, CloudWatch.", sub:["compute","storage","networking","serverless","databases"] },
-  { id:"terraform", ctx:"HCL, providers, resources, modules, remote state, workspaces, plan/apply.", sub:["hcl-basics","modules","state-management","providers"] },
-  { id:"data-engineering", ctx:"ETL/ELT, Spark, Kafka, data warehouses, Airflow, star/snowflake schema.", sub:["etl-pipelines","apache-spark","kafka","data-warehousing","airflow"] },
-  { id:"machine-learning", ctx:"Supervised/unsupervised, bias-variance, gradient descent, neural networks.", sub:["supervised-learning","model-evaluation","neural-networks","feature-engineering"] },
-  { id:"generative-ai", ctx:"LLMs, transformers, RAG, fine-tuning, embeddings, vector DBs, hallucination.", sub:["llms","rag","fine-tuning","embeddings","transformer-architecture"] },
-  { id:"prompt-engineering", ctx:"Zero-shot, few-shot, chain-of-thought, role prompting, structured output.", sub:["prompting-techniques","structured-output","context-management"] },
-  { id:"llm-ops", ctx:"LLM deployment, inference, quantisation, caching, cost optimisation, evaluation.", sub:["inference","model-serving","evaluation","cost-optimization"] },
-  { id:"computer-vision", ctx:"CNNs, image classification, YOLO, segmentation, OpenCV, transfer learning.", sub:["cnn-architecture","object-detection","transfer-learning","opencv"] },
-  { id:"nlp", ctx:"Tokenisation, Word2Vec, BERT, text classification, NER, seq2seq, attention.", sub:["tokenization","embeddings","text-classification","transformers"] },
+  { id:"api-design", ctx:"REST vs GraphQL vs gRPC, versioning, error handling, rate limiting.", sub:["rest","graphql","grpc","versioning"] },
+  { id:"authentication", ctx:"JWT, OAuth2, sessions, MFA, SSO, password hashing, bcrypt.", sub:["jwt","oauth","sessions","mfa"] },
+  { id:"microservices", ctx:"Service discovery, API gateway, circuit breaker, saga pattern, service mesh.", sub:["service-discovery","circuit-breaker","saga","service-mesh"] },
+  { id:"database", ctx:"SQL joins, indexing, ACID, isolation levels, query optimisation, NoSQL.", sub:["sql","indexing","transactions","query-optimization","nosql"] },
+  { id:"sql", ctx:"Window functions, CTEs, stored procedures, triggers, query optimization.", sub:["window-functions","ctes","optimization"] },
+  { id:"nosql", ctx:"CAP theorem, document stores, key-value stores, wide-column stores.", sub:["mongodb","dynamodb","cassandra","cap-theorem"] },
+  
+  // Programming Languages
+  { id:"javascript", ctx:"Closures, prototypes, promises, async/await, event loop, modules.", sub:["closures","prototypes","promises","async-await"] },
+  { id:"typescript", ctx:"Generics, utility types, discriminated unions, narrowing, decorators.", sub:["generics","utility-types","discriminated-unions"] },
   { id:"python", ctx:"Comprehensions, generators, decorators, async/await, type hints, GIL.", sub:["python-basics","oop","functional-programming","async","decorators"] },
+  { id:"nodejs", ctx:"Streams, buffers, cluster, middleware, event loop, async patterns.", sub:["streams","cluster","middleware","events"] },
+  { id:"react", ctx:"Hooks rules, context, performance, state management, SSR.", sub:["hooks","context","performance","state-management"] },
+  
+  // DevOps & Cloud
+  { id:"devops", ctx:"CI/CD, Docker, Kubernetes, Terraform, monitoring, blue-green deploys.", sub:["ci-cd","docker","kubernetes","iac","monitoring"] },
+  { id:"ci-cd", ctx:"Pipeline design, GitOps, trunk-based development, Docker builds.", sub:["pipelines","gitops","trunk-based","optimization"] },
+  { id:"containers", ctx:"Docker images, volumes, networking, orchestration, security.", sub:["docker-basics","networking","orchestration","security"] },
+  { id:"sre", ctx:"SLIs, SLOs, error budgets, toil, incident response, chaos engineering.", sub:["slos-slas","incident-response","observability","chaos-engineering"] },
+  { id:"kubernetes", ctx:"Pods, ReplicaSets, Deployments, Services, Ingress, ConfigMaps, RBAC.", sub:["pods","services","config","scaling","storage","rbac"] },
+  { id:"aws", ctx:"EC2, S3, RDS, DynamoDB, Lambda, VPC, IAM, CloudFormation, ECS/EKS.", sub:["compute","storage","networking","serverless","databases"] },
+  { id:"gcp", ctx:"GKE, Cloud Storage, BigQuery, VPC, Cloud Run, App Engine.", sub:["gke","cloud-storage","bigquery","networking"] },
+  { id:"azure", ctx:"Azure VMs, Blob Storage, VNet, App Service, Functions, Azure AD.", sub:["azure-basics","networking","storage","identity"] },
+  { id:"terraform", ctx:"HCL, providers, resources, modules, remote state, workspaces.", sub:["hcl-basics","modules","state-management","providers"] },
+  { id:"monitoring", ctx:"Prometheus, Grafana, alerting, dashboards, SLOs/SLIs.", sub:["prometheus","grafana","alerting","dashboards"] },
+  { id:"caching", ctx:"Redis, Memcached, CDN, cache invalidation strategies, eviction policies.", sub:["redis","cdn","strategies","eviction"] },
+  
+  // Data & AI
+  { id:"data-engineering", ctx:"ETL/ELT, Spark, Kafka, data warehouses, Airflow, star schema.", sub:["etl-pipelines","apache-spark","kafka","data-warehousing","airflow"] },
+  { id:"machine-learning", ctx:"Supervised/unsupervised, bias-variance, gradient descent, evaluation.", sub:["supervised-learning","model-evaluation","feature-engineering"] },
+  { id:"supervised-learning", ctx:"Classification, regression, overfitting, cross-validation, feature scaling.", sub:["classification","regression","overfitting","cross-validation"] },
+  { id:"neural-networks", ctx:"Activation functions, backpropagation, optimizers, regularization, CNNs.", sub:["activation","backpropagation","optimizers","regularization"] },
+  { id:"ensemble-methods", ctx:"Random Forest, Boosting (XGBoost), Bagging, Stacking.", sub:["random-forest","boosting","bagging","stacking"] },
+  { id:"generative-ai", ctx:"LLMs, transformers, RAG, fine-tuning, embeddings, vector DBs.", sub:["llms","rag","fine-tuning","embeddings","transformer-architecture"] },
+  { id:"llms", ctx:"Transformer architecture, prompting, hallucination, fine-tuning, tokens.", sub:["transformers","prompting","hallucination","tokenization"] },
+  { id:"prompt-engineering", ctx:"Zero-shot, few-shot, chain-of-thought, role prompting, structured output.", sub:["prompting-techniques","structured-output","context-management"] },
+  { id:"llm-ops", ctx:"LLM deployment, inference, quantisation, caching, cost optimisation.", sub:["inference","model-serving","evaluation","cost-optimization"] },
+  { id:"computer-vision", ctx:"CNNs, image classification, YOLO, segmentation, transfer learning.", sub:["cnn-architecture","object-detection","transfer-learning"] },
+  { id:"nlp", ctx:"Tokenisation, Word2Vec, BERT, text classification, NER, transformers.", sub:["tokenization","embeddings","text-classification","transformers"] },
+  
+  // Security
   { id:"security", ctx:"OWASP Top 10, SQL injection, XSS, CSRF, JWT, TLS, secrets management.", sub:["web-security","authentication","cryptography","owasp","secure-coding"] },
-  { id:"networking", ctx:"OSI model, TCP/UDP, DNS, HTTP/2/3, load balancing, CDN, WebSockets, TLS.", sub:["tcp-ip","http","dns","load-balancing","protocols"] },
+  
+  // Infrastructure
+  { id:"networking", ctx:"OSI model, TCP/UDP, DNS, HTTP/2/3, load balancing, CDN, WebSockets.", sub:["tcp-ip","http","dns","load-balancing","protocols"] },
   { id:"operating-systems", ctx:"Processes vs threads, scheduling, memory management, file systems, IPC.", sub:["processes-threads","scheduling","memory-management","file-systems"] },
   { id:"linux", ctx:"grep/awk/sed, chmod, bash scripting, cron, systemd, package managers.", sub:["shell-commands","shell-scripting","system-administration","networking-tools"] },
   { id:"unix", ctx:"POSIX, pipes, signals, file descriptors, IPC (pipes, sockets, shared memory).", sub:["posix","signals","ipc","file-descriptors","shell-scripting"] },
+  
+  // Mobile
   { id:"ios", ctx:"Swift, UIKit vs SwiftUI, ARC, GCD, Core Data, URLSession, MVVM.", sub:["swift","swiftui","uikit","concurrency","data-persistence"] },
   { id:"android", ctx:"Kotlin, Activity/Fragment lifecycle, Compose, ViewModel, Room, Coroutines.", sub:["kotlin","jetpack","lifecycle","coroutines","architecture"] },
-  { id:"react-native", ctx:"RN architecture (JSI), React Navigation, Redux/Zustand, native modules, Expo.", sub:["rn-architecture","navigation","performance","native-modules"] },
-  { id:"testing", ctx:"Unit, integration, E2E, TDD, BDD, mocking/stubbing, coverage, pyramids.", sub:["unit-testing","tdd","mocking","test-strategy"] },
-  { id:"e2e-testing", ctx:"Playwright/Cypress/Selenium, POM, flaky tests, visual regression.", sub:["playwright","cypress","page-object-model","ci-integration"] },
-  { id:"api-testing", ctx:"REST/GraphQL testing, Postman, contract testing (Pact), k6, schema validation.", sub:["rest-testing","contract-testing","load-testing","mocking"] },
+  { id:"react-native", ctx:"RN architecture (JSI), React Navigation, Redux/Zustand, native modules.", sub:["rn-architecture","navigation","performance","native-modules"] },
+  
+  // Testing
+  { id:"testing", ctx:"Unit, integration, E2E, TDD, BDD, mocking, coverage, pyramids.", sub:["unit-testing","tdd","mocking","test-strategy"] },
+  { id:"e2e-testing", ctx:"Playwright/Cypress, POM, flaky tests, visual regression, CI integration.", sub:["playwright","cypress","page-object-model","ci-integration"] },
+  { id:"api-testing", ctx:"REST/GraphQL testing, Postman, contract testing, k6, schema validation.", sub:["rest-testing","contract-testing","load-testing","mocking"] },
   { id:"performance-testing", ctx:"Load/stress/soak, profiling, k6, JMeter, Lighthouse, Core Web Vitals.", sub:["load-testing","profiling","web-performance","database-performance"] },
-  { id:"engineering-management", ctx:"1:1s, perf reviews, roadmaps, estimation, stakeholder comms, hiring.", sub:["leadership","project-management","hiring","technical-strategy"] },
-  { id:"behavioral", ctx:"STAR method: leadership, conflict, failure, deadlines, teamwork, ambiguity.", sub:["leadership","conflict-resolution","failure-handling","teamwork"] },
+  
+  // Management
+  { id:"engineering-management", ctx:"1:1s, perf reviews, roadmaps, estimation, stakeholder comms.", sub:["leadership","project-management","hiring","technical-strategy"] },
+  { id:"behavioral", ctx:"STAR method: leadership, conflict, failure, deadlines, teamwork.", sub:["leadership","conflict-resolution","failure-handling","teamwork"] },
+  
+  // Certifications
+  { id:"certifications", ctx:"AWS, GCP, Azure, Kubernetes, Terraform, Security certification exam prep.", sub:["aws","kubernetes","terraform","security","azure","gcp"] },
 ];
 
 const F_CHANNELS = [

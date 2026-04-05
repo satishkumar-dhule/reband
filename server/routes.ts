@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import { type Server } from "http";
+import { type Server, request as httpRequest } from "http";
 import { client } from "./db";
 import fs from "fs";
 import path from "path";
@@ -1635,6 +1635,25 @@ export async function registerRoutes(
       console.error("Error fetching progress:", error);
       res.status(500).json({ error: "Failed to fetch progress" });
     }
+  });
+
+  // --- Go API Proxy ---
+  // Forwards /go-api/* → http://localhost:3001/* so the React frontend
+  // can reach the Go service from the same origin without CORS issues.
+  app.all("/go-api/*", (req, res) => {
+    const targetPath = req.url.replace(/^\/go-api/, "") || "/";
+    const proxyReq = httpRequest(
+      { hostname: "localhost", port: 3001, path: targetPath, method: req.method,
+        headers: { ...req.headers, host: "localhost:3001" } },
+      (proxyRes) => {
+        res.writeHead(proxyRes.statusCode ?? 502, proxyRes.headers);
+        proxyRes.pipe(res, { end: true });
+      }
+    );
+    proxyReq.on("error", (e) => {
+      if (!res.headersSent) res.status(502).json({ error: "Go API unavailable", detail: e.message });
+    });
+    req.pipe(proxyReq, { end: true });
   });
 
   return httpServer;

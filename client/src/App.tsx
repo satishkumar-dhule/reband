@@ -140,6 +140,7 @@ const TrainingMode = lazy(() => import("@/pages/TrainingMode"));
 const About = lazy(() => import("@/pages/About"));
 const WhatsNew = lazy(() => import("@/pages/WhatsNew"));
 const PathDetail = lazy(() => import("@/pages/PathDetail"));
+const GoExplorer = lazy(() => import("@/pages/GoExplorer"));
 
 /**
  * OnboardingGuard — no longer forces users through onboarding.
@@ -194,6 +195,7 @@ const AboutRoute = S(About, GenericPageSkeleton);
 const WhatsNewRoute = S(WhatsNew, GenericPageSkeleton);
 const BotActivityRoute = S(BotActivity, GenericPageSkeleton);
 const TrainingModeRoute = S(TrainingMode, GenericPageSkeleton);
+const GoExplorerRoute = S(GoExplorer, GenericPageSkeleton);
 
 function MinimalApp() {
   const [location] = useLocation();
@@ -248,6 +250,9 @@ function MinimalApp() {
 
       {/* Training */}
       <Route path="/training" component={TrainingModeRoute} />
+
+      {/* Go API Explorer */}
+      <Route path="/go-explorer" component={GoExplorerRoute} />
 
       {/* Home route — must come BEFORE catch-all */}
       <Route path="/" component={HomeRoute} />
