@@ -120,6 +120,38 @@ export async function registerRoutes(
   app.get("/api/keep-alive", (_req, res) => {
     res.json({ status: "ok", timestamp: Date.now() });
   });
+
+  // Offline sync endpoint — accepts client-side change records and persists to DB
+  app.post("/api/sync", async (req, res) => {
+    try {
+      const { entity, entityId, action, data } = req.body;
+      if (!entity || !entityId || !action) {
+        return res.status(400).json({ error: "entity, entityId, and action are required" });
+      }
+
+      // Route to the right table based on entity type
+      if (entity === "question_history" || entity === "history") {
+        const qId = (data?.questionId) ?? entityId;
+        await client.execute({
+          sql: `INSERT INTO question_history (question_id, event_type, event_source, metadata, created_at)
+                VALUES (?, ?, ?, ?, ?)`,
+          args: [qId, action, "client-sync", JSON.stringify(data ?? {}), new Date().toISOString()],
+        });
+      } else if (entity === "progress" || entity === "session") {
+        await client.execute({
+          sql: `INSERT INTO user_sessions (id, session_type, status, started_at, last_accessed_at)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET status=excluded.status, last_accessed_at=excluded.last_accessed_at`,
+          args: [entityId, data?.sessionType ?? "study", action, new Date().toISOString(), new Date().toISOString()],
+        });
+      }
+      // Silently succeed for unknown entity types (client-side only data)
+      res.json({ ok: true, entity, entityId, action });
+    } catch (error) {
+      console.error("Sync error:", error);
+      res.status(500).json({ error: "Sync failed" });
+    }
+  });
   
   // Get all channels with question counts (cached)
   app.get("/api/channels", async (_req, res) => {
@@ -136,6 +168,32 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching channels:", error);
       res.status(500).json({ error: "Failed to fetch channels" });
+    }
+  });
+
+  // Support legacy query-param format: /api/questions?channel=X
+  app.get("/api/questions", async (req, res) => {
+    const { channel } = req.query;
+    if (!channel || typeof channel !== "string") {
+      return res.status(400).json({ error: "Missing required query param: channel" });
+    }
+    try {
+      const { subChannel, difficulty } = req.query;
+      const cacheKey = `questions-${channel}-${subChannel}-${difficulty}`;
+      const data = await getCached(cacheKey, async () => {
+        let sql = "SELECT id, question, answer, explanation, difficulty, sub_channel, tags, channel, diagram, eli5, videos, companies, source_url FROM questions WHERE channel = ? AND status != 'deleted'";
+        const args: any[] = [channel];
+        if (subChannel && subChannel !== "all") { sql += " AND sub_channel = ?"; args.push(subChannel); }
+        if (difficulty && difficulty !== "all") { sql += " AND difficulty = ?"; args.push(difficulty); }
+        sql += " ORDER BY created_at ASC";
+        const result = await client.execute({ sql, args });
+        return result.rows.map((r: any) => parseQuestion(r));
+      });
+      setReadCache(res, 60, 120);
+      res.json(data);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      res.status(500).json({ error: "Failed to fetch questions" });
     }
   });
 
@@ -999,24 +1057,27 @@ export async function registerRoutes(
     }
   });
 
-  // Get a single learning path by ID
-  app.get("/api/learning-paths/:pathId", async (req, res) => {
+  // ── Static sub-routes MUST come before /:pathId to avoid shadowing ──
+
+  // Get learning path stats
+  app.get("/api/learning-paths/stats", async (_req, res) => {
     try {
-      const { pathId } = req.params;
-      
-      const result = await client.execute({
-        sql: "SELECT * FROM learning_paths WHERE id = ? LIMIT 1",
-        args: [pathId]
-      });
-
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Learning path not found" });
+      const result = await client.execute(
+        "SELECT path_type, difficulty, COUNT(*) as count FROM learning_paths WHERE status = 'active' GROUP BY path_type, difficulty"
+      );
+      const stats = { total: 0, byType: {} as Record<string, number>, byDifficulty: {} as Record<string, number> };
+      for (const row of result.rows) {
+        const count = Number(row.count);
+        stats.total += count;
+        const type = row.path_type as string;
+        stats.byType[type] = (stats.byType[type] || 0) + count;
+        const diff = row.difficulty as string;
+        stats.byDifficulty[diff] = (stats.byDifficulty[diff] || 0) + count;
       }
-
-      res.json(parseLearningPath(result.rows[0]));
+      res.json(stats);
     } catch (error) {
-      console.error("Error fetching learning path:", error);
-      res.status(500).json({ error: "Failed to fetch learning path" });
+      console.error("Error fetching learning path stats:", error);
+      res.status(500).json({ error: "Failed to fetch learning path stats" });
     }
   });
 
@@ -1046,34 +1107,59 @@ export async function registerRoutes(
     }
   });
 
-  // Get learning path stats
-  app.get("/api/learning-paths/stats", async (_req, res) => {
+  // Create a custom learning path
+  app.post("/api/learning-paths", async (req, res) => {
     try {
-      const result = await client.execute(
-        "SELECT path_type, difficulty, COUNT(*) as count FROM learning_paths WHERE status = 'active' GROUP BY path_type, difficulty"
-      );
-
-      const stats = {
-        total: 0,
-        byType: {} as Record<string, number>,
-        byDifficulty: {} as Record<string, number>,
-      };
-
-      for (const row of result.rows) {
-        const count = Number(row.count);
-        stats.total += count;
-        
-        const type = row.path_type as string;
-        stats.byType[type] = (stats.byType[type] || 0) + count;
-        
-        const diff = row.difficulty as string;
-        stats.byDifficulty[diff] = (stats.byDifficulty[diff] || 0) + count;
+      const { title, description, channels, difficulty, estimatedHours, pathType } = req.body;
+      if (!title || !channels || !Array.isArray(channels)) {
+        return res.status(400).json({ error: "title and channels are required" });
       }
-
-      res.json(stats);
+      const id = crypto.randomUUID();
+      const now = new Date().toISOString();
+      await client.execute({
+        sql: `INSERT INTO learning_paths (id, title, description, path_type, difficulty, estimated_hours, channels, question_ids, tags, prerequisites, learning_objectives, milestones, metadata, status, created_at, last_updated)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)`,
+        args: [
+          id,
+          title,
+          description ?? "",
+          pathType ?? "skill",
+          difficulty ?? "intermediate",
+          estimatedHours ?? 40,
+          JSON.stringify(channels),
+          JSON.stringify([]),
+          JSON.stringify(channels),
+          JSON.stringify([]),
+          JSON.stringify([]),
+          JSON.stringify([]),
+          JSON.stringify({}),
+          now,
+          now,
+        ],
+      });
+      const result = await client.execute({ sql: "SELECT * FROM learning_paths WHERE id = ? LIMIT 1", args: [id] });
+      res.status(201).json(parseLearningPath(result.rows[0]));
     } catch (error) {
-      console.error("Error fetching learning path stats:", error);
-      res.status(500).json({ error: "Failed to fetch learning path stats" });
+      console.error("Error creating learning path:", error);
+      res.status(500).json({ error: "Failed to create learning path" });
+    }
+  });
+
+  // Get a single learning path by ID (must come after static sub-routes)
+  app.get("/api/learning-paths/:pathId", async (req, res) => {
+    try {
+      const { pathId } = req.params;
+      const result = await client.execute({
+        sql: "SELECT * FROM learning_paths WHERE id = ? LIMIT 1",
+        args: [pathId]
+      });
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Learning path not found" });
+      }
+      res.json(parseLearningPath(result.rows[0]));
+    } catch (error) {
+      console.error("Error fetching learning path:", error);
+      res.status(500).json({ error: "Failed to fetch learning path" });
     }
   });
 
@@ -1141,11 +1227,15 @@ export async function registerRoutes(
         subtitle,
         channelId,
         certificationId,
-        progress,
-        totalItems,
-        completedItems,
-        sessionData
+        progress = 0,
+        totalItems = 0,
+        completedItems = 0,
+        sessionData = {}
       } = req.body;
+
+      if (!sessionKey || !sessionType || !title) {
+        return res.status(400).json({ error: "sessionKey, sessionType, and title are required" });
+      }
 
       // Check if session already exists
       const existing = await client.execute({
