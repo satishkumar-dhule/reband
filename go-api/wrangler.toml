@@ -1,0 +1,30 @@
+name = "devprep-go-api"
+main = "dist/_worker.js"
+compatibility_date = "2024-12-01"
+
+# Workers Free tier: 100,000 req/day. Upgrade for more.
+# workers_dev = true   # set to false when using a custom domain
+
+[build]
+command = "make build-worker"
+
+# ─── Secrets (set via Cloudflare dashboard or `wrangler secret put`) ──────────
+# LIBSQL_URL         — libsql://your-db.turso.io
+# LIBSQL_AUTH_TOKEN  — auth token from `turso db tokens create your-db`
+
+# ─── Non-secret environment variables ─────────────────────────────────────────
+[vars]
+LOG_LEVEL = "info"
+# CORS_ORIGINS = "https://open-interview.github.io,https://your-domain.com"
+
+# ─── Optional: Cloudflare D1 binding (alternative to Turso) ──────────────────
+# If you migrate to D1, add a binding here and update db_libsql.go:
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "devprep"
+# database_id = "YOUR_D1_DATABASE_ID"
+
+# ─── Routes (optional — activate if using a custom domain) ───────────────────
+# [[routes]]
+# pattern = "api.open-interview.github.io/*"
+# zone_name = "open-interview.github.io"

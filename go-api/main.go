@@ -1,119 +1,83 @@
 package main
 
 import (
+	"context"
 	"devprep-api/db"
-	"devprep-api/handlers"
-	"devprep-api/middleware"
-	"encoding/json"
-	"fmt"
-	"log"
+	"devprep-api/internal/app"
+	"log/slog"
 	"net/http"
 	"os"
-	"runtime"
+	"os/signal"
+	"syscall"
 	"time"
-
-	"github.com/go-chi/chi/v5"
-	chimiddleware "github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
+	// ─── Structured JSON logging ────────────────────────────────────────────────
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: logLevel(),
+	}))
+	slog.SetDefault(logger)
+
+	// ─── Database ───────────────────────────────────────────────────────────────
+	database, err := db.Open()
+	if err != nil {
+		slog.Error("failed to open database", "error", err)
+		os.Exit(1)
+	}
+	defer database.Close()
+
+	// ─── Router ─────────────────────────────────────────────────────────────────
+	router := app.NewRouter(database)
+
+	// ─── HTTP server ─────────────────────────────────────────────────────────────
 	port := os.Getenv("GO_API_PORT")
 	if port == "" {
 		port = "3001"
 	}
 
-	database, err := db.Open()
-	if err != nil {
-		log.Fatalf("[go-api] failed to open database: %v", err)
+	srv := &http.Server{
+		Addr:         ":" + port,
+		Handler:      router,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 35 * time.Second, // slightly above chi's 30s Timeout middleware
+		IdleTimeout:  120 * time.Second,
 	}
-	defer database.Close()
 
-	r := chi.NewRouter()
+	// ─── Graceful shutdown ───────────────────────────────────────────────────────
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-	r.Use(middleware.Logger)
-	r.Use(middleware.CORS)
-	r.Use(chimiddleware.Recoverer)
-	r.Use(chimiddleware.Compress(5))
+	go func() {
+		slog.Info("server starting", "port", port, "version", app.Version)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			slog.Error("server error", "error", err)
+			os.Exit(1)
+		}
+	}()
 
-	// ─── Health & Info ─────────────────────────────────────────────────────────
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]any{
-			"status":    "ok",
-			"service":   "devprep-go-api",
-			"timestamp": time.Now().UTC().Format(time.RFC3339),
-			"go":        runtime.Version(),
-		})
-	})
+	<-quit
+	slog.Info("shutting down gracefully…")
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]any{
-			"service": "DevPrep Go API",
-			"version": "1.0.0",
-			"docs":    fmt.Sprintf("http://localhost:%s/api/v1", port),
-			"endpoints": map[string]string{
-				"health":         "GET /health",
-				"channels":       "GET /api/v1/channels",
-				"stats":          "GET /api/v1/stats",
-				"questions":      "GET /api/v1/questions",
-				"question":       "GET /api/v1/questions/{questionId}",
-				"random_q":       "GET /api/v1/questions/random",
-				"subchannels":    "GET /api/v1/channels/{channelId}/subchannels",
-				"companies":      "GET /api/v1/channels/{channelId}/companies",
-				"challenges":     "GET /api/v1/coding/challenges",
-				"challenge":      "GET /api/v1/coding/challenges/{id}",
-				"random_c":       "GET /api/v1/coding/random",
-				"coding_stats":   "GET /api/v1/coding/stats",
-				"flashcards":     "GET /api/v1/flashcards",
-				"flashcards_ch":  "GET /api/v1/flashcards/{channelId}",
-				"voice_sessions": "GET /api/v1/voice-sessions",
-				"certifications": "GET /api/v1/certifications",
-				"certification":  "GET /api/v1/certifications/{id}",
-				"paths":          "GET /api/v1/learning-paths",
-				"path":           "GET /api/v1/learning-paths/{pathId}",
-			},
-		})
-	})
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 
-	// ─── API v1 ────────────────────────────────────────────────────────────────
-	r.Route("/api/v1", func(r chi.Router) {
+	if err := srv.Shutdown(ctx); err != nil {
+		slog.Error("forced shutdown", "error", err)
+		os.Exit(1)
+	}
+	slog.Info("server stopped")
+}
 
-		// Channels & Stats
-		r.Get("/channels", handlers.GetChannels(database))
-		r.Get("/stats", handlers.GetStats(database))
-		r.Get("/channels/{channelId}/subchannels", handlers.GetSubchannels(database))
-		r.Get("/channels/{channelId}/companies", handlers.GetCompanies(database))
-
-		// Questions — note: /random must be registered before /{questionId}
-		r.Get("/questions", handlers.GetQuestions(database))
-		r.Get("/questions/random", handlers.GetRandomQuestion(database))
-		r.Get("/questions/{questionId}", handlers.GetQuestion(database))
-
-		// Coding Challenges
-		r.Get("/coding/challenges", handlers.GetChallenges(database))
-		r.Get("/coding/random", handlers.GetRandomChallenge(database))
-		r.Get("/coding/stats", handlers.GetChallengeStats(database))
-		r.Get("/coding/challenges/{id}", handlers.GetChallenge(database))
-
-		// Flashcards
-		r.Get("/flashcards", handlers.GetFlashcards(database))
-		r.Get("/flashcards/{channelId}", handlers.GetFlashcardsByChannel(database))
-
-		// Voice Sessions
-		r.Get("/voice-sessions", handlers.GetVoiceSessions(database))
-
-		// Certifications
-		r.Get("/certifications", handlers.GetCertifications(database))
-		r.Get("/certifications/{id}", handlers.GetCertification(database))
-
-		// Learning Paths
-		r.Get("/learning-paths", handlers.GetLearningPaths(database))
-		r.Get("/learning-paths/{pathId}", handlers.GetLearningPath(database))
-	})
-
-	log.Printf("[go-api] listening on :%s", port)
-	if err := http.ListenAndServe(":"+port, r); err != nil {
-		log.Fatalf("[go-api] server error: %v", err)
+func logLevel() slog.Level {
+	switch os.Getenv("LOG_LEVEL") {
+	case "debug":
+		return slog.LevelDebug
+	case "warn":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelInfo
 	}
 }

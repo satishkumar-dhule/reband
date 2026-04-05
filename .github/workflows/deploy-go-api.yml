@@ -1,0 +1,143 @@
+name: Deploy Go API → Cloudflare Workers
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "go-api/**"
+      - ".github/workflows/deploy-go-api.yml"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "go-api/**"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-go-api-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION: "1.23"
+
+jobs:
+  # ─── CI: build + test (every push & PR) ─────────────────────────────────────
+  ci:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: go-api
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go ${{ env.GO_VERSION }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: go-api/go.sum
+
+      # go mod tidy downloads any missing dependencies and keeps go.sum in sync.
+      # In a fully-committed repo the tidy should produce no diff; in CI this is
+      # the safe way to handle freshly-added packages before a local tidy commit.
+      - name: Tidy & verify modules
+        run: |
+          go mod tidy
+          go mod verify
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test (native build — SQLite)
+        run: go test -race -timeout 60s ./...
+
+      - name: Build local server binary
+        run: make build
+
+      # ── Cloudflare Workers WASM build ───────────────────────────────────────
+      - name: Build WASM worker
+        run: |
+          GOOS=js GOARCH=wasm go build -tags worker \
+            -trimpath -ldflags="-s -w" \
+            -o dist/app.wasm ./worker/
+
+      - name: Upload WASM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-api-wasm-${{ github.sha }}
+          path: go-api/dist/app.wasm
+          retention-days: 7
+
+  # ─── Deploy (main / master only, not PRs) ───────────────────────────────────
+  deploy:
+    name: Deploy to Cloudflare Workers
+    needs: ci
+    if: >
+      github.event_name != 'pull_request' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: go-api
+
+    environment:
+      name: production
+      url: https://devprep-go-api.workers.dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go ${{ env.GO_VERSION }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: go-api/go.sum
+
+      - name: Setup Node (for Wrangler)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Wrangler
+        run: npm install -g wrangler@latest
+
+      - name: Tidy modules
+        run: go mod tidy
+
+      - name: Build WASM worker + JS glue
+        run: make build-worker
+
+      # Push secrets from GitHub Actions secrets to Cloudflare.
+      # Required GitHub secrets:
+      #   CLOUDFLARE_API_TOKEN   — "Edit Cloudflare Workers" token
+      #   CLOUDFLARE_ACCOUNT_ID  — found in the Cloudflare dashboard
+      #   LIBSQL_URL             — libsql://your-db.turso.io
+      #   LIBSQL_AUTH_TOKEN      — from `turso db tokens create <db>`
+      - name: Push secrets to Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          printf '%s' "${{ secrets.LIBSQL_URL }}" \
+            | wrangler secret put LIBSQL_URL --config wrangler.toml
+          printf '%s' "${{ secrets.LIBSQL_AUTH_TOKEN }}" \
+            | wrangler secret put LIBSQL_AUTH_TOKEN --config wrangler.toml
+
+      - name: Deploy with Wrangler
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: wrangler deploy --config wrangler.toml
+
+      - name: Smoke test deployed worker
+        run: |
+          WORKER_URL="https://devprep-go-api.workers.dev"
+          echo "› GET $WORKER_URL/health"
+          STATUS=$(curl -sSf -o /dev/null -w "%{http_code}" "$WORKER_URL/health")
+          if [ "$STATUS" != "200" ]; then
+            echo "✗ Health check returned HTTP $STATUS"
+            exit 1
+          fi
+          echo "✓ Worker is healthy"
