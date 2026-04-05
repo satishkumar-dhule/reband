@@ -134,7 +134,7 @@
     "swarm:qa:bash": "./scripts/swarm-qa-runner.sh",
     "swarm:qa:opencode": "./scripts/swarm-qa-with-opencode.sh",
     "swarm:qa:start": "npm run dev & sleep 5 && npm run swarm:qa",
-    "swarm:content": "npx tsx scripts/parallel-content-swarm.ts",
+    "swarm:content": "npx tsx scripts/parallel-content-swarm.ts && node script/fetch-questions-for-build.js",
     "swarm:content:questions": "npx tsx scripts/parallel-content-swarm.ts --type=questions",
     "swarm:content:certs": "npx tsx scripts/parallel-content-swarm.ts --type=certifications",
     "swarm:content:flashcards": "npx tsx scripts/parallel-content-swarm.ts --type=flashcards",
