@@ -192,13 +192,6 @@ const ExamSidebar = memo(function ExamSidebar({
   );
 });
 
-interface AnswerRecord {
-  questionId: string;
-  selectedOptionId: string;
-  isCorrect: boolean;
-  timeSpent: number;
-}
-
 export default function CertificationExam() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute('/certification/:id/exam');

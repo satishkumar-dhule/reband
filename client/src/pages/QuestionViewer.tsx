@@ -448,38 +448,34 @@ export default function QuestionViewer() {
         <div className="border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]">
           <div className="max-w-7xl mx-auto px-4">
             <nav className="flex gap-1 -mb-px" aria-label="Main view">
-              <Button
-                onClick={() => setActiveMainTab('questions')}
-                variant={activeMainTab === 'questions' ? 'primary' : 'ghost'}
-                size="md"
-                className="rounded-none border-b-2"
-                data-testid="tab-questions"
-              >
-                Questions
-              </Button>
-              <Button
-                onClick={() => setActiveMainTab('flashcards')}
-                variant={activeMainTab === 'flashcards' ? 'primary' : 'ghost'}
-                size="md"
-                className="rounded-none border-b-2"
-                data-testid="tab-flashcards"
-              >
-                Flashcards
-                {flashcards.length > 0 && (
-                  <span className="ml-2 px-1.5 py-0.5 text-xs bg-[var(--gh-accent-fg)]/10 rounded-full">
-                    {flashcards.length}
-                  </span>
-                )}
-              </Button>
-              <Button
-                onClick={() => setActiveMainTab('voice')}
-                variant={activeMainTab === 'voice' ? 'primary' : 'ghost'}
-                size="md"
-                className="rounded-none border-b-2"
-                data-testid="tab-voice"
-              >
-                Voice
-              </Button>
+              {(
+                [
+                  { id: 'questions', label: 'Questions', badge: null },
+                  { id: 'flashcards', label: 'Flashcards', badge: flashcards.length > 0 ? flashcards.length : null },
+                  { id: 'voice', label: 'Voice', badge: null },
+                ] as const
+              ).map(({ id, label, badge }) => (
+                <Button
+                  key={id}
+                  onClick={() => setActiveMainTab(id)}
+                  variant="ghost"
+                  size="md"
+                  data-testid={`tab-${id}`}
+                  className={cn(
+                    'rounded-none border-b-2 transition-colors',
+                    activeMainTab === id
+                      ? 'border-[var(--gh-accent-fg)] text-[var(--gh-accent-fg)] font-semibold'
+                      : 'border-transparent text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)]',
+                  )}
+                >
+                  {label}
+                  {badge !== null && (
+                    <span className="ml-2 px-1.5 py-0.5 text-xs bg-[var(--gh-accent-fg)]/10 rounded-full">
+                      {badge}
+                    </span>
+                  )}
+                </Button>
+              ))}
             </nav>
           </div>
         </div>

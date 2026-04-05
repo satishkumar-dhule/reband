@@ -7,12 +7,10 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EnhancedMermaid } from '../EnhancedMermaid';
 import { YouTubePlayer } from '../YouTubePlayer';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { 
-  BookOpen, Code2, Lightbulb, ExternalLink, ChevronDown, Baby, Copy, Check, Tag,
+  BookOpen, Lightbulb, ExternalLink, ChevronDown, Baby, Tag,
   GitBranch, Play, FileText, Sparkles, Zap, Eye, Brain, Layers
 } from 'lucide-react';
 import type { Question } from '../../lib/data';
@@ -21,188 +19,28 @@ import { SimilarQuestions } from '../SimilarQuestions';
 import { formatTag } from '../../lib/utils';
 import { BlogService } from '../../services/api.service';
 import { useTheme } from '../../context/ThemeContext';
+import { preprocessMarkdown, renderWithInlineCode, isValidMermaidDiagram } from '../../lib/markdown-utils';
+import { CodeBlock } from '../shared/CodeBlock';
 
 type MediaTab = 'tldr' | 'diagram' | 'eli5' | 'video';
-
-function preprocessMarkdown(text: string): string {
-  if (!text) return '';
-  let processed = text;
-  
-  // Protect code blocks from processing by temporarily replacing them
-  const codeBlocks: string[] = [];
-  processed = processed.replace(/```[\s\S]*?```/g, (match) => {
-    codeBlocks.push(match);
-    return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
-  });
-  
-  // Fix Big-O notation
-  processed = processed.replace(/([OΘΩ])\(([^)]+)\)/g, '`$1($2)`');
-  
-  // Convert bullet characters to markdown bullets FIRST
-  processed = processed.replace(/^[•·]\s*/gm, '- ');
-  
-  // Handle nested lists: detect sub-bullets after a parent bullet or heading with colon
-  const lines = processed.split('\n');
-  const fixedLines: string[] = [];
-  let inNestedList = false;
-  
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
-    const trimmedLine = line.trim();
-    
-    // Check if this is a parent list item (bullet with bold text ending with colon)
-    // OR a bold heading ending with colon (like **Key Use Cases:**)
-    const isParentItem = /^-\s+\*\*[^*]+:\*\*\s*$/.test(trimmedLine) || /^\*\*[^*]+:\*\*\s*$/.test(trimmedLine);
-    
-    if (isParentItem) {
-      inNestedList = true;
-      fixedLines.push(line);
-      continue;
-    }
-    
-    // Check if this is a sub-bullet (should be indented)
-    if (inNestedList && /^-\s+/.test(trimmedLine)) {
-      // Indent sub-bullets with 2 spaces
-      fixedLines.push('  ' + trimmedLine);
-      continue;
-    }
-    
-    // Exit nested list mode on empty line or non-bullet line
-    if (inNestedList && (!trimmedLine || !/^-\s+/.test(trimmedLine))) {
-      inNestedList = false;
-    }
-    
-    // Fix orphaned bold markers
-    const boldMarkers = (line.match(/\*\*/g) || []).length;
-    if (boldMarkers % 2 === 1) {
-      if (trimmedLine.startsWith('**') && boldMarkers === 1) {
-        line = line.replace(/^\s*\*\*\s*/, '');
-      } else if (trimmedLine.endsWith('**') && boldMarkers === 1) {
-        line = line.replace(/\s*\*\*\s*$/, '');
-      }
-    }
-    
-    fixedLines.push(line);
-  }
-  processed = fixedLines.join('\n');
-  
-  // Clean up multiple newlines
-  processed = processed.replace(/\n{3,}/g, '\n\n');
-  processed = processed.replace(/^\n+/, '');
-  
-  // Restore code blocks
-  codeBlocks.forEach((block, index) => {
-    processed = processed.replace(`__CODE_BLOCK_${index}__`, block);
-  });
-  
-  return processed;
-}
-
-function isValidMermaidDiagram(diagram: string | undefined | null): boolean {
-  if (!diagram || typeof diagram !== 'string') return false;
-  const trimmed = diagram.trim();
-  if (!trimmed || trimmed.length < 10) return false;
-  const validStarts = ['graph', 'flowchart', 'sequenceDiagram', 'classDiagram', 'stateDiagram', 'erDiagram', 'journey', 'gantt', 'pie', 'gitGraph', 'mindmap', 'timeline', 'quadrantChart', 'sankey', 'xychart', 'block'];
-  const firstLine = trimmed.split('\n')[0].toLowerCase().trim();
-  const hasValidStart = validStarts.some(start => firstLine.startsWith(start.toLowerCase()));
-  if (!hasValidStart) return false;
-  const lines = trimmed.split('\n').filter(line => {
-    const l = line.trim().toLowerCase();
-    return l && !l.startsWith('%%') && !validStarts.some(s => l.startsWith(s.toLowerCase()));
-  });
-  if (lines.length < 3) return false;
-  const lowerContent = trimmed.toLowerCase();
-  if (
-    (lowerContent.includes('start') && lowerContent.includes('end') && lines.length <= 3) ||
-    (lowerContent.match(/\bstart\b/g)?.length === 1 && lowerContent.match(/\bend\b/g)?.length === 1 && lines.length <= 2)
-  ) {
-    return false;
-  }
-  return true;
-}
-
-function renderWithInlineCode(text: string): React.ReactNode {
-  if (!text) return null;
-  const parts = text.split(/`([^`]+)`/g);
-  return parts.map((part, index) => {
-    if (index % 2 === 1) {
-      return (
-        <code 
-          key={index}
-          className="px-2 py-1 mx-1 bg-primary/20 text-primary rounded-lg text-[0.9em] font-mono border border-primary/30"
-        >
-          {part}
-        </code>
-      );
-    }
-    return part;
-  });
-}
 
 interface ExtremeAnswerPanelProps {
   question: Question;
   isCompleted: boolean;
 }
 
-function CodeBlock({ code, language }: { code: string; language: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
+// Keep a thin wrapper to preserve the motion entrance used by GenZ aesthetic
+function AnimatedCodeBlock({ code, language }: { code: string; language: string }) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl overflow-hidden border border-border bg-muted/50 shadow-xl"
     >
-      <div className="flex items-center justify-between px-5 py-3 bg-muted border-b border-border">
-        <div className="flex items-center gap-3">
-          <Code2 className="w-5 h-5 text-primary" />
-          <span className="text-sm uppercase tracking-wider text-primary font-bold">
-            {language || 'code'}
-          </span>
-        </div>
-        <motion.button
-          onClick={handleCopy}
-          className="flex items-center gap-2 px-4 py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-all"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {copied ? (
-            <>
-              <Check className="w-4 h-4 text-green-500" />
-              <span className="text-green-500 font-medium">Copied!</span>
-            </>
-          ) : (
-            <>
-              <Copy className="w-4 h-4" />
-              <span>Copy</span>
-            </>
-          )}
-        </motion.button>
-      </div>
-      <SyntaxHighlighter
-        language={language || 'text'}
-        style={vscDarkPlus}
-        customStyle={{ 
-          margin: 0, 
-          padding: '1.5rem', 
-          background: 'transparent',
-          fontSize: '0.875rem',
-          lineHeight: '1.6',
-        }}
-        wrapLines={true}
-        wrapLongLines={true}
-      >
-        {code}
-      </SyntaxHighlighter>
+      <CodeBlock code={code} language={language} size="full" />
     </motion.div>
   );
 }
+
 
 function TabbedMediaPanel({ 
   question,

@@ -2,13 +2,11 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EnhancedMermaid } from './EnhancedMermaid';
 import { YouTubePlayer } from './YouTubePlayer';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { 
-  BookOpen, Code2, Lightbulb, ExternalLink,
-  ChevronDown, Baby, Copy, Check, Tag,
+  BookOpen, Lightbulb, ExternalLink,
+  ChevronDown, Baby, Tag,
   GitBranch, Play, FileText
 } from 'lucide-react';
 import type { Question } from '../lib/data';
@@ -17,175 +15,11 @@ import { QuestionFeedback } from './QuestionFeedback';
 import { SimilarQuestions } from './SimilarQuestions';
 import { formatTag } from '../lib/utils';
 import { BlogService } from '../services/api.service';
-import { Button, IconButton } from './unified/Button';
+import { Button } from './unified/Button';
+import { preprocessMarkdown, renderWithInlineCode, isValidMermaidDiagram } from '../lib/markdown-utils';
+import { CodeBlock } from './shared/CodeBlock';
 
 type MediaTab = 'tldr' | 'diagram' | 'eli5' | 'video';
-
-/**
- * Preprocess markdown text to fix common formatting issues
- */
-function preprocessMarkdown(text: string): string {
-  if (!text) return '';
-  
-  let processed = text;
-  
-  // Wrap Big-O notation in code spans to protect from markdown parsing
-  // Matches O(n), O(n²), O(n log n), O(1), O(n^2), Θ(n), Ω(n), etc.
-  processed = processed.replace(/([OΘΩ])\(([^)]+)\)/g, '`$1($2)`');
-  
-  // Fix bold markers right before code fences: "text**```" -> "text**\n```"
-  processed = processed.replace(/\*\*\s*```/g, '**\n\n```');
-  
-  // Fix bold markers right after code fences: "```**text" -> "```\n**text"
-  processed = processed.replace(/```\s*\*\*/g, '```\n\n**');
-  
-  // Remove ** markers inside code blocks (they shouldn't be there)
-  // Match code blocks and clean their content
-  processed = processed.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, content) => {
-    // Remove ** markers from inside code blocks
-    const cleanedContent = content.replace(/\*\*/g, '');
-    return '```' + lang + '\n' + cleanedContent + '```';
-  });
-  
-  // Fix code fences that are not on their own line
-  // Pattern: text followed by ``` on same line (but not at start of line)
-  // This handles cases like "Example: ```yaml" -> "Example:\n```yaml"
-  processed = processed.replace(/([^\n`])(\s*```)/g, '$1\n```');
-  // Pattern: ``` followed by text on same line (except language identifier)
-  processed = processed.replace(/(```\w*)\s*\n?\s*([^\n`])/g, '$1\n$2');
-  // Fix colon followed by backticks with optional space: ": ```" or ":```"
-  processed = processed.replace(/:\s*```/g, ':\n\n```');
-  
-  // Fix broken bold markers - standalone ** on their own line
-  processed = processed.replace(/^\*\*\s*$/gm, '');
-  
-  // Fix bold markers that are split across lines (e.g., "**\nSome text**")
-  processed = processed.replace(/\*\*\s*\n\s*([^*]+)\*\*/g, '**$1**');
-  
-  // Fix pattern like "**\n1. Title**" or "**\n- Item**" -> "**1. Title**" or "**- Item**"
-  processed = processed.replace(/\*\*\s*\n\s*(\d+\.\s+[^*\n]+)\*\*/g, '**$1**');
-  processed = processed.replace(/\*\*\s*\n\s*(-\s+[^*\n]+)\*\*/g, '**$1**');
-  
-  // Fix "Text**- " pattern (missing space/newline before dash) -> "Text**\n- "
-  processed = processed.replace(/\*\*-\s+/g, '**\n- ');
-  
-  // Fix "Text**1. " pattern (missing newline before numbered list) -> "Text**\n1. "
-  processed = processed.replace(/\*\*(\d+)\.\s+/g, '**\n$1. ');
-  
-  // Fix patterns like "title**- **subtitle" -> "title**\n- **subtitle**"
-  processed = processed.replace(/\*\*-\s*\*\*([^*]+)\*\*/g, '**\n- **$1**');
-  processed = processed.replace(/\*\*-\s*\*\*([^*\n]+)/g, '**\n- **$1**');
-  
-  // Fix "- **Text**- " pattern (list item followed by another without newline)
-  processed = processed.replace(/-\s*\*\*([^*]+)\*\*-\s+/g, '- **$1**\n- ');
-  
-  // Fix unclosed bold markers at start of lines followed by content
-  // Pattern: line starting with ** but no closing ** on same line
-  const lines = processed.split('\n');
-  const fixedLines: string[] = [];
-  
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
-    
-    // Count ** occurrences in line
-    const boldMarkers = (line.match(/\*\*/g) || []).length;
-    
-    // If odd number of ** markers, it's unbalanced
-    if (boldMarkers % 2 === 1) {
-      // If line starts with ** and has no closing, remove the opening **
-      if (line.trim().startsWith('**') && boldMarkers === 1) {
-        line = line.replace(/^\s*\*\*\s*/, '');
-      }
-      // If line ends with ** and has no opening, remove the closing **
-      else if (line.trim().endsWith('**') && boldMarkers === 1) {
-        line = line.replace(/\s*\*\*\s*$/, '');
-      }
-    }
-    
-    fixedLines.push(line);
-  }
-  processed = fixedLines.join('\n');
-  
-  // Fix inline bullet points
-  processed = processed.replace(/^[•·]\s*/gm, '- ');
-  
-  if (processed.includes('•') || processed.includes('·')) {
-    const bulletLines = processed.split('\n');
-    const processedLines = bulletLines.map(line => {
-      const bulletCount = (line.match(/[•·]/g) || []).length;
-      if (bulletCount > 1 || (bulletCount === 1 && !line.trim().startsWith('•') && !line.trim().startsWith('·'))) {
-        const parts = line.split(/[•·]/).map(p => p.trim()).filter(p => p);
-        if (parts.length > 1) {
-          return parts.map(p => `- ${p}`).join('\n');
-        }
-      }
-      return line.replace(/^[•·]\s*/, '- ');
-    });
-    processed = processedLines.join('\n');
-  }
-  
-  processed = processed.replace(/(\d+[.)]\s+[^0-9]+?)(?=\s+\d+[.)])/g, '$1\n');
-  processed = processed.replace(/(?<!\n)(\d+[.)]\s+)/g, '\n$1');
-  processed = processed.replace(/\n{3,}/g, '\n\n');
-  processed = processed.replace(/^\n+/, '');
-  
-  return processed;
-}
-
-// Check if mermaid diagram is valid
-function isValidMermaidDiagram(diagram: string | undefined | null): boolean {
-  if (!diagram || typeof diagram !== 'string') return false;
-  const trimmed = diagram.trim();
-  if (!trimmed || trimmed.length < 10) return false;
-  
-  const validStarts = ['graph', 'flowchart', 'sequenceDiagram', 'classDiagram', 'stateDiagram', 'erDiagram', 'journey', 'gantt', 'pie', 'gitGraph', 'mindmap', 'timeline', 'quadrantChart', 'sankey', 'xychart', 'block'];
-  const firstLine = trimmed.split('\n')[0].toLowerCase().trim();
-  const hasValidStart = validStarts.some(start => firstLine.startsWith(start.toLowerCase()));
-  if (!hasValidStart) return false;
-  
-  const lines = trimmed.split('\n').filter(line => {
-    const l = line.trim().toLowerCase();
-    return l && !l.startsWith('%%') && !validStarts.some(s => l.startsWith(s.toLowerCase()));
-  });
-  
-  if (lines.length < 3) return false;
-  
-  const lowerContent = trimmed.toLowerCase();
-  if (
-    (lowerContent.includes('start') && lowerContent.includes('end') && lines.length <= 3) ||
-    (lowerContent.match(/\bstart\b/g)?.length === 1 && lowerContent.match(/\bend\b/g)?.length === 1 && lines.length <= 2)
-  ) {
-    return false;
-  }
-  
-  return true;
-}
-
-/**
- * Renders text with inline code (backticks) as styled code elements
- */
-function renderWithInlineCode(text: string): React.ReactNode {
-  if (!text) return null;
-  
-  // Split by backticks, alternating between text and code
-  const parts = text.split(/`([^`]+)`/g);
-  
-  return parts.map((part, index) => {
-    // Odd indices are code (content between backticks)
-    if (index % 2 === 1) {
-      return (
-        <code 
-          key={index}
-          className="px-1.5 py-0.5 mx-0.5 bg-primary/15 text-primary rounded text-[0.9em] font-mono"
-        >
-          {part}
-        </code>
-      );
-    }
-    // Even indices are regular text
-    return part;
-  });
-}
 
 interface AnswerPanelProps {
   question: Question;
@@ -262,54 +96,6 @@ function ExpandableCard({
           )}
         </AnimatePresence>
       )}
-    </div>
-  );
-}
-
-// Code block with copy button
-function CodeBlock({ code, language }: { code: string; language: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="rounded-lg sm:rounded-xl overflow-hidden border border-border bg-muted dark:bg-[var(--gh-canvas-subtle,#1e1e1e)]">
-      <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-2 bg-muted/50 border-b border-border">
-        <div className="flex items-center gap-2">
-          <Code2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
-          <span className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground font-medium">
-            {language || 'code'}
-          </span>
-        </div>
-        <IconButton
-          icon={copied ? <Check aria-hidden="true" className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" /> : <Copy aria-hidden="true" className="w-3 h-3 sm:w-4 sm:h-4" />}
-          variant="ghost"
-          size="sm"
-          aria-label="Copy code"
-          onClick={handleCopy}
-        />
-        {copied && <span className="text-gh-success text-[10px] sm:text-xs mr-2">Copied</span>}
-      </div>
-      <SyntaxHighlighter
-        language={language || 'text'}
-        style={vscDarkPlus}
-        customStyle={{ 
-          margin: 0, 
-          padding: '0.75rem', 
-          background: 'transparent',
-          fontSize: '0.75rem',
-          lineHeight: '1.5',
-        }}
-        wrapLines={true}
-        wrapLongLines={true}
-        className="!text-xs sm:!text-sm !p-3 sm:!p-4"
-      >
-        {code}
-      </SyntaxHighlighter>
     </div>
   );
 }

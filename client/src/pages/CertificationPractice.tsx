@@ -345,12 +345,12 @@ export default function CertificationPractice() {
     }
   }, [currentIndex, totalQuestions, isTestCheckpoint, isCheckpointPassed, startTest, onQuestionSwipe]);
 
-  const goToPrev = () => {
+  const goToPrev = useCallback(() => {
     if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+      setCurrentIndex(prev => prev - 1);
       setMobileView('question');
     }
-  };
+  }, [currentIndex]);
 
   const markCompleted = () => {
     if (currentQuestion) {

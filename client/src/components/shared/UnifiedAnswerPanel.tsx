@@ -7,17 +7,16 @@ import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { 
   BookOpen, Lightbulb, Baby, Code2, Play, FileText, 
-  ExternalLink, Copy, Check, ChevronDown, ChevronUp
+  ExternalLink, ChevronDown, ChevronUp
 } from 'lucide-react';
 import type { Question } from '../../types';
 import { cn } from '../../lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import type { SyntaxHighlighterProps } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { EnhancedMermaid } from '../EnhancedMermaid';
 import { YouTubePlayer } from '../YouTubePlayer';
+import { preprocessMarkdown } from '../../lib/markdown-utils';
+import { CodeBlock } from './CodeBlock';
 
 interface UnifiedAnswerPanelProps {
   question: Question;
@@ -27,23 +26,6 @@ interface UnifiedAnswerPanelProps {
 
 type ContentTab = 'answer' | 'diagram' | 'eli5' | 'video';
 
-function preprocessMarkdown(text: string): string {
-  if (!text) return '';
-  let processed = text;
-  
-  // Fix code fences
-  processed = processed.replace(/([^\n])(```)/g, '$1\n$2');
-  processed = processed.replace(/(```\w*)\s*\n?\s*([^\n`])/g, '$1\n$2');
-  
-  // Fix bold markers
-  processed = processed.replace(/^\*\*\s*$/gm, '');
-  processed = processed.replace(/\*\*\s*\n\s*([^*]+)\*\*/g, '**$1**');
-  
-  // Fix bullet points
-  processed = processed.replace(/^[•·]\s*/gm, '- ');
-  
-  return processed;
-}
 
 export function UnifiedAnswerPanel({ 
   question, 
@@ -52,7 +34,6 @@ export function UnifiedAnswerPanel({
 }: UnifiedAnswerPanelProps) {
   const shouldReduceMotion = useReducedMotion();
   const [activeTab, setActiveTab] = useState<ContentTab>('answer');
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['main']));
 
   const hasDiagram = !!question.diagram;
@@ -65,12 +46,6 @@ export function UnifiedAnswerPanel({
     { id: 'eli5', label: 'ELI5', icon: Baby, available: hasEli5 },
     { id: 'video', label: 'Video', icon: Play, available: hasVideo },
   ];
-
-  const handleCopyCode = (code: string, id: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(id);
-    setTimeout(() => setCopiedCode(null), 2000);
-  };
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => {
@@ -154,30 +129,12 @@ export function UnifiedAnswerPanel({
                         code({ className, children, ...props }) {
                           const match = /language-(\w+)/.exec(className || '');
                           const codeString = String(children).replace(/\n$/, '');
-                          const codeId = `code-${Math.random().toString(36).substr(2, 9)}`;
                           const isInline = !match;
 
                           if (!isInline && match) {
                             return (
-                              <div className="relative group my-4">
-                                <button
-                                  onClick={() => handleCopyCode(codeString, codeId)}
-                                  className="absolute top-2 right-2 p-2 rounded-lg bg-secondary/80 hover:bg-secondary transition-all opacity-0 group-hover:opacity-100 z-10"
-                                >
-                                  {copiedCode === codeId ? (
-                                    <Check className="w-4 h-4 text-green-400" />
-                                  ) : (
-                                    <Copy className="w-4 h-4" />
-                                  )}
-                                </button>
-                                <SyntaxHighlighter
-                                  style={vscDarkPlus as SyntaxHighlighterProps['style']}
-                                  language={match[1]}
-                                  PreTag="div"
-                                  className="rounded-xl !bg-black/40 !my-0"
-                                >
-                                  {codeString}
-                                </SyntaxHighlighter>
+                              <div className="my-4">
+                                <CodeBlock code={codeString} language={match[1]} size="compact" />
                               </div>
                             );
                           }

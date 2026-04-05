@@ -9,32 +9,7 @@ import {
   getMasteryLabel, getMasteryColor, getNextReviewPreview,
   type ReviewCard, type ConfidenceRating 
 } from '../lib/spaced-repetition';
-
-/**
- * Renders text with inline code (backticks) as styled code elements
- */
-function renderWithInlineCode(text: string): React.ReactNode {
-  if (!text) return null;
-  
-  // Split by backticks, alternating between text and code
-  const parts = text.split(/`([^`]+)`/g);
-  
-  return parts.map((part, index) => {
-    // Odd indices are code (content between backticks)
-    if (index % 2 === 1) {
-      return (
-        <code 
-          key={index}
-          className="px-1.5 py-0.5 mx-0.5 bg-primary/15 text-primary rounded text-[0.9em] font-mono"
-        >
-          {part}
-        </code>
-      );
-    }
-    // Even indices are regular text
-    return part;
-  });
-}
+import { renderWithInlineCode } from '../lib/markdown-utils';
 
 interface QuestionPanelProps {
   question: Question;

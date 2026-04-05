@@ -19,6 +19,7 @@ import type { Question } from '../../types';
 import { cn } from '../../lib/utils';
 import { QuestionHistoryIcon } from '../unified/QuestionHistory';
 import { memo } from 'react';
+import { renderWithInlineCode, getDifficultyConfig } from '../../lib/markdown-utils';
 
 interface UnifiedQuestionPanelProps {
   question: Question;
@@ -26,56 +27,21 @@ interface UnifiedQuestionPanelProps {
   onRevealAnswer?: () => void;
 }
 
-function renderWithInlineCode(text: string): React.ReactNode {
-  if (!text) return null;
-  const parts = text.split(/`([^`]+)`/g);
-  return parts.map((part, index) => {
-    if (index % 2 === 1) {
-      return (
-        <code 
-          key={index}
-          className="px-2 py-1 mx-1 bg-primary/15 text-primary rounded-lg text-[0.95em] font-mono border border-primary/20"
-        >
-          {part}
-        </code>
-      );
-    }
-    return part;
-  });
-}
-
-const difficultyConfig = {
-  beginner: {
-    color: 'text-green-400',
-    bg: 'bg-green-500/10',
-    border: 'border-green-500/30',
-    icon: Target,
-    label: 'Beginner'
-  },
-  intermediate: {
-    color: 'text-amber-400',
-    bg: 'bg-amber-500/10',
-    border: 'border-amber-500/30',
-    icon: Zap,
-    label: 'Intermediate'
-  },
-  advanced: {
-    color: 'text-red-400',
-    bg: 'bg-red-500/10',
-    border: 'border-red-500/30',
-    icon: Brain,
-    label: 'Advanced'
-  }
-};
-
 export const UnifiedQuestionPanel = memo(function UnifiedQuestionPanel({ 
   question, 
   mode,
   onRevealAnswer 
 }: UnifiedQuestionPanelProps) {
   const shouldReduceMotion = useReducedMotion();
-  const diffConfig = difficultyConfig[question.difficulty as keyof typeof difficultyConfig] || difficultyConfig.intermediate;
-  const DiffIcon = diffConfig.icon;
+  const diffShared = getDifficultyConfig(question.difficulty);
+  const DIFF_ICON_MAP: Record<string, React.ElementType> = { beginner: Target, intermediate: Zap, advanced: Brain };
+  const DiffIcon = DIFF_ICON_MAP[question.difficulty] ?? Target;
+  const diffConfig = {
+    color: diffShared.colorClass,
+    bg: diffShared.bgClass,
+    border: diffShared.borderClass,
+    label: diffShared.label,
+  };
 
   // Stagger animation for children
   const containerVariants: Variants = {
