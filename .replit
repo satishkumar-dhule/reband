@@ -130,6 +130,7 @@ exposeLocalhost = true
 ANTHROPIC_BASE_URL = "http://localhost:4000"
 ANTHROPIC_API_KEY = "_DUMMY_API_KEY_"
 LITELLM_MASTER_KEY = "sk-local-dev-key"
+OPENAI_API_KEY = "_DUMMY_API_KEY_"
 
 [userenv.shared]
 BETTER_AUTH_SECRET = "Mk+ZBSvYL/o7LSymDNxa3EdS32yubRVDa3I0YiMDB4A="
