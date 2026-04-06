@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.mlocate
     pkgs.openai
     pkgs.nettools
     pkgs.xorg.libXft

@@ -1,4 +1,93 @@
 model_list:
+  # ── Anthropic models via Replit proxy ─────────────────────────────────────
+  - model_name: claude-opus-4-6
+    litellm_params:
+      model: anthropic/claude-opus-4-6
+      api_base: os.environ/AI_INTEGRATIONS_ANTHROPIC_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_ANTHROPIC_API_KEY
+
+  - model_name: claude-sonnet-4-6
+    litellm_params:
+      model: anthropic/claude-sonnet-4-6
+      api_base: os.environ/AI_INTEGRATIONS_ANTHROPIC_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_ANTHROPIC_API_KEY
+
+  - model_name: claude-haiku-4-5
+    litellm_params:
+      model: anthropic/claude-haiku-4-5
+      api_base: os.environ/AI_INTEGRATIONS_ANTHROPIC_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_ANTHROPIC_API_KEY
+
+  # ── OpenAI models via Replit proxy ────────────────────────────────────────
+  - model_name: gpt-5.2
+    litellm_params:
+      model: openai/gpt-5.2
+      api_base: os.environ/AI_INTEGRATIONS_OPENAI_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_OPENAI_API_KEY
+
+  - model_name: gpt-5-mini
+    litellm_params:
+      model: openai/gpt-5-mini
+      api_base: os.environ/AI_INTEGRATIONS_OPENAI_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_OPENAI_API_KEY
+
+  - model_name: gpt-5-nano
+    litellm_params:
+      model: openai/gpt-5-nano
+      api_base: os.environ/AI_INTEGRATIONS_OPENAI_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_OPENAI_API_KEY
+
+  - model_name: o4-mini
+    litellm_params:
+      model: openai/o4-mini
+      api_base: os.environ/AI_INTEGRATIONS_OPENAI_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_OPENAI_API_KEY
+
+  # ── Gemini models via Replit proxy ────────────────────────────────────────
+  - model_name: gemini-3.1-pro-preview
+    litellm_params:
+      model: gemini/gemini-3.1-pro-preview
+      api_base: os.environ/AI_INTEGRATIONS_GEMINI_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_GEMINI_API_KEY
+
+  - model_name: gemini-2.5-pro
+    litellm_params:
+      model: gemini/gemini-2.5-pro
+      api_base: os.environ/AI_INTEGRATIONS_GEMINI_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_GEMINI_API_KEY
+
+  - model_name: gemini-2.5-flash
+    litellm_params:
+      model: gemini/gemini-2.5-flash
+      api_base: os.environ/AI_INTEGRATIONS_GEMINI_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_GEMINI_API_KEY
+
+  # ── OpenRouter models via Replit proxy (Llama, Mistral, DeepSeek, etc.) ──
+  - model_name: meta-llama/llama-4-maverick
+    litellm_params:
+      model: openai/meta-llama/llama-4-maverick
+      api_base: os.environ/AI_INTEGRATIONS_OPENROUTER_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_OPENROUTER_API_KEY
+
+  - model_name: deepseek/deepseek-r1
+    litellm_params:
+      model: openai/deepseek/deepseek-r1
+      api_base: os.environ/AI_INTEGRATIONS_OPENROUTER_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_OPENROUTER_API_KEY
+
+  - model_name: mistralai/mistral-large-2
+    litellm_params:
+      model: openai/mistralai/mistral-large-2
+      api_base: os.environ/AI_INTEGRATIONS_OPENROUTER_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_OPENROUTER_API_KEY
+
+  - model_name: x-ai/grok-3
+    litellm_params:
+      model: openai/x-ai/grok-3
+      api_base: os.environ/AI_INTEGRATIONS_OPENROUTER_BASE_URL
+      api_key: os.environ/AI_INTEGRATIONS_OPENROUTER_API_KEY
+
+  # ── Ollama local models (optional, requires Ollama running) ───────────────
   - model_name: qwen-coder
     litellm_params:
       model: ollama/qwen2.5-coder:7b
@@ -6,6 +95,8 @@ model_list:
 
 litellm_settings:
   master_key: sk-local-dev-key
+  drop_params: true
+  set_verbose: false
 
 general_settings:
   disable_prisma: true
