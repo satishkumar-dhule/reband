@@ -23,9 +23,10 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbP
 import { useCredits } from '../context/CreditsContext';
 import { SEOHead } from '@/lib/ui';
 import { Button, IconButton } from '@/lib/ui';
+import { SessionResults, type DomainResult, StudyOptionList } from '@/lib/ui';
 import {
-  ArrowLeft, Award, Target, CheckCircle, XCircle,
-  ChevronRight, ChevronLeft, Lightbulb, BarChart3,
+  ArrowLeft, Award,
+  ChevronRight, ChevronLeft, Lightbulb,
   RotateCcw, Flag, BookOpen, Zap, Trophy, AlertCircle, Home, Clock,
   ChevronsLeft, ChevronsRight, LayoutList
 } from 'lucide-react';
@@ -894,44 +895,19 @@ function ActiveExam({
         </h2>
 
         {/* Options */}
-        <div className="space-y-3 mb-6">
-          {currentQuestion.options.map((option) => {
-            const isSelected = selectedOption === option.id;
-            const showResult = isAnswered && (examMode === 'practice' || examMode === 'review');
-            const isCorrect = option.isCorrect;
-            
-            let variant: 'primary' | 'outline' | 'success' | 'danger' = 'outline';
-            if (showResult) {
-              variant = isCorrect ? 'success' : isSelected ? 'danger' : 'outline';
-            } else if (isSelected) {
-              variant = 'primary';
-            }
-            
-            return (
-              <Button
-                key={option.id}
-                variant={variant}
-                onClick={() => !isAnswered && onSelectOption(option.id)}
-                disabled={isAnswered && examMode !== 'review'}
-                className="w-full justify-start p-4 h-auto"
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                    showResult && isCorrect ? 'border-[var(--gh-success-fg)] bg-[var(--gh-success-fg)]' :
-                    showResult && isSelected && !isCorrect ? 'border-[var(--gh-danger-fg)] bg-[var(--gh-danger-fg)]' :
-                    isSelected ? 'border-primary bg-primary' :
-                    'border-muted-foreground/30'
-                  }`}>
-                    {showResult && isCorrect && <CheckCircle className="w-4 h-4 text-white" />}
-                    {showResult && isSelected && !isCorrect && <XCircle className="w-4 h-4 text-white" />}
-                    {!showResult && isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
-                  </div>
-                  <span className="text-sm leading-relaxed">{option.text}</span>
-                </div>
-              </Button>
-            );
-          })}
-        </div>
+        <StudyOptionList
+          options={currentQuestion.options}
+          selectedIds={selectedOption ? [selectedOption] : []}
+          feedbackState={
+            isAnswered && (examMode === 'practice' || examMode === 'review')
+              ? 'revealing'
+              : 'none'
+          }
+          isMultiple={false}
+          disabled={isAnswered && examMode !== 'review'}
+          onSelect={(id) => !isAnswered && onSelectOption(id)}
+          className="mb-6"
+        />
 
         {/* Explanation */}
         <AnimatePresence>
@@ -1022,134 +998,39 @@ function ResultsScreen({
   certification,
   examConfig,
   results,
-  questions,
-  answers,
   onRetry,
   onReview,
   onBack,
 }: ResultsScreenProps) {
+  const passingScore = examConfig?.passingScore ?? 70;
+
+  const domainResults: DomainResult[] = examConfig
+    ? examConfig.domains
+        .map((domain) => {
+          const dr = results.domainResults[domain.id];
+          if (!dr || dr.total === 0) return null;
+          return { label: domain.name, correct: dr.correct, total: dr.total, percentage: dr.percentage };
+        })
+        .filter((d): d is DomainResult => d !== null)
+    : [];
+
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Result Header */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center py-8"
-        >
-          <div className={`w-24 h-24 mx-auto mb-4 rounded-full flex items-center justify-center ${
-            results.passed 
-              ? 'bg-gradient-to-br from-green-500 to-emerald-600' 
-              : 'bg-gradient-to-br from-red-500 to-rose-600'
-          }`}>
-            {results.passed ? (
-              <Trophy className="w-12 h-12 text-foreground" />
-            ) : (
-              <RotateCcw className="w-12 h-12 text-foreground" />
-            )}
-          </div>
-
-          <h1 className="text-3xl font-bold mb-2">
-            {results.passed ? '🎉 Congratulations!' : 'Keep Practicing!'}
-          </h1>
-          
-          <p className="text-muted-foreground mb-4">
-            {results.passed 
-              ? `You passed the ${certification.name} practice exam!`
-              : `You need ${examConfig?.passingScore || 70}% to pass. Keep studying!`
-            }
-          </p>
-
-          {/* Score Circle */}
-          <div className="relative w-32 h-32 mx-auto mb-6">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle
-                cx="64"
-                cy="64"
-                r="56"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                className="text-muted"
-              />
-              <circle
-                cx="64"
-                cy="64"
-                r="56"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                strokeDasharray={`${results.percentage * 3.52} 352`}
-                className={results.passed ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'}
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-bold">{results.percentage}%</span>
-              <span className="text-xs text-muted-foreground">
-                {results.correct}/{results.total}
-              </span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-card border border-border rounded-xl p-4 text-center">
-            <Target className="w-5 h-5 mx-auto mb-2 text-primary" />
-            <div className="text-2xl font-bold">{results.correct}</div>
-            <div className="text-xs text-muted-foreground">Correct</div>
-          </div>
-          <div className="bg-card border border-border rounded-xl p-4 text-center">
-            <Trophy className="w-5 h-5 mx-auto mb-2 text-primary" />
-            <div className="text-2xl font-bold">{results.avgTime}s</div>
-            <div className="text-xs text-muted-foreground">Avg Time</div>
-          </div>
-          <div className="bg-card border border-border rounded-xl p-4 text-center">
-            <BarChart3 className="w-5 h-5 mx-auto mb-2 text-primary" />
-            <div className="text-2xl font-bold">{examConfig?.passingScore || 70}%</div>
-            <div className="text-xs text-muted-foreground">Pass Mark</div>
-          </div>
-        </div>
-
-        {/* Domain Breakdown */}
-        {examConfig && Object.keys(results.domainResults).length > 0 && (
-          <div className="bg-card border border-border rounded-xl p-4 mb-6">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-primary" />
-              Domain Performance
-            </h3>
-            <div className="space-y-3">
-              {examConfig.domains.map(domain => {
-                const domainResult = results.domainResults[domain.id];
-                if (!domainResult || domainResult.total === 0) return null;
-                
-                return (
-                  <div key={domain.id}>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-muted-foreground">{domain.name}</span>
-                      <span className={`font-medium ${
-                        domainResult.percentage >= 70 ? 'text-[var(--gh-success-fg)]' : 'text-[var(--gh-danger-fg)]'
-                      }`}>
-                        {domainResult.correct}/{domainResult.total} ({domainResult.percentage}%)
-                      </span>
-                    </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full rounded-full transition-all ${
-                          domainResult.percentage >= 70 ? 'bg-[var(--gh-success-fg)]' : 'bg-[var(--gh-danger-fg)]'
-                        }`}
-                        style={{ width: `${domainResult.percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="space-y-3">
+    <SessionResults
+      score={results.percentage}
+      correct={results.correct}
+      total={results.total}
+      passed={results.passed}
+      passingScore={passingScore}
+      elapsedSeconds={results.totalTime}
+      domainResults={domainResults}
+      title={results.passed ? `${certification.name} — Passed!` : `${certification.name} — Keep Practicing`}
+      subtitle={
+        results.passed
+          ? `You scored ${results.percentage}% — great work!`
+          : `You need ${passingScore}% to pass. You scored ${results.percentage}%.`
+      }
+      actions={
+        <>
           <Button
             onClick={onReview}
             size="lg"
@@ -1158,7 +1039,6 @@ function ResultsScreen({
           >
             Review Answers
           </Button>
-          
           <Button
             variant="secondary"
             onClick={onRetry}
@@ -1168,7 +1048,6 @@ function ResultsScreen({
           >
             Try Again
           </Button>
-          
           <Button
             variant="ghost"
             onClick={onBack}
@@ -1176,8 +1055,8 @@ function ResultsScreen({
           >
             Back to Certification
           </Button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    />
   );
 }

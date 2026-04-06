@@ -6,12 +6,12 @@ import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, ArrowRight, CheckCircle, XCircle, Trophy,
-  Home, Check, X, Zap
+  ArrowLeft, ArrowRight, Trophy,
+  Home, Zap
 } from 'lucide-react';
 import { SEOHead } from '@/lib/ui';
 import { getDifficultyClasses } from '@/lib/difficulty';
-import { DesktopSidebarWrapper, SessionResults } from '@/lib/ui';
+import { DesktopSidebarWrapper, SessionResults, StudyOptionList } from '@/lib/ui';
 import { GenZCard, GenZButton, GenZProgress, GenZTimer } from '@/lib/ui';
 import { Button } from '@/lib/ui';
 import {
@@ -42,13 +42,14 @@ const QuestionDisplay = memo(function QuestionDisplay({
   onOptionSelect,
 }: QuestionDisplayProps) {
   const isMultiple = question.type === 'multiple';
-  
+  const selectedIds = answers[question.id] || [];
+
   return (
     <>
       <div className="flex items-center gap-2 mb-3">
         <span className={`px-2 py-0.5 text-xs uppercase rounded ${
-          isMultiple 
-            ? 'bg-destructive/20 text-destructive' 
+          isMultiple
+            ? 'bg-destructive/20 text-destructive'
             : 'bg-cyan-500/20 text-cyan-400'
         }`}>
           {isMultiple ? 'Select all that apply' : 'Single choice'}
@@ -60,56 +61,14 @@ const QuestionDisplay = memo(function QuestionDisplay({
 
       <h2 className="text-lg font-bold mb-6">{question.question}</h2>
 
-      <div className="space-y-2">
-        {question.options.map((option) => {
-          const isSelected = (answers[question.id] || []).includes(option.id);
-          const showCorrect = showFeedback && option.isCorrect;
-          const showWrong = showFeedback === 'incorrect' && isSelected && !option.isCorrect;
-          
-          return (
-            <Button
-              key={option.id}
-              onClick={() => onOptionSelect(option.id)}
-              disabled={showFeedback !== null}
-              variant={showCorrect ? 'success' : showWrong ? 'danger' : isSelected ? 'outline' : 'ghost'}
-              size="md"
-              fullWidth
-              className={`justify-start p-3 md:p-4 h-auto text-left min-h-[44px] ${
-                showCorrect
-                  ? 'border-primary bg-primary/20'
-                  : showWrong
-                  ? 'border-destructive bg-destructive/20'
-                  : isSelected
-                  ? 'border-primary bg-primary/10'
-                  : 'border-border hover:border-primary/50'
-              } ${showFeedback ? 'cursor-default' : ''}`}
-            >
-              <div className="flex items-start gap-3">
-                <div className={`w-6 h-6 ${isMultiple ? 'rounded-md' : 'rounded-full'} border-2 flex items-center justify-center flex-shrink-0 ${
-                  showCorrect
-                    ? 'border-primary bg-primary'
-                    : showWrong
-                    ? 'border-destructive bg-destructive'
-                    : isSelected 
-                    ? 'border-primary bg-primary' 
-                    : 'border-border'
-                }`}>
-                  {showCorrect && <Check className="w-4 h-4 text-black" />}
-                  {showWrong && <X className="w-4 h-4 text-foreground" />}
-                  {!showFeedback && isSelected && <Check className="w-4 h-4 text-black" />}
-                </div>
-                <span className="text-sm">{option.text}</span>
-              </div>
-            </Button>
-          );
-        })}
-      </div>
-      
-      {isMultiple && !showFeedback && (
-        <p className="mt-3 text-xs text-muted-foreground text-center">
-          Select all correct answers, then click "Confirm" to continue
-        </p>
-      )}
+      <StudyOptionList
+        options={question.options}
+        selectedIds={selectedIds}
+        feedbackState={showFeedback !== null ? 'revealing' : 'none'}
+        isMultiple={isMultiple}
+        disabled={showFeedback !== null}
+        onSelect={onOptionSelect}
+      />
     </>
   );
 });
