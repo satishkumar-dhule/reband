@@ -1,0 +1,317 @@
+{
+  "stats": [
+    {
+      "botName": "unified-content",
+      "totalRuns": 3,
+      "successfulRuns": 2,
+      "totalCreated": 0,
+      "totalUpdated": 0,
+      "totalDeleted": 0,
+      "lastRun": "2026-04-05T16:12:56.632Z"
+    }
+  ],
+  "runs": [
+    {
+      "id": 3,
+      "botName": "unified-content",
+      "startedAt": "2026-04-05T16:12:56.632Z",
+      "completedAt": "2026-04-05T16:19:42.917Z",
+      "status": "completed",
+      "itemsProcessed": 0,
+      "itemsCreated": 0,
+      "itemsUpdated": 0,
+      "itemsDeleted": 0,
+      "summary": {
+        "results": {
+          "success": 11,
+          "failed": 1,
+          "byType": {
+            "question": {
+              "success": 3,
+              "failed": 0
+            },
+            "challenge": {
+              "success": 3,
+              "failed": 0
+            },
+            "certification": {
+              "success": 2,
+              "failed": 1
+            },
+            "test": {
+              "success": 3,
+              "failed": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "botName": "unified-content",
+      "startedAt": "2026-04-05T16:10:03.328Z",
+      "completedAt": "2026-04-05T16:12:04.634Z",
+      "status": "completed",
+      "itemsProcessed": 0,
+      "itemsCreated": 0,
+      "itemsUpdated": 0,
+      "itemsDeleted": 0,
+      "summary": {
+        "results": {
+          "success": 4,
+          "failed": 0,
+          "byType": {
+            "question": {
+              "success": 1,
+              "failed": 0
+            },
+            "challenge": {
+              "success": 1,
+              "failed": 0
+            },
+            "certification": {
+              "success": 1,
+              "failed": 0
+            },
+            "test": {
+              "success": 1,
+              "failed": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": 1,
+      "botName": "unified-content",
+      "startedAt": "2026-04-05T16:09:33.393Z",
+      "completedAt": null,
+      "status": "running",
+      "itemsProcessed": 0,
+      "itemsCreated": 0,
+      "itemsUpdated": 0,
+      "itemsDeleted": 0,
+      "summary": null
+    }
+  ],
+  "queue": [
+    {
+      "id": 4,
+      "itemType": "question",
+      "itemId": "q-4",
+      "action": "verify",
+      "priority": 3,
+      "status": "pending",
+      "reason": null,
+      "createdBy": "creator",
+      "createdAt": "2026-04-05T16:14:19.865Z"
+    },
+    {
+      "id": 3,
+      "itemType": "question",
+      "itemId": "q-3",
+      "action": "verify",
+      "priority": 3,
+      "status": "pending",
+      "reason": null,
+      "createdBy": "creator",
+      "createdAt": "2026-04-05T16:13:52.336Z"
+    },
+    {
+      "id": 2,
+      "itemType": "question",
+      "itemId": "q-2",
+      "action": "verify",
+      "priority": 3,
+      "status": "pending",
+      "reason": null,
+      "createdBy": "creator",
+      "createdAt": "2026-04-05T16:13:26.816Z"
+    },
+    {
+      "id": 1,
+      "itemType": "question",
+      "itemId": "q-1",
+      "action": "verify",
+      "priority": 3,
+      "status": "pending",
+      "reason": null,
+      "createdBy": "creator",
+      "createdAt": "2026-04-05T16:10:27.369Z"
+    }
+  ],
+  "ledger": [
+    {
+      "id": 19,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "test",
+      "itemId": "test-1775405980911",
+      "reason": "Generated Quick Test MCQ",
+      "createdAt": "2026-04-05T16:19:40.911Z"
+    },
+    {
+      "id": 18,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "test",
+      "itemId": "test-1775405969309",
+      "reason": "Generated Quick Test MCQ",
+      "createdAt": "2026-04-05T16:19:29.309Z"
+    },
+    {
+      "id": 17,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "test",
+      "itemId": "test-1775405959236",
+      "reason": "Generated Quick Test MCQ",
+      "createdAt": "2026-04-05T16:19:19.236Z"
+    },
+    {
+      "id": 16,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "certification",
+      "itemId": "certification-1775405889503",
+      "reason": "Generated Certification MCQ",
+      "createdAt": "2026-04-05T16:18:09.503Z"
+    },
+    {
+      "id": 15,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "certification",
+      "itemId": "certification-1775405831428",
+      "reason": "Generated Certification MCQ",
+      "createdAt": "2026-04-05T16:17:11.428Z"
+    },
+    {
+      "id": 14,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "challenge",
+      "itemId": "challenge-1775405777986",
+      "reason": "Generated Coding Challenge",
+      "createdAt": "2026-04-05T16:16:17.986Z"
+    },
+    {
+      "id": 13,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "challenge",
+      "itemId": "challenge-1775405746053",
+      "reason": "Generated Coding Challenge",
+      "createdAt": "2026-04-05T16:15:46.053Z"
+    },
+    {
+      "id": 12,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "challenge",
+      "itemId": "challenge-1775405705329",
+      "reason": "Generated Coding Challenge",
+      "createdAt": "2026-04-05T16:15:05.329Z"
+    },
+    {
+      "id": 11,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "question",
+      "itemId": "q-4",
+      "reason": "Generated Interview Question",
+      "createdAt": "2026-04-05T16:14:19.868Z"
+    },
+    {
+      "id": 10,
+      "botName": "creator",
+      "action": "create",
+      "itemType": "question",
+      "itemId": "q-4",
+      "reason": "Created by Creator Bot",
+      "createdAt": "2026-04-05T16:14:19.861Z"
+    },
+    {
+      "id": 9,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "question",
+      "itemId": "q-3",
+      "reason": "Generated Interview Question",
+      "createdAt": "2026-04-05T16:13:52.339Z"
+    },
+    {
+      "id": 8,
+      "botName": "creator",
+      "action": "create",
+      "itemType": "question",
+      "itemId": "q-3",
+      "reason": "Created by Creator Bot",
+      "createdAt": "2026-04-05T16:13:52.334Z"
+    },
+    {
+      "id": 7,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "question",
+      "itemId": "q-2",
+      "reason": "Generated Interview Question",
+      "createdAt": "2026-04-05T16:13:26.819Z"
+    },
+    {
+      "id": 6,
+      "botName": "creator",
+      "action": "create",
+      "itemType": "question",
+      "itemId": "q-2",
+      "reason": "Created by Creator Bot",
+      "createdAt": "2026-04-05T16:13:26.812Z"
+    },
+    {
+      "id": 5,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "test",
+      "itemId": "test-1775405522597",
+      "reason": "Generated Quick Test MCQ",
+      "createdAt": "2026-04-05T16:12:02.597Z"
+    },
+    {
+      "id": 4,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "certification",
+      "itemId": "certification-1775405511336",
+      "reason": "Generated Certification MCQ",
+      "createdAt": "2026-04-05T16:11:51.336Z"
+    },
+    {
+      "id": 3,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "challenge",
+      "itemId": "challenge-1775405471287",
+      "reason": "Generated Coding Challenge",
+      "createdAt": "2026-04-05T16:11:11.287Z"
+    },
+    {
+      "id": 2,
+      "botName": "unified-content",
+      "action": "create",
+      "itemType": "question",
+      "itemId": "q-1",
+      "reason": "Generated Interview Question",
+      "createdAt": "2026-04-05T16:10:27.371Z"
+    },
+    {
+      "id": 1,
+      "botName": "creator",
+      "action": "create",
+      "itemType": "question",
+      "itemId": "q-1",
+      "reason": "Created by Creator Bot",
+      "createdAt": "2026-04-05T16:10:27.366Z"
+    }
+  ],
+  "generatedAt": "2026-04-06T06:31:17.550Z"
+}
