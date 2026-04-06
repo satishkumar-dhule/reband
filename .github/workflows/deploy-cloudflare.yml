@@ -159,12 +159,32 @@ jobs:
       - name: Setup Node & pnpm
         uses: ./.github/actions/setup-node-pnpm
 
+      - name: Ensure Cloudflare Pages project exists
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/devprep-pages")
+          if [ "$STATUS" = "404" ]; then
+            echo "Project not found, creating devprep-pages..."
+            curl -s -X POST \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data '{"name":"devprep-pages","production_branch":"main"}' \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" | jq '.success'
+            echo "Project created."
+          else
+            echo "Project devprep-pages already exists (HTTP $STATUS)."
+          fi
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Deploy to Cloudflare Pages (staging)
         run: |
           npx wrangler pages deploy dist/public \
             --project-name=devprep-pages \
             --branch=staging \
-            --commit-dirty=false
+            --commit-dirty=true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -198,7 +218,7 @@ jobs:
           npx wrangler pages deploy dist/public \
             --project-name=devprep-pages \
             --branch=main \
-            --commit-dirty=false
+            --commit-dirty=true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
