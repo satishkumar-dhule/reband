@@ -1,0 +1,28 @@
+/*
+  Cloudflare Pages SPA routing rules.
+  All non-asset requests fall back to index.html for client-side routing.
+*/
+/* _redirects file for Cloudflare Pages */
+/* Format: from  to  status  conditions */
+
+/* API routes handled by Functions (worker) */
+/api/*  /api/:splat  200
+
+/* Go API proxy */
+/go-api/*  /go-api/:splat  200
+
+/* Static assets - serve directly */
+/assets/*  /assets/:splat  200
+/data/*  /data/:splat  200
+/*.png  /*.png  200
+/*.jpg  /*.jpg  200
+/*.svg  /*.svg  200
+/*.ico  /*.ico  200
+/*.webmanifest  /*.webmanifest  200
+/*.css  /*.css  200
+/*.js  /*.js  200
+/robots.txt  /robots.txt  200
+/sitemap.xml  /sitemap.xml  200
+
+/* SPA fallback - everything else goes to index.html */
+/*  /index.html  200

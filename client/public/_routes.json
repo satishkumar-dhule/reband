@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "include": ["/api/*", "/go-api/*"],
+  "exclude": ["/assets/*", "/data/*", "/*.png", "/*.jpg", "/*.svg", "/*.ico", "/*.css", "/*.js", "/robots.txt", "/sitemap.xml"]
+}

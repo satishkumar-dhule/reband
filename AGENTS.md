@@ -20,9 +20,11 @@ This project uses a **supervisor-delegate pattern**. The main Replit agent acts 
 **Theme**: GitHub design system (Primer-inspired, GitHub color tokens, system font stack)
 **Stack**: React 19 + Vite 7 + TypeScript 5 + Tailwind CSS 4 + shadcn/ui
 **Database**: Local SQLite (`file:local.db`) — Turso sync for remote backup
-**Deployment**: **GitHub Pages (static SPA, zero backend servers in production)**
-- Staging: `https://stage-open-interview.github.io`
-- Production: `https://open-interview.github.io`
+**Deployment**: **GitHub Pages** or **Cloudflare Pages** (static SPA, zero backend servers in production)
+- GitHub Pages Staging: `https://stage-open-interview.github.io`
+- GitHub Pages Production: `https://open-interview.github.io`
+- Cloudflare Pages Staging: `https://staging.devprep-pages.pages.dev`
+- Cloudflare Pages Production: `https://devprep-pages.pages.dev`
 **Data strategy**: DB is source of truth → build-time export to `public/data/*.json` → SPA fetches static JSON
 **Package**: `code-reels`
 
@@ -30,12 +32,13 @@ This project uses a **supervisor-delegate pattern**. The main Replit agent acts 
 
 ## Architecture Principles (Iron Laws)
 
-### 1. Static-First (GitHub Pages)
-- Production runs with **NO backend server** — pure static files served by GitHub Pages
+### 1. Static-First (GitHub Pages / Cloudflare Pages)
+- Production runs with **NO backend server** — pure static files served by GitHub Pages or Cloudflare Pages
 - All dynamic data (questions, channels, paths) is **exported from DB at build time** to `public/data/*.json`
 - Frontend fetches static JSON in production (`/data/channels.json`, `/data/channel-<id>.json`, etc.)
 - In development, frontend proxies `/api/*` to Express server (port 5173)
 - Use `IS_STATIC` env flag (`VITE_STATIC_MODE=true`) to switch data fetching strategy
+- **Cloudflare Pages Functions** (`functions/` directory) provide optional API layer with Hono for dynamic routes when DB is configured via Turso HTTP or D1
 
 ### 2. DB as Single Source of Truth
 - All content lives in SQLite/Turso — **never hardcode question/answer data in React**
@@ -87,8 +90,9 @@ Action: <specific redo instruction>
 
 ---
 
-## Build Pipeline (Static GitHub Pages)
+## Build Pipeline (Static GitHub Pages / Cloudflare Pages)
 
+### GitHub Pages
 ```bash
 # Full static build (run before deploying)
 node script/fetch-questions-for-build.js    # DB → public/data/*.json
@@ -101,6 +105,21 @@ tsx script/deploy-pages.ts                  # push dist/ to gh-pages branch
 ```
 
 npm script: `npm run build:static`
+
+### Cloudflare Pages
+```bash
+# Full build + deploy to Cloudflare Pages
+npm run build:static                        # data export + Vite build
+npx wrangler pages deploy dist/public \     # deploy to Cloudflare
+  --project-name=devprep-pages \
+  --branch=main
+```
+
+npm scripts:
+- `npm run build:cf` — Full static build + worker compilation
+- `npm run deploy:cf` — Deploy to Cloudflare Pages production
+- `npm run deploy:cf:staging` — Deploy to Cloudflare Pages staging
+- `npm run dev:worker` — Local dev with wrangler Pages Functions
 
 ---
 
@@ -371,12 +390,22 @@ client/src/App.tsx        React app with routing (wouter)
 client/src/lib/           Core business logic
 client/src/pages/          All pages
 client/src/components/    All UI components
+functions/                Cloudflare Pages Functions (Hono API)
+  api/[[all]].ts          Main API router (all /api/* routes)
+  go-api/[[all]].ts       Proxy to Go API service
+worker/                   Cloudflare Worker utilities
+  index.ts                Hono app with all API routes + static JSON fallback
+  cache.ts                LRU cache with gzip compression
+  db.ts                   Turso HTTP / D1 database adapters
 script/                   Build & data scripts (100+ utility scripts)
 .github/workflows/        GitHub Actions CI/CD
+  deploy-app.yml          GitHub Pages deployment
+  deploy-cloudflare.yml   Cloudflare Pages deployment
 .opencode/agents/         All opencode agent definitions
 .agents/skills/           All agent skills
 CONTENT_STANDARDS.md      Content quality rules (all content agents must read this)
 UNIFIED_CONTROLS_SPEC.md  Unified controls specification
+wrangler.toml             Cloudflare Pages + Workers configuration
 ```
 
 ---
@@ -386,6 +415,7 @@ UNIFIED_CONTROLS_SPEC.md  Unified controls specification
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | `deploy-app.yml` | Push to main | Deploy static SPA to GitHub Pages (with staging) |
+| `deploy-cloudflare.yml` | Push to main | Deploy static SPA + Functions to Cloudflare Pages |
 | `deploy-blog.yml` | Push to main | Deploy blog to GitHub Pages |
 | `content-generation.yml` | Scheduled | Generate new content via coordinator |
 | `daily-maintenance.yml` | Daily | DB cleanup, duplicate check |
@@ -398,9 +428,21 @@ UNIFIED_CONTROLS_SPEC.md  Unified controls specification
 
 ---
 
-## Last Session Summary (April 1, 2026)
+## Last Session Summary (April 6, 2026)
 
 ### Key Changes Applied
+- **Cloudflare Deployment**: Full Cloudflare Pages + Workers support added
+  - `wrangler.toml` configuration for Pages + Functions
+  - `functions/api/[[all]].ts` — Hono-based API router (all endpoints from Express)
+  - `functions/go-api/[[all]].ts` — Proxy to Go API service
+  - `worker/index.ts` — Complete Hono app with 40+ API routes
+  - `worker/cache.ts` — LRU cache with CompressionStream gzip support
+  - `worker/db.ts` — Turso HTTP / D1 database adapters
+  - Static JSON fallback when no DB configured
+  - `_routes.json` and `_redirects` for SPA routing
+  - `.github/workflows/deploy-cloudflare.yml` — CI/CD for Cloudflare
+  - npm scripts: `build:cf`, `deploy:cf`, `deploy:cf:staging`, `dev:worker`
+  - Dependencies: `hono`, `wrangler`, `@cloudflare/workers-types`
 - **Architecture**: Migrated to local SQLite (`file:local.db`), implemented static-first GitHub Pages deployment
 - **Features Added**: Flashcards system with SRS (spaced repetition), Coding challenges pipeline
 - **GitHub Theme**: Full GitHub design system integration with CSS variables and dark/light mode
@@ -421,5 +463,5 @@ UNIFIED_CONTROLS_SPEC.md  Unified controls specification
 
 ---
 
-Last Updated: 2026-04-01
+Last Updated: 2026-04-06
 Maintained by: devprep-tech-writer agent + supervisor
