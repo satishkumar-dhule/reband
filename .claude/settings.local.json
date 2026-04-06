@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la /home/runner/workspace/.env*)",
+      "Bash(xargs basename:*)",
+      "Bash(grep -r \"export function\" /home/runner/workspace/client/src/lib/*.ts)"
+    ]
+  }
+}
