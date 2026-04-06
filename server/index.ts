@@ -7,6 +7,8 @@ import { setupCodexBridge } from "./codex-bridge";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { ensureTablesExist } from "./db-init";
+import { applyPerformancePragmas } from "./db";
+import { warmAllCaches } from "./cache-warmer";
 import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -109,15 +111,24 @@ declare module "http" {
   }
 }
 
-// Gzip/Brotli compression for all responses — 60-70% smaller payloads
+// Gzip compression for all responses — 60-70% smaller payloads
+// threshold: 512 bytes — compress even small API responses (JSON arrays)
+// level: 6 — good balance of speed vs compression ratio
 app.use(compression({
   level: 6,
-  threshold: 1024,
+  threshold: 512,
   filter: (req: Request, res: Response) => {
     if (req.headers['x-no-compression']) return false;
     return compression.filter(req, res);
   },
 }));
+
+// Keep-alive + performance headers on every response
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  res.set("Connection", "keep-alive");
+  res.set("Keep-Alive", "timeout=60, max=1000");
+  next();
+});
 
 // Security headers — Content Security Policy and other hardening
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -198,9 +209,13 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Ensure all DB tables exist before serving any requests
+  // 1. Apply SQLite performance PRAGMAs first (WAL mode, 64MB cache, mmap)
+  await applyPerformancePragmas();
+
+  // 2. Ensure all DB tables + indexes exist
   await ensureTablesExist();
 
+  // 3. Register routes
   await registerRoutes(httpServer, app);
   await registerAuthRoutes(httpServer, app);
   registerAIRoutes(app);
@@ -240,6 +255,12 @@ app.use((req, res, next) => {
       if (process.env.NODE_ENV !== "production") {
         startAnthropicProxy();
       }
+      // Pre-warm all caches in the background — non-blocking.
+      // Any request arriving before warm-up completes will hit the DB once,
+      // then cache for all subsequent requests.
+      warmAllCaches().catch((err) => {
+        console.warn("[cache-warmer] Background warm-up failed:", err);
+      });
     },
   );
 

@@ -1,6 +1,6 @@
 /**
- * Database initialization — ensures all required tables exist before the server handles any request.
- * Safe to call on every startup (uses CREATE TABLE IF NOT EXISTS).
+ * Database initialization — ensures all required tables and indexes exist.
+ * Safe to call on every startup (uses CREATE TABLE/INDEX IF NOT EXISTS).
  */
 import { client } from "./db";
 
@@ -229,21 +229,71 @@ export async function ensureTablesExist(): Promise<void> {
     created_at TEXT
   )`);
 
-  // Indexes (ignore errors if already exist — IF NOT EXISTS handles it)
+  // ─── Indexes ────────────────────────────────────────────────────────────────
+  // Covering indexes are ordered to match the WHERE + GROUP BY + ORDER BY
+  // clauses in the most frequently executed queries.
   const indexes = [
+    // Basic column indexes (kept for backward compat)
     `CREATE INDEX IF NOT EXISTS idx_questions_channel ON questions(channel)`,
     `CREATE INDEX IF NOT EXISTS idx_questions_difficulty ON questions(difficulty)`,
     `CREATE INDEX IF NOT EXISTS idx_questions_status ON questions(status)`,
-    `CREATE INDEX IF NOT EXISTS idx_questions_channel_status ON questions(channel, status)`,
+
+    // ── COVERING indexes — eliminate table-lookups for hot queries ──────────
+
+    // /api/channels  → SELECT channel, COUNT(*) … WHERE status != ? GROUP BY channel
+    `CREATE INDEX IF NOT EXISTS idx_questions_status_channel
+       ON questions(status, channel)`,
+
+    // /api/stats     → SELECT channel, difficulty, COUNT(*) … WHERE status != ?
+    //                  GROUP BY channel, difficulty
+    // Covering (status, channel, difficulty) lets SQLite resolve the whole
+    // query from the index without touching the main B-tree rows.
+    `CREATE INDEX IF NOT EXISTS idx_questions_stats_covering
+       ON questions(status, channel, difficulty)`,
+
+    // /api/questions?channel=X  → WHERE channel=? AND status != ? ORDER BY created_at
+    `CREATE INDEX IF NOT EXISTS idx_questions_channel_status_created
+       ON questions(channel, status, created_at)`,
+
+    // /api/questions?channel=X&subChannel=Y
+    `CREATE INDEX IF NOT EXISTS idx_questions_channel_sub_status
+       ON questions(channel, sub_channel, status)`,
+
+    // /api/questions?channel=X&difficulty=Y
+    `CREATE INDEX IF NOT EXISTS idx_questions_channel_diff_status
+       ON questions(channel, difficulty, status)`,
+
+    // /api/question/random, /api/question/:id
+    `CREATE INDEX IF NOT EXISTS idx_questions_channel_status_id
+       ON questions(channel, status, id)`,
+
+    // /api/certifications  → WHERE status = ?
     `CREATE INDEX IF NOT EXISTS idx_certifications_status ON certifications(status)`,
     `CREATE INDEX IF NOT EXISTS idx_certifications_category ON certifications(category)`,
-    `CREATE INDEX IF NOT EXISTS idx_learning_paths_status ON learning_paths(status)`,
+
+    // /api/learning-paths  → WHERE status = 'active' ORDER BY popularity DESC
+    `CREATE INDEX IF NOT EXISTS idx_learning_paths_status_pop
+       ON learning_paths(status, popularity DESC)`,
     `CREATE INDEX IF NOT EXISTS idx_learning_paths_path_type ON learning_paths(path_type)`,
+
+    // /api/user/sessions
     `CREATE INDEX IF NOT EXISTS idx_user_sessions_status ON user_sessions(status)`,
     `CREATE INDEX IF NOT EXISTS idx_user_sessions_session_key ON user_sessions(session_key)`,
+    `CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id)`,
+
+    // /api/history
     `CREATE INDEX IF NOT EXISTS idx_question_history_question_id ON question_history(question_id)`,
+
+    // /api/coding/challenges
     `CREATE INDEX IF NOT EXISTS idx_coding_challenges_difficulty ON coding_challenges(difficulty)`,
     `CREATE INDEX IF NOT EXISTS idx_coding_challenges_category ON coding_challenges(category)`,
+
+    // /api/flashcards/:channelId → WHERE channel = ? AND status = ?
+    `CREATE INDEX IF NOT EXISTS idx_flashcards_channel_status
+       ON flashcards(channel, status)`,
+
+    // /api/voice-sessions → WHERE channel = ?
+    `CREATE INDEX IF NOT EXISTS idx_voice_sessions_channel ON voice_sessions(channel)`,
   ];
 
   for (const sql of indexes) {

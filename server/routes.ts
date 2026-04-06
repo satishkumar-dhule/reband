@@ -4,6 +4,7 @@ import { client } from "./db";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { gzipSync } from "zlib";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, "..", "client", "public", "data");
@@ -17,14 +18,22 @@ async function readDataFile(filename: string): Promise<any | null> {
   }
 }
 
-const MAX_CACHE_SIZE = 500;
+const MAX_CACHE_SIZE = 1000;
 const CACHE_TTL = 3_600_000; // 1 hour in-memory TTL
 
-// LRU cache with ETag support
-const channelCache = new Map<string, { data: any; timestamp: number; etag: string }>();
+// LRU cache — stores pre-serialized JSON and pre-compressed gzip bytes.
+// This eliminates BOTH JSON.stringify and gzip compression from the hot request path.
+// The only work done per request is a Map lookup, an ETag compare, and a Buffer write.
+interface CacheEntry {
+  data: any;
+  json: string;        // raw JSON string (used for non-gzip clients)
+  gzipped: Buffer;     // pre-compressed gzip bytes (sent directly to gzip clients)
+  etag: string;
+  timestamp: number;
+}
+const channelCache = new Map<string, CacheEntry>();
 
-function makeETag(data: any): string {
-  const str = JSON.stringify(data);
+function makeETagFromStr(str: string): string {
   let hash = 5381;
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
@@ -32,33 +41,64 @@ function makeETag(data: any): string {
   return `"${(hash >>> 0).toString(36)}"`;
 }
 
+function buildEntry(data: any): Omit<CacheEntry, "timestamp"> {
+  const json = JSON.stringify(data);
+  const etag = makeETagFromStr(json);
+  // Pre-compress at level 6 — done once, paid back on every subsequent request
+  let gzipped: Buffer;
+  try {
+    gzipped = gzipSync(json, { level: 6 });
+  } catch {
+    gzipped = Buffer.from(json, "utf-8");
+  }
+  return { data, json, gzipped, etag };
+}
+
 interface CacheResult<T> {
   data: T;
+  json: string;
+  gzipped: Buffer;
   etag: string;
+}
+
+/**
+ * Inject a pre-warmed entry into the shared cache (called by cache-warmer.ts).
+ * JSON serialization + gzip compression happen here (once), not per request.
+ */
+export function setCacheEntry(key: string, data: any): void {
+  if (channelCache.size >= MAX_CACHE_SIZE) {
+    const firstKey = channelCache.keys().next().value;
+    if (firstKey) channelCache.delete(firstKey);
+  }
+  channelCache.set(key, { ...buildEntry(data), timestamp: Date.now() });
 }
 
 async function getCached<T>(key: string, fetchFn: () => Promise<T>): Promise<CacheResult<T>> {
   const cached = channelCache.get(key);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    // LRU: move to end
     channelCache.delete(key);
     channelCache.set(key, cached);
-    return { data: cached.data as T, etag: cached.etag };
+    return { data: cached.data as T, json: cached.json, gzipped: cached.gzipped, etag: cached.etag };
   }
   const data = await fetchFn();
+  const entry = buildEntry(data);
   if (channelCache.size >= MAX_CACHE_SIZE) {
     const firstKey = channelCache.keys().next().value;
     if (firstKey) channelCache.delete(firstKey);
   }
-  const etag = makeETag(data);
-  channelCache.set(key, { data, timestamp: Date.now(), etag });
-  return { data, etag };
+  channelCache.set(key, { ...entry, timestamp: Date.now() });
+  return { data, json: entry.json, gzipped: entry.gzipped, etag: entry.etag };
 }
 
 function invalidateChannelCache(): void {
   channelCache.clear();
 }
 
-// Send JSON with ETag + aggressive HTTP caching; sends 304 if client has current version
+// Send pre-compressed JSON with ETag + aggressive HTTP caching.
+// For gzip-capable clients: sends pre-compressed bytes directly (zero compression work).
+// For other clients: sends raw JSON string.
+// Express compression middleware is bypassed by setting Content-Encoding explicitly.
 function sendCached(req: any, res: any, result: CacheResult<any>, maxAgeSeconds = 3600) {
   res.set("ETag", result.etag);
   res.set("Vary", "Accept-Encoding");
@@ -67,7 +107,18 @@ function sendCached(req: any, res: any, result: CacheResult<any>, maxAgeSeconds 
     return;
   }
   res.set("Cache-Control", `public, max-age=${maxAgeSeconds}, stale-while-revalidate=86400`);
-  res.json(result.data);
+  res.set("Content-Type", "application/json; charset=utf-8");
+
+  const acceptsGzip = (req.headers["accept-encoding"] || "").includes("gzip");
+  if (acceptsGzip) {
+    // Send pre-compressed bytes — Express compression middleware is bypassed
+    // because Content-Encoding is set before Express can intercept.
+    res.set("Content-Encoding", "gzip");
+    res.set("Content-Length", result.gzipped.length);
+    res.end(result.gzipped);
+  } else {
+    res.send(result.json);
+  }
 }
 
 // Safe JSON.parse wrapper to prevent crashes from malformed data
