@@ -1,26 +1,20 @@
 name: 🧪 Manual E2E Tests
 
-# Run E2E tests manually with custom options
-
 on:
   workflow_dispatch:
     inputs:
       pattern:
-        description: 'Test file or grep pattern (e.g., "e2e/home.spec.ts" or "search")'
+        description: 'Test file or grep pattern (e.g. "e2e/home.spec.ts" or "search")'
         required: true
         type: string
       browser:
-        description: 'Browser to test'
+        description: 'Browser'
         required: false
         default: 'chromium'
         type: choice
-        options:
-          - chromium
-          - firefox
-          - webkit
-          - all
+        options: [chromium, firefox, webkit, all]
       retries:
-        description: 'Number of retries'
+        description: 'Retry count'
         required: false
         default: '2'
         type: string
@@ -30,48 +24,35 @@ permissions:
 
 jobs:
   test:
-    name: 🧪 Run Tests
+    name: 🧪 Run E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node-pnpm
-      
-      - name: Validate Inputs
+
+      - name: Validate inputs
         run: |
-          # Validate pattern (allow any string but sanitize to prevent command injection)
-          # We'll ensure it doesn't contain backticks or $() substitution
-          if [[ "${{ inputs.pattern }}" =~ [\`\$] ]]; then
-            echo "❌ Pattern contains invalid characters"
+          if [[ "${{ inputs.pattern }}" =~ ['`$] ]]; then
+            echo "❌ Pattern contains unsafe characters"
             exit 1
           fi
-          # Validate browser is one of allowed choices
-          if [[ ! "${{ inputs.browser }}" =~ ^(chromium|firefox|webkit|all)$ ]]; then
-            echo "❌ Invalid browser: ${{ inputs.browser }}"
-            exit 1
-          fi
-          # Validate retries is a non-negative integer
           if [[ ! "${{ inputs.retries }}" =~ ^[0-9]+$ ]]; then
-            echo "❌ Invalid retries: ${{ inputs.retries }}"
+            echo "❌ retries must be a non-negative integer"
             exit 1
           fi
           echo "✅ Inputs validated"
-      
+
       - name: Fetch test data
         run: node script/fetch-questions-for-build.js
-        env:
+        continue-on-error: true
 
-      - name: Install Playwright (if not cached)
+      - name: Install Playwright browsers
         run: |
-          if [ ! -d "$HOME/.cache/ms-playwright" ] || [ -z "$(ls -A "$HOME/.cache/ms-playwright")" ]; then
-            echo "Installing Playwright browsers..."
-            if [ "${{ inputs.browser }}" = "all" ]; then
-              pnpm exec playwright install --with-deps
-            else
-              pnpm exec playwright install --with-deps ${{ inputs.browser }}
-            fi
+          if [ "${{ inputs.browser }}" = "all" ]; then
+            pnpm exec playwright install --with-deps
           else
-            echo "Playwright browsers cached, skipping install"
+            pnpm exec playwright install --with-deps ${{ inputs.browser }}
           fi
 
       - name: Build application
@@ -80,37 +61,37 @@ jobs:
       - name: Run tests
         run: |
           BROWSER_FLAG=""
-          if [ "${{ inputs.browser }}" != "all" ]; then
-            BROWSER_FLAG="--project=${{ inputs.browser }}"
-          fi
-          
-          if [[ "${{ inputs.pattern }}" == *".spec.ts"* ]] || [[ "${{ inputs.pattern }}" == *"e2e/"* ]]; then
-            pnpm exec playwright test "${{ inputs.pattern }}" $BROWSER_FLAG --retries=${{ inputs.retries }}
+          [ "${{ inputs.browser }}" != "all" ] && BROWSER_FLAG="--project=${{ inputs.browser }}"
+
+          PATTERN="${{ inputs.pattern }}"
+          if [[ "$PATTERN" == *".spec.ts"* ]] || [[ "$PATTERN" == *"e2e/"* ]]; then
+            pnpm exec playwright test "$PATTERN" $BROWSER_FLAG \
+              --retries=${{ inputs.retries }}
           else
-            pnpm exec playwright test --grep "${{ inputs.pattern }}" $BROWSER_FLAG --retries=${{ inputs.retries }}
+            pnpm exec playwright test --grep "$PATTERN" $BROWSER_FLAG \
+              --retries=${{ inputs.retries }}
           fi
         env:
           CI: 'true'
 
-      - name: Compress test results
+      - name: Compress & upload results
         if: always()
-        run: |
-          tar -czf test-results.tar.gz test-results/ playwright-report/ 2>/dev/null || true
-        shell: bash
+        run: tar -czf test-results.tar.gz test-results/ playwright-report/ 2>/dev/null || true
 
-      - name: Upload results
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results
+          name: e2e-results-${{ github.run_number }}
           path: test-results.tar.gz
           retention-days: 7
 
       - name: Summary
         if: always()
         run: |
-          echo "## 🧪 E2E Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Pattern:** \`${{ inputs.pattern }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Browser:** ${{ inputs.browser }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Retries:** ${{ inputs.retries }}" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## 🧪 E2E Test Results"
+            echo ""
+            echo "**Pattern:** \`${{ inputs.pattern }}\`"
+            echo "**Browser:** ${{ inputs.browser }}"
+            echo "**Retries:** ${{ inputs.retries }}"
+          } >> "$GITHUB_STEP_SUMMARY"

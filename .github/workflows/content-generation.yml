@@ -1,18 +1,16 @@
 name: 🤖 Content Generation
 
-# Unified content generation using the parallel swarm.
-# Generates all 6 content types: questions, certifications, flashcards,
-# voice sessions, learning paths, and coding challenges.
-# Runs daily at 2 AM UTC; supports manual triggers per type.
+# Generates all 6 content types via the parallel swarm:
+# questions, certifications, flashcards, voice sessions, learning paths, coding challenges.
+# Runs daily at 2 AM UTC; supports per-type manual triggers.
 
 on:
   schedule:
     - cron: '0 2 * * *'
-
   workflow_dispatch:
     inputs:
       type:
-        description: 'Content type (leave blank for all)'
+        description: 'Content type (blank = all)'
         required: false
         default: ''
         type: choice
@@ -38,7 +36,7 @@ on:
         default: ''
 
 concurrency:
-  group: content-generation-${{ github.event_name == 'schedule' && 'scheduled' || 'dispatch' }}
+  group: content-generation-${{ github.event_name == 'schedule' && 'scheduled' || github.run_id }}
   cancel-in-progress: false
 
 permissions:
@@ -49,44 +47,29 @@ jobs:
     name: 🚀 Run Content Swarm
     runs-on: ubuntu-latest
     timeout-minutes: 120
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-bot
 
       - name: Build swarm arguments
         id: args
         run: |
-          ARGS=""
-          if [ -n "${{ inputs.type }}" ]; then
-            ARGS="$ARGS --type=${{ inputs.type }}"
-          fi
-          if [ -n "${{ inputs.channel }}" ]; then
-            ARGS="$ARGS --channel=${{ inputs.channel }}"
-          fi
-          WORKERS="${{ inputs.workers || '5' }}"
-          ARGS="$ARGS --workers=$WORKERS"
-          if [ -n "${{ inputs.model }}" ]; then
-            ARGS="$ARGS --model=${{ inputs.model }}"
-          fi
-          echo "args=$ARGS" >> $GITHUB_OUTPUT
+          ARGS="--workers=${{ inputs.workers || '5' }}"
+          [ -n "${{ inputs.type }}"    ] && ARGS="$ARGS --type=${{ inputs.type }}"
+          [ -n "${{ inputs.channel }}" ] && ARGS="$ARGS --channel=${{ inputs.channel }}"
+          [ -n "${{ inputs.model }}"   ] && ARGS="$ARGS --model=${{ inputs.model }}"
+          echo "args=$ARGS" >> "$GITHUB_OUTPUT"
           echo "Swarm args: $ARGS"
 
       - name: Run parallel content swarm
         run: npx tsx scripts/parallel-content-swarm.ts ${{ steps.args.outputs.args }}
 
-      - name: Export questions for static build
-        run: node script/fetch-questions-for-build.js
-        continue-on-error: true
-
-      - name: Export question history
-        run: node script/fetch-question-history.js
-        continue-on-error: true
-
-      - name: Export bot monitor data
-        run: node script/fetch-bot-monitor-data.js
+      - name: Export static data (parallel, non-fatal)
+        run: |
+          node script/fetch-questions-for-build.js &
+          node script/fetch-question-history.js    &
+          node script/fetch-bot-monitor-data.js    &
+          wait
         continue-on-error: true
 
       - name: Commit generated content
@@ -100,41 +83,35 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "## 🤖 Content Swarm Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Type | ${{ inputs.type || 'all' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Workers | ${{ inputs.workers || '5' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Channel | ${{ inputs.channel || 'all' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Triggered by | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Timestamp | $(date -u +'%Y-%m-%d %H:%M:%S UTC') |" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## 🤖 Content Swarm Summary"
+            echo ""
+            echo "| Setting | Value |"
+            echo "|---------|-------|"
+            echo "| Type    | ${{ inputs.type || 'all' }} |"
+            echo "| Workers | ${{ inputs.workers || '5' }} |"
+            echo "| Channel | ${{ inputs.channel || 'all' }} |"
+            echo "| Trigger | ${{ github.event_name }} |"
+            echo "| Time    | $(date -u +'%Y-%m-%d %H:%M:%S UTC') |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
-  maintenance:
-    name: 🧹 Post-Generation Maintenance
+  post-generation:
+    name: 🧹 Post-Generation Tasks
     needs: generate
     if: always() && github.event_name == 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node-pnpm
 
-      - name: Clear old NEW flags
-        run: node script/maintenance/clear-old-new-flags.js
-        continue-on-error: true
-
-      - name: Generate curated learning paths (static)
-        run: node script/generate-curated-paths.js
-        continue-on-error: true
-
-      - name: Generate RSS feed
-        run: node script/generate-rss.js
-        continue-on-error: true
-
-      - name: Generate sitemap
-        run: node script/generate-sitemap.js
+      - name: Run maintenance & static asset generation (parallel, non-fatal)
+        run: |
+          node script/maintenance/clear-old-new-flags.js &
+          node script/generate-curated-paths.js          &
+          node script/generate-rss.js                    &
+          node script/generate-sitemap.js                &
+          wait
         continue-on-error: true
 
       - name: Commit static assets
@@ -142,5 +119,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "Maintenance Bot"
           git add client/public/ 2>/dev/null || true
-          git diff --staged --quiet || git commit -m "chore: post-generation maintenance [skip ci]"
+          git diff --staged --quiet || git commit -m "chore: post-generation static assets [skip ci]"
           git push || echo "::warning::Push failed"

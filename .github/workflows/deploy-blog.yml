@@ -1,8 +1,7 @@
 name: 🚀 Deploy Blog
 
-# Deploys the blog site to GitHub Pages
-# Only builds static HTML from existing content (no AI generation)
-# Schedule: Daily at 4:00 AM UTC
+# Builds and deploys the static blog from existing content (no AI generation).
+# Runs daily at 5 AM UTC or after a successful Content Generation run.
 
 on:
   schedule:
@@ -14,11 +13,12 @@ on:
 
 jobs:
   deploy:
-    name: 📦 Build & Deploy
+    name: 📦 Build & Deploy Blog
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: |
-      github.event_name == 'workflow_dispatch' || 
-      github.event_name == 'schedule' || 
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
       github.event.workflow_run.conclusion == 'success'
     permissions:
       contents: write
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node-pnpm
 
-      - name: Build static site
+      - name: Build static blog
         run: node script/generate-blog.js --html-only
         env:
           GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
@@ -37,13 +37,16 @@ jobs:
           repo: openstackdaily/openstackdaily.github.io
           branch: main
           token: ${{ secrets.GH_TOKEN }}
-          commit-message: 'Deploy: $(date -u +"%Y-%m-%d %H:%M UTC")'
+          commit-message: 'Deploy: ${{ github.sha }}'
           preserve-cname: 'true'
 
       - name: Summary
         run: |
-          echo "## 🚀 Blog Deployed" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**URL:** https://openstackdaily.github.io" >> $GITHUB_STEP_SUMMARY
-          echo "**Articles:** $(find blog-output/posts -type f -name 'index.html' 2>/dev/null | wc -l)" >> $GITHUB_STEP_SUMMARY
-          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          ARTICLE_COUNT=$(find blog-output/posts -type f -name 'index.html' 2>/dev/null | wc -l)
+          {
+            echo "## 🚀 Blog Deployed"
+            echo ""
+            echo "**URL:** https://openstackdaily.github.io"
+            echo "**Articles:** $ARTICLE_COUNT"
+            echo "**Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          } >> "$GITHUB_STEP_SUMMARY"

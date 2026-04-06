@@ -2,7 +2,7 @@ name: 🔍 Duplicate Detection
 
 on:
   schedule:
-    # Run weekly on Sunday at midnight UTC
+    # Weekly on Sunday at midnight UTC
     - cron: '0 0 * * 0'
   workflow_dispatch:
     inputs:
@@ -11,13 +11,9 @@ on:
         required: false
         default: 'question'
         type: choice
-        options:
-          - question
-          - challenge
-          - test
-          - certification
+        options: [question, challenge, test, certification]
       channel:
-        description: 'Specific channel (leave empty for all)'
+        description: 'Specific channel (blank = all)'
         required: false
         default: ''
       auto_fix:
@@ -35,90 +31,49 @@ jobs:
     name: 🔍 Check for Duplicates
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
     steps:
       - uses: actions/checkout@v4
-      
       - uses: ./.github/actions/setup-node-pnpm
-      
-      - name: Validate Inputs
+
+      - name: Validate inputs
+        if: github.event_name == 'workflow_dispatch'
         run: |
-          # Validate content_type
-          if [[ -n "${{ inputs.content_type }}" ]]; then
-            if [[ ! "${{ inputs.content_type }}" =~ ^(question|challenge|test|certification)$ ]]; then
-              echo "❌ Invalid content_type: ${{ inputs.content_type }}"
-              exit 1
-            fi
-          fi
-          # Validate channel (allow alphanumeric, hyphen, underscore)
-          if [[ -n "${{ inputs.channel }}" ]]; then
-            if [[ ! "${{ inputs.channel }}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
-              echo "❌ Invalid channel: ${{ inputs.channel }}"
-              exit 1
-            fi
-          fi
-          # Validate auto_fix is boolean
-          if [[ -n "${{ inputs.auto_fix }}" && "${{ inputs.auto_fix }}" != "true" && "${{ inputs.auto_fix }}" != "false" ]]; then
-            echo "❌ Invalid auto_fix: ${{ inputs.auto_fix }}"
+          if [[ -n "${{ inputs.channel }}" ]] && \
+             [[ ! "${{ inputs.channel }}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            echo "❌ Invalid channel — only alphanumeric, hyphens, underscores allowed"
             exit 1
           fi
           echo "✅ Inputs validated"
-      
-      - name: Initialize Vector DB
+
+      - name: Check Vector DB status
         env:
-          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_URL:     ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
-        run: |
-          echo "Checking vector DB status..."
-          pnpm run vector:stats || echo "Vector DB not available, will use fallback"
-      
-      - name: Run Duplicate Detection
+        run: pnpm run vector:stats || echo "Vector DB unavailable — fallback mode"
+
+      - name: Run duplicate detection
         id: duplicate-check
         env:
-          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_URL:     ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
         run: |
           ARGS=("--report")
-          
-          if [ -n "${{ inputs.content_type }}" ]; then
-            ARGS+=("--type=${{ inputs.content_type }}")
-          fi
-          
-          if [ -n "${{ inputs.channel }}" ]; then
-            ARGS+=("--channel=${{ inputs.channel }}")
-          fi
-          
-          if [ "${{ inputs.auto_fix }}" == "true" ]; then
-            ARGS+=("--fix")
-          fi
-          
+          ARGS+=("--type=${{ inputs.content_type || 'question' }}")
+          [ -n "${{ inputs.channel }}" ]  && ARGS+=("--channel=${{ inputs.channel }}")
+          [ "${{ inputs.auto_fix }}" == "true" ] && ARGS+=("--fix")
           echo "Running: node script/check-duplicates.js ${ARGS[*]}"
           node script/check-duplicates.js "${ARGS[@]}"
-      
-      - name: Upload Duplicate Report
+
+      - name: Upload duplicate report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: duplicate-report-${{ github.run_number }}
           path: duplicate-report-*.json
           retention-days: 30
-      
-      - name: Generate Summary
-        if: always()
-        run: |
-          echo "## 🔍 Duplicate Detection Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Content Type:** ${{ inputs.content_type || 'question' }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Channel:** ${{ inputs.channel || 'all' }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Auto-fix:** ${{ inputs.auto_fix }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          if [ -f duplicate-report-*.json ]; then
-            echo "📄 Detailed report available in artifacts" >> $GITHUB_STEP_SUMMARY
-          fi
-      
-      - name: Create Issue if Duplicates Found
+          if-no-files-found: ignore
+
+      - name: Create issue if duplicates found
         if: failure()
         uses: actions/github-script@v7
         with:
@@ -126,72 +81,83 @@ jobs:
           script: |
             const fs = require('fs');
             const files = fs.readdirSync('.').filter(f => f.startsWith('duplicate-report-'));
-            
-            if (files.length > 0) {
-              const report = JSON.parse(fs.readFileSync(files[0], 'utf8'));
-              
-              if (report.duplicateCount > 0) {
-                const duplicatePairs = report.duplicatePairs.slice(0, 10).map(pair => {
-                  const dups = pair.duplicates.map(d => '`' + d.id + '` (' + d.similarity + '%)').join(', ');
-                  return '- `' + pair.original + '` has ' + pair.duplicates.length + ' duplicate(s): ' + dups;
-                }).join('\n');
-                
-                const moreText = report.duplicatePairs.length > 10 ? '\n_...and ' + (report.duplicatePairs.length - 10) + ' more pairs_' : '';
-                const channelArg = report.channel ? ' --channel=' + report.channel : '';
-                
-                const codeBlock = '```bash\n# Review duplicates\npnpm run check:duplicates -- --type=' + report.contentType + channelArg + '\n\n# Auto-fix (mark for deletion)\npnpm run check:duplicates:fix -- --type=' + report.contentType + channelArg + '\n```';
-                
-                const issueBody = '## Duplicate Detection Report\n\n' +
-                  '**Content Type:** ' + report.contentType + '\n' +
-                  '**Channel:** ' + (report.channel || 'all') + '\n' +
-                  '**Total Scanned:** ' + report.totalScanned + '\n' +
-                  '**Duplicate Pairs:** ' + report.duplicateCount + '\n\n' +
-                  '### Action Required\n' +
-                  'Review the duplicate pairs and decide whether to:\n' +
-                  '1. Delete duplicates\n' +
-                  '2. Merge content\n' +
-                  '3. Mark as false positive\n\n' +
-                  '### Duplicate Pairs\n' +
-                  duplicatePairs + '\n' +
-                  moreText + '\n\n' +
-                  '### How to Fix\n' +
-                  codeBlock + '\n\n' +
-                  '---\n' +
-                  '_Generated by [Duplicate Detection Workflow](' + context.payload.repository.html_url + '/actions/runs/' + context.runId + ')_';
-                
-                await github.rest.issues.create({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  title: '🚨 Duplicates Detected: ' + report.duplicateCount + ' pairs found',
-                  body: issueBody,
-                  labels: ['duplicate', 'content-quality', 'automated']
-                });
-              }
-            }
+            if (!files.length) return;
 
-  # Run reconciliation after duplicate check
-  reconcile-after-cleanup:
-    name: 🔄 Reconcile Content
+            const report = JSON.parse(fs.readFileSync(files[0], 'utf8'));
+            if (!report.duplicateCount) return;
+
+            const pairs = report.duplicatePairs.slice(0, 10).map(p => {
+              const dups = p.duplicates.map(d => `\`${d.id}\` (${d.similarity}%)`).join(', ');
+              return `- \`${p.original}\` → ${dups}`;
+            }).join('\n');
+
+            const more = report.duplicatePairs.length > 10
+              ? `\n_...and ${report.duplicatePairs.length - 10} more pairs_`
+              : '';
+
+            const channelArg = report.channel ? ` --channel=${report.channel}` : '';
+            const typeArg    = `--type=${report.contentType}`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              title: `🚨 Duplicates Detected: ${report.duplicateCount} pairs found`,
+              labels: ['duplicate', 'content-quality', 'automated'],
+              body: [
+                '## Duplicate Detection Report',
+                '',
+                `**Content Type:** ${report.contentType}`,
+                `**Channel:** ${report.channel || 'all'}`,
+                `**Total Scanned:** ${report.totalScanned}`,
+                `**Duplicate Pairs:** ${report.duplicateCount}`,
+                '',
+                '### Duplicate Pairs',
+                pairs + more,
+                '',
+                '### How to Fix',
+                '```bash',
+                `# Review\npnpm run check:duplicates -- ${typeArg}${channelArg}`,
+                `# Auto-fix\npnpm run check:duplicates:fix -- ${typeArg}${channelArg}`,
+                '```',
+                '',
+                `---`,
+                `_Generated by [Duplicate Detection Workflow](${context.payload.repository.html_url}/actions/runs/${context.runId})_`
+              ].join('\n')
+            });
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## 🔍 Duplicate Detection Results"
+            echo ""
+            echo "**Content Type:** ${{ inputs.content_type || 'question' }}"
+            echo "**Channel:** ${{ inputs.channel || 'all' }}"
+            echo "**Auto-fix:** ${{ inputs.auto_fix || 'false' }}"
+            echo "**Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            echo ""
+            ls duplicate-report-*.json 2>/dev/null && echo "📄 Detailed report in artifacts" || true
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  reconcile:
+    name: 🔄 Reconcile After Cleanup
     needs: check-duplicates
     if: inputs.auto_fix == true
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    
     steps:
       - uses: actions/checkout@v4
-      
       - uses: ./.github/actions/setup-node-pnpm
-      
-      - name: Run Reconciliation
+
+      - name: Run reconciliation
         env:
-          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_URL:     ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
-        run: |
-          echo "Running reconciliation after duplicate cleanup..."
-          pnpm run bot:reconcile -- --threshold=0.75
-      
+        run: pnpm run bot:reconcile --threshold=0.75
+
       - name: Summary
         run: |
-          echo "## 🔄 Reconciliation Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Content has been reconciled after duplicate cleanup" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## 🔄 Reconciliation Complete"
+            echo "Content reconciled after duplicate cleanup."
+          } >> "$GITHUB_STEP_SUMMARY"

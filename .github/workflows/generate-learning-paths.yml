@@ -1,48 +1,41 @@
-name: Generate Curated Learning Paths
+name: 🎓 Generate Learning Paths
 
 on:
   schedule:
-    # Run daily at 4 AM UTC (after content generation and maintenance complete)
+    # Daily at 4 AM UTC — after content generation (2 AM) and maintenance (3 AM)
     - cron: '0 4 * * *'
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   generate-paths:
+    name: 🎓 Generate Curated Paths
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 15
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Setup database
-        run: |
-          echo "Database URL configured"
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-pnpm
 
       - name: Generate curated learning paths
-        run: |
-          node script/generate-curated-paths.js
+        run: node script/generate-curated-paths.js
 
-      - name: Commit and push if changed
+      - name: Commit if changed
         run: |
-          git config --global user.name 'Curated Paths Bot'
-          git config --global user.email 'bot@github-actions'
+          git config --local user.email "action@github.com"
+          git config --local user.name "Curated Paths Bot"
           git add -A
-          git diff --quiet && git diff --staged --quiet || (git commit -m "🎓 Update curated learning paths [automated]" && git push)
+          git diff --staged --quiet || \
+            git commit -m "chore: update curated learning paths [skip ci]"
+          git push || echo "::warning::Push failed (nothing to push or concurrent run)"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## 🎓 Learning Paths Generation"
+            echo "**Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          } >> "$GITHUB_STEP_SUMMARY"

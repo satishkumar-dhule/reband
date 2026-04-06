@@ -1,16 +1,14 @@
 name: 📊 Social Media & Analytics
 
-# Unified social media workflow
-# Combines: social-analytics.yml + linkedin-poll.yml
-# Handles: LinkedIn posts, polls, and analytics collection
+# LinkedIn posts, polls, and GitHub analytics collection.
 
 on:
   schedule:
-    # Daily at 7 AM: Social analytics (after all deploys complete)
+    # 7 AM UTC: LinkedIn post (after all deploys complete)
     - cron: '0 7 * * *'
-    # Daily at 10 AM: LinkedIn poll
+    # 10 AM UTC: LinkedIn poll
     - cron: '0 10 * * *'
-  
+
   workflow_dispatch:
     inputs:
       task:
@@ -18,36 +16,26 @@ on:
         required: true
         default: 'all'
         type: choice
-        options:
-          - all
-          - linkedin-post
-          - linkedin-poll
-          - analytics
-      # LinkedIn post inputs
+        options: [all, linkedin-post, linkedin-poll, analytics]
       post_url:
-        description: 'Specific blog post URL (for linkedin-post)'
+        description: 'Blog post URL (linkedin-post only)'
         required: false
-        type: string
-      # LinkedIn poll inputs
       question_id:
-        description: 'Question ID for poll (for linkedin-poll)'
+        description: 'Question ID (linkedin-poll only)'
         required: false
         default: ''
       channel:
-        description: 'Filter by channel (for linkedin-poll)'
+        description: 'Channel filter (linkedin-poll only)'
         required: false
         default: ''
       difficulty:
-        description: 'Filter by difficulty (for linkedin-poll)'
+        description: 'Difficulty filter (linkedin-poll only)'
         required: false
         default: 'beginner'
         type: choice
-        options:
-          - beginner
-          - intermediate
-          - advanced
+        options: [beginner, intermediate, advanced]
       poll_duration:
-        description: 'Poll duration in hours (for linkedin-poll)'
+        description: 'Poll duration in hours'
         required: false
         default: '24'
       dry_run:
@@ -63,9 +51,10 @@ permissions:
 jobs:
   linkedin-post:
     name: 📢 LinkedIn Post
-    if: |
-      (github.event.schedule == '0 5 * * *') ||
-      (github.event_name == 'workflow_dispatch' && (inputs.task == 'all' || inputs.task == 'linkedin-post'))
+    if: >
+      github.event.schedule == '0 7 * * *' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.task == 'all' || inputs.task == 'linkedin-post'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -84,13 +73,13 @@ jobs:
         run: node script/publish-to-linkedin.js
         env:
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
-          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
-          POST_TITLE: ${{ steps.get_post.outputs.title }}
-          POST_URL: ${{ steps.get_post.outputs.url }}
+          LINKEDIN_PERSON_URN:   ${{ secrets.LINKEDIN_PERSON_URN }}
+          POST_TITLE:   ${{ steps.get_post.outputs.title }}
+          POST_URL:     ${{ steps.get_post.outputs.url }}
           POST_EXCERPT: ${{ steps.get_post.outputs.excerpt }}
-          POST_TAGS: ${{ steps.get_post.outputs.tags }}
+          POST_TAGS:    ${{ steps.get_post.outputs.tags }}
           POST_CHANNEL: ${{ steps.get_post.outputs.channel }}
-          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
+          OLLAMA_URL:   ${{ secrets.OLLAMA_URL }}
 
       - name: Mark post as shared
         if: steps.get_post.outputs.has_post == 'true' && steps.publish.outputs.posted == 'true'
@@ -100,9 +89,10 @@ jobs:
 
   linkedin-poll:
     name: 📊 LinkedIn Poll
-    if: |
-      (github.event.schedule == '0 10 * * *') ||
-      (github.event_name == 'workflow_dispatch' && (inputs.task == 'all' || inputs.task == 'linkedin-poll'))
+    if: >
+      github.event.schedule == '0 10 * * *' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.task == 'all' || inputs.task == 'linkedin-poll'))
     runs-on: ubuntu-latest
     timeout-minutes: 35
     outputs:
@@ -111,22 +101,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-bot
 
-      - name: Post Poll to LinkedIn
+      - name: Post poll to LinkedIn
         id: poll
+        run: node script/post-linkedin-poll.js
         env:
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
-          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
-          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
-          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          LINKEDIN_PERSON_URN:   ${{ secrets.LINKEDIN_PERSON_URN }}
+          OLLAMA_URL:     ${{ secrets.OLLAMA_URL }}
+          QDRANT_URL:     ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
-          QUESTION_ID: ${{ inputs.question_id }}
-          CHANNEL: ${{ inputs.channel }}
-          DIFFICULTY: ${{ inputs.difficulty }}
-          POLL_DURATION: ${{ inputs.poll_duration || '24' }}
-          DRY_RUN: ${{ inputs.dry_run || 'false' }}
-        run: node script/post-linkedin-poll.js
+          QUESTION_ID:    ${{ inputs.question_id }}
+          CHANNEL:        ${{ inputs.channel }}
+          DIFFICULTY:     ${{ inputs.difficulty || 'beginner' }}
+          POLL_DURATION:  ${{ inputs.poll_duration || '24' }}
+          DRY_RUN:        ${{ inputs.dry_run || 'false' }}
 
-      - name: Trigger blog deploy (new blog was generated)
+      - name: Trigger blog deploy (if new post generated)
         if: steps.poll.outputs.blog_generated == 'true'
         continue-on-error: true
         uses: actions/github-script@v7
@@ -135,46 +125,51 @@ jobs:
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
-              repo: context.repo.repo,
+              repo:  context.repo.repo,
               workflow_id: 'deploy-blog.yml',
               ref: 'main'
             });
-            console.log('✅ Blog deploy triggered for newly generated post');
+            console.log('✅ Blog deploy triggered');
 
   analytics:
     name: 📈 GitHub Analytics
-    if: |
-      (github.event.schedule == '0 5 * * *') ||
-      (github.event_name == 'workflow_dispatch' && (inputs.task == 'all' || inputs.task == 'analytics'))
+    if: >
+      github.event.schedule == '0 7 * * *' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.task == 'all' || inputs.task == 'analytics'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node-pnpm
 
-      - name: Collect GitHub Analytics
+      - name: Collect GitHub analytics
         run: node script/github-analytics-bot.js
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          REPO_OWNER: satishkumar-dhule
-          REPO_NAME: code-reels
-          PAGES_REPO_OWNER: open-interview
-          PAGES_REPO_NAME: open-interview.github.io
+          GITHUB_TOKEN:      ${{ secrets.GH_TOKEN }}
+          REPO_OWNER:        satishkumar-dhule
+          REPO_NAME:         code-reels
+          PAGES_REPO_OWNER:  open-interview
+          PAGES_REPO_NAME:   open-interview.github.io
 
   summary:
     name: 📋 Summary
     needs: [linkedin-post, linkedin-poll, analytics]
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Generate Summary
+      - name: Generate summary
         run: |
-          echo "## 📊 Social Media & Analytics Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Task | Status | Notes |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|--------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 📢 LinkedIn Post | ${{ needs.linkedin-post.result == 'success' && '✅' || needs.linkedin-post.result == 'skipped' && '⏭️' || '❌' }} | Blog post shared |" >> $GITHUB_STEP_SUMMARY
-          echo "| 📊 LinkedIn Poll | ${{ needs.linkedin-poll.result == 'success' && '✅' || needs.linkedin-poll.result == 'skipped' && '⏭️' || '❌' }} | ${{ needs.linkedin-poll.outputs.blog_generated == 'true' && '📝 New blog generated + deploy triggered' || 'Blog already existed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 📈 Analytics | ${{ needs.analytics.result == 'success' && '✅' || needs.analytics.result == 'skipped' && '⏭️' || '❌' }} | GitHub stats collected |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          result() { case "$1" in success) echo "✅";; skipped) echo "⏭️";; *) echo "❌";; esac; }
+          {
+            echo "## 📊 Social Media & Analytics Summary"
+            echo ""
+            echo "| Task | Status | Notes |"
+            echo "|------|--------|-------|"
+            echo "| 📢 LinkedIn Post | $(result "${{ needs.linkedin-post.result }}") | Blog post shared |"
+            echo "| 📊 LinkedIn Poll | $(result "${{ needs.linkedin-poll.result }}") | ${{ needs.linkedin-poll.outputs.blog_generated == 'true' && '📝 New blog + deploy triggered' || 'No new blog' }} |"
+            echo "| 📈 Analytics     | $(result "${{ needs.analytics.result }}")     | GitHub stats collected |"
+            echo ""
+            echo "**Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          } >> "$GITHUB_STEP_SUMMARY"

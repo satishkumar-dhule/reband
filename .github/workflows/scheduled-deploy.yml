@@ -2,7 +2,7 @@ name: 🔄 Scheduled Deploy
 
 on:
   schedule:
-    # Run daily at 6 AM UTC (after blog deploy at 5 AM)
+    # Daily at 6 AM UTC — after blog deploy (5 AM) and content generation (2 AM)
     - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
@@ -16,84 +16,104 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: scheduled-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
-    name: Deploy Website
+    name: 🚀 Build & Deploy
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 25
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
-      - name: Setup Node.js with pnpm
-        uses: ./.github/actions/setup-node-pnpm
-        with:
-          node-version: '20'
-          pnpm-version: '10'
-      
+
+      - uses: ./.github/actions/setup-node-pnpm
+
       - name: Fetch and generate data (parallel)
         run: |
-          # Start all data fetching/generation scripts in parallel
-          node script/fetch-questions-for-build.js &
-          PID1=$!
-          node script/fetch-question-history.js &
-          PID2=$!
-          node script/generate-curated-paths.js &
-          PID3=$!
-          node script/generate-rss.js &
-          PID4=$!
-          node script/generate-sitemap.js &
-          PID5=$!
-          node script/fetch-bot-monitor-data.js &
-          PID6=$!
-          
-          # Wait for all background jobs and capture exit codes
-          FAILED=0
-          for pid in $PID1 $PID2 $PID3 $PID4 $PID5 $PID6; do
-            wait $pid || FAILED=1
+          mkdir -p logs
+          node script/fetch-questions-for-build.js  > logs/fetch-questions.log 2>&1 &  PID1=$!
+          node script/fetch-question-history.js     > logs/fetch-history.log   2>&1 &  PID2=$!
+          node script/generate-curated-paths.js     > logs/gen-paths.log       2>&1 &  PID3=$!
+          node script/generate-rss.js               > logs/gen-rss.log         2>&1 &  PID4=$!
+          node script/generate-sitemap.js           > logs/gen-sitemap.log     2>&1 &  PID5=$!
+          node script/fetch-bot-monitor-data.js     > logs/bot-monitor.log     2>&1 &  PID6=$!
+
+          declare -A PIDS=([1]=$PID1 [2]=$PID2 [3]=$PID3 [4]=$PID4 [5]=$PID5 [6]=$PID6)
+          declare -A NAMES=(
+            [1]="fetch-questions-for-build"
+            [2]="fetch-question-history"
+            [3]="generate-curated-paths"
+            [4]="generate-rss"
+            [5]="generate-sitemap"
+            [6]="fetch-bot-monitor-data"
+          )
+          declare -A LOGS=(
+            [1]="logs/fetch-questions.log"
+            [2]="logs/fetch-history.log"
+            [3]="logs/gen-paths.log"
+            [4]="logs/gen-rss.log"
+            [5]="logs/gen-sitemap.log"
+            [6]="logs/bot-monitor.log"
+          )
+
+          FAILED=()
+          for i in 1 2 3 4 5 6; do
+            if ! wait "${PIDS[$i]}"; then
+              FAILED+=("$i")
+            fi
           done
-          
-          if [ $FAILED -eq 1 ]; then
-            echo "One or more data fetching scripts failed"
+
+          if [ ${#FAILED[@]} -gt 0 ]; then
+            echo "❌ Data scripts failed:"
+            for i in "${FAILED[@]}"; do
+              echo ""
+              echo "--- ${NAMES[$i]} ---"
+              cat "${LOGS[$i]}"
+            done
             exit 1
           fi
-        env:
-      
+          echo "✅ All data scripts completed"
+
       - name: Cache build output
         uses: actions/cache@v4
         with:
           path: dist
-          key: ${{ runner.os }}-dist-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.{ts,tsx,js,jsx,json,css,html}') }}
+          key: ${{ runner.os }}-dist-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('client/src/**/*.{ts,tsx}', 'vite.config.ts') }}
           restore-keys: |
             ${{ runner.os }}-dist-${{ hashFiles('**/pnpm-lock.yaml') }}-
             ${{ runner.os }}-dist-
 
       - name: Build website
-        run: |
-          pnpm run build
-          pnpm run build:pagefind
         env:
           NODE_ENV: production
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
-      
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        run: |
+          pnpm run build
+          pnpm run build:pagefind
+
+      - uses: ./.github/actions/deploy-pages
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          cname: open-interview.github.io
-          commit_message: 'chore: scheduled deploy [skip ci]'
-      
+          source-dir: dist/public
+          repo: open-interview/open-interview.github.io
+          branch: gh-pages
+          token: ${{ secrets.GH_TOKEN }}
+          commit-message: 'chore: scheduled deploy [skip ci]'
+          preserve-cname: 'true'
+
       - name: Summary
         run: |
-          echo "## 🚀 Deployment Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
-          echo "**Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "**Reason:** ${{ github.event.inputs.reason }}" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**URL:** https://open-interview.github.io/" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## 🚀 Scheduled Deployment Complete"
+            echo ""
+            echo "**Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            echo "**Trigger:** ${{ github.event_name }}"
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              echo "**Reason:** ${{ inputs.reason }}"
+            fi
+            echo ""
+            echo "**URL:** https://open-interview.github.io/"
+          } >> "$GITHUB_STEP_SUMMARY"

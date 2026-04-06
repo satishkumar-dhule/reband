@@ -1,12 +1,10 @@
 name: 📝 Manual Blog Post
 
-# Manually generate a blog post from a specific topic
-
 on:
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Question or topic to generate blog from'
+        description: 'Question or topic to generate a blog post from'
         required: true
         type: string
       publish:
@@ -23,6 +21,7 @@ jobs:
   generate:
     name: 📰 Generate Blog Post
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-bot
@@ -31,11 +30,11 @@ jobs:
         id: generate
         run: node script/generate-blog-from-input.js
         env:
-          INPUT_TOPIC: ${{ inputs.topic }}
-          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          INPUT_TOPIC:    ${{ inputs.topic }}
+          QDRANT_URL:     ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
-          OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          OLLAMA_URL:     ${{ secrets.OLLAMA_URL }}
+          GITHUB_TOKEN:   ${{ secrets.GH_TOKEN }}
 
       - name: Trigger blog deploy
         if: success() && inputs.publish
@@ -45,24 +44,25 @@ jobs:
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
-              repo: context.repo.repo,
+              repo:  context.repo.repo,
               workflow_id: 'deploy-blog.yml',
               ref: 'main'
             });
+            console.log('✅ Blog deploy triggered');
 
       - name: Summary
         if: always()
         run: |
-          echo "## 📝 Blog Post Generated" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Topic:** ${{ inputs.topic }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.generate.outputs.success }}" == "true" ]; then
-            echo "✅ **Title:** ${{ steps.generate.outputs.title }}" >> $GITHUB_STEP_SUMMARY
-            echo "**Channel:** ${{ steps.generate.outputs.channel }}" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ inputs.publish }}" == "true" ]; then
-              echo "🚀 Blog deploy triggered" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## 📝 Blog Post Generation"
+            echo ""
+            echo "**Topic:** ${{ inputs.topic }}"
+            echo ""
+            if [ "${{ steps.generate.outputs.success }}" == "true" ]; then
+              echo "✅ **Title:** ${{ steps.generate.outputs.title }}"
+              echo "**Channel:** ${{ steps.generate.outputs.channel }}"
+              [ "${{ inputs.publish }}" == "true" ] && echo "🚀 Blog deploy triggered"
+            else
+              echo "❌ Generation failed"
             fi
-          else
-            echo "❌ Generation failed" >> $GITHUB_STEP_SUMMARY
-          fi
+          } >> "$GITHUB_STEP_SUMMARY"

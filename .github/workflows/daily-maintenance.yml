@@ -1,15 +1,15 @@
 name: 🧹 Daily Maintenance
 
-# Runs daily to clear old "NEW" flags and perform other maintenance tasks
+# Clears old "NEW" flags and runs lightweight DB maintenance tasks.
 
 on:
   schedule:
-    # Run daily at 3 AM UTC (after content generation at 2 AM completes)
+    # 3 AM UTC — after content generation (2 AM) completes
     - cron: '0 3 * * *'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   maintenance:
@@ -18,24 +18,22 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      
       - uses: ./.github/actions/setup-node-pnpm
-      
-      - name: Run migrations (if needed)
-        run: |
-          echo "🔄 Running database migrations..."
-          node script/migrations/add-is-new-column.js 2>/dev/null || echo "⚠️  Migration skipped or already applied"
-      
-      - name: Clear old NEW flags
-        run: |
-          echo "🧹 Clearing NEW flags for questions older than 7 days..."
-          node script/maintenance/clear-old-new-flags.js
-      
-      - name: Generate Summary
+
+      - name: Run DB migrations (idempotent)
+        run: node script/migrations/add-is-new-column.js 2>/dev/null || true
+
+      - name: Clear old NEW flags (questions older than 7 days)
+        run: node script/maintenance/clear-old-new-flags.js
+
+      - name: Summary
         if: always()
         run: |
-          echo "## 🧹 Daily Maintenance Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Tasks completed:**" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Cleared old NEW flags" >> $GITHUB_STEP_SUMMARY
-          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## 🧹 Daily Maintenance Results"
+            echo ""
+            echo "- ✅ DB migrations checked"
+            echo "- ✅ OLD NEW flags cleared"
+            echo ""
+            echo "**Time:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          } >> "$GITHUB_STEP_SUMMARY"
