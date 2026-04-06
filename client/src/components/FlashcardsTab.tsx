@@ -316,8 +316,8 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
           <BookOpen className="w-6 h-6 text-[var(--gh-fg-muted)]" />
         </div>
         <div>
-          <p className="font-semibold text-[var(--gh-fg)]">No flashcards yet</p>
-          <p className="text-sm text-[var(--gh-fg-muted)] mt-1">Flashcards for this topic are coming soon.</p>
+          <p className="font-semibold text-[var(--gh-fg)]">No flashcards available</p>
+          <p className="text-sm text-[var(--gh-fg-muted)] mt-1">No flashcards have been created for this topic yet.</p>
         </div>
       </div>
     );

@@ -530,8 +530,8 @@ export function ExtremeQuestionViewer({ channelId, questionId }: ExtremeQuestion
       
       if (!hasFilters) {
         toast({
-          title: "Content coming soon!",
-          description: `We're preparing questions for "${channel.name}". Check back soon!`,
+          title: "No questions available",
+          description: `There are no questions available for "${channel.name}" yet.`,
           variant: "warning",
         });
         setShouldRedirect(true);

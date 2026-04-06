@@ -397,8 +397,8 @@ export default function CertificationPractice() {
   useEffect(() => {
     if (!loading && certification && questions.length === 0 && !error) {
       toast({
-        title: "Content coming soon!",
-        description: `We're preparing questions for "${certification.name}". Check back soon!`,
+        title: "No questions available",
+        description: `Questions for "${certification.name}" are not yet available.`,
         variant: "warning",
       });
       setShouldRedirect(true);
@@ -960,7 +960,7 @@ export default function CertificationPractice() {
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <BookOpen className="w-4 h-4" />
-                {totalQuestions > 0 ? `Start Practice (${totalQuestions} questions)` : 'Questions Coming Soon'}
+                {totalQuestions > 0 ? `Start Practice (${totalQuestions} questions)` : 'No Questions Available'}
               </button>
               <button
                 onClick={() => setLocation(`/certification/${certificationId}/exam`)}

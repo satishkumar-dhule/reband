@@ -471,7 +471,7 @@ function QuickQuizCard({
             </div>
             <div>
               <h2 className="font-semibold sm:text-lg">No quiz available</h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">Tests coming soon for your channels</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">No tests available for your channels right now</p>
             </div>
           </div>
         </div>

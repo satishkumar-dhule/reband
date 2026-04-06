@@ -418,10 +418,10 @@ export default function CertificationExam() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 mx-auto mb-4 text-amber-500" />
-          <h2 className="text-xl font-semibold mb-2">Questions Coming Soon</h2>
+          <h2 className="text-xl font-semibold mb-2">No Questions Available</h2>
           <p className="text-muted-foreground mb-4">
-            We're preparing certification-specific questions for {certification.name}. 
-            In the meantime, try the general practice mode.
+            Questions for {certification.name} are not yet available. 
+            Try the general practice mode instead.
           </p>
           <Button onClick={() => setLocation(`/certification/${certificationId}`)}>
             Go to Practice Mode

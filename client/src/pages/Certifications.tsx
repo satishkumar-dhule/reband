@@ -319,7 +319,7 @@ function CertCard({ cert, isStarted, onToggleStarted, onNavigate }: CertCardProp
           </>
         ) : (
           <Button variant="ghost" size="sm" className="flex-1" disabled icon={<Clock className="w-3.5 h-3.5" />}>
-            Coming Soon
+            Not Available
           </Button>
         )}
         <Button

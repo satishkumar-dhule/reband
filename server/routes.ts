@@ -194,6 +194,53 @@ export async function registerRoutes(
     }
   });
 
+  // Full-text search across questions
+  app.get("/api/search", async (req, res) => {
+    const { q, limit: limitParam } = req.query;
+    if (!q || typeof q !== "string" || q.trim().length < 2) {
+      return res.status(400).json({ error: "Query must be at least 2 characters" });
+    }
+    const limit = Math.min(parseInt(String(limitParam ?? "20"), 10) || 20, 50);
+    const term = `%${q.trim().toLowerCase()}%`;
+    try {
+      const cacheKey = `search-${q.trim().toLowerCase()}-${limit}`;
+      const result = await getCached(cacheKey, async () => {
+        const sql = `
+          SELECT id, question, answer, difficulty, channel, sub_channel, tags, companies, videos, diagram
+          FROM questions
+          WHERE status != 'deleted'
+            AND (
+              LOWER(question) LIKE ?
+              OR LOWER(answer) LIKE ?
+              OR LOWER(tags) LIKE ?
+            )
+          LIMIT ?
+        `;
+        const r = await client.execute({ sql, args: [term, term, term, limit] });
+        return r.rows.map((row: any) => ({
+          id: row.id,
+          question: row.question,
+          answer: typeof row.answer === "string" ? row.answer.slice(0, 200) : "",
+          difficulty: row.difficulty,
+          channel: row.channel,
+          subChannel: row.sub_channel,
+          tags: (() => {
+            try { return JSON.parse(row.tags || "[]"); } catch { return []; }
+          })(),
+          companies: (() => {
+            try { return JSON.parse(row.companies || "[]"); } catch { return []; }
+          })(),
+          hasVideo: !!row.videos && row.videos !== "null" && row.videos !== "{}",
+          hasDiagram: typeof row.diagram === "string" && row.diagram.length > 20,
+        }));
+      });
+      res.json({ results: result.data, total: result.data.length });
+    } catch (error) {
+      console.error("Search error:", error);
+      res.status(500).json({ error: "Search failed" });
+    }
+  });
+
   // Support legacy query-param format: /api/questions?channel=X
   app.get("/api/questions", async (req, res) => {
     const { channel } = req.query;

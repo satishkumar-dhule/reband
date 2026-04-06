@@ -681,7 +681,6 @@ export default function CodingChallenge() {
               </div>
             )}
           </div>
-        </div>
 
         {/* ── Filter & Search ──────────────────────────────── */}
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">

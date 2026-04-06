@@ -249,9 +249,9 @@ export function ComingSoon({
   }, [redirectDelay, redirectTo, setLocation]);
 
   const defaultTitle = type === 'channel' 
-    ? `${name || 'This channel'} is coming soon!`
+    ? `No questions available for ${name || 'this channel'}`
     : type === 'certification'
-    ? `${name || 'This certification'} is being prepared!`
+    ? `No questions available for ${name || 'this certification'}`
     : title || message.title;
 
   const defaultDescription = description || message.subtitle;

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback, RefObject, useMemo } from 'react';
-import { Search, X, ArrowRight, Zap, Target, Flame, Tag, Building2, Video, GitBranch, Filter, Code2 } from 'lucide-react';
+import { Search, X, ArrowRight, Zap, Target, Flame, Tag, Building2, Video, GitBranch, Filter, Code2, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { searchAll, type UnifiedSearchResult, type SearchResult, type CodingSearchResult } from '../lib/fuzzy-search';
+import { getAllQuestions } from '../lib/questions-loader';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useUnifiedToast } from '@/hooks/use-unified-toast';
@@ -82,15 +83,63 @@ export function SearchModal({ isOpen, onClose, initialQuery }: SearchModalProps)
   }, [isOpen]);
   
   useEffect(() => {
-    if (debouncedQuery.length >= 2) {
+    if (debouncedQuery.length < 2) {
+      setResults([]);
+      return;
+    }
+
+    const localQuestions = getAllQuestions();
+    if (localQuestions.length > 0) {
+      // Fast path: local fuzzy search from in-memory cache
       setIsSearching(true);
       const searchResults = searchAll(debouncedQuery, 50);
       setResults(searchResults);
       setSelectedIndex(0);
       setIsSearching(false);
-    } else {
-      setResults([]);
+      return;
     }
+
+    // Fallback: server-side search when local cache is cold
+    setIsSearching(true);
+    const controller = new AbortController();
+
+    fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}&limit=30`, {
+      signal: controller.signal,
+    })
+      .then(r => r.json())
+      .then((data: { results: any[]; total: number }) => {
+        const converted: SearchResult[] = (data.results || []).map((item: any) => ({
+          type: 'question' as const,
+          score: 1,
+          matchedIn: ['question' as const],
+          question: {
+            id: item.id,
+            question: item.question,
+            answer: item.answer,
+            explanation: '',
+            difficulty: item.difficulty || 'intermediate',
+            channel: item.channel,
+            subChannel: item.subChannel || '',
+            tags: item.tags || [],
+            companies: item.companies || [],
+            videos: undefined,
+            diagram: '',
+            eli5: '',
+            sourceUrl: '',
+          },
+        }));
+        setResults(converted);
+        setSelectedIndex(0);
+        setIsSearching(false);
+      })
+      .catch(err => {
+        if (err.name !== 'AbortError') {
+          console.error('Server search failed:', err);
+          setIsSearching(false);
+        }
+      });
+
+    return () => controller.abort();
   }, [debouncedQuery]);
 
   useEffect(() => {
