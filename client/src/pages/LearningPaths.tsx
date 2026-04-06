@@ -93,7 +93,7 @@ export default function LearningPaths() {
       localStorage.setItem('customPaths', JSON.stringify(saved));
       toast({ title: 'Path Created', description: `"${newPath.name}" is ready to start.` });
       resetCustomPath();
-      setLocation('/my-path');
+      setLocation(`/path/${pathId}`);
     } catch { toast({ title: 'Error', description: 'Could not save path.', variant: 'destructive' }); }
     finally { setIsSubmitting(false); }
   };

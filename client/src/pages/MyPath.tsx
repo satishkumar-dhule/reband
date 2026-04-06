@@ -534,13 +534,15 @@ export default function MyPath() {
                         {/* Actions */}
                         <div className="flex items-center gap-3 pt-2">
                           <Button
-                            onClick={() => togglePathActivation(path)}
-                            variant={isActive ? 'secondary' : 'primary'}
+                            onClick={() => setLocation(`/path/${path.id}`)}
+                            variant="primary"
                             className="flex-1"
+                            icon={<ChevronRight className="w-4 h-4" />}
+                            iconPosition="right"
                           >
-                            {isActive ? 'Deactivate' : 'Activate'}
+                            View Path
                           </Button>
-                          
+
                           <IconButton
                             icon={<Edit className="w-5 h-5" />}
                             aria-label="Edit path"
