@@ -1,13 +1,17 @@
 {
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://localhost:4000",
+    "AI_INTEGRATIONS_ANTHROPIC_API_KEY": "_DUMMY_API_KEY_"
+  },
   "permissions": {
     "allow": [
       "Bash(ls -la /home/runner/workspace/.env*)",
       "Bash(xargs basename:*)",
-      "Bash(grep -r \"export function\" /home/runner/workspace/client/src/lib/*.ts)"
+      "Bash(grep -r \"export function\" /home/runner/workspace/client/src/lib/*.ts)",
+      "Bash(grep -r \"--z-\" /home/runner/workspace/client/src/styles --include=\"*.css\")",
+      "Bash(grep -n \"TODO\\\\|FIXME\\\\|XXX\\\\|BUG\\\\|HACK\" /home/runner/workspace/server/*.ts)",
+      "Bash(npm run:*)",
+      "Read(//tmp/**)"
     ]
-  },
-  "env": {
-    "ANTHROPIC_BASE_URL": "http://localhost:4000",
-    "AI_INTEGRATIONS_ANTHROPIC_API_KEY": "_DUMMY_API_KEY_"
   }
 }

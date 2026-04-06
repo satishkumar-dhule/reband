@@ -1,5 +1,6 @@
 {pkgs}: {
   deps = [
+    pkgs.gemini-cli
     pkgs.mlocate
     pkgs.openai
     pkgs.nettools
