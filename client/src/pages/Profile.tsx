@@ -237,7 +237,7 @@ export default function Profile() {
               <User className="w-8 h-8 text-[var(--gh-fg-muted)]" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-[var(--gh-fg)]">My Profile & Stats</h1>
+              <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">My Profile & Stats</h1>
               <p className="text-sm text-[var(--gh-fg-muted)]">Stats are tracked locally in your browser — no account needed.</p>
             </div>
           </div>

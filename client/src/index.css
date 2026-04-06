@@ -168,3 +168,45 @@
     flex-direction: column !important;
   }
 }
+
+/* ============================================
+   Typography Scale Utilities — Issue #87
+   Consistent heading hierarchy across all pages
+   ============================================ */
+
+/* Page-level title: used for <h1> in page headers */
+.page-title {
+  font-size: var(--text-page-title, 1.25rem); /* 20px */
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--gh-fg);
+}
+
+/* Section heading: used for <h2> in card / panel headers */
+.section-heading {
+  font-size: var(--text-section, 0.875rem); /* 14px */
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--gh-fg);
+}
+
+/* Sub-section label: used for small group labels */
+.sub-heading {
+  font-size: var(--text-sub, 0.75rem); /* 12px */
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gh-fg-muted);
+}
+
+/* ============================================
+   Card Padding Scale — Issue #86
+   Standard spacing for card / panel components
+   ============================================ */
+
+/* Tight card: icon lists, stat chips */
+.card-padding-sm  { padding: 0.75rem; }
+/* Default card: most content cards */
+.card-padding-md  { padding: 1rem; }
+/* Spacious card: featured / hero cards */
+.card-padding-lg  { padding: 1.5rem; }

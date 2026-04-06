@@ -188,7 +188,7 @@ export default function Bookmarks() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
                             <span className="text-xs font-semibold text-primary">{fmt(question.channelId)}</span>
-                            <Badge className={`text-[10px] ${diff.badgeClass}`}>{diff.label}</Badge>
+                            <DifficultyBadge level={(question.difficulty as 'beginner' | 'intermediate' | 'advanced') ?? 'beginner'} size="xs" />
                           </div>
                           <h3 className="text-sm font-semibold group-hover:text-primary line-clamp-2 leading-snug transition-colors">
                             {question.question}
