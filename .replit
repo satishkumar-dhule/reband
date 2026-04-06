@@ -134,8 +134,4 @@ OPENAI_API_KEY = "_DUMMY_API_KEY_"
 
 [userenv.shared]
 BETTER_AUTH_SECRET = "Mk+ZBSvYL/o7LSymDNxa3EdS32yubRVDa3I0YiMDB4A="
-<<<<<<< HEAD
-BETTER_AUTH_URL = "https://c0f0aa91-068b-40ce-8f08-bc4da8fd9499-00-2r8k096itka2u.worf.replit.dev"
-=======
-BETTER_AUTH_URL = "https://46c8b56a-6976-4491-9820-a02e72cb55a2-00-105dy5scv5uk4.janeway.replit.dev"
->>>>>>> 01834afb (Update project dependencies and lockfile for Node.js development)
+BETTER_AUTH_URL = "https://10757c09-0734-4a82-81e9-623a9b03fdd0-00-27b58fy13x1mn.janeway.replit.dev"
