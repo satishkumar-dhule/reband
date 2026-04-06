@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MOTION } from '@/lib/motion';
 import { EnhancedMermaid } from './EnhancedMermaid';
 import { YouTubePlayer } from './YouTubePlayer';
 import ReactMarkdown from 'react-markdown';
@@ -88,7 +89,7 @@ function ExpandableCard({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={MOTION.default}
               className="overflow-hidden"
             >
               <div className="px-2.5 pb-2">{children}</div>
@@ -209,7 +210,7 @@ function TabbedMediaPanel({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
+              transition={MOTION.default}
               className="flex items-start gap-2"
             >
               <Lightbulb aria-hidden="true" className="w-4 h-4 text-[var(--gh-accent-emphasis)] shrink-0 mt-0.5" />
@@ -223,7 +224,7 @@ function TabbedMediaPanel({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
+              transition={MOTION.default}
             >
               <EnhancedMermaid 
                 chart={question.diagram!} 
@@ -239,7 +240,7 @@ function TabbedMediaPanel({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
+              transition={MOTION.default}
               className="flex items-start gap-2"
             >
               <span aria-hidden="true" className="text-base flex-shrink-0">🧒</span>
@@ -253,7 +254,7 @@ function TabbedMediaPanel({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
+              transition={MOTION.default}
             >
               <YouTubePlayer 
                 shortVideo={question.videos?.shortVideo} 

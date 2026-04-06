@@ -6,7 +6,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AppLayout } from '@/lib/ui';
+import { AppLayout, EmptyState } from '@/lib/ui';
 import { SEOHead } from '@/lib/ui';
 import { allChannelsConfig, getChannelName } from '../lib/channels-config';
 import { curatedPaths } from '../lib/learning-paths-data';
@@ -435,7 +435,20 @@ export default function MyPath() {
             </MotionButton>
 
             {/* Custom Paths Grid */}
-            {customPaths.length > 0 ? (
+            {customPaths.length === 0 ? (
+              <EmptyState
+                icon={<Brain className="w-8 h-8" />}
+                title="No custom paths yet"
+                description="Create your first learning path to build a focused, personalised study plan across any mix of channels and certifications."
+                variant="info"
+                size="lg"
+                action={
+                  <Button variant="primary" onClick={() => setLocation('/learning-paths')}>
+                    Create a Path
+                  </Button>
+                }
+              />
+            ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {customPaths.map((path, i) => {
                   const isActive = isPathActive(path.id);
@@ -547,32 +560,6 @@ export default function MyPath() {
                   );
                 })}
               </div>
-            ) : (
-              /* Empty State */
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="flex items-center justify-center min-h-[50vh]"
-              >
-                <div className="text-center max-w-md px-4">
-                  <div 
-                    className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
-                    style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--gh-accent-emphasis) 20%, transparent), color-mix(in srgb, var(--gh-accent-emphasis) 20%, transparent))' }}
-                  >
-                    <Brain className="w-12 h-12" style={{ color: 'var(--gh-accent-emphasis)' }} />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-2">No custom paths yet</h3>
-                  <p className="text-muted-foreground mb-6">Create your first custom learning path to get started</p>
-                  <Button
-                    onClick={() => setLocation('/learning-paths')}
-                    variant="primary"
-                    size="lg"
-                  >
-                    Create Your First Path
-                  </Button>
-                </div>
-              </motion.div>
             )}
 
             {/* Curated Paths Section */}

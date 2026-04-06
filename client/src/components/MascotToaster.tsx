@@ -6,6 +6,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MOTION } from '@/lib/motion';
 import { useToast } from '@/hooks/use-toast';
 import { X, CheckCircle, XCircle, MessageSquare, AlertTriangle, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -104,7 +105,7 @@ function MascotBubble({
       initial={{ opacity: 0, y: 20, scale: 0.8 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -10, scale: 0.9 }}
-      transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+      transition={MOTION.spring}
       className="fixed bottom-20 z-[var(--z-toast)] max-w-xs"
       style={{ left: Math.max(16, Math.min(mascotPosition - 80, window.innerWidth - 280)) }}
     >

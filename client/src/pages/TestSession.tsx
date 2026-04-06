@@ -2,7 +2,7 @@
  * Test Session - Quiz interface
  */
 
-import { useState, useEffect, useMemo, useCallback, memo } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
 import { useLocation, useParams } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -124,6 +124,8 @@ export default function TestSession() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [startTime, setStartTime] = useState<number>(0);
+  const [elapsed, setElapsed] = useState(0);
+  const elapsedRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [result, setResult] = useState<{ score: number; correct: number; total: number; passed: boolean } | null>(null);
   const [showFeedback, setShowFeedback] = useState<'correct' | 'incorrect' | null>(null);
 
@@ -155,10 +157,20 @@ export default function TestSession() {
     setQuestions(sessionQuestions);
     setAnswers({});
     setCurrentIndex(0);
+    setElapsed(0);
     setStartTime(Date.now());
     setResult(null);
     setSessionState('in-progress');
   }, [test]);
+
+  useEffect(() => {
+    if (sessionState === 'in-progress') {
+      elapsedRef.current = setInterval(() => setElapsed(s => s + 1), 1000);
+    } else {
+      if (elapsedRef.current) clearInterval(elapsedRef.current);
+    }
+    return () => { if (elapsedRef.current) clearInterval(elapsedRef.current); };
+  }, [sessionState]);
 
   const handleOptionSelect = useCallback((optionId: string) => {
     if (!currentQuestion) return;
@@ -369,7 +381,11 @@ export default function TestSession() {
                   />
                 </div>
               </div>
-              
+
+              <span className="text-xs font-mono text-muted-foreground tabular-nums" aria-live="polite" aria-label="Elapsed time">
+                {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}
+              </span>
+
               <span className="text-xs text-muted-foreground">
                 {answeredCount}/{questions.length}
               </span>

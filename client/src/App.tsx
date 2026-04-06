@@ -25,6 +25,11 @@ import {
   CertificationsSkeleton,
   ProfileSkeleton,
   GenericPageSkeleton,
+  BookmarkListSkeleton,
+  TestsListSkeleton,
+  MyPathTimelineSkeleton,
+  BadgeGridSkeleton,
+  LearningPathListSkeleton,
 } from "@/components/skeletons/PageSkeletons";
 
 // Import prefetch utilities
@@ -181,16 +186,16 @@ const VoiceSessionRoute = S(VoiceSession, VoiceSkeleton);
 const CodingChallengeRoute = S(CodingChallenge, CodingSkeleton);
 const ReviewSessionRoute = S(ReviewSession, ReviewSkeleton);
 const StatsRoute = S(Stats, StatsSkeleton);
-const BookmarksRoute = S(Bookmarks, GenericPageSkeleton);
+const BookmarksRoute = S(Bookmarks, BookmarkListSkeleton);
 const ProfileRoute = S(Profile, ProfileSkeleton);
-const LearningPathsRoute = S(LearningPaths, GenericPageSkeleton);
-const BadgesRoute = S(Badges, GenericPageSkeleton);
+const LearningPathsRoute = S(LearningPaths, LearningPathListSkeleton);
+const BadgesRoute = S(Badges, BadgeGridSkeleton);
 const CertificationsRoute = S(Certifications, CertificationsSkeleton);
 const CertificationPracticeRoute = S(CertificationPractice, CertificationsSkeleton);
 const CertificationExamRoute = S(CertificationExam, CertificationsSkeleton);
-const TestsRoute = S(Tests, GenericPageSkeleton);
+const TestsRoute = S(Tests, TestsListSkeleton);
 const TestSessionRoute = S(TestSession, GenericPageSkeleton);
-const MyPathRoute = S(MyPath, GenericPageSkeleton);
+const MyPathRoute = S(MyPath, MyPathTimelineSkeleton);
 const PathDetailRoute = S(PathDetail, GenericPageSkeleton);
 const OnboardingRoute = S(Onboarding, GenericPageSkeleton);
 const AboutRoute = S(About, GenericPageSkeleton);

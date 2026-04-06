@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { MOTION } from '@/lib/motion';
 import { Zap, Target, Flame, Bookmark, Clock, Check, Building2, Hash, TrendingUp, Brain, Sparkles } from 'lucide-react';
 import type { Question } from '../lib/data';
 import { formatTag } from '../lib/utils';
@@ -265,7 +266,7 @@ export function QuestionPanel({
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={MOTION.default}
           className={`font-bold text-foreground leading-tight ${
             question.question.length > 200 
               ? 'text-sm sm:text-base lg:text-lg' 

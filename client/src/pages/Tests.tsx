@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { AppLayout } from '@/lib/ui';
+import { AppLayout, EmptyState } from '@/lib/ui';
 import { SEOHead } from '@/lib/ui';
 import { Button } from '@/lib/ui';
 import { Input } from '@/lib/ui';
@@ -158,44 +158,56 @@ export default function Tests() {
 
             {/* Tests Grid */}
             {loading ? (
-              <div className="flex items-center justify-center min-h-[50vh]">
-                <div className="text-center">
-                  <div className="text-4xl mb-4">⏳</div>
-                  <p className="text-muted-foreground">Loading tests...</p>
-                </div>
-              </div>
+              <EmptyState
+                icon={<Clock className="w-8 h-8" />}
+                title="Loading tests…"
+                description="Fetching your available tests and progress."
+                variant="default"
+                size="md"
+                animated={false}
+              />
             ) : error ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center min-h-[50vh] text-center"
-              >
-                <div className="bg-[var(--gh-danger-emphasis,#cf222e)]/10 border border-[var(--gh-danger-emphasis,#cf222e)]/30 p-6 rounded-xl mb-6 max-w-md">
-                  <AlertTriangle className="w-12 h-12 text-[var(--gh-danger-emphasis,#cf222e)] mx-auto mb-4" />
-                  <h3 className="text-xl font-bold mb-2">Failed to load tests</h3>
-                  <p className="text-muted-foreground mb-4">{error}</p>
-                </div>
-                <Button
-                  variant="primary"
-                  onClick={loadTestsData}
-                  className="gap-2"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Try Again
-                </Button>
-              </motion.div>
+              <EmptyState
+                icon={<AlertTriangle className="w-8 h-8" />}
+                title="Failed to load tests"
+                description={error}
+                variant="error"
+                size="md"
+                action={
+                  <Button variant="primary" onClick={loadTestsData} className="gap-2">
+                    <RefreshCw className="w-4 h-4" />
+                    Try Again
+                  </Button>
+                }
+              />
             ) : filteredTests.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center justify-center min-h-[50vh]"
-              >
-                <div className="text-center">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <h3 className="text-2xl font-bold mb-2">No tests found</h3>
-                  <p className="text-muted-foreground">Try a different search term</p>
-                </div>
-              </motion.div>
+              searchQuery ? (
+                <EmptyState
+                  icon={<Search className="w-8 h-8" />}
+                  title="No tests match your search"
+                  description={`No results for "${searchQuery}". Try a different keyword or clear the search.`}
+                  variant="default"
+                  size="md"
+                  action={
+                    <Button variant="secondary" onClick={() => setSearchQuery('')}>
+                      Clear search
+                    </Button>
+                  }
+                />
+              ) : (
+                <EmptyState
+                  icon={<Target className="w-8 h-8" />}
+                  title="No tests available yet"
+                  description="Tests are generated from your subscribed channels. Subscribe to a channel to unlock tests."
+                  variant="info"
+                  size="lg"
+                  action={
+                    <Button variant="primary" onClick={() => setLocation('/channels')}>
+                      Browse Channels
+                    </Button>
+                  }
+                />
+              )
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredTests.map((test, i) => {
