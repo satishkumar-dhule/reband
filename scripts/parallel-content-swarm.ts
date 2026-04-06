@@ -818,6 +818,13 @@ function releaseSlot(slot: number): void {
   activeSlots.delete(slot);
 }
 
+// SIGTERM then SIGKILL after 5 s if the process is still alive
+function forceKillProcess(proc: ReturnType<typeof spawn>): void {
+  proc.kill("SIGTERM");
+  const kg = setTimeout(() => { try { proc.kill("SIGKILL"); } catch (_) {} }, 5_000);
+  proc.once("close", () => clearTimeout(kg));
+}
+
 async function launchAgent(agent: Agent): Promise<void> {
   if (activeSlots.size >= MAX_WORKERS || systemOverloaded()) {
     await waitForCapacity();
@@ -860,7 +867,7 @@ async function launchAgent(agent: Agent): Promise<void> {
 
   child.stdout?.on("data", (data) => { stdout += data.toString(); });
 
-  const timer = setTimeout(() => child.kill("SIGTERM"), TIMEOUT_MS);
+  const timer = setTimeout(() => forceKillProcess(child), TIMEOUT_MS);
 
   child.on("close", async () => {
     clearTimeout(timer);
@@ -876,28 +883,44 @@ async function launchAgent(agent: Agent): Promise<void> {
     agent.endedAt = Date.now();
     agent.child = undefined;
 
+    const shouldRetry = agent.generated === 0 && agent.retries < MAX_RETRIES;
+
     if (agent.generated > 0) {
       agent.status = "done";
-    } else if (agent.retries < MAX_RETRIES) {
+      releaseSlot(slot);
+    } else if (shouldRetry) {
       agent.retries++;
       agent.status = "pending";
       agent.baseline = final;
       agent.generated = 0;
+      agent.stalled = false;
+      releaseSlot(slot);
+      // Wait with exponential backoff then re-launch — without this the agent
+      // just sits as "pending" and never executes again.
       await new Promise(r => setTimeout(r, BASE_RETRY_MS * Math.pow(2, agent.retries - 1)));
+      launchAgent(agent).catch(() => { agent.status = "failed"; });
     } else {
       agent.status = "failed";
+      releaseSlot(slot);
     }
-
-    releaseSlot(slot);
   });
 
   child.on("error", () => {
     clearTimeout(timer);
     clearInterval(pollTimer);
-    agent.status = "failed";
     agent.endedAt = Date.now();
     agent.child = undefined;
-    releaseSlot(slot);
+    if (agent.retries < MAX_RETRIES) {
+      agent.retries++;
+      agent.status = "pending";
+      agent.stalled = false;
+      releaseSlot(slot);
+      setTimeout(() => { launchAgent(agent).catch(() => { agent.status = "failed"; }); },
+        BASE_RETRY_MS * Math.pow(2, agent.retries - 1));
+    } else {
+      agent.status = "failed";
+      releaseSlot(slot);
+    }
   });
 }
 
@@ -962,11 +985,14 @@ async function main() {
   });
 
   const stallMonitor = setInterval(() => {
-    const active = getActiveAgents();
-    for (const agent of active) {
-      if (agent.stalled && agent.child && agent.retries < MAX_RETRIES) {
-        console.log("\n" + C.y + "⚠ Stall detected on " + agent.task.type + "/" + agent.task.label + ", restarting..." + C.r);
-        agent.child.kill("SIGTERM");
+    for (const agent of getActiveAgents()) {
+      if (agent.stalled && agent.child) {
+        // Force-kill (SIGTERM → SIGKILL after 5 s) regardless of retry count.
+        // The close handler decides whether to retry or mark as failed.
+        // Clear stalled immediately so we don't re-signal on the next tick
+        // before the process has had time to exit.
+        forceKillProcess(agent.child);
+        agent.stalled = false;
       }
     }
   }, STALL_THRESHOLD_MS);
