@@ -112,7 +112,7 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
 
       {/* ─── TOP HEADER ─────────────────────────────────── */}
       <header
-        className="fixed top-0 left-0 right-0 z-50 h-[56px] flex items-center gap-3 px-4 border-b"
+        className="fixed top-0 left-0 right-0 z-[var(--z-header)] h-[var(--header-height)] flex items-center gap-3 px-4 border-b"
         style={{ background: "var(--header-bg)", borderColor: "var(--sidebar-border)" }}
       >
         {/* Logo */}
@@ -166,31 +166,31 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
       </header>
 
       {/* ─── BODY (below fixed header) ──────────────────── */}
-      <div className="flex pt-[56px] min-h-[calc(100vh-56px)]">
+      <div className="flex justify-center pt-[var(--header-height)] min-h-[calc(100vh-var(--header-height))]">
+        {/* Shared max-width wrapper keeps sidebar + content aligned */}
+        <div className={cn("flex flex-1 w-full", !fullWidth && "max-w-[--container-max]")}>
 
-        {/* ─── DESKTOP SIDEBAR ──────────────────────────── */}
-        <aside
-          className="hidden lg:block shrink-0 w-52 xl:w-60 border-r"
-          style={{ background: "var(--sidebar-bg)", borderColor: "var(--sidebar-border)" }}
-        >
-          <div className="sticky top-[56px] h-[calc(100vh-56px)] overflow-y-auto">
-            <SidebarNav />
-          </div>
-        </aside>
+          {/* ─── DESKTOP SIDEBAR ──────────────────────────── */}
+          <aside
+            className="hidden lg:block shrink-0 w-52 xl:w-60 border-r"
+            style={{ background: "var(--sidebar-bg)", borderColor: "var(--sidebar-border)" }}
+          >
+            <div className="sticky top-[var(--header-height)] h-[calc(100vh-var(--header-height))] overflow-y-auto">
+              <SidebarNav />
+            </div>
+          </aside>
 
-        {/* ─── MAIN CONTENT ─────────────────────────────── */}
-        <main className={cn(
-          "flex-1 min-w-0 pb-[60px] lg:pb-0",
-          !fullWidth && "max-w-[--container-max] mx-auto"
-        )}>
-          {children}
-        </main>
+          {/* ─── MAIN CONTENT ─────────────────────────────── */}
+          <main className="flex-1 min-w-0 pb-[60px] lg:pb-0">
+            {children}
+          </main>
+        </div>
       </div>
 
       {/* ─── MOBILE DRAWER ──────────────────────────────── */}
       {mobileOpen && (
         <div 
-          className="lg:hidden fixed inset-0 z-[60] flex"
+          className="lg:hidden fixed inset-0 z-[var(--z-drawer)] flex"
           role="dialog"
           aria-modal="true"
           aria-label="Navigation menu"
@@ -208,7 +208,7 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
             role="document"
           >
             <div
-              className="flex items-center justify-between px-4 h-[56px] border-b shrink-0"
+              className="flex items-center justify-between px-4 h-[var(--header-height)] border-b shrink-0"
               style={{ borderColor: "var(--sidebar-border)" }}
             >
               <div className="flex items-center gap-2">

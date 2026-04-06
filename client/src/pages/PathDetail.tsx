@@ -6,6 +6,7 @@ import { SEOHead } from '@/lib/ui';
 import { curatedPaths } from '../lib/learning-paths-data';
 import { allChannelsConfig } from '../lib/channels-config';
 import { Button } from '@/lib/ui';
+import { getDifficultyClasses, getDifficultyLabel } from '@/lib/difficulty';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
 import {
   Home, ChevronRight, Clock, Trophy, CheckCircle2, Circle,
@@ -149,14 +150,6 @@ export default function PathDetail() {
   }
 
   const Icon = path.icon;
-  const difficultyColor =
-    path.difficulty === 'Beginner' || path.difficulty === 'Beginner Friendly'
-      ? 'text-[var(--gh-success-fg)] bg-[var(--gh-success-subtle)] border-[var(--gh-success-muted)]'
-      : path.difficulty === 'Intermediate'
-      ? 'text-[var(--gh-attention-fg)] bg-[var(--gh-attention-subtle)] border-[var(--gh-attention-muted)]'
-      : path.difficulty === 'Advanced'
-      ? 'text-[var(--gh-danger-fg)] bg-[var(--gh-danger-subtle)] border-[var(--gh-danger-muted)]'
-      : 'text-[var(--gh-fg-muted)] bg-[var(--gh-canvas-subtle)] border-[var(--gh-border)]';
 
   return (
     <>
@@ -204,7 +197,7 @@ export default function PathDetail() {
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <h1 className="text-xl font-semibold text-[var(--gh-fg)]">{path.name}</h1>
                     {path.difficulty !== 'Custom' && (
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${difficultyColor}`}>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${getDifficultyClasses(path.difficulty)}`}>
                         {path.difficulty}
                       </span>
                     )}

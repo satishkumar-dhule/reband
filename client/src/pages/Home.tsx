@@ -16,6 +16,7 @@ import { useCredits } from "../context/CreditsContext";
 import { useUserPreferences } from "../context/UserPreferencesContext";
 import { useAchievementContext } from "../context/AchievementContext";
 import { Button } from '@/lib/ui';
+import { ProgressBar } from '@/lib/ui';
 import { HomeSkeleton } from '@/lib/ui';
 import { t } from "@/lib/i18n";
 
@@ -223,12 +224,7 @@ const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }
           <span>{progress.completed}/{questionCount} done</span>
           <span>{progress.pct}%</span>
         </div>
-        <div className="gh-progress" role="progressbar" aria-valuenow={progress.pct} aria-valuemin={0} aria-valuemax={100} aria-label="Progress">
-          <div
-            className="gh-progress-bar"
-            style={{ width: `${progress.pct}%` }}
-          />
-        </div>
+        <ProgressBar current={progress.completed} max={questionCount} size="sm" showPercentage={false} />
       </div>
 
       <div className="flex items-center gap-3 text-xs text-[var(--gh-fg-muted)]">
@@ -349,7 +345,7 @@ export default function Home() {
               {/* Quick actions — compact toolbar on desktop, card grid on mobile */}
               <section>
                 <h2 className="text-sm font-semibold text-[var(--gh-fg)] mb-3">{t('home.quickActions')}</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-4 gap-2">
                   {quickActions.map((action) => {
                     const Icon = action.icon;
                     return (
@@ -464,12 +460,7 @@ export default function Home() {
                     <span>{t('home.stats.totalCompletion')}</span>
                     <span className="font-medium text-[var(--gh-fg)]">{overallProgress}%</span>
                   </div>
-                  <div className="gh-progress">
-                    <div
-                      className="gh-progress-bar"
-                      style={{ width: `${overallProgress}%` }}
-                    />
-                  </div>
+                  <ProgressBar current={overallProgress} max={100} size="sm" showPercentage={false} />
                 </div>
               </section>
 

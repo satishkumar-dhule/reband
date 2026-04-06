@@ -191,6 +191,23 @@
   --gh-bg-elevated: #161b22;
   --gh-bg-muted: #21262d;
   --gh-bg-inset: #0d1117;
+
+  /* ===== TIER / BADGE SEMANTIC COLORS (dark mode) ===== */
+  --tier-bronze-fg:   #d97706;
+  --tier-bronze-bg:   #1c1400;
+  --tier-bronze-border: #78350f;
+  --tier-silver-fg:   #9ca3af;
+  --tier-silver-bg:   #111827;
+  --tier-silver-border: #374151;
+  --tier-gold-fg:     #eab308;
+  --tier-gold-bg:     #1c1a00;
+  --tier-gold-border: #713f12;
+  --tier-platinum-fg: #22d3ee;
+  --tier-platinum-bg: #001f29;
+  --tier-platinum-border: #164e63;
+  --tier-diamond-fg:  #a78bfa;
+  --tier-diamond-bg:  #1e0035;
+  --tier-diamond-border: #4c1d95;
 }
 
 /* ===== LEGACY COMPATIBILITY ALIASES ===== */
@@ -294,6 +311,71 @@
   --container-lg: 1012px;
   --container-xl: 1280px;
   --container-max: 1280px;
+
+  /* ===== LAYOUT DIMENSIONS ===== */
+  /* Single source of truth for fixed heights — change here, works everywhere */
+  --header-height: 56px;
+
+  /* ===== Z-INDEX SCALE ===== */
+  /* Documented stacking context — use these vars instead of magic numbers */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 20;
+  --z-header: 50;
+  --z-drawer: 60;
+  --z-overlay: 65;
+  --z-submenu: 70;
+  --z-toast: 80;
+  --z-modal: 90;
+  --z-tooltip: 100;
+
+  /* ===== BORDER RADIUS SCALE ===== */
+  /* Single scale for the whole app — desktop and mobile share these tiers */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-2xl: 32px;
+  --radius-full: 9999px;
+
+  /* ===== TIER / BADGE SEMANTIC COLORS ===== */
+  /* Achievement badge tier colors — add a new tier here, nowhere else */
+  --tier-bronze-fg:   #92400e;
+  --tier-bronze-bg:   #fffbeb;
+  --tier-bronze-border: #fde68a;
+  --tier-silver-fg:   #374151;
+  --tier-silver-bg:   #f9fafb;
+  --tier-silver-border: #d1d5db;
+  --tier-gold-fg:     #854d0e;
+  --tier-gold-bg:     #fefce8;
+  --tier-gold-border: #fef08a;
+  --tier-platinum-fg: #164e63;
+  --tier-platinum-bg: #ecfeff;
+  --tier-platinum-border: #a5f3fc;
+  --tier-diamond-fg:  #4c1d95;
+  --tier-diamond-bg:  #f5f3ff;
+  --tier-diamond-border: #ddd6fe;
+}
+
+/* ===== DESIGN-SYSTEM.CSS SHIMS ===== */
+/*
+ * Compatibility aliases — maps old design-system.css variable names to the
+ * canonical github-tokens.css names. This allows gradual migration without
+ * breaking components that still reference the old names.
+ */
+:root {
+  --color-text-primary: var(--gh-fg);
+  --color-text-secondary: var(--gh-fg-muted);
+  --color-text-tertiary: var(--gh-fg-subtle);
+  --color-border-default: var(--gh-border);
+  --color-border-subtle: var(--gh-border-muted);
+  --color-success: var(--gh-success-fg);
+  --color-warning: var(--gh-attention-fg);
+  --color-error: var(--gh-danger-fg);
+  --color-info: var(--gh-accent-fg);
+  --color-difficulty-beginner: var(--gh-diff-beginner);
+  --color-difficulty-intermediate: var(--gh-diff-intermediate);
+  --color-difficulty-advanced: var(--gh-diff-advanced);
 }
 
 /* ===== MEDIA QUERY FOR PREFERENCES ===== */

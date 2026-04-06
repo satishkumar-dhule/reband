@@ -13,7 +13,7 @@ import { Haptics } from '../lib/haptics';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
 import { AppLayout } from '@/lib/ui';
-import { Button, IconButton } from '@/lib/ui';
+import { Button, IconButton, Badge } from '@/lib/ui';
 import { QuestionViewerSkeleton, ReviewSkeleton } from '@/lib/ui';
 import {
   getCard, recordReview, addToSRS,
@@ -400,7 +400,7 @@ export default function QuestionViewer() {
       <div className="flex flex-col min-h-screen bg-[var(--gh-canvas-subtle)]">
         {/* Top Breadcrumb & Nav Bar */}
         <div className="sticky top-14 z-20 bg-[var(--gh-canvas)] border-b border-[var(--gh-border)] px-4 py-2">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 overflow-hidden">
               <Link href="/" className="text-[var(--gh-accent-fg)] hover:underline whitespace-nowrap flex items-center gap-1 text-sm">
                 <Home className="w-3.5 h-3.5" />
@@ -444,7 +444,7 @@ export default function QuestionViewer() {
 
         {/* Tab Navigation */}
         <div className="border-b border-[var(--gh-border)] bg-[var(--gh-canvas)]">
-          <div className="max-w-7xl mx-auto px-4">
+          <div className="px-4">
             <nav className="flex gap-1 -mb-px" aria-label="Main view">
               {(
                 [
@@ -481,7 +481,7 @@ export default function QuestionViewer() {
         <PanelGroup
           direction="horizontal"
           autoSaveId="question-viewer-panels"
-          className="panel-group-responsive max-w-7xl mx-auto w-full px-4 py-6"
+          className="panel-group-responsive w-full px-4 py-6"
         >
           {/* Main Content (Left) */}
           <Panel defaultSize={65} minSize={40} className="min-w-0">
@@ -526,9 +526,9 @@ export default function QuestionViewer() {
               {currentQuestion?.tags && currentQuestion.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-4">
                   {currentQuestion.tags.map(tag => (
-                    <span key={tag} className="text-xs text-[var(--gh-fg-muted)] bg-[var(--gh-canvas-subtle)] px-2 py-0.5 rounded-full border border-[var(--gh-border)]">
+                    <Badge key={tag} variant="secondary" className="text-xs">
                       {tag}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               )}

@@ -7,6 +7,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery } from "@tanstack/react-query";
+import { getDifficultyClasses, getDifficultyLabel } from '@/lib/difficulty';
 import {
   AppLayout, SEOHead, SkipLink, Button, Badge,
   PageHeader, SearchInput, CertificationsSkeleton, EmptyState,
@@ -45,12 +46,6 @@ const iconMap: Record<string, React.ElementType> = {
   infinity: GitBranch, 'git-branch': GitBranch, award: Award,
 };
 
-const difficultyConfig: Record<string, { label: string; className: string }> = {
-  beginner:     { label: 'Beginner',     className: 'text-green-700 dark:text-green-400 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/40' },
-  intermediate: { label: 'Intermediate', className: 'text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/40' },
-  advanced:     { label: 'Advanced',     className: 'text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/40' },
-  expert:       { label: 'Expert',       className: 'text-red-700 dark:text-red-400 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40' },
-};
 
 const categoryLabels: Record<string, string> = {
   cloud: 'Cloud', devops: 'DevOps', security: 'Security',
@@ -246,7 +241,6 @@ function CertCard({ cert, isStarted, onToggleStarted, onNavigate }: CertCardProp
   const completedCount = getCertProgress(cert.id);
   const progressPct = questionCount > 0 ? Math.min(100, Math.round((completedCount / questionCount) * 100)) : 0;
   const hasQuestions = questionCount > 0;
-  const diff = difficultyConfig[cert.difficulty] ?? difficultyConfig.intermediate;
   const catLabel = categoryLabels[cert.category] ?? cert.category;
 
   return (
@@ -264,8 +258,8 @@ function CertCard({ cert, isStarted, onToggleStarted, onNavigate }: CertCardProp
           <h3 className="text-sm font-semibold leading-tight line-clamp-2">{cert.name}</h3>
           {examCode && <p className="text-[10px] text-muted-foreground mt-0.5">{examCode}</p>}
         </div>
-        <Badge className={`text-[10px] capitalize shrink-0 ${diff.className}`}>
-          {diff.label}
+        <Badge className={`text-[10px] capitalize shrink-0 ${getDifficultyClasses(cert.difficulty)}`}>
+          {getDifficultyLabel(cert.difficulty)}
         </Badge>
       </div>
 

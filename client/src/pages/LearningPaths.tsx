@@ -8,6 +8,7 @@ import { allChannelsConfig } from '../lib/channels-config';
 import { curatedPaths } from '../lib/learning-paths-data';
 import { Plus, ChevronRight, Check, X, Search, Clock, Trophy } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { getDifficultyClasses } from '@/lib/difficulty';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -25,13 +26,6 @@ interface CustomPath {
   certifications: string[];
 }
 
-// ─── Difficulty badge config ──────────────────────────────────────────────────
-
-const difficultyClass: Record<string, string> = {
-  Beginner:     'text-green-700  dark:text-green-400  border-green-200  dark:border-green-800  bg-green-50  dark:bg-green-950/40',
-  Intermediate: 'text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/40',
-  Advanced:     'text-red-700    dark:text-red-400    border-red-200    dark:border-red-800    bg-red-50    dark:bg-red-950/40',
-};
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -195,7 +189,7 @@ export default function LearningPaths() {
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm leading-tight">{path.name}</h3>
                       </div>
-                      <Badge className={`text-[10px] capitalize shrink-0 ${difficultyClass[path.difficulty] ?? ''}`}>
+                      <Badge className={`text-[10px] capitalize shrink-0 ${getDifficultyClasses(path.difficulty)}`}>
                         {path.difficulty}
                       </Badge>
                     </div>

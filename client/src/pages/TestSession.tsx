@@ -10,6 +10,7 @@ import {
   Home, Check, X, Zap
 } from 'lucide-react';
 import { SEOHead } from '@/lib/ui';
+import { getDifficultyClasses } from '@/lib/difficulty';
 import { DesktopSidebarWrapper } from '@/lib/ui';
 import { GenZCard, GenZButton, GenZProgress, GenZTimer } from '@/lib/ui';
 import { Button } from '@/lib/ui';
@@ -52,11 +53,7 @@ const QuestionDisplay = memo(function QuestionDisplay({
         }`}>
           {isMultiple ? 'Select all that apply' : 'Single choice'}
         </span>
-        <span className={`px-2 py-0.5 text-xs uppercase rounded ${
-          question.difficulty === 'beginner' ? 'bg-primary/20 text-primary' :
-          question.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
-          'bg-destructive/20 text-destructive'
-        }`}>
+        <span className={`px-2 py-0.5 text-xs uppercase rounded border ${getDifficultyClasses(question.difficulty)}`}>
           {question.difficulty}
         </span>
       </div>

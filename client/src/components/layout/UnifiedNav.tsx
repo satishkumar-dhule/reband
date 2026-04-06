@@ -156,7 +156,7 @@ export function MobileBottomNav() {
       {/* Backdrop Overlay - CSS-only animation */}
       {showMenu && (
         <div
-          className={`fixed inset-0 z-[65] bg-background/80 backdrop-blur-md lg:hidden ${prefersReducedMotion ? '' : 'animate-fade-in'}`}
+          className={`fixed inset-0 z-[var(--z-overlay)] bg-background/80 backdrop-blur-md lg:hidden ${prefersReducedMotion ? '' : 'animate-fade-in'}`}
           style={{ animationDuration: prefersReducedMotion ? '0ms' : '200ms' }}
           onClick={() => setShowMenu(null)}
         />
@@ -165,7 +165,7 @@ export function MobileBottomNav() {
       {/* Full-screen Submenu with Premium UX - CSS-only animation */}
       {showMenu && currentSubNav.length > 0 && (
         <div
-          className={`fixed inset-x-0 bottom-0 z-[70] glass-card border-t border-border rounded-t-[32px] shadow-2xl overflow-hidden lg:hidden max-h-[80vh] flex flex-col ${prefersReducedMotion ? '' : 'animate-slide-up'}`}
+          className={`fixed inset-x-0 bottom-0 z-[var(--z-submenu)] glass-card border-t border-border rounded-t-[32px] shadow-2xl overflow-hidden lg:hidden max-h-[80vh] flex flex-col ${prefersReducedMotion ? '' : 'animate-slide-up'}`}
           style={{ 
             background: 'var(--gh-canvas-overlay)',
             animationDuration: prefersReducedMotion ? '0ms' : '300ms',
@@ -232,7 +232,7 @@ export function MobileBottomNav() {
                 >
                   {/* Icon - Glow effect for active state */}
                   <div className={cn(
-                    "w-14 h-14 rounded-[16px] flex items-center justify-center flex-shrink-0 transition-all",
+                    "w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0 transition-all",
                     isActive 
                       ? "bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30" 
                       : isVoice 
@@ -240,7 +240,7 @@ export function MobileBottomNav() {
                         : "bg-background"
                   )}>
                     <Icon className={cn(
-                      "w-7 h-7",
+                      "w-5 h-5",
                       isActive ? "text-primary-foreground" : "text-foreground"
                     )} strokeWidth={2} />
                   </div>
@@ -285,7 +285,7 @@ export function MobileBottomNav() {
       )}
 
       {/* Bottom Navigation Bar - Premium Glassmorphism */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden pb-safe">
+      <nav className="fixed bottom-0 left-0 right-0 z-[var(--z-header)] lg:hidden pb-safe">
         <div className="glass-card border-t border-border shadow-2xl" style={{ 
           background: 'var(--gh-canvas-overlay)',
           backdropFilter: 'blur(24px) saturate(200%)',

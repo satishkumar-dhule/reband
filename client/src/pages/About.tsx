@@ -16,6 +16,7 @@ import { getAllQuestions, channels } from '../lib/data';
 import { cn } from '../lib/utils';
 import { Button, MotionButton, IconButton } from '@/lib/ui';
 import { Input } from '@/lib/ui';
+import { CodeBlock } from '@/components/CodeBlock';
 
 // Animated counter component
 function AnimatedCounter({ value, duration = 2 }: { value: number; duration?: number }) {
@@ -66,32 +67,6 @@ function TerminalTyping({ text, delay = 0 }: { text: string; delay?: number }) {
   );
 }
 
-// Code snippet with copy functionality
-function CodeSnippet({ code, language = 'bash' }: { code: string; language?: string }) {
-  const [copied, setCopied] = useState(false);
-  
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="relative group">
-      <pre className="bg-background/80 p-4 rounded-lg text-xs overflow-x-auto font-mono text-[var(--gh-fg)]">
-        <code>{code}</code>
-      </pre>
-      <IconButton
-        onClick={handleCopy}
-        size="sm"
-        icon={copied ? <Check className="w-3 h-3 text-[var(--gh-success-fg)]" /> : <Copy className="w-3 h-3" />}
-        aria-label="Copy to clipboard"
-        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
-        variant="ghost"
-      />
-    </div>
-  );
-}
 
 // Floating tech icons background
 function FloatingIcons() {
@@ -545,13 +520,13 @@ export default function About() {
                       <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                         <Terminal className="w-5 h-5 text-primary" /> Quick Start
                       </h3>
-                      <CodeSnippet code={`# Clone and run locally
+                      <CodeBlock code={`# Clone and run locally
 git clone https://github.com/open-interview/open-interview.git
 cd open-interview
 pnpm install
 pnpm dev
 
-# Or just visit: https://open-interview.github.io`} />
+# Or just visit: https://open-interview.github.io`} language="bash" />
                     </div>
                   </div>
                 </motion.div>
@@ -731,7 +706,7 @@ pnpm dev
 
                   <div className="border border-border rounded-xl p-6 bg-card">
                     <h3 className="font-bold text-lg mb-4">Contributing Guide</h3>
-                    <CodeSnippet code={`# Fork and clone the repo
+                    <CodeBlock code={`# Fork and clone the repo
 git clone https://github.com/YOUR_USERNAME/open-interview.git
 
 # Create a feature branch
@@ -741,7 +716,7 @@ git checkout -b feature/awesome-feature
 git commit -m "Add awesome feature"
 
 # Push and create a PR
-git push origin feature/awesome-feature`} />
+git push origin feature/awesome-feature`} language="bash" />
                   </div>
                 </motion.div>
               )}
