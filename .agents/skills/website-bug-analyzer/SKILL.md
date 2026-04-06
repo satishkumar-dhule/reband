@@ -1,3 +1,8 @@
+---
+name: website-bug-analyzer
+description: Analyzes websites for UI/UX bugs and creates structured bug reports for GitHub issues.
+---
+
 # Skill: Website Bug Analyzer
 
 ## Overview

@@ -1,3 +1,8 @@
+---
+name: github-theme-components
+description: GitHub-style UI component library for React applications using shadcn/ui and Tailwind CSS 4.
+---
+
 # Skill: github-theme-components
 
 # GitHub Theme Component Library

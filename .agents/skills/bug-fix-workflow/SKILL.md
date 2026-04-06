@@ -1,3 +1,8 @@
+---
+name: bug-fix-workflow
+description: Standardized TDD-based bug fix workflow with GitHub issue integration for tracking progress.
+---
+
 # Skill: Bug Fix Workflow
 
 ## Overview

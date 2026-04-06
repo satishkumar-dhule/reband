@@ -1,3 +1,8 @@
+---
+name: github-theme-migration
+description: Instructions for migrating DevPrep to a GitHub-inspired design language, covering visual design system and component patterns.
+---
+
 # Skill: github-theme-migration
 
 # GitHub-Like Theme Migration for DevPrep
