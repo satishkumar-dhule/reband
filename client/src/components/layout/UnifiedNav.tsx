@@ -318,20 +318,7 @@ export function MobileBottomNav() {
           backdropFilter: 'blur(24px) saturate(200%)',
           WebkitBackdropFilter: 'blur(24px) saturate(200%)'
         }}>
-          {/* Active Indicator - CSS custom properties for position */}
-          <div 
-            className="h-1 rounded-full transition-all duration-200 ease-out"
-            style={{ 
-              background: 'var(--gh-success-fg)',
-              boxShadow: '0 0 20px var(--gh-success-fg)',
-              width: `calc(100% / ${mainNavItems.length} - 16px)`,
-              marginLeft: `calc(${(mainNavItems.findIndex(i => activeSection === i.id) || 0)} * (100% / ${mainNavItems.length}))`,
-              transform: `translateX(8px)`,
-              maxWidth: '48px',
-              marginRight: 'auto'
-            }}
-          />
-          <div className="flex items-center justify-around h-[60px] px-1 max-w-md mx-auto">
+          <div className="flex items-stretch h-[60px]">
             {mainNavItems.map((item) => {
               const isActive = activeSection === item.id;
               const hasSubmenu = item.id === 'practice' || item.id === 'learn' || item.id === 'progress';
@@ -345,13 +332,13 @@ export function MobileBottomNav() {
                   onTouchStart={() => !hasSubmenu && prefetchRoute(item.path)}
                   onMouseEnter={() => !hasSubmenu && prefetchRoute(item.path)}
                   className={cn(
-                    "relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-all touch-manipulation pt-1",
+                    "relative flex flex-col items-center justify-center gap-0.5 flex-1 transition-all touch-manipulation",
                     isActive || isMenuOpen ? "text-primary" : "text-muted-foreground"
                   )}
                   aria-label={item.label}
                   type="button"
                 >
-                  {/* Active Indicator - CSS-only transition */}
+                  {/* Active Indicator - aligned per-item at the top */}
                   <div
                     className={cn(
                       "absolute top-0 w-8 h-0.5 rounded-full transition-opacity duration-200",
@@ -385,7 +372,7 @@ export function MobileBottomNav() {
                   
                   {/* Label */}
                   <span className={cn(
-                    "text-xs font-medium leading-none mt-0.5",
+                    "text-xs font-medium leading-none",
                     isActive || isMenuOpen ? "text-primary" : "text-muted-foreground"
                   )}>
                     {item.label}
