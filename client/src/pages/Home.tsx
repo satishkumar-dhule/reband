@@ -3,21 +3,16 @@ import { useLocation, Link } from "wouter";
 import React, { useMemo, useCallback, lazy, Suspense } from "react";
 import {
   Mic, Code, RotateCcw, BookOpen, ChevronRight,
-  Flame, CheckCircle2, Layers, TrendingUp,
-  Clock, Activity, Brain, Award,
-  Circle, Star, GitFork, AlertCircle, Coins, ArrowRight
+  Flame, CheckCircle2, TrendingUp, Clock,
+  Activity, Brain, Award, Circle, Star,
+  GitFork, AlertCircle
 } from "lucide-react";
-import { AppLayout } from '@/lib/ui';
-import { SEOHead } from '@/lib/ui';
+import { AppLayout, SEOHead, Button, ProgressBar } from "@/lib/ui";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/lib/ui";
 import { allChannelsConfig } from "../lib/channels-config";
 import { cn } from "../lib/utils";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/lib/ui';
-import { useCredits } from "../context/CreditsContext";
 import { useUserPreferences } from "../context/UserPreferencesContext";
 import { useAchievementContext } from "../context/AchievementContext";
-import { Button } from '@/lib/ui';
-import { ProgressBar } from '@/lib/ui';
-import { HomeSkeleton } from '@/lib/ui';
 import { t } from "@/lib/i18n";
 
 const ContributionGrid = lazy(() => import("./ContributionGrid"));
@@ -27,17 +22,22 @@ interface ApiChannel {
   questionCount: number;
 }
 
+interface ActivityStat {
+  date: string;
+  count: number;
+}
+
 function useApiChannels() {
   return useQuery<ApiChannel[]>({
-    queryKey: ['channels'],
+    queryKey: ["channels"],
     staleTime: Infinity,
     gcTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const basePath = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') + '/';
-      const response = await fetch(`${basePath}data/channels.json`);
-      if (!response.ok) throw new Error(`Failed to fetch channels: ${response.status}`);
-      const data = await response.json();
-      if (!Array.isArray(data) || data.length === 0) throw new Error('No channels available');
+      const basePath = (import.meta.env.BASE_URL || "/").replace(/\/$/, "") + "/";
+      const res = await fetch(`${basePath}data/channels.json`);
+      if (!res.ok) throw new Error(`Failed to fetch channels: ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) throw new Error("No channels available");
       return data;
     },
   });
@@ -53,63 +53,88 @@ function getProgress(channelId: string, total: number) {
   }
 }
 
-function useRecentActivity() {
+// Read real activity stats from localStorage (written by ActivityStorage.trackActivity)
+function useActivityStats(): ActivityStat[] {
   return useMemo(() => {
-    const activities: Array<{
-      icon: typeof CheckCircle2;
-      text: string;
-      time: string;
-      color: string;
-    }> = [];
     try {
-      const statsStr = localStorage.getItem('activity-stats');
-      const stats = statsStr ? JSON.parse(statsStr) : [];
+      const raw = localStorage.getItem("activity-stats");
+      return raw ? (JSON.parse(raw) as ActivityStat[]) : [];
+    } catch {
+      return [];
+    }
+  }, []);
+}
+
+function useRecentActivity(activityStats: ActivityStat[]) {
+  return useMemo(() => {
+    const activities: { icon: typeof CheckCircle2; text: string; time: string; color: string }[] = [];
+    try {
       const completedIds = new Set<string>();
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key?.startsWith('progress-')) {
-          const ids = JSON.parse(localStorage.getItem(key) || '[]');
+        if (key?.startsWith("progress-")) {
+          const ids = JSON.parse(localStorage.getItem(key) || "[]");
           ids.forEach((id: string) => completedIds.add(id));
         }
       }
-      const achievementsStr = localStorage.getItem('devprep_achievements');
+      const achievementsStr = localStorage.getItem("devprep_achievements");
       const achievements = achievementsStr ? JSON.parse(achievementsStr) : [];
       const now = new Date();
-      if (completedIds.size > 0) {
-        const today = now.toISOString().split('T')[0];
-        const hasActivityToday = stats.some((s: { date: string }) => s.date === today);
-        if (hasActivityToday) {
-          activities.push({ icon: CheckCircle2, text: `Completed ${completedIds.size} questions`, time: "Today", color: "text-[var(--gh-success-fg)]" });
-        } else if (stats.length > 0) {
-          const lastStat = stats[stats.length - 1];
-          const lastDate = new Date(lastStat.date);
-          const diffDays = Math.floor((now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-          const timeAgo = diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`;
-          activities.push({ icon: CheckCircle2, text: `Completed ${completedIds.size} questions`, time: timeAgo, color: "text-[var(--gh-success-fg)]" });
+
+      if (completedIds.size > 0 && activityStats.length > 0) {
+        const lastStat = activityStats[activityStats.length - 1];
+        const lastDate = new Date(lastStat.date);
+        const diffDays = Math.floor((now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+        const timeAgo = diffDays === 0 ? "Today" : diffDays === 1 ? "Yesterday" : `${diffDays} days ago`;
+        activities.push({
+          icon: CheckCircle2,
+          text: `${lastStat.count} question${lastStat.count !== 1 ? "s" : ""} answered`,
+          time: timeAgo,
+          color: "text-[var(--gh-success-fg)]",
+        });
+        if (completedIds.size > lastStat.count) {
+          activities.push({
+            icon: CheckCircle2,
+            text: `${completedIds.size} questions completed in total`,
+            time: "All time",
+            color: "text-[var(--gh-fg-muted)]",
+          });
         }
       }
+
       if (achievements.length > 0) {
-        const lastAchievement = achievements[achievements.length - 1];
-        const unlockedAt = lastAchievement.unlockedAt ? new Date(lastAchievement.unlockedAt) : now;
+        const last = achievements[achievements.length - 1];
+        const unlockedAt = last.unlockedAt ? new Date(last.unlockedAt) : now;
         const diffDays = Math.floor((now.getTime() - unlockedAt.getTime()) / (1000 * 60 * 60 * 24));
-        const timeAgo = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`;
-        activities.push({ icon: Award, text: `Earned '${lastAchievement.title}' badge`, time: timeAgo, color: "text-[var(--gh-attention-fg)]" });
+        const timeAgo = diffDays === 0 ? "Today" : diffDays === 1 ? "Yesterday" : `${diffDays} days ago`;
+        activities.push({
+          icon: Award,
+          text: `Earned '${last.title}' badge`,
+          time: timeAgo,
+          color: "text-[var(--gh-attention-fg)]",
+        });
       }
-    } catch (error) {
-      console.warn('Failed to load recent activity:', error);
+    } catch {
+      /* silently ignore */
     }
+
     if (activities.length === 0) {
-      return [{ icon: CheckCircle2, text: "Start answering questions to track progress", time: "Now", color: "text-[var(--gh-fg-muted)]" }];
+      activities.push({
+        icon: CheckCircle2,
+        text: "Start answering questions to track progress",
+        time: "Now",
+        color: "text-[var(--gh-fg-muted)]",
+      });
     }
     return activities.slice(0, 5);
-  }, []);
+  }, [activityStats]);
 }
 
 function useEarnedBadges() {
   return useMemo(() => {
     try {
-      const stored = localStorage.getItem('devprep_achievements');
-      return stored ? JSON.parse(stored) : [];
+      const raw = localStorage.getItem("devprep_achievements");
+      return raw ? JSON.parse(raw) : [];
     } catch {
       return [];
     }
@@ -117,29 +142,27 @@ function useEarnedBadges() {
 }
 
 const quickActions = [
-  { label: t('home.action.voicePractice'), icon: Mic, path: "/voice-interview", desc: t('home.action.voicePractice.desc') },
-  { label: t('home.action.codingChallenges'), icon: Code, path: "/coding", desc: t('home.action.codingChallenges.desc') },
-  { label: t('home.action.srsReview'), icon: RotateCcw, path: "/review", desc: t('home.action.srsReview.desc') },
-  { label: t('home.action.learningPaths'), icon: BookOpen, path: "/learning-paths", desc: t('home.action.learningPaths.desc') },
+  { label: t("home.action.voicePractice"), icon: Mic, path: "/voice-interview", desc: t("home.action.voicePractice.desc") },
+  { label: t("home.action.codingChallenges"), icon: Code, path: "/coding", desc: t("home.action.codingChallenges.desc") },
+  { label: t("home.action.srsReview"), icon: RotateCcw, path: "/review", desc: t("home.action.srsReview.desc") },
+  { label: t("home.action.learningPaths"), icon: BookOpen, path: "/learning-paths", desc: t("home.action.learningPaths.desc") },
 ];
 
-// Top-level stat tile shown in the hero row
-function StatTile({ icon: Icon, value, label, color, href }: {
-  icon: any; value: string | number; label: string; color: string; href?: string;
+// Small stat tile used in the hero row
+function StatTile({ icon: Icon, value, label, colorClass }: {
+  icon: any; value: string | number; label: string; colorClass: string;
 }) {
-  const inner = (
-    <div className="gh-card p-4 flex items-center gap-3 h-full">
-      <div className={cn("w-9 h-9 rounded-md flex items-center justify-center shrink-0", color)}>
+  return (
+    <div className="gh-card p-4 flex items-center gap-3">
+      <div className={cn("w-9 h-9 rounded-md flex items-center justify-center shrink-0", colorClass)}>
         <Icon className="w-4 h-4" />
       </div>
       <div className="min-w-0">
-        <div className="text-lg font-semibold text-[var(--gh-fg)] leading-tight truncate">{value}</div>
+        <div className="text-xl font-semibold text-[var(--gh-fg)] leading-tight truncate">{value}</div>
         <div className="text-xs text-[var(--gh-fg-muted)] truncate">{label}</div>
       </div>
     </div>
   );
-  if (href) return <Link href={href} className="block hover-elevate rounded-md">{inner}</Link>;
-  return inner;
 }
 
 const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }: { channelId: string; questionCount: number }) {
@@ -148,49 +171,32 @@ const ChannelCard = React.memo(function ChannelCard({ channelId, questionCount }
   const progress = useMemo(() => getProgress(channelId, questionCount), [channelId, questionCount]);
   if (!config) return null;
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      setLocation(`/channel/${channelId}`);
-    }
-  }, [setLocation, channelId]);
-
   return (
     <Button
       variant="outline"
       onClick={() => setLocation(`/channel/${channelId}`)}
-      onKeyDown={handleKeyDown}
+      onKeyDown={useCallback((e: React.KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setLocation(`/channel/${channelId}`); }
+      }, [setLocation, channelId])}
       className="flex flex-col gap-3 p-4 rounded-md border border-[var(--gh-border)] hover:border-[var(--gh-accent-fg)] cursor-pointer bg-[var(--gh-canvas)] transition-colors group text-left w-full"
       data-testid={`card-channel-${channelId}`}
-      aria-label={`${config.name}: ${progress.completed} of ${questionCount} questions completed, ${progress.pct}% progress`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <BookOpen className="w-4 h-4 text-[var(--gh-accent-fg)] shrink-0" aria-hidden="true" />
-          <span className="font-semibold text-sm text-[var(--gh-accent-fg)] truncate group-hover:underline">{config.name}</span>
-        </div>
+      <div className="flex items-center gap-2 min-w-0">
+        <BookOpen className="w-4 h-4 text-[var(--gh-accent-fg)] shrink-0" />
+        <span className="font-semibold text-sm text-[var(--gh-accent-fg)] truncate group-hover:underline">{config.name}</span>
       </div>
       <p className="text-xs text-[var(--gh-fg-muted)] line-clamp-2 leading-relaxed">{config.description}</p>
       <div className="mt-auto space-y-1.5">
         <div className="flex items-center justify-between text-xs text-[var(--gh-fg-muted)]">
-          <span>{progress.completed}/{questionCount} done</span>
+          <span>{progress.completed}/{questionCount}</span>
           <span>{progress.pct}%</span>
         </div>
         <ProgressBar current={progress.completed} max={questionCount} size="sm" showPercentage={false} />
       </div>
       <div className="flex items-center gap-3 text-xs text-[var(--gh-fg-muted)]">
-        <span className="flex items-center gap-1 capitalize">
-          <Circle className="w-2.5 h-2.5 fill-current" aria-hidden="true" />
-          {config.category}
-        </span>
-        <span className="flex items-center gap-1">
-          <Star className="w-3 h-3" aria-hidden="true" />
-          {questionCount}
-        </span>
-        <span className="flex items-center gap-1">
-          <GitFork className="w-3 h-3" aria-hidden="true" />
-          {progress.pct}%
-        </span>
+        <span className="flex items-center gap-1 capitalize"><Circle className="w-2.5 h-2.5 fill-current" />{config.category}</span>
+        <span className="flex items-center gap-1"><Star className="w-3 h-3" />{questionCount}</span>
+        <span className="flex items-center gap-1"><GitFork className="w-3 h-3" />{progress.pct}%</span>
       </div>
     </Button>
   );
@@ -200,9 +206,8 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const { data: apiChannels = [], isLoading, error } = useApiChannels();
   const earnedBadges = useEarnedBadges();
-  const { preferences } = useUserPreferences();
-  const { balance } = useCredits();
-  const recentActivityData = useRecentActivity();
+  const activityStats = useActivityStats();
+  const recentActivityData = useRecentActivity(activityStats);
 
   const channelMap = useMemo(() =>
     Object.fromEntries(apiChannels.map((c: ApiChannel) => [c.id, c.questionCount])),
@@ -215,11 +220,8 @@ export default function Home() {
   );
 
   const totalCompleted = useMemo(() =>
-    allChannelsConfig.reduce((s, c) => {
-      const total = channelMap[c.id] ?? 0;
-      return s + getProgress(c.id, total).completed;
-    }, 0),
-    [allChannelsConfig, channelMap]
+    allChannelsConfig.reduce((s, c) => s + getProgress(c.id, channelMap[c.id] ?? 0).completed, 0),
+    [channelMap]
   );
 
   const overallProgress = useMemo(() =>
@@ -228,37 +230,33 @@ export default function Home() {
   );
 
   const streak = useMemo(() => {
-    let currentStreak = 0;
+    let s = 0;
     try {
-      const statsStr = localStorage.getItem("daily-stats");
-      if (!statsStr) return 0;
-      const stats = JSON.parse(statsStr);
+      const stats = activityStats.slice().sort((a, b) => b.date.localeCompare(a.date));
       for (let i = 0; i < 365; i++) {
         const d = new Date();
         d.setDate(d.getDate() - i);
-        if (stats.find((x: any) => x.date === d.toISOString().split("T")[0])) currentStreak++;
+        const dateStr = d.toISOString().split("T")[0];
+        if (stats.find((x) => x.date === dateStr)) s++;
         else break;
       }
     } catch {}
-    return currentStreak;
-  }, []);
+    return s;
+  }, [activityStats]);
 
   const pinnedChannels = apiChannels.slice(0, Math.min(6, apiChannels.length));
-  const today = new Intl.DateTimeFormat(undefined, {
-    weekday: "long", month: "long", day: "numeric",
-  }).format(new Date());
+  const today = new Intl.DateTimeFormat(undefined, { weekday: "long", month: "long", day: "numeric" }).format(new Date());
 
   return (
     <>
       <SEOHead
         title="DevPrep - Free Technical Interview Prep"
-        description="Master technical interviews with 1000+ questions, spaced repetition flashcards, and voice practice. Free forever, no sign-up required."
+        description="Master technical interviews with 1000+ questions, spaced repetition flashcards, and voice practice."
       />
       <AppLayout>
         <div className="min-h-screen bg-[var(--gh-canvas-subtle)]" id="main-content">
           <div className="max-w-6xl mx-auto px-4 py-8 lg:px-8">
 
-            {/* Breadcrumb */}
             <Breadcrumb className="mb-6">
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -269,49 +267,61 @@ export default function Home() {
 
             {/* Header */}
             <div className="mb-6">
-              <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">{t('home.dashboard')}</h1>
+              <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">{t("home.dashboard")}</h1>
               <p className="text-[var(--gh-fg-muted)] mt-1">{today}</p>
             </div>
 
-            {/* ── Stats Hero Row ── full-width, 4 tiles */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+            {/* ── 3-tile stats strip ── */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
               <StatTile
                 icon={Flame}
                 value={streak || "—"}
-                label={t('home.stats.dayStreak')}
-                color="bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)]"
+                label={t("home.stats.dayStreak")}
+                colorClass="bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)]"
               />
               <StatTile
                 icon={CheckCircle2}
                 value={totalCompleted}
-                label={t('home.stats.questionsCompleted')}
-                color="bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)]"
+                label={t("home.stats.questionsCompleted")}
+                colorClass="bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)]"
               />
               <StatTile
                 icon={TrendingUp}
                 value={`${overallProgress}%`}
-                label={t('home.stats.overallProgress')}
-                color="bg-[var(--gh-done-subtle)] text-[var(--gh-done-fg)]"
-              />
-              <StatTile
-                icon={Coins}
-                value={balance.toLocaleString()}
-                label={t('home.credits')}
-                color="bg-[var(--gh-accent-subtle)] text-[var(--gh-accent-fg)]"
-                href="/profile"
+                label={t("home.stats.overallProgress")}
+                colorClass="bg-[var(--gh-done-subtle)] text-[var(--gh-done-fg)]"
               />
             </div>
+
+            {/* ── Study Activity — full width, real data ── */}
+            <section className="gh-card p-5 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-semibold text-[var(--gh-fg)]">{t("home.activity.study")}</h2>
+                <div className="flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5 text-[var(--gh-fg-muted)]" />
+                  {streak > 0 && (
+                    <span className="text-xs text-[var(--gh-attention-fg)] font-medium flex items-center gap-1">
+                      <Flame className="w-3 h-3" />
+                      {streak}-day streak
+                    </span>
+                  )}
+                </div>
+              </div>
+              <Suspense fallback={<div className="h-20 animate-pulse bg-[var(--gh-canvas-subtle)] rounded" />}>
+                <ContributionGrid stats={activityStats} weeks={17} />
+              </Suspense>
+            </section>
 
             {/* ── Two-column layout ── */}
             <div className="flex flex-col lg:flex-row gap-6">
 
-              {/* ── Main column ── */}
+              {/* Main column */}
               <div className="flex-1 min-w-0 space-y-6">
 
                 {/* Quick Actions */}
                 <section>
-                  <h2 className="text-sm font-semibold text-[var(--gh-fg)] mb-3">{t('home.quickActions')}</h2>
-                  <div className="grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-4 gap-2">
+                  <h2 className="text-sm font-semibold text-[var(--gh-fg)] mb-3">{t("home.quickActions")}</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {quickActions.map((action) => {
                       const Icon = action.icon;
                       return (
@@ -333,19 +343,15 @@ export default function Home() {
                   </div>
                 </section>
 
-                {/* Topics */}
+                {/* Channels / Topics */}
                 <section>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <h2 className="text-sm font-semibold text-[var(--gh-fg)]">{t('home.yourTopics')}</h2>
+                      <h2 className="text-sm font-semibold text-[var(--gh-fg)]">{t("home.yourTopics")}</h2>
                       <span className="gh-label gh-label-gray">{apiChannels.length}</span>
                     </div>
-                    <Link
-                      href="/channels"
-                      className="text-xs text-[var(--gh-accent-fg)] hover:underline flex items-center gap-0.5"
-                      data-testid="link-all-channels"
-                    >
-                      {t('home.viewAll')} <ChevronRight className="w-3 h-3" />
+                    <Link href="/channels" className="text-xs text-[var(--gh-accent-fg)] hover:underline flex items-center gap-0.5" data-testid="link-all-channels">
+                      {t("home.viewAll")} <ChevronRight className="w-3 h-3" />
                     </Link>
                   </div>
 
@@ -359,67 +365,34 @@ export default function Home() {
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                       <div className="bg-[var(--gh-danger-subtle)] border border-[var(--gh-danger-fg)]/20 p-6 rounded-xl mb-4 max-w-md">
                         <AlertCircle className="w-10 h-10 text-[var(--gh-danger-fg)] mx-auto mb-3" />
-                        <h3 className="text-base font-semibold text-[var(--gh-fg)] mb-2">{t('home.error.channels')}</h3>
+                        <h3 className="text-base font-semibold text-[var(--gh-fg)] mb-2">{t("home.error.channels")}</h3>
                         <p className="text-sm text-[var(--gh-fg-muted)]">{error instanceof Error ? error.message : String(error)}</p>
                       </div>
-                      <Button variant="primary" onClick={() => window.location.reload()}>
-                        {t('home.error.tryAgain')}
-                      </Button>
+                      <Button variant="primary" onClick={() => window.location.reload()}>{t("home.error.tryAgain")}</Button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {pinnedChannels.map((channel) => (
-                        <ChannelCard key={channel.id} channelId={channel.id} questionCount={channel.questionCount} />
+                      {pinnedChannels.map((ch) => (
+                        <ChannelCard key={ch.id} channelId={ch.id} questionCount={ch.questionCount} />
                       ))}
                     </div>
                   )}
                 </section>
               </div>
 
-              {/* ── Right Sidebar ── */}
-              <div className="hidden md:block w-72 shrink-0 space-y-5">
+              {/* ── Right sidebar ── */}
+              <div className="hidden md:flex flex-col w-64 shrink-0 gap-5">
 
-                {/* 1. Study Activity — most visual, at the top */}
-                <section className="gh-card p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-sm font-semibold text-[var(--gh-fg)]">{t('home.activity.study')}</h2>
-                    <Activity className="w-4 h-4 text-[var(--gh-fg-muted)]" />
-                  </div>
-                  <p className="text-xs text-[var(--gh-fg-muted)] mb-4">
-                    {streak > 0 ? t('home.activity.streak.active', { count: streak }) : t('home.activity.streak.none')}
-                  </p>
-                  <Suspense fallback={<div className="h-24 animate-pulse bg-[var(--gh-canvas-subtle)] rounded" />}>
-                    <ContributionGrid />
-                  </Suspense>
-                </section>
-
-                {/* 2. Overall progress bar */}
-                <section className="gh-card p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-sm font-semibold text-[var(--gh-fg)]">{t('home.stats.yourProgress')}</h2>
-                    <span className="text-xs font-semibold text-[var(--gh-fg)]">{overallProgress}%</span>
-                  </div>
-                  <ProgressBar current={overallProgress} max={100} size="sm" showPercentage={false} />
-                  <div className="mt-3 flex items-center justify-between text-xs text-[var(--gh-fg-muted)]">
-                    <span>{totalCompleted} completed</span>
-                    <span>{totalQuestions} total</span>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-[var(--gh-border-muted)]">
-                    <div className="flex items-center gap-2 text-xs text-[var(--gh-fg-muted)]">
-                      <Layers className="w-3.5 h-3.5 text-[var(--gh-accent-fg)]" />
-                      <span>{apiChannels.length} {t('home.stats.topicsUnlocked')}</span>
-                    </div>
-                  </div>
-                </section>
-
-                {/* 3. Recent Activity */}
+                {/* Recent Activity */}
                 <section className="gh-card overflow-hidden">
-                  <h2 className="text-sm font-semibold text-[var(--gh-fg)] p-4 border-b border-[var(--gh-border-muted)]">{t('home.activity.recent')}</h2>
+                  <h2 className="text-sm font-semibold text-[var(--gh-fg)] px-4 py-3 border-b border-[var(--gh-border-muted)]">
+                    {t("home.activity.recent")}
+                  </h2>
                   <div className="divide-y divide-[var(--gh-border-muted)]">
                     {recentActivityData.map((item, i) => {
                       const Icon = item.icon;
                       return (
-                        <div key={i} className="flex items-start gap-3 p-4">
+                        <div key={i} className="flex items-start gap-3 px-4 py-3">
                           <Icon className={cn("w-4 h-4 mt-0.5 shrink-0", item.color)} />
                           <div className="flex-1 min-w-0">
                             <p className="text-xs text-[var(--gh-fg)] leading-snug">{item.text}</p>
@@ -434,12 +407,25 @@ export default function Home() {
                   </div>
                 </section>
 
-                {/* 4. Achievements + CTA — merged into one card */}
+                {/* Progress */}
                 <section className="gh-card p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-sm font-semibold text-[var(--gh-fg)]">{t('home.achievements')}</h2>
+                    <h2 className="text-sm font-semibold text-[var(--gh-fg)]">{t("home.stats.yourProgress")}</h2>
+                    <span className="text-xs font-semibold text-[var(--gh-fg)]">{overallProgress}%</span>
+                  </div>
+                  <ProgressBar current={overallProgress} max={100} size="sm" showPercentage={false} />
+                  <div className="mt-2 flex items-center justify-between text-xs text-[var(--gh-fg-muted)]">
+                    <span>{totalCompleted} done</span>
+                    <span>{totalQuestions} total</span>
+                  </div>
+                </section>
+
+                {/* Achievements + CTA */}
+                <section className="gh-card p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-sm font-semibold text-[var(--gh-fg)]">{t("home.achievements")}</h2>
                     <Link href="/badges" className="text-xs text-[var(--gh-accent-fg)] hover:underline">
-                      {t('home.achievements.viewAll')}
+                      {t("home.achievements.viewAll")}
                     </Link>
                   </div>
 
@@ -457,31 +443,20 @@ export default function Home() {
                         <Icon className="w-4 h-4" />
                       </div>
                     ))}
-                    <div className="w-9 h-9 rounded-full bg-[var(--gh-canvas-subtle)] border border-[var(--gh-border-muted)] border-dashed flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-full bg-[var(--gh-canvas-subtle)] border border-dashed border-[var(--gh-border-muted)] flex items-center justify-center">
                       <Circle className="w-4 h-4 text-[var(--gh-fg-subtle)] opacity-40" />
                     </div>
                   </div>
-
                   <p className="text-xs text-[var(--gh-fg-muted)] mb-4">
-                    {t('home.achievements.badgeCount', { count: earnedBadges.length })}
+                    {t("home.achievements.badgeCount", { count: earnedBadges.length })}
                   </p>
 
                   <div className="border-t border-[var(--gh-border-muted)] pt-4 flex flex-col gap-2">
-                    <Button
-                      variant="primary"
-                      onClick={() => setLocation("/channels")}
-                      fullWidth
-                      data-testid="button-explore-channels"
-                    >
-                      {t('home.cta.explore')}
+                    <Button variant="primary" onClick={() => setLocation("/channels")} fullWidth data-testid="button-explore-channels">
+                      {t("home.cta.explore")}
                     </Button>
-                    <Button
-                      variant="secondary"
-                      onClick={() => setLocation("/learning-paths")}
-                      fullWidth
-                      data-testid="button-view-paths"
-                    >
-                      {t('home.cta.paths')}
+                    <Button variant="secondary" onClick={() => setLocation("/learning-paths")} fullWidth data-testid="button-view-paths">
+                      {t("home.cta.paths")}
                     </Button>
                   </div>
                 </section>
