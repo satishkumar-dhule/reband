@@ -1,6 +1,10 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const IMMUTABLE_RE = /\/assets\/(js|css|images|fonts)\/[^/]+-[a-f0-9]{8,}\.(js|css|woff2?|ttf|otf|png|jpe?g|webp|avif|gif|svg)$/i;
 
