@@ -336,3 +336,151 @@ export const ProfileSkeleton = memo(function ProfileSkeleton() {
     </AppShell>
   );
 });
+
+export const BadgeGridSkeleton = memo(function BadgeGridSkeleton() {
+  return (
+    <AppShell>
+      <div className="max-w-5xl mx-auto space-y-5">
+        <div className="space-y-1.5">
+          <Bone className="h-8 w-40" />
+          <Bone className="h-4 w-64" />
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {Array.from({ length: 15 }).map((_, i) => (
+            <div key={i} className="border border-[var(--gh-border)] rounded-md p-4 flex flex-col items-center space-y-2">
+              <Bone className="h-14 w-14 rounded-full" />
+              <Bone className="h-3.5 w-20" />
+              <Bone className="h-2.5 w-16" />
+              <Bone className="h-1.5 w-full rounded-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </AppShell>
+  );
+});
+
+export const LearningPathListSkeleton = memo(function LearningPathListSkeleton() {
+  return (
+    <AppShell>
+      <div className="max-w-4xl mx-auto space-y-5">
+        <div className="space-y-1.5">
+          <Bone className="h-8 w-48" />
+          <Bone className="h-4 w-72" />
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="border border-[var(--gh-border)] rounded-lg p-5 space-y-3">
+              <div className="flex items-start gap-3">
+                <Bone className="h-10 w-10 rounded-lg shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <Bone className="h-5 w-48" />
+                  <Bone className="h-3.5 w-64" />
+                </div>
+                <Bone className="h-6 w-20 rounded-full shrink-0" />
+              </div>
+              <Bone className="h-1.5 w-full rounded-full" />
+              <div className="flex gap-2">
+                <Bone className="h-5 w-16 rounded-full" />
+                <Bone className="h-5 w-20 rounded-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </AppShell>
+  );
+});
+
+export const BookmarkListSkeleton = memo(function BookmarkListSkeleton() {
+  return (
+    <AppShell>
+      <div className="max-w-4xl mx-auto space-y-5">
+        <div className="flex items-center gap-3">
+          <Bone className="h-8 w-48" />
+          <Bone className="h-8 w-28 ml-auto rounded-md" />
+        </div>
+        <div className="flex gap-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Bone key={i} className="h-7 w-24 rounded-full" />
+          ))}
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="border border-[var(--gh-border)] rounded-lg p-4 flex items-start gap-3">
+              <Bone className="h-8 w-8 rounded-md shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Bone className="h-4 w-3/4" />
+                <Bone className="h-3.5 w-1/2" />
+                <div className="flex gap-2">
+                  <Bone className="h-5 w-16 rounded-full" />
+                  <Bone className="h-5 w-20 rounded-full" />
+                </div>
+              </div>
+              <Bone className="h-8 w-8 rounded-md shrink-0" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </AppShell>
+  );
+});
+
+export const TestsListSkeleton = memo(function TestsListSkeleton() {
+  return (
+    <AppShell>
+      <div className="max-w-4xl mx-auto space-y-5">
+        <div className="space-y-1.5">
+          <Bone className="h-8 w-40" />
+          <Bone className="h-4 w-60" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="border border-[var(--gh-border)] rounded-lg p-5 space-y-4">
+              <div className="flex items-center gap-3">
+                <Bone className="h-9 w-9 rounded-lg shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <Bone className="h-4 w-3/4" />
+                  <Bone className="h-3 w-1/2" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Bone className="h-5 w-16 rounded-full" />
+                <Bone className="h-5 w-24 rounded-full" />
+              </div>
+              <Bone className="h-9 w-full rounded-md" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </AppShell>
+  );
+});
+
+export const MyPathTimelineSkeleton = memo(function MyPathTimelineSkeleton() {
+  return (
+    <AppShell>
+      <div className="max-w-3xl mx-auto space-y-6">
+        <div className="space-y-1.5">
+          <Bone className="h-8 w-40" />
+          <Bone className="h-4 w-60" />
+        </div>
+        <div className="space-y-0">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex gap-4">
+              <div className="flex flex-col items-center">
+                <Bone className="h-8 w-8 rounded-full shrink-0" />
+                {i < 4 && <div className="w-0.5 flex-1 bg-[var(--gh-border)] my-1" />}
+              </div>
+              <div className="flex-1 pb-6 space-y-2">
+                <Bone className="h-4 w-40" />
+                <Bone className="h-3.5 w-56" />
+                <Bone className="h-1.5 w-full rounded-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </AppShell>
+  );
+});
