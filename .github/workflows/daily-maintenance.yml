@@ -19,16 +19,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: ./.github/actions/setup-bot
+      - uses: ./.github/actions/setup-node-pnpm
       
       - name: Run migrations (if needed)
-        env:
         run: |
           echo "🔄 Running database migrations..."
-          node script/migrations/add-is-new-column.js || echo "⚠️  Migration skipped or already applied"
+          node script/migrations/add-is-new-column.js 2>/dev/null || echo "⚠️  Migration skipped or already applied"
       
       - name: Clear old NEW flags
-        env:
         run: |
           echo "🧹 Clearing NEW flags for questions older than 7 days..."
           node script/maintenance/clear-old-new-flags.js

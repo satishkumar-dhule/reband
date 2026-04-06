@@ -31,12 +31,10 @@ jobs:
         run: pnpm install
 
       - name: Setup database
-        env:
         run: |
           echo "Database URL configured"
 
       - name: Generate curated learning paths
-        env:
         run: |
           node script/generate-curated-paths.js
 
