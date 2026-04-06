@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'wouter';
 import {
-  AppLayout, SEOHead, Switch,
-  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
-  PageContainer, SectionHeader, GhStatCard, LoadingSpinner,
+  AppLayout, SEOHead, Switch, SkipLink,
+  PageHeader, SectionHeader, GhStatCard, LoadingSpinner,
 } from '@/lib/ui';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { useGlobalStats } from '../hooks/use-progress';
@@ -12,7 +11,7 @@ import { useChannelStats } from '../hooks/use-stats';
 import { allChannelsConfig } from '../lib/channels-config';
 import { channels } from '../lib/data';
 import {
-  User, Settings, Target, BookOpen, Home, BarChart2,
+  User, Settings, Target, BookOpen, BarChart2,
   CheckCircle2, Layers, Trophy, Flame, Zap, Clock,
   CheckCircle, Boxes, ChartLine, GitBranch, Binary, Puzzle,
   Calculator, Cpu, Terminal, Layout, Server, Database,
@@ -204,9 +203,14 @@ export default function Profile() {
       <>
         <SEOHead title="Profile & Stats - DevPrep" description="Your learning profile and progress" canonical="/profile" />
         <AppLayout>
-          <PageContainer maxWidth="3xl" py="py-8">
+          <div className="bg-card border-b border-border">
+            <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+              <PageHeader title="Profile & Stats" subtitle="Stats are tracked locally in your browser — no account needed." className="mb-0" />
+            </div>
+          </div>
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
             <LoadingSpinner fullPage label="Loading profile…" />
-          </PageContainer>
+          </div>
         </AppLayout>
       </>
     );
@@ -216,32 +220,14 @@ export default function Profile() {
     <>
       <SEOHead title="Profile & Stats - DevPrep" description="Your learning profile and progress" canonical="/profile" />
       <AppLayout>
-        <PageContainer maxWidth="3xl" py="py-8" id="main-content">
-          <Breadcrumb className="mb-6">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/" className="flex items-center gap-1">
-                  <Home className="w-3.5 h-3.5" /> Home
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Profile & Stats</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          {/* User header */}
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-16 h-16 rounded-full border border-[var(--gh-border)] bg-[var(--gh-canvas)] flex items-center justify-center flex-shrink-0">
-              <User className="w-8 h-8 text-[var(--gh-fg-muted)]" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">My Profile & Stats</h1>
-              <p className="text-sm text-[var(--gh-fg-muted)]">Stats are tracked locally in your browser — no account needed.</p>
-            </div>
+        <SkipLink />
+        <div className="bg-card border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+            <PageHeader title="Profile & Stats" subtitle="Stats are tracked locally in your browser — no account needed." className="mb-0" />
           </div>
+        </div>
 
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8" id="main-content">
           <div className="space-y-8">
 
             {/* Overview stats */}
@@ -381,7 +367,7 @@ export default function Profile() {
             />
 
           </div>
-        </PageContainer>
+        </div>
       </AppLayout>
     </>
   );

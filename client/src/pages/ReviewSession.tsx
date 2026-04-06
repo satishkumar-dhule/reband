@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useLocation } from 'wouter';
-import { AppLayout } from '@/lib/ui';
-import { SEOHead } from '@/lib/ui';
+import { AppLayout, SEOHead, PageHeader, SkipLink } from '@/lib/ui';
 import { useCredits } from '../context/CreditsContext';
 import { ListenButton } from '@/lib/ui';
 import { Button } from '@/lib/ui';
@@ -342,8 +341,15 @@ export default function ReviewSession() {
       />
 
       <AppLayout>
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          {/* Header */}
+        <SkipLink />
+        <div className="bg-card border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+            <PageHeader title="Spaced Repetition Review" subtitle="Review due cards to strengthen your memory" className="mb-0" />
+          </div>
+        </div>
+
+        <div className="max-w-3xl mx-auto px-4 md:px-8 py-8" id="main-content">
+          {/* Session Controls */}
           <div className="flex flex-col gap-4 mb-6">
             <div className="flex items-center justify-between">
               <Button

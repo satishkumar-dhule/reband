@@ -9,8 +9,7 @@ import {
   Sparkles, Lock, Unlock, Filter, BarChart2, Timer,
   ChevronLeft, Hash, Star
 } from 'lucide-react';
-import { SEOHead } from '@/lib/ui';
-import { AppLayout } from '@/lib/ui';
+import { SEOHead, AppLayout, PageHeader } from '@/lib/ui';
 import { CodeEditor } from '@/lib/ui';
 import { DiffBadge, diffColor } from '@/lib/ui';
 import { LiveTimer } from '@/lib/ui';
@@ -613,44 +612,39 @@ export default function CodingChallenge() {
       <SkipLink />
       <div className="min-h-screen bg-[var(--gh-canvas-subtle)]">
 
-        {/* ── Hero Header ──────────────────────────────────── */}
-        <div className="relative bg-[var(--gh-canvas)] border-b border-[var(--gh-border)] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[var(--gh-accent-subtle)]/30 via-transparent to-transparent pointer-events-none" />
-          <div className="relative max-w-7xl mx-auto px-6 py-10">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-8 h-8 rounded-lg bg-[var(--gh-accent-fg)]/15 border border-[var(--gh-accent-fg)]/30 flex items-center justify-center">
-                    <Code className="w-4 h-4 text-[var(--gh-accent-fg)]" />
-                  </div>
-                  <span className="text-xs font-bold uppercase tracking-widest text-[var(--gh-accent-fg)]">Coding Challenges</span>
+        {/* ── Page Header ──────────────────────────────────── */}
+        <div className="bg-card border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+            <PageHeader
+              title="Coding Challenges"
+              subtitle="Solve real interview problems with instant test execution in JavaScript and Python."
+              actions={
+                <div className="flex items-center gap-3 flex-wrap">
+                  <button
+                    onClick={() => startRandom('easy')}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-hover)] text-white text-sm font-bold transition-all active:scale-95"
+                    data-testid="button-quick-start"
+                  >
+                    <Play className="w-4 h-4" /> Quick Start (Easy)
+                  </button>
+                  <button
+                    onClick={() => startRandom()}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--gh-border)] text-sm font-semibold text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] transition-all"
+                    data-testid="button-random-challenge"
+                  >
+                    <Zap className="w-4 h-4 text-amber-400" /> Random
+                  </button>
                 </div>
-                <h1 className="text-3xl font-bold text-[var(--gh-fg)]">Practice. Build. Ship.</h1>
-                <p className="text-[var(--gh-fg-muted)] max-w-lg">
-                  Solve real interview problems with instant test execution in JavaScript and Python.
-                </p>
-              </div>
+              }
+              className="mb-0"
+            />
+          </div>
+        </div>
 
-              <div className="flex items-center gap-3 flex-wrap">
-                <button
-                  onClick={() => startRandom('easy')}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-hover)] text-white text-sm font-bold transition-all active:scale-95"
-                  data-testid="button-quick-start"
-                >
-                  <Play className="w-4 h-4" /> Quick Start (Easy)
-                </button>
-                <button
-                  onClick={() => startRandom()}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--gh-border)] text-sm font-semibold text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] transition-all"
-                  data-testid="button-random-challenge"
-                >
-                  <Zap className="w-4 h-4 text-amber-400" /> Random
-                </button>
-              </div>
-            </div>
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
 
             {/* Stats row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: 'Solved', value: solvedIds.size, total: challenges.length, icon: CheckCircle, color: 'text-[var(--gh-success-fg)]', bg: 'bg-[var(--gh-success-subtle)]' },
                 { label: 'Attempted', value: stats.totalAttempts, icon: Target, color: 'text-[var(--gh-accent-fg)]', bg: 'bg-[var(--gh-accent-subtle)]/30' },
@@ -690,7 +684,7 @@ export default function CodingChallenge() {
         </div>
 
         {/* ── Filter & Search ──────────────────────────────── */}
-        <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">
           <div className="flex flex-col md:flex-row gap-3 mb-6">
             {/* Search */}
             <div className="relative flex-1">

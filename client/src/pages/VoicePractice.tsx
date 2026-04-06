@@ -1,21 +1,16 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useLocation, Link } from 'wouter';
+import { useLocation } from 'wouter';
 import {
-  ArrowLeft, Eye, EyeOff, Volume2, Trophy, RotateCcw, 
+  Eye, EyeOff, Volume2, Trophy, RotateCcw, 
   ChevronRight, Sparkles, BookOpen, Mic, Zap,
   Target, Clock, TrendingUp, Star, Crown, Lock, Play,
-  MessageSquare, Brain, BarChart3, Flame, Waves, AlertCircle, Info, Home
+  MessageSquare, Brain, BarChart3, Flame, Waves, AlertCircle, Info
 } from 'lucide-react';
-import { SEOHead } from '@/lib/ui';
-import { AppLayout } from '@/lib/ui';
+import { SEOHead, AppLayout, Button, SkipLink, VoiceSkeleton, PageHeader } from '@/lib/ui';
 import { useUserPreferences } from '../context/UserPreferencesContext';
 import { loadChannelQuestions } from '../lib/questions-loader';
 import { useSpeechRecognition, isSpeechRecognitionSupported } from '../hooks/use-speech-recognition';
 import type { Question } from '../types';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/lib/ui';
-import { Button } from '@/lib/ui';
-import { SkipLink } from '@/lib/ui';
-import { VoiceSkeleton } from '@/lib/ui';
 import { GHCard } from '../components/shared/GHCard';
 
 type PracticeMode = 'training' | 'interview';
@@ -264,40 +259,14 @@ export default function VoicePractice() {
     <AppLayout>
       <SEOHead title="Voice Practice | DevPrep" description="Practice your technical communication skills" />
       <SkipLink />
-      
-      <div className="max-w-4xl mx-auto px-4 py-8" id="main-content">
-        {/* Breadcrumb Navigation */}
-        <Breadcrumb className="mb-6">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/" className="flex items-center gap-1">
-                <Home className="w-3.5 h-3.5" />
-                Home
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Voice Practice</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">Voice Interview Practice</h1>
-            <p className="text-[var(--gh-fg-muted)]">Practice your technical communication skills</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              onClick={() => setLocation('/')}
-              variant="secondary"
-              icon={<ArrowLeft className="w-4 h-4" />}
-            >
-              Back
-            </Button>
-          </div>
+      <div className="bg-card border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+          <PageHeader title="Voice Interview Practice" subtitle="Practice your technical communication skills" className="mb-0" />
         </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8" id="main-content">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
