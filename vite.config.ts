@@ -207,17 +207,98 @@ export default defineConfig({
             return 'vendor-dead'; // Will be tree-shaken to near-zero
           }
 
-          // Everything else goes into a shared libs chunk
+          // Better Auth and auth utilities
+          if (id.includes('better-auth') || id.includes('better-call') ||
+              id.includes('oslo') || id.includes('@node-rs/') ||
+              id.includes('jose') || id.includes('nanostores')) {
+            return 'vendor-auth';
+          }
+
+          // Chart / data-viz
+          if (id.includes('recharts') || id.includes('d3-') ||
+              id.includes('delaunator') || id.includes('robust-predicates') ||
+              id.includes('internmap') || id.includes('victory')) {
+            return 'vendor-charts';
+          }
+
+          // Everything else — should be small after the above splits
           return 'vendor-libs';
         },
       },
     },
   },
   optimizeDeps: {
+    // Pre-bundle ALL commonly-used deps at server start.
+    // Each dep NOT listed here gets lazily compiled on first import,
+    // causing a visible stall. Listing them here moves that cost to startup.
     include: [
+      // React core
+      'react',
+      'react/jsx-runtime',
+      'react/jsx-dev-runtime',
+      'react-dom',
+      'react-dom/client',
+      // Routing + data
+      'wouter',
+      '@tanstack/react-query',
+      // UI primitives
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-avatar',
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-collapsible',
+      '@radix-ui/react-context-menu',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-hover-card',
+      '@radix-ui/react-label',
+      '@radix-ui/react-menubar',
+      '@radix-ui/react-navigation-menu',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-progress',
+      '@radix-ui/react-radio-group',
+      '@radix-ui/react-scroll-area',
+      '@radix-ui/react-select',
+      '@radix-ui/react-separator',
+      '@radix-ui/react-slider',
+      '@radix-ui/react-slot',
+      '@radix-ui/react-switch',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-toast',
+      '@radix-ui/react-toggle',
+      '@radix-ui/react-toggle-group',
+      '@radix-ui/react-tooltip',
+      // Icons
+      'lucide-react',
+      // Styling utilities
+      'class-variance-authority',
+      'clsx',
+      'tailwind-merge',
+      // Animation
+      'framer-motion',
+      // Forms
+      'react-hook-form',
+      '@hookform/resolvers',
+      'zod',
+      // Notifications
+      'sonner',
+      // Theme
+      'next-themes',
+      // Dates
+      'date-fns',
+      // Utils
+      'cmdk',
+      // Syntax highlighting — CJS modules that require pre-bundling for ESM compat
       'react-syntax-highlighter',
       'react-syntax-highlighter/dist/esm/styles/prism',
       'react-syntax-highlighter/dist/esm/styles/hljs',
+    ],
+    // Explicitly exclude only libs that are pure ESM and are truly lazy-loaded.
+    // CJS libs must be included (not excluded) so Vite transforms them correctly.
+    exclude: [
+      'mermaid',
+      '@monaco-editor/react',
+      'monaco-editor',
     ],
     esbuildOptions: {
       target: 'esnext',
@@ -235,6 +316,17 @@ export default defineConfig({
         target: 'http://localhost:5173',
         changeOrigin: true,
       },
+    },
+    // Pre-transform the main entry on startup so the first browser request
+    // hits a warm cache instead of triggering on-demand compilation.
+    warmup: {
+      clientFiles: [
+        './src/main.tsx',
+        './src/App.tsx',
+        './src/components/layout/AppLayout.tsx',
+        './src/pages/Home.tsx',
+        './src/lib/queryClient.ts',
+      ],
     },
   },
   preview: {
