@@ -122,7 +122,7 @@ function ChallengeView({
             <div className="w-px h-4 bg-[var(--gh-border)]" />
 
             <div className="flex items-center gap-2 min-w-0">
-              <span className={cn('w-2 h-2 rounded-full shrink-0', isSolved ? 'bg-emerald-400' : 'bg-amber-400')} />
+              <span className={cn('w-2 h-2 rounded-full shrink-0', isSolved ? 'bg-[var(--gh-success-fg)]' : 'bg-[var(--gh-attention-fg)]')} />
               <h1 className="text-sm font-semibold text-[var(--gh-fg)] truncate">{challenge.title}</h1>
               <DiffBadge d={challenge.difficulty} />
               <span className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--gh-border)] text-[var(--gh-fg-muted)] bg-[var(--gh-canvas-subtle)] hidden sm:inline">
@@ -161,12 +161,12 @@ function ChallengeView({
               className={cn(
                 'flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-semibold transition-all',
                 isRunning
-                  ? 'bg-emerald-500/20 text-emerald-400 cursor-not-allowed'
-                  : 'bg-emerald-500 hover:bg-emerald-400 text-black active:scale-95'
+                  ? 'bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] cursor-not-allowed'
+                  : 'bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-hover)] text-white active:scale-95'
               )}
             >
               {isRunning
-                ? <><span className="w-3.5 h-3.5 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />Running…</>
+                ? <><span className="w-3.5 h-3.5 border-2 border-[var(--gh-success-fg)] border-t-transparent rounded-full animate-spin" />Running…</>
                 : <><Play className="w-3.5 h-3.5" />Run Tests</>
               }
             </button>
@@ -211,12 +211,12 @@ function ChallengeView({
                       {challenge.category}
                     </span>
                     {isSolved && (
-                      <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/12 border border-emerald-500/30 text-emerald-400 font-bold">
+                      <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[var(--gh-success-subtle)] border border-[var(--gh-success-fg)]/30 text-[var(--gh-success-fg)] font-bold">
                         <CheckCircle className="w-3 h-3" /> Solved
                       </span>
                     )}
                   </div>
-                  <h2 className="text-xl font-bold text-[var(--gh-fg)]">{challenge.title}</h2>
+                  <h2 className="text-xl font-semibold text-[var(--gh-fg)]">{challenge.title}</h2>
 
                   {/* Companies */}
                   {challenge.companies && challenge.companies.length > 0 && (
@@ -297,13 +297,13 @@ function ChallengeView({
                   <div>
                     <button
                       onClick={() => setShowHints(!showHints)}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-[var(--gh-border)] hover:border-amber-500/40 hover:bg-amber-500/6 transition-all group"
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-[var(--gh-border)] hover:border-[var(--gh-attention-fg)]/40 hover:bg-[var(--gh-attention-subtle)] transition-all group"
                     >
-                      <span className="flex items-center gap-2 text-sm font-semibold text-amber-400">
+                      <span className="flex items-center gap-2 text-sm font-semibold text-[var(--gh-attention-fg)]">
                         <Lightbulb className="w-4 h-4" />
                         {showHints ? 'Hide hints' : `Need a hint? (${challenge.hints.length} available)`}
                       </span>
-                      {showHints ? <ChevronUp className="w-4 h-4 text-amber-400" /> : <ChevronDown className="w-4 h-4 text-amber-400" />}
+                      {showHints ? <ChevronUp className="w-4 h-4 text-[var(--gh-attention-fg)]" /> : <ChevronDown className="w-4 h-4 text-[var(--gh-attention-fg)]" />}
                     </button>
 
                     <AnimatePresence>
@@ -328,10 +328,10 @@ function ChallengeView({
                             </AnimatePresence>
                             {challenge.hints.length > 1 && (
                               <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-amber-400/60">{hintIndex + 1}/{challenge.hints.length}</span>
+                                <span className="text-[10px] text-[var(--gh-attention-fg)]/60">{hintIndex + 1}/{challenge.hints.length}</span>
                                 <button
                                   onClick={() => setHintIndex((hintIndex + 1) % challenge.hints.length)}
-                                  className="text-xs text-amber-400 font-semibold hover:underline"
+                                  className="text-xs text-[var(--gh-attention-fg)] font-semibold hover:underline"
                                 >
                                   Next hint →
                                 </button>
@@ -415,15 +415,15 @@ function ChallengeView({
             <DialogHeader>
               <div className="flex justify-center mb-4">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500/40 flex items-center justify-center">
-                    <Trophy className="w-10 h-10 text-emerald-400" />
+                  <div className="w-20 h-20 rounded-full bg-[var(--gh-success-subtle)] border-2 border-[var(--gh-success-fg)]/40 flex items-center justify-center">
+                    <Trophy className="w-10 h-10 text-[var(--gh-success-fg)]" />
                   </div>
-                  <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center">
+                  <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-[var(--gh-attention-fg)] flex items-center justify-center">
                     <Star className="w-3.5 h-3.5 text-black" />
                   </div>
                 </div>
               </div>
-              <DialogTitle className="text-2xl font-bold text-[var(--gh-fg)]">Challenge Complete!</DialogTitle>
+              <DialogTitle className="text-2xl font-semibold text-[var(--gh-fg)]">Challenge Complete!</DialogTitle>
               <DialogDescription className="text-[var(--gh-fg-muted)] mt-2">
                 All tests passed. Great solution!
               </DialogDescription>
@@ -634,7 +634,7 @@ export default function CodingChallenge() {
               <div className="flex items-center gap-3 flex-wrap">
                 <button
                   onClick={() => startRandom('easy')}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-bold transition-all active:scale-95"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-hover)] text-white text-sm font-bold transition-all active:scale-95"
                   data-testid="button-quick-start"
                 >
                   <Play className="w-4 h-4" /> Quick Start (Easy)
@@ -652,9 +652,9 @@ export default function CodingChallenge() {
             {/* Stats row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
               {[
-                { label: 'Solved', value: solvedIds.size, total: challenges.length, icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+                { label: 'Solved', value: solvedIds.size, total: challenges.length, icon: CheckCircle, color: 'text-[var(--gh-success-fg)]', bg: 'bg-[var(--gh-success-subtle)]' },
                 { label: 'Attempted', value: stats.totalAttempts, icon: Target, color: 'text-[var(--gh-accent-fg)]', bg: 'bg-[var(--gh-accent-subtle)]/30' },
-                { label: 'Avg Time', value: `${Math.floor(stats.averageTime / 60)}m`, icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+                { label: 'Avg Time', value: `${Math.floor(stats.averageTime / 60)}m`, icon: Clock, color: 'text-[var(--gh-attention-fg)]', bg: 'bg-[var(--gh-attention-subtle)]' },
                 { label: 'Total', value: challenges.length, icon: BarChart2, color: 'text-[var(--gh-fg-muted)]', bg: 'bg-[var(--gh-canvas-subtle)]' },
               ].map((s, i) => (
                 <div key={i} className="rounded-xl border border-[var(--gh-border)] bg-[var(--gh-canvas)] p-4 flex items-center gap-3">
@@ -678,7 +678,7 @@ export default function CodingChallenge() {
                 </div>
                 <div className="h-2 bg-[var(--gh-canvas-subtle)] rounded-full overflow-hidden border border-[var(--gh-border)]">
                   <motion.div
-                    className="h-full bg-emerald-500 rounded-full"
+                    className="h-full bg-[var(--gh-success-emphasis)] rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${(solvedIds.size / challenges.length) * 100}%` }}
                     transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -714,8 +714,8 @@ export default function CodingChallenge() {
                   className={cn(
                     'px-3 py-1.5 rounded-md text-xs font-semibold capitalize transition-all',
                     diffFilter === d
-                      ? d === 'easy' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                        : d === 'medium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                      ? d === 'easy' ? 'bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] border border-[var(--gh-success-fg)]/30'
+                        : d === 'medium' ? 'bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)] border border-[var(--gh-attention-fg)]/30'
                         : 'bg-[var(--gh-accent-fg)]/15 text-[var(--gh-accent-fg)] border border-[var(--gh-accent-fg)]/30'
                       : 'text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)]'
                   )}

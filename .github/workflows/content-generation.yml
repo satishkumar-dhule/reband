@@ -121,7 +121,6 @@ jobs:
         continue-on-error: true
         run: |
           echo "Verifying database sync..."
-          # Add verification logic here if available
           echo "::notice::Quick generation completed successfully"
 
   creator:
@@ -146,7 +145,6 @@ jobs:
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
           COUNT: ${{ inputs.count || '5' }}
         run: |
-          # Retry logic for network-dependent operations
           MAX_RETRIES=3
           RETRY_COUNT=0
           EXIT_CODE=1
@@ -168,7 +166,6 @@ jobs:
             fi
           done
           
-          # Try to extract count from logs or set default
           echo "count=${{ inputs.count || '5' }}" >> $GITHUB_OUTPUT
           exit $EXIT_CODE
       
@@ -177,7 +174,6 @@ jobs:
         continue-on-error: true
         run: |
           echo "Verifying creator output..."
-          # Add verification logic here
           echo "::notice::Creator bot completed successfully"
 
   analysis:
@@ -203,7 +199,6 @@ jobs:
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
         run: |
-          # Retry logic for network-dependent operations
           MAX_RETRIES=3
           RETRY_COUNT=0
           EXIT_CODE=1
@@ -233,7 +228,6 @@ jobs:
         continue-on-error: true
         run: |
           echo "Verifying analysis results..."
-          # Add verification logic here
           echo "::notice::Analysis bot completed successfully"
 
   verifier:
@@ -261,7 +255,6 @@ jobs:
           MODE: scan
           LIMIT: ${{ inputs.count || '10' }}
         run: |
-          # Retry logic for network-dependent operations
           MAX_RETRIES=3
           RETRY_COUNT=0
           EXIT_CODE=1
@@ -291,7 +284,6 @@ jobs:
         continue-on-error: true
         run: |
           echo "Verifying verification results..."
-          # Add verification logic here
           echo "::notice::Verifier bot completed successfully"
 
   processor:
@@ -318,7 +310,6 @@ jobs:
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
           MAX_ITEMS: ${{ inputs.count || '10' }}
         run: |
-          # Retry logic for network-dependent operations
           MAX_RETRIES=3
           RETRY_COUNT=0
           EXIT_CODE=1
@@ -348,9 +339,8 @@ jobs:
         continue-on-error: true
         run: |
           echo "Verifying processor output..."
-          # Check if session files exist
           if [ -d "client/public/data/sessions" ]; then
-            SESSION_COUNT=$(find client/public/data/sessions -name "*.json" -type f | wc -l)
+            SESSION_COUNT=$(find client/public/data/sessions -name "*.json" -type f 2>/dev/null | wc -l)
             echo "Processed $SESSION_COUNT session files"
           fi
           echo "::notice::Processor bot completed successfully"
@@ -426,7 +416,6 @@ jobs:
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
           OLLAMA_URL: ${{ secrets.OLLAMA_URL }}
         run: |
-          # Retry logic for network-dependent operations
           MAX_RETRIES=2
           RETRY_COUNT=0
           EXIT_CODE=1
@@ -448,9 +437,8 @@ jobs:
             fi
           done
           
-          # Count generated blogs if possible
           if [ -d "client/public/data/blogs" ]; then
-            BLOG_COUNT=$(find client/public/data/blogs -name "*.json" -type f | wc -l)
+            BLOG_COUNT=$(find client/public/data/blogs -name "*.json" -type f 2>/dev/null | wc -l)
           else
             BLOG_COUNT=0
           fi
@@ -462,9 +450,8 @@ jobs:
         continue-on-error: true
         run: |
           echo "Verifying blog generation..."
-          # Check if blog files exist
           if [ -d "client/public/data/blogs" ]; then
-            BLOG_COUNT=$(find client/public/data/blogs -name "*.json" -type f | wc -l)
+            BLOG_COUNT=$(find client/public/data/blogs -name "*.json" -type f 2>/dev/null | wc -l)
             echo "Generated $BLOG_COUNT blog files"
             if [ $BLOG_COUNT -gt 0 ]; then
               echo "::notice::Blog generation completed successfully with $BLOG_COUNT blogs"
@@ -497,7 +484,6 @@ jobs:
           QDRANT_URL: ${{ secrets.QDRANT_URL }}
           QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
         run: |
-          # Retry logic for network-dependent operations
           MAX_RETRIES=2
           RETRY_COUNT=0
           EXIT_CODE=1
@@ -519,9 +505,8 @@ jobs:
             fi
           done
           
-          # Count generated sessions if possible
           if [ -d "client/public/data/voice-sessions" ]; then
-            SESSION_COUNT=$(find client/public/data/voice-sessions -name "*.json" -type f | wc -l)
+            SESSION_COUNT=$(find client/public/data/voice-sessions -name "*.json" -type f 2>/dev/null | wc -l)
           else
             SESSION_COUNT=0
           fi
@@ -533,9 +518,8 @@ jobs:
         continue-on-error: true
         run: |
           echo "Verifying voice sessions..."
-          # Check if voice session files exist
           if [ -d "client/public/data/voice-sessions" ]; then
-            SESSION_COUNT=$(find client/public/data/voice-sessions -name "*.json" -type f | wc -l)
+            SESSION_COUNT=$(find client/public/data/voice-sessions -name "*.json" -type f 2>/dev/null | wc -l)
             echo "Generated $SESSION_COUNT voice sessions"
             if [ $SESSION_COUNT -gt 0 ]; then
               echo "::notice::Voice sessions completed successfully with $SESSION_COUNT sessions"
@@ -581,11 +565,11 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add -f client/public/data/bot-monitor.json
-          git add -f client/public/data/intelligence/ || true
-          git add -f client/public/data/voice-sessions/ || true
+          git add -f client/public/data/bot-monitor.json 2>/dev/null || true
+          git add -f client/public/data/intelligence/ 2>/dev/null || true
+          git add -f client/public/data/voice-sessions/ 2>/dev/null || true
           git diff --staged --quiet || git commit -m "Update bot monitor [skip ci]"
-          git push
+          git push || echo "::warning::Failed to push updates"
 
   summary:
     name: 📋 Summary

@@ -27,6 +27,7 @@ import { getDb, initBotTables } from './shared/db.js';
 import { logAction } from './shared/ledger.js';
 import { addToQueue } from './shared/queue.js';
 import { startRun, completeRun, failRun, updateRunStats } from './shared/runs.js';
+import { runWithRetries, parseJson } from '../utils.js';
 
 const BOT_NAME = 'unified-content';
 const db = getDb();
@@ -101,22 +102,79 @@ const CONTENT_TYPES = {
 // ============================================
 
 async function generateQuestion(options) {
-  const { runPipeline } = await import('./creator-bot.js');
-  return runPipeline(options.topic || options.input, {
-    type: 'question',
-    channel: options.channel,
-    difficulty: options.difficulty
-  });
+  try {
+    const { generateQuestionWithRAG } = await import('../ai/services/rag-enhanced-generation.js');
+    const result = await generateQuestionWithRAG(
+      options.topic || options.input || 'general interview question',
+      options.channel || 'system-design',
+      { difficulty: options.difficulty || 'intermediate' }
+    );
+    
+    if (result.success) {
+      return {
+        success: true,
+        savedId: result.question?.id,
+        result
+      };
+    }
+  } catch (e) {
+    console.log(`   RAG unavailable: ${e.message}`);
+  }
+
+  // Fallback: generate using basic prompt
+  const prompt = `Create a high-quality technical interview question.
+
+Topic/Input: "${options.topic || options.input || 'general interview topic'}"
+Channel: ${options.channel || 'system-design'}
+Difficulty: ${options.difficulty || 'intermediate'}
+
+Return ONLY a JSON object:
+{
+  "question": "Clear, specific interview question",
+  "answer": "Brief 1-2 sentence answer",
+  "explanation": "Detailed explanation (200-500 words) with examples",
+  "tags": ["tag1", "tag2", "tag3"],
+  "subChannel": "specific sub-topic",
+  "companies": ["Company1", "Company2"]
+}
+
+Requirements:
+- Question should be practical and commonly asked in interviews
+- Explanation should be comprehensive with real-world examples
+- Include relevant companies that ask this type of question`;
+
+  const response = await runWithRetries(prompt);
+  const parsed = parseJson(response);
+  
+  if (!parsed || !parsed.question) {
+    return { success: false, error: 'Failed to generate question' };
+  }
+  
+  return {
+    success: true,
+    savedId: `q-${Date.now()}`,
+    result: { question: parsed }
+  };
 }
 
 async function generateChallenge(options) {
-  const { generateCodingChallenge } = await import('../ai/graphs/coding-challenge-graph.js');
-  return generateCodingChallenge({
-    difficulty: options.difficulty || 'medium',
-    category: options.category || 'arrays',
-    companies: options.companies || ['Google', 'Meta', 'Amazon'],
-    existingTitles: []
-  });
+  try {
+    const { generateCodingChallenge } = await import('../ai/graphs/coding-challenge-graph.js');
+    const result = await generateCodingChallenge({
+      difficulty: options.difficulty || 'medium',
+      category: options.category || 'arrays',
+      companies: options.companies || ['Google', 'Meta', 'Amazon'],
+      existingTitles: []
+    });
+    
+    if (result.success) {
+      return { success: true, savedId: result.id, result };
+    }
+    return { success: false, error: result.error || 'Challenge generation failed' };
+  } catch (e) {
+    console.log(`   Challenge generation failed: ${e.message}`);
+    return { success: false, error: e.message };
+  }
 }
 
 async function generateCodingProblem(options) {

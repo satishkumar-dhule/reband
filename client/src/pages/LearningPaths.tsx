@@ -178,7 +178,7 @@ export default function LearningPaths() {
                 return (
                   <div
                     key={path.id}
-                    className="group bg-card border border-border rounded-md p-5 flex flex-col hover-elevate transition-all"
+                    className="group bg-card border border-border rounded-md p-4 flex flex-col hover-elevate transition-all"
                     data-testid={`card-path-${path.id}`}
                   >
                     {/* Card header */}

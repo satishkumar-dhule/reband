@@ -416,10 +416,10 @@ Return ONLY valid JSON (no markdown):
 }
 
 // ============================================
-// MAIN
+// MAIN & EXPORTS
 // ============================================
 
-async function main() {
+export async function buildSessions() {
   console.log('=== 🏗️ Session Builder Bot (LangGraph) ===\n');
   
   await initBotTables();
@@ -451,12 +451,17 @@ async function main() {
     console.log(`Relationships created: ${state.savedRelationships}`);
     console.log(`Sessions created: ${state.savedSessions}`);
     
+    return { success: true, ...stats };
+    
   } catch (error) {
     console.error('Fatal error:', error);
     await failRun(run.id, error);
-    process.exit(1);
+    throw error;
   }
 }
+
+// Alias for backward compatibility
+const main = buildSessions;
 
 // Run if called directly
 const isMainModule = import.meta.url === `file://${process.argv[1]}`;
@@ -464,5 +469,4 @@ if (isMainModule) {
   main().catch(console.error);
 }
 
-export { main as buildSessions };
-export default { buildSessions: main };
+export default { buildSessions };

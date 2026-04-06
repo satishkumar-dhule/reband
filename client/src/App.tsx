@@ -30,6 +30,8 @@ import {
   MyPathTimelineSkeleton,
   BadgeGridSkeleton,
   LearningPathListSkeleton,
+  OnboardingSkeleton,
+  GoExplorerSkeleton,
 } from "@/components/skeletons/PageSkeletons";
 
 // Import prefetch utilities
@@ -197,12 +199,12 @@ const TestsRoute = S(Tests, TestsListSkeleton);
 const TestSessionRoute = S(TestSession, GenericPageSkeleton);
 const MyPathRoute = S(MyPath, MyPathTimelineSkeleton);
 const PathDetailRoute = S(PathDetail, GenericPageSkeleton);
-const OnboardingRoute = S(Onboarding, GenericPageSkeleton);
+const OnboardingRoute = S(Onboarding, OnboardingSkeleton);
 const AboutRoute = S(About, GenericPageSkeleton);
 const WhatsNewRoute = S(WhatsNew, GenericPageSkeleton);
 const BotActivityRoute = S(BotActivity, GenericPageSkeleton);
 const TrainingModeRoute = S(TrainingMode, GenericPageSkeleton);
-const GoExplorerRoute = S(GoExplorer, GenericPageSkeleton);
+const GoExplorerRoute = S(GoExplorer, GoExplorerSkeleton);
 
 function MinimalApp() {
   const [location] = useLocation();

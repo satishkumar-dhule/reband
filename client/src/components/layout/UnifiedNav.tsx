@@ -244,7 +244,7 @@ export function MobileBottomNav() {
                     setShowMenu(null);
                   }}
                   className={cn(
-                    "w-full flex items-center gap-4 p-4 rounded-[20px] transition-all relative overflow-hidden min-h-[56px] touch-manipulation",
+                    "w-full flex items-center gap-4 p-4 rounded-xl transition-all relative overflow-hidden min-h-[56px] touch-manipulation",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                     isActive 
                       ? "bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30" 
@@ -259,7 +259,7 @@ export function MobileBottomNav() {
                 >
                   {/* Icon - Glow effect for active state */}
                   <div className={cn(
-                    "w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0 transition-all",
+                    "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-all",
                     isActive 
                       ? "bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30" 
                       : isVoice 
@@ -366,7 +366,7 @@ export function MobileBottomNav() {
                   {/* Icon Container - CSS scale transform instead of framer-motion */}
                   <div
                     className={cn(
-                      "w-9 h-9 rounded-[12px] flex items-center justify-center transition-transform",
+                      "w-9 h-9 rounded-lg flex items-center justify-center transition-transform",
                       item.highlight
                         ? isActive || isMenuOpen
                           ? "bg-gradient-to-br from-primary to-primary/80" 
@@ -701,7 +701,7 @@ export function UnifiedMobileHeader({ title, showBack, onSearchClick }: UnifiedM
             <button
               onClick={() => window.history.back()}
               aria-label="Go back"
-              className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-[12px] transition-colors touch-manipulation"
+              className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg transition-colors touch-manipulation"
               style={{
                 background: 'hsl(0 0% 10% / 0.5)',
                 border: '1px solid hsl(0 0% 12%)'
@@ -713,7 +713,7 @@ export function UnifiedMobileHeader({ title, showBack, onSearchClick }: UnifiedM
           ) : (
             <button onClick={() => setLocation('/')} aria-label="Go to home" className="flex items-center gap-2">
               <div 
-                className="w-8 h-8 rounded-[10px] flex items-center justify-center shadow-lg"
+                className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg"
                 style={{ 
                   background: 'linear-gradient(135deg, hsl(150 100% 50%) 0%, hsl(150 100% 40%))',
                   boxShadow: '0 0 20px hsl(150 100% 50% / 0.3)'
@@ -733,20 +733,20 @@ export function UnifiedMobileHeader({ title, showBack, onSearchClick }: UnifiedM
           )}
         </div>
 
-        {/* Right: Actions */}
+        {/* Right: Actions - Search with visible label for discoverability */}
         <div className="flex items-center gap-2">
-          {/* Search */}
           <button
             onClick={onSearchClick}
-            aria-label="Search"
-            className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-[12px] transition-colors touch-manipulation"
+            aria-label="Search questions and topics"
+            className="flex items-center gap-1.5 h-9 px-3 rounded-lg transition-colors touch-manipulation"
             style={{
               background: 'hsl(0 0% 10% / 0.5)',
               border: '1px solid hsl(0 0% 12%)'
             }}
             type="button"
           >
-            <Search className="w-4 h-4 text-foreground" strokeWidth={2} />
+            <Search className="w-4 h-4 text-foreground shrink-0" strokeWidth={2} />
+            <span className="text-xs text-muted-foreground hidden min-[380px]:inline">Search</span>
           </button>
         </div>
       </div>

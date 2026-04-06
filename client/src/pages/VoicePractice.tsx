@@ -284,7 +284,7 @@ export default function VoicePractice() {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-[var(--gh-fg)]">Voice Interview Practice</h1>
+            <h1 className="text-2xl font-semibold text-[var(--gh-fg)]">Voice Interview Practice</h1>
             <p className="text-[var(--gh-fg-muted)]">Practice your technical communication skills</p>
           </div>
           <div className="flex items-center gap-2">

@@ -397,7 +397,7 @@ export default function ReviewSession() {
 
               {/* Question */}
               <div className="min-h-[120px] flex items-center justify-center mb-8">
-                <h2 className="text-2xl md:text-3xl font-semibold text-center text-[var(--gh-fg)] leading-snug">
+                <h2 className="text-xl font-semibold text-center text-[var(--gh-fg)] leading-snug">
                   {question.question}
                 </h2>
               </div>
