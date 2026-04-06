@@ -576,7 +576,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node-pnpm
       - name: Generate monitor data
-        env:
         run: node script/fetch-bot-monitor-data.js
       - name: Commit and push
         run: |
