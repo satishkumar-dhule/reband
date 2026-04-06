@@ -182,8 +182,11 @@ export default defineConfig({
   ],
   
   webServer: {
-    command: 'npm run dev:vite',
-    // Use environment variable or default to first available port
+    // In CI static mode, serve the pre-built dist instead of the Vite dev server.
+    // Set SERVE_STATIC=true to enable this (e.g. in the Cloudflare Pages deploy workflow).
+    command: process.env.SERVE_STATIC === 'true'
+      ? 'npx serve dist/public -l 5001 --no-clipboard'
+      : 'npm run dev:vite',
     url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5001',
     reuseExistingServer: !process.env.CI,
     timeout: 180000, // 3 minutes - allows for slow builds and heavy dependency loading

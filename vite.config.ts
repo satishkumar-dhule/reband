@@ -313,7 +313,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:5173',
+        target: `http://localhost:${process.env.BACKEND_PORT || 5000}`,
         changeOrigin: true,
       },
     },

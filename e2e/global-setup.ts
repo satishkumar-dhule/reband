@@ -16,7 +16,7 @@ async function globalSetup(config: FullConfig) {
 
   try {
     // Wait for server to be ready
-    const baseURL = config.use?.baseURL || 'http://localhost:5173';
+    const baseURL = config.use?.baseURL || 'http://localhost:5001';
     console.log(`⏳ Waiting for server at ${baseURL}...`);
     
     // Verify server is up via fetch (no browser crash risk)

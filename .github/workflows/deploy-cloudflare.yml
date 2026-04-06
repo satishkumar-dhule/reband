@@ -102,6 +102,8 @@ jobs:
           pnpm exec playwright test e2e/core.spec.ts --project=chromium-desktop
         env:
           CI: 'true'
+          SERVE_STATIC: 'true'
+          PLAYWRIGHT_BASE_URL: 'http://localhost:5001'
 
       - name: Compress test results
         if: failure()
@@ -154,9 +156,6 @@ jobs:
       - name: Setup Node & pnpm
         uses: ./.github/actions/setup-node-pnpm
 
-      - name: Install wrangler
-        run: pnpm add -D wrangler
-
       - name: Deploy to Cloudflare Pages (staging)
         run: |
           npx wrangler pages deploy dist/public \
@@ -190,9 +189,6 @@ jobs:
 
       - name: Setup Node & pnpm
         uses: ./.github/actions/setup-node-pnpm
-
-      - name: Install wrangler
-        run: pnpm add -D wrangler
 
       - name: Deploy to Cloudflare Pages (production)
         run: |
