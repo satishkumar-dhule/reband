@@ -183,6 +183,32 @@
   }
 }
 
+/* ── Mobile PanelGroup fix ──────────────────────────────────────────────────
+   react-resizable-panels in direction="vertical" sets height: N% on child
+   panels. Without a fixed-height parent those resolve to 0 and content
+   disappears. On mobile we override to auto-height block layout so the
+   content flows normally. The resize handle is also hidden — not useful
+   on touch screens.
+   ─────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  [data-panel-group-direction="vertical"].panel-group-responsive {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  [data-panel-group-direction="vertical"].panel-group-responsive > [data-panel] {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    flex-basis: auto !important;
+    flex-shrink: 0 !important;
+  }
+  [data-panel-group-direction="vertical"].panel-group-responsive > [data-resize-handle] {
+    display: none !important;
+  }
+}
+
 /* ============================================
    Typography Scale Utilities — Issue #87
    Consistent heading hierarchy across all pages

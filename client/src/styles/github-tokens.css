@@ -294,7 +294,7 @@
   --container-xl:  1280px;
   --container-max: 1280px;
 
-  --header-height: 52px;
+  --header-height: 56px;  /* = Tailwind h-14 — matches sticky top-14 used in QuestionViewer */
 
   --icon-sm: 1rem;
   --icon-md: 1.25rem;

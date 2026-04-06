@@ -155,7 +155,7 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
 
       {/* ─── TOPBAR ─────────────────────────────────────── */}
       <header
-        className="fixed top-0 left-0 right-0 z-[var(--z-header)] h-[var(--header-height)] flex items-center gap-3 px-4 border-b border-[var(--gh-border)]"
+        className="fixed top-0 left-0 right-0 z-[var(--z-header)] h-14 flex items-center gap-3 px-4 border-b border-[var(--gh-border)]"
         style={{ background: "var(--header-bg)" }}
       >
         {/* Logo — terminal green @ mark */}
@@ -190,16 +190,6 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
         </button>
 
         <div className="flex-1" />
-
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="lg:hidden w-8 h-8 flex items-center justify-center rounded text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-overlay)] transition-all duration-[0.12s]"
-          aria-label="Open menu"
-          data-testid="button-mobile-menu"
-        >
-          <Menu className="w-4 h-4" />
-        </button>
       </header>
 
       {/* ─── BODY ────────────────────────────────────────── */}
