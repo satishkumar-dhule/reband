@@ -37,6 +37,30 @@ function startGoAPI() {
   console.log(`[go-api] started on port ${goPort}`);
 }
 
+function startAnthropicProxy() {
+  const proxyScript = path.resolve(__dirnameServer, "..", "anthropic-proxy.py");
+  const proxyPort = "4000";
+
+  const child = spawn("python3", [proxyScript], {
+    env: {
+      ...process.env,
+      PROXY_PORT: proxyPort,
+    },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+  child.stdout.on("data", (d: Buffer) => process.stdout.write(`[anthropic-proxy] ${d}`));
+  child.stderr.on("data", (d: Buffer) => process.stderr.write(`[anthropic-proxy] ${d}`));
+  child.on("exit", (code: number | null) => {
+    if (code !== 0 && code !== null) {
+      console.error(`[anthropic-proxy] exited with code ${code} — restarting in 3s`);
+      setTimeout(startAnthropicProxy, 3000);
+    }
+  });
+
+  console.log(`[anthropic-proxy] started on port ${proxyPort}`);
+}
+
 // Suppress Vite's non-fatal "Failed to parse JSON file" noise that comes from
 // application/ld+json inline scripts in index.html being processed by the JSON plugin.
 // This is a dev-only cosmetic issue; the app serves correctly regardless.
@@ -209,6 +233,9 @@ app.use((req, res, next) => {
       log(`serving on port ${port}`);
       startKeepAlive();
       startGoAPI();
+      if (process.env.NODE_ENV !== "production") {
+        startAnthropicProxy();
+      }
     },
   );
 

@@ -1,0 +1,27 @@
+/workspace$ 
+~/workspace$ export ANTHROPIC_BASE_URL=localhost:4000
+~/workspace$ claude 
+╭─── Claude Code v2.1.92 ───────────────────────────────────────────────────────────────────────────────────────────╮
+│                                               │ Tips for getting started                                          │
+│                 Welcome back!                 │ Run /init to create a CLAUDE.md file with instructions for Claude │
+│                                               │ ───────────────────────────────────────────────────────────────── │
+│                    ▐▛███▜▌                    │ Recent activity                                                   │
+│                   ▝▜█████▛▘                   │ No recent activity                                                │
+│                     ▘▘ ▝▝                     │                                                                   │
+│                                               │                                                                   │
+│   Opus 4.6 (1M context) · API Usage Billing   │                                                                   │
+│                  ~/workspace                  │                                                                   │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+  ↑ Opus now defaults to 1M context · 5x more room, same pricing
+
+❯ hi                                                                                                                                             
+  ⎿  Unable to connect to API (ConnectionRefused)
+     Retrying in 10 seconds… (attempt 6/10)                                                                                                      
+                                                                                                                                               
+✢ Considering…                                                                                                                                   
+   
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯                                                                                                                                              
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  esc to interrupt                                                                                                                             
