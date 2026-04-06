@@ -1,31 +1,15 @@
-/**
- * GitHub-Style Card Components
- * 
- * Updated to follow GitHub Primer design system:
- * - Border-radius: 6px (rounded-md) - GitHub standard
- * - Border: 1px solid border color
- * - No shadows by default (GitHub style)
- * - Proper hover states for interactive cards
- */
-
 import * as React from "react"
-
 import { cn } from "@/lib/utils"
 
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
-    /** Enable hover state styling */
-    hoverable?: boolean;
-  }
+  React.HTMLAttributes<HTMLDivElement> & { hoverable?: boolean }
 >(({ className, hoverable = false, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      // GitHub standard: rounded-md (6px), no shadow by default
-      "rounded-md border border-border bg-card text-card-foreground",
-      // Optional hover state
-      hoverable && "hover:border-primary/40 transition-colors cursor-pointer",
+      "rounded-md border border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg)]",
+      hoverable && "hover:border-[#3d4f6e] transition-colors duration-[0.12s] cursor-pointer",
       className
     )}
     {...props}
@@ -39,8 +23,10 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    // Consistent spacing: mb-3 (GitHub standard), flex-start alignment
-    className={cn("flex flex-col space-y-1.5 p-4 pb-0", className)}
+    className={cn(
+      "flex items-center justify-between px-[18px] py-[14px] border-b border-[var(--gh-border)]",
+      className
+    )}
     {...props}
   />
 ))
@@ -52,7 +38,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("font-semibold text-base leading-tight", className)}
+    className={cn("text-[13px] font-medium text-[var(--gh-fg)]", className)}
     {...props}
   />
 ))
@@ -64,7 +50,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-xs text-[var(--gh-fg-muted)]", className)}
     {...props}
   />
 ))
@@ -74,8 +60,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  // Consistent padding: p-4 (16px) for all cards
-  <div ref={ref} className={cn("p-4", className)} {...props} />
+  <div ref={ref} className={cn("p-[18px]", className)} {...props} />
 ))
 CardContent.displayName = "CardContent"
 
@@ -85,8 +70,10 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    // Consistent spacing with divider
-    className={cn("flex items-center p-4 pt-0 mt-3 border-t border-border/50", className)}
+    className={cn(
+      "flex items-center px-[18px] py-[14px] border-t border-[var(--gh-border)]",
+      className
+    )}
     {...props}
   />
 ))

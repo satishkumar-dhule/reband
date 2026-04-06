@@ -2,44 +2,68 @@ import { ReactNode, useState, useEffect, useCallback, useRef } from "react";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { useLocation } from "wouter";
 import {
-  Home, BookOpen, Mic, Code, RotateCcw, BarChart2,
-  Bookmark, User, Map, Search, Menu, X, Brain, Award,
+  Home, BookOpen, Mic, Code, RotateCcw,
+  Bookmark, User, Map, Search, Menu, X, Award,
+  Terminal,
 } from "lucide-react";
-import { ThemeToggle } from "../ThemeToggle";
 import { UnifiedSearch } from "../UnifiedSearch";
 import { cn } from "@/lib/utils";
 import { MobileBottomNav } from "./UnifiedNav";
 
-const NAV_ITEMS = [
-  { icon: Home,      label: "Home",            path: "/" },
-  { icon: BookOpen,  label: "Channels",        path: "/channels" },
-  { icon: Award,     label: "Certifications",  path: "/certifications" },
-  { icon: Mic,       label: "Voice",           path: "/voice-interview" },
-  { icon: Code,      label: "Coding",          path: "/coding" },
-  { icon: RotateCcw, label: "Review",          path: "/review" },
-  { icon: Bookmark,  label: "Saved",           path: "/bookmarks" },
-  { icon: Map,       label: "Paths",           path: "/learning-paths" },
+const PRACTICE_ITEMS = [
+  { icon: Home,      label: "Home",      path: "/" },
+  { icon: BookOpen,  label: "Questions", path: "/channels" },
+  { icon: Award,     label: "Certs",     path: "/certifications" },
+  { icon: Mic,       label: "Voice",     path: "/voice-interview" },
+  { icon: Code,      label: "Coding",    path: "/coding" },
+] as const;
+
+const LEARNING_ITEMS = [
+  { icon: Map,       label: "Paths",     path: "/learning-paths" },
+  { icon: RotateCcw, label: "Review",    path: "/review" },
+  { icon: Bookmark,  label: "Saved",     path: "/bookmarks" },
+] as const;
+
+const ACCOUNT_ITEMS = [
   { icon: User,      label: "Profile & Stats", path: "/profile" },
 ] as const;
 
-type NavItemType = (typeof NAV_ITEMS)[number];
+type AnyNavItem = { icon: any; label: string; path: string };
 
-function NavItem({ item, active, onClick }: { item: NavItemType; active: boolean; onClick?: () => void }) {
+function SectionLabel({ label }: { label: string }) {
+  return (
+    <div className="px-3 pt-4 pb-1">
+      <span className="text-[10px] text-[var(--gh-fg-subtle)] uppercase tracking-[0.1em] select-none">
+        [ {label} ]
+      </span>
+    </div>
+  );
+}
+
+function NavItem({
+  item,
+  active,
+  onClick,
+}: {
+  item: AnyNavItem;
+  active: boolean;
+  onClick?: () => void;
+}) {
   const [, setLocation] = useLocation();
   const Icon = item.icon;
   return (
     <button
       onClick={() => { setLocation(item.path); onClick?.(); }}
-      data-testid={`nav-${item.label.toLowerCase()}`}
+      data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "w-full flex items-center gap-3 px-3 py-[7px] rounded-md text-sm transition-colors text-left",
+        "w-full flex items-center gap-3 px-3 py-[7px] text-[12.5px] transition-all duration-[0.12s] text-left rounded-sm relative",
         active
-          ? "bg-[var(--sidebar-active-bg)] text-foreground font-medium"
-          : "text-muted-foreground hover:bg-[var(--sidebar-active-bg)] hover:text-foreground"
+          ? "text-[#00d084] bg-[rgba(0,208,132,0.10)] border-l-2 border-l-[#00d084] pl-[10px]"
+          : "text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-overlay)] border-l-2 border-l-transparent pl-[10px]"
       )}
     >
-      <Icon className="w-4 h-4 shrink-0" strokeWidth={active ? 2.5 : 2} />
+      <Icon className="w-3.5 h-3.5 shrink-0" strokeWidth={active ? 2.5 : 2} />
       <span>{item.label}</span>
     </button>
   );
@@ -50,14 +74,27 @@ function SidebarNav({ onClose }: { onClose?: () => void }) {
   const isActive = useCallback(
     (path: string) => {
       if (path === "/") return location === "/";
-      if (path === "/certifications") return location.startsWith("/certifications") || location.startsWith("/certification/");
+      if (path === "/certifications")
+        return location.startsWith("/certifications") || location.startsWith("/certification/");
       return location.startsWith(path);
     },
     [location]
   );
+
   return (
-    <nav className="flex flex-col gap-0.5 px-2 py-3">
-      {NAV_ITEMS.map((item) => (
+    <nav className="flex flex-col py-2">
+      <SectionLabel label="Practice" />
+      {PRACTICE_ITEMS.map((item) => (
+        <NavItem key={item.path} item={item} active={isActive(item.path)} onClick={onClose} />
+      ))}
+
+      <SectionLabel label="Learning" />
+      {LEARNING_ITEMS.map((item) => (
+        <NavItem key={item.path} item={item} active={isActive(item.path)} onClick={onClose} />
+      ))}
+
+      <SectionLabel label="Account" />
+      {ACCOUNT_ITEMS.map((item) => (
         <NavItem key={item.path} item={item} active={isActive(item.path)} onClick={onClose} />
       ))}
     </nav>
@@ -109,48 +146,44 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
     }
   }, [mobileOpen]);
 
-  // Full-width / fullscreen layout (e.g. coding challenge) — no nav, no padding
   if (hideNav) {
     return <>{children}</>;
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[var(--gh-canvas)]">
 
-      {/* ─── TOP HEADER ─────────────────────────────────── */}
+      {/* ─── TOPBAR ─────────────────────────────────────── */}
       <header
-        className="fixed top-0 left-0 right-0 z-[var(--z-header)] h-[var(--header-height)] flex items-center gap-3 px-4 border-b"
-        style={{ background: "var(--header-bg)", borderColor: "var(--sidebar-border)" }}
+        className="fixed top-0 left-0 right-0 z-[var(--z-header)] h-[var(--header-height)] flex items-center gap-3 px-4 border-b border-[var(--gh-border)]"
+        style={{ background: "var(--header-bg)" }}
       >
-        {/* Logo */}
+        {/* Logo — terminal green @ mark */}
         <button
           onClick={() => setLocation("/")}
           className="flex items-center gap-2 shrink-0"
           aria-label="Go to home"
           data-testid="link-home-logo"
         >
-          <div
-            className="w-8 h-8 rounded-md flex items-center justify-center shrink-0"
-            style={{ background: "var(--gh-blue)" }}
-          >
-            <Brain className="w-4 h-4 text-white" strokeWidth={2.5} />
+          <div className="w-7 h-7 rounded flex items-center justify-center bg-[rgba(0,208,132,0.12)] border border-[rgba(0,208,132,0.25)]">
+            <Terminal className="w-3.5 h-3.5 text-[#00d084]" strokeWidth={2} />
           </div>
-          <span className="font-semibold text-sm hidden sm:block text-foreground">DevPrep</span>
+          <span className="text-[13px] font-medium hidden sm:block text-[var(--gh-fg)]">
+            DevPrep
+          </span>
         </button>
 
         {/* Search bar */}
         <button
           onClick={() => setSearchOpen(true)}
-          className="flex items-center gap-2 h-9 px-3 rounded-md border text-sm text-muted-foreground flex-1 max-w-xs transition-colors hover:border-[var(--gh-blue)]"
-          style={{ background: "var(--background)", borderColor: "var(--sidebar-border)" }}
+          className="flex items-center gap-2 h-8 px-3 rounded border text-xs text-[var(--gh-fg-muted)] flex-1 max-w-xs transition-all duration-[0.12s] hover:border-[#3d4f6e] hover:text-[var(--gh-fg)] bg-[var(--gh-canvas-inset)] border-[var(--gh-border)]"
           data-testid="button-search"
           aria-label="Search"
         >
-          <Search className="w-3.5 h-3.5 shrink-0" />
+          <Search className="w-3 h-3 shrink-0" />
           <span className="flex-1 text-left">Search...</span>
           <kbd
-            className="hidden sm:inline-flex text-[10px] px-1.5 py-0.5 rounded border font-mono leading-none"
-            style={{ borderColor: "var(--sidebar-border)", color: "var(--muted-foreground)" }}
+            className="hidden sm:inline-flex text-[10px] px-1.5 py-0.5 rounded border font-mono leading-none border-[var(--gh-border)] text-[var(--gh-fg-subtle)]"
           >
             /
           </kbd>
@@ -158,29 +191,25 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
 
         <div className="flex-1" />
 
-        {/* Theme toggle */}
-        <ThemeToggle />
-
         {/* Mobile hamburger */}
         <button
           onClick={() => setMobileOpen(true)}
-          className="lg:hidden w-9 h-9 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground transition-colors"
+          className="lg:hidden w-8 h-8 flex items-center justify-center rounded text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-overlay)] transition-all duration-[0.12s]"
           aria-label="Open menu"
           data-testid="button-mobile-menu"
         >
-          <Menu className="w-5 h-5" />
+          <Menu className="w-4 h-4" />
         </button>
       </header>
 
-      {/* ─── BODY (below fixed header) ──────────────────── */}
+      {/* ─── BODY ────────────────────────────────────────── */}
       <div className="flex justify-center pt-[var(--header-height)] min-h-[calc(100vh-var(--header-height))]">
-        {/* Shared max-width wrapper keeps sidebar + content aligned */}
         <div className={cn("flex flex-1 w-full", !fullWidth && "max-w-[--container-max]")}>
 
           {/* ─── DESKTOP SIDEBAR ──────────────────────────── */}
           <aside
-            className="hidden lg:block shrink-0 w-52 xl:w-60 border-r"
-            style={{ background: "var(--sidebar-bg)", borderColor: "var(--sidebar-border)" }}
+            className="hidden lg:block shrink-0 w-[220px] border-r border-[var(--gh-border)]"
+            style={{ background: "var(--sidebar-bg)" }}
           >
             <div className="sticky top-[var(--header-height)] h-[calc(100vh-var(--header-height))] overflow-y-auto">
               <SidebarNav />
@@ -188,7 +217,7 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
           </aside>
 
           {/* ─── MAIN CONTENT ─────────────────────────────── */}
-          <main className="flex-1 min-w-0 pb-[60px] lg:pb-0">
+          <main className="flex-1 min-w-0 pb-[60px] lg:pb-0 bg-[var(--gh-canvas)]">
             {children}
           </main>
         </div>
@@ -196,41 +225,33 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
 
       {/* ─── MOBILE DRAWER ──────────────────────────────── */}
       {mobileOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 z-[var(--z-drawer)] flex"
           role="dialog"
           aria-modal="true"
           aria-label="Navigation menu"
         >
-          {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-black/60"
             onClick={() => setMobileOpen(false)}
             aria-hidden="true"
           />
-          {/* Drawer panel */}
           <div
             ref={drawerRef}
-            className="relative flex flex-col w-64 border-r shadow-xl"
-            style={{ background: "var(--sidebar-bg)", borderColor: "var(--sidebar-border)" }}
+            className="relative flex flex-col w-[220px] border-r border-[var(--gh-border)]"
+            style={{ background: "var(--sidebar-bg)" }}
             role="document"
           >
-            <div
-              className="flex items-center justify-between px-4 h-[var(--header-height)] border-b shrink-0"
-              style={{ borderColor: "var(--sidebar-border)" }}
-            >
+            <div className="flex items-center justify-between px-4 h-[var(--header-height)] border-b border-[var(--gh-border)] shrink-0">
               <div className="flex items-center gap-2">
-                <div
-                  className="w-7 h-7 rounded-md flex items-center justify-center"
-                  style={{ background: "var(--gh-blue)" }}
-                >
-                  <Brain className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                <div className="w-6 h-6 rounded flex items-center justify-center bg-[rgba(0,208,132,0.12)] border border-[rgba(0,208,132,0.25)]">
+                  <Terminal className="w-3 h-3 text-[#00d084]" strokeWidth={2} />
                 </div>
-                <span className="font-semibold text-sm text-foreground">DevPrep</span>
+                <span className="text-[13px] font-medium text-[var(--gh-fg)]">DevPrep</span>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] transition-all duration-[0.12s]"
                 aria-label="Close menu"
                 aria-expanded="true"
                 data-testid="button-close-mobile-menu"
@@ -248,7 +269,7 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
       {/* ─── SEARCH MODAL ───────────────────────────────── */}
       <UnifiedSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      {/* ─── MOBILE BOTTOM NAVIGATION ────────────────────── */}
+      {/* ─── MOBILE BOTTOM NAV ────────────────────────────── */}
       <MobileBottomNav />
     </div>
   );

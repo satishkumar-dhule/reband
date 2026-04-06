@@ -1,415 +1,513 @@
 /**
- * GitHub Design System Tokens
- * 
- * This file provides the single source of truth for all GitHub-themed colors.
- * All colors follow GitHub Primer design tokens and include both light/dark mode variants.
- * WCAG AA compliant (4.5:1 contrast ratio for text).
- * 
- * Usage in CSS: color: var(--gh-fg-muted);
- * Usage in Tailwind: text-[var(--gh-fg-muted)] or use mapped utility classes
- * 
- * @see https://primer.style/css/support/color-system
+ * AgentMail Terminal Theme — Design Tokens
+ *
+ * Dark-first developer console aesthetic:
+ *   - Near-black base (#0d0f12) with terminal-green (#00d084) accent
+ *   - JetBrains Mono for all UI text
+ *   - Flat, borderless depth — no drop shadows
+ *   - Micro-contrast borders (#2a3140)
+ *
+ * The --gh-* naming convention is preserved for backward compatibility
+ * with existing components that reference these tokens.
  */
 
-/* ===== LIGHT MODE (Default) ===== */
+/* ===== LIGHT MODE ===== */
 :root,
 [data-theme="light"],
 .light {
-  /* Canvas backgrounds */
-  --gh-canvas: #ffffff;
-  --gh-canvas-subtle: #f6f8fa;
-  --gh-canvas-inset: #f0f6fc;
+  --gh-canvas:         #ffffff;
+  --gh-canvas-subtle:  #f6f8fa;
+  --gh-canvas-inset:   #f0f6fc;
   --gh-canvas-overlay: #ffffff;
-  
-  /* Foreground / text - WCAG AA compliant */
-  --gh-fg: #1f2328;
-  --gh-fg-muted: #59636e; /* Was #636c76 - adjusted for WCAG AA */
-  --gh-fg-subtle: #6e7781;
-  --gh-fg-on-emphasis: #ffffff;
-  
-  /* Borders */
-  --gh-border: #d0d7de;
+
+  --gh-fg:              #1f2328;
+  --gh-fg-muted:        #59636e;
+  --gh-fg-subtle:       #6e7781;
+  --gh-fg-on-emphasis:  #ffffff;
+
+  --gh-border:       #d0d7de;
   --gh-border-muted: #d8dee4;
-  
-  /* Accent (blue) */
-  --gh-accent-fg: #0969da;
-  --gh-accent-emphasis: #0969da;
-  --gh-accent-subtle: #ddf4ff;
-  --gh-accent-hover: #0550ae;
-  
-  /* Success (green) */
-  --gh-success-fg: #1a7f37;
-  --gh-success-emphasis: #1f883d;
-  --gh-success-subtle: #dafbe1;
-  --gh-success-hover: #116329;
-  
-  /* Attention (yellow/orange) */
-  --gh-attention-fg: #9a6700;
-  --gh-attention-emphasis: #bf8700;
-  --gh-attention-subtle: #fff8c5;
-  --gh-attention-hover: #7d4e00;
-  
-  /* Danger (red) */
-  --gh-danger-fg: #d1242f;
-  --gh-danger-emphasis: #cf222e;
-  --gh-danger-subtle: #ffebe9;
-  --gh-danger-hover: #82071e;
-  
-  /* Done (purple) */
-  --gh-done-fg: #8250df;
-  --gh-done-emphasis: #8250df;
-  --gh-done-subtle: #fbefff;
-  --gh-done-hover: #6e40c9;
-  
-  /* Neutral */
+
+  --gh-accent-fg:        #0969da;
+  --gh-accent-emphasis:  #0969da;
+  --gh-accent-subtle:    #ddf4ff;
+  --gh-accent-hover:     #0550ae;
+
+  --gh-success-fg:        #1a7f37;
+  --gh-success-emphasis:  #1f883d;
+  --gh-success-subtle:    #dafbe1;
+  --gh-success-hover:     #116329;
+
+  --gh-attention-fg:        #9a6700;
+  --gh-attention-emphasis:  #bf8700;
+  --gh-attention-subtle:    #fff8c5;
+  --gh-attention-hover:     #7d4e00;
+
+  --gh-danger-fg:        #d1242f;
+  --gh-danger-emphasis:  #cf222e;
+  --gh-danger-subtle:    #ffebe9;
+  --gh-danger-hover:     #82071e;
+
+  --gh-done-fg:        #8250df;
+  --gh-done-emphasis:  #8250df;
+  --gh-done-subtle:    #fbefff;
+  --gh-done-hover:     #6e40c9;
+
   --gh-neutral-emphasis: #6e7781;
-  --gh-neutral-subtle: #eaeef2;
-  --gh-neutral-muted: #8b949e;
-  
-  /* Pink accent (for gradients) */
-  --gh-pink-fg: #bf3989;
-  --gh-pink-emphasis: #a371f7;
-  --gh-pink-subtle: #ffeff7;
-  
-  /* Cody colors */
+  --gh-neutral-subtle:   #eaeef2;
+  --gh-neutral-muted:    #8b949e;
+
+  --gh-pink-fg:        #bf3989;
+  --gh-pink-emphasis:  #a371f7;
+  --gh-pink-subtle:    #ffeff7;
+
   --gh-cody-fg: #8b5cf6;
-  
-  /* Difficulty badges */
-  --gh-diff-beginner: #1f883d;
-  --gh-diff-beginner-bg: #dafbe1;
-  --gh-diff-intermediate: #9a6700;
-  --gh-diff-intermediate-bg: #fff8c5;
-  --gh-diff-advanced: #cf222e;
-  --gh-diff-advanced-bg: #ffebe9;
-  
-  /* Focus ring */
+
+  --gh-diff-beginner:          #1f883d;
+  --gh-diff-beginner-bg:       #dafbe1;
+  --gh-diff-intermediate:      #9a6700;
+  --gh-diff-intermediate-bg:   #fff8c5;
+  --gh-diff-advanced:          #cf222e;
+  --gh-diff-advanced-bg:       #ffebe9;
+
   --gh-focus-ring: rgba(9, 105, 218, 0.4);
-  
-  /* Shadows */
+
   --gh-shadow-xs: 0 1px 0 rgba(27, 31, 36, 0.04);
   --gh-shadow-sm: 0 1px 2px rgba(27, 31, 36, 0.04);
   --gh-shadow-md: 0 3px 6px rgba(140, 149, 159, 0.15);
   --gh-shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.2);
   --gh-shadow-xl: 0 12px 48px rgba(140, 149, 159, 0.3);
-  
-  /* Common backgrounds for components */
+
   --gh-bg-elevated: #ffffff;
-  --gh-bg-muted: #f6f8fa;
-  --gh-bg-inset: #f6f8fa;
-  
-  /* Skeleton backgrounds - optimized for loading states */
-  /* Light mode: subtle gray with good contrast on white */
-  --gh-skeleton-bg: #e8eaed;
+  --gh-bg-muted:    #f6f8fa;
+  --gh-bg-inset:    #f6f8fa;
+
+  --gh-skeleton-bg:      #e8eaed;
   --gh-skeleton-bg-dark: #30363d;
+
+  --tier-bronze-fg:     #92400e;
+  --tier-bronze-bg:     #fffbeb;
+  --tier-bronze-border: #fde68a;
+  --tier-silver-fg:     #374151;
+  --tier-silver-bg:     #f9fafb;
+  --tier-silver-border: #d1d5db;
+  --tier-gold-fg:       #854d0e;
+  --tier-gold-bg:       #fefce8;
+  --tier-gold-border:   #fef08a;
+  --tier-platinum-fg:   #164e63;
+  --tier-platinum-bg:   #ecfeff;
+  --tier-platinum-border: #a5f3fc;
+  --tier-diamond-fg:    #4c1d95;
+  --tier-diamond-bg:    #f5f3ff;
+  --tier-diamond-border: #ddd6fe;
 }
 
-/* ===== DARK MODE ===== */
+/* ===== DARK MODE — AgentMail Terminal Theme ===== */
 [data-theme="dark"],
 .dark {
-  /* Canvas backgrounds */
-  --gh-canvas: #0d1117;
-  --gh-canvas-subtle: #161b22;
-  --gh-canvas-inset: #010409;
-  --gh-canvas-overlay: #161b22;
-  
-  /* Foreground / text - WCAG AA compliant */
-  --gh-fg: #e6edf3;
-  --gh-fg-muted: #8b949e;
-  --gh-fg-subtle: #6e7681;
-  --gh-fg-on-emphasis: #ffffff;
-  
-  /* Borders */
-  --gh-border: #30363d;
-  --gh-border-muted: #21262d;
-  
-  /* Accent (blue) */
-  --gh-accent-fg: #58a6ff;
-  --gh-accent-emphasis: #1f6feb;
-  --gh-accent-subtle: #031d30;
-  --gh-accent-hover: #388bfd;
-  
-  /* Success (green) */
-  --gh-success-fg: #3fb950;
-  --gh-success-emphasis: #238636;
-  --gh-success-subtle: #0d1f12;
-  --gh-success-hover: #2ea043;
-  
-  /* Attention (yellow/orange) */
-  --gh-attention-fg: #d29922;
-  --gh-attention-emphasis: #9e6a03;
-  --gh-attention-subtle: #1c1502;
-  --gh-attention-hover: #e3b341;
-  
-  /* Danger (red) */
-  --gh-danger-fg: #f85149;
-  --gh-danger-emphasis: #da3633;
-  --gh-danger-subtle: #160b10;
-  --gh-danger-hover: #ff7b72;
-  
-  /* Done (purple) */
-  --gh-done-fg: #a371f7;
+  /* ── Backgrounds ── */
+  --gh-canvas:         #0d0f12;  /* base — app root */
+  --gh-canvas-subtle:  #161a1f;  /* surface — sidebar, topbar, cards */
+  --gh-canvas-inset:   #080a0d;  /* input-bg — text inputs, code blocks */
+  --gh-canvas-overlay: #1e2329;  /* elevated — hover rows, modals, dropdowns */
+
+  /* ── Text ── */
+  --gh-fg:             #e8edf3;  /* primary — headings, active items */
+  --gh-fg-muted:       #7a8799;  /* secondary — body text, nav labels */
+  --gh-fg-subtle:      #3d4a5c;  /* muted — placeholders, timestamps */
+  --gh-fg-on-emphasis: #000000;  /* text on green CTA buttons */
+
+  /* ── Borders ── */
+  --gh-border:       #2a3140;   /* default dividers, card borders */
+  --gh-border-muted: #2a3140;
+
+  /* ── Accent — Terminal Green ── */
+  --gh-accent-fg:       #00d084;
+  --gh-accent-emphasis: #00d084;
+  --gh-accent-subtle:   rgba(0, 208, 132, 0.13);  /* accent-dim */
+  --gh-accent-hover:    #00e895;
+
+  /* ── Success maps to terminal green ── */
+  --gh-success-fg:       #00d084;
+  --gh-success-emphasis: #00d084;
+  --gh-success-subtle:   rgba(0, 208, 132, 0.13);
+  --gh-success-hover:    #00e895;
+
+  /* ── Attention / Warning — Amber ── */
+  --gh-attention-fg:       #f5a623;
+  --gh-attention-emphasis: #f5a623;
+  --gh-attention-subtle:   rgba(245, 166, 35, 0.12);
+  --gh-attention-hover:    #f5b94a;
+
+  /* ── Danger — Red ── */
+  --gh-danger-fg:       #ff5c5c;
+  --gh-danger-emphasis: #ff5c5c;
+  --gh-danger-subtle:   rgba(255, 92, 92, 0.10);
+  --gh-danger-hover:    #ff7575;
+
+  /* ── Done / Purple ── */
+  --gh-done-fg:       #a371f7;
   --gh-done-emphasis: #8957e5;
-  --gh-done-subtle: #2ea043;
-  --gh-done-hover: #8a3ffc;
-  
-  /* Skeleton backgrounds - optimized for loading states */
-  --gh-skeleton-bg: #30363d;
-  --gh-skeleton-bg-dark: #21262d;
-  
-  /* Neutral */
-  --gh-neutral-emphasis: #6e7681;
-  --gh-neutral-subtle: #21262d;
-  --gh-neutral-muted: #484f58;
-  
-  /* Pink accent (for gradients) */
-  --gh-pink-fg: #f778ba;
+  --gh-done-subtle:   rgba(163, 113, 247, 0.12);
+  --gh-done-hover:    #8a3ffc;
+
+  /* ── Neutral ── */
+  --gh-neutral-emphasis: #3d4a5c;
+  --gh-neutral-subtle:   #1e2329;  /* elevated */
+  --gh-neutral-muted:    #2a3140;
+
+  /* ── Pink ── */
+  --gh-pink-fg:       #f778ba;
   --gh-pink-emphasis: #a371f7;
-  --gh-pink-subtle: #320755;
-  
-  /* Cody colors */
+  --gh-pink-subtle:   #320755;
+
   --gh-cody-fg: #a371f7;
-  
-  /* Difficulty badges */
-  --gh-diff-beginner: #3fb950;
-  --gh-diff-beginner-bg: #0d1f12;
-  --gh-diff-intermediate: #d29922;
-  --gh-diff-intermediate-bg: #1c1502;
-  --gh-diff-advanced: #f85149;
-  --gh-diff-advanced-bg: #160b10;
-  
-  /* ===== TIER / BADGE SEMANTIC COLORS (dark mode) ===== */
-  --tier-bronze-fg:     #fbbf24;
-  --tier-bronze-bg:     rgba(120, 53, 15, 0.25);
-  --tier-bronze-border: rgba(120, 53, 15, 0.5);
-  --tier-silver-fg:     #94a3b8;
-  --tier-silver-bg:     rgba(30, 41, 59, 0.3);
-  --tier-silver-border: rgba(71, 85, 105, 0.5);
-  --tier-gold-fg:       #facc15;
-  --tier-gold-bg:       rgba(113, 63, 18, 0.25);
-  --tier-gold-border:   rgba(113, 63, 18, 0.5);
-  --tier-platinum-fg:   #22d3ee;
-  --tier-platinum-bg:   rgba(22, 78, 99, 0.25);
-  --tier-platinum-border: rgba(22, 78, 99, 0.5);
-  --tier-diamond-fg:    #a78bfa;
-  --tier-diamond-bg:    rgba(46, 16, 101, 0.25);
-  --tier-diamond-border: rgba(46, 16, 101, 0.5);
 
-  /* Focus ring */
-  --gh-focus-ring: rgba(88, 166, 255, 0.4);
-  
-  /* Shadows */
-  --gh-shadow-xs: 0 1px 0 rgba(0, 0, 0, 0);
-  --gh-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --gh-shadow-md: 0 3px 6px rgba(1, 4, 9, 0.4);
-  --gh-shadow-lg: 0 8px 24px rgba(1, 4, 9, 0.5);
-  --gh-shadow-xl: 0 12px 48px rgba(1, 4, 9, 0.6);
-  
-  /* Common backgrounds for components */
-  --gh-bg-elevated: #161b22;
-  --gh-bg-muted: #21262d;
-  --gh-bg-inset: #0d1117;
+  /* ── Difficulty badges ── */
+  --gh-diff-beginner:        #00d084;
+  --gh-diff-beginner-bg:     rgba(0, 208, 132, 0.10);
+  --gh-diff-intermediate:    #f5a623;
+  --gh-diff-intermediate-bg: rgba(245, 166, 35, 0.10);
+  --gh-diff-advanced:        #ff5c5c;
+  --gh-diff-advanced-bg:     rgba(255, 92, 92, 0.10);
 
-  /* ===== TIER / BADGE SEMANTIC COLORS (dark mode) ===== */
-  --tier-bronze-fg:   #d97706;
-  --tier-bronze-bg:   #1c1400;
-  --tier-bronze-border: #78350f;
-  --tier-silver-fg:   #9ca3af;
-  --tier-silver-bg:   #111827;
-  --tier-silver-border: #374151;
-  --tier-gold-fg:     #eab308;
-  --tier-gold-bg:     #1c1a00;
-  --tier-gold-border: #713f12;
-  --tier-platinum-fg: #22d3ee;
-  --tier-platinum-bg: #001f29;
-  --tier-platinum-border: #164e63;
-  --tier-diamond-fg:  #a78bfa;
-  --tier-diamond-bg:  #1e0035;
-  --tier-diamond-border: #4c1d95;
+  /* ── Focus ring ── */
+  --gh-focus-ring: rgba(0, 208, 132, 0.25);
+
+  /* ── No shadows (flat terminal aesthetic) ── */
+  --gh-shadow-xs: none;
+  --gh-shadow-sm: none;
+  --gh-shadow-md: none;
+  --gh-shadow-lg: none;
+  --gh-shadow-xl: none;
+
+  /* ── Common backgrounds ── */
+  --gh-bg-elevated: #1e2329;
+  --gh-bg-muted:    #161a1f;
+  --gh-bg-inset:    #080a0d;
+
+  /* ── Skeleton ── */
+  --gh-skeleton-bg:      #2a3140;
+  --gh-skeleton-bg-dark: #1e2329;
+
+  /* ── Tier / Badge colors ── */
+  --tier-bronze-fg:       #f5a623;
+  --tier-bronze-bg:       rgba(120, 53, 15, 0.20);
+  --tier-bronze-border:   rgba(245, 166, 35, 0.30);
+  --tier-silver-fg:       #94a3b8;
+  --tier-silver-bg:       rgba(30, 41, 59, 0.30);
+  --tier-silver-border:   rgba(71, 85, 105, 0.40);
+  --tier-gold-fg:         #facc15;
+  --tier-gold-bg:         rgba(113, 63, 18, 0.20);
+  --tier-gold-border:     rgba(250, 204, 21, 0.25);
+  --tier-platinum-fg:     #22d3ee;
+  --tier-platinum-bg:     rgba(22, 78, 99, 0.20);
+  --tier-platinum-border: rgba(34, 211, 238, 0.25);
+  --tier-diamond-fg:      #a78bfa;
+  --tier-diamond-bg:      rgba(46, 16, 101, 0.20);
+  --tier-diamond-border:  rgba(167, 139, 250, 0.25);
+
+  /* ── Layout-specific overrides ── */
+  --header-bg:           #161a1f;  /* topbar = surface, not canvas */
+  --sidebar-active-bg:   rgba(0, 208, 132, 0.13);
+  --sidebar-active-border: #00d084;
 }
 
 /* ===== LEGACY COMPATIBILITY ALIASES ===== */
-/* These map to the new --gh-* naming convention for backward compatibility */
 :root {
-  /* Text colors - legacy aliases */
-  --color-text-primary: var(--gh-fg);
+  --color-text-primary:   var(--gh-fg);
   --color-text-secondary: var(--gh-fg-muted);
-  --color-text-tertiary: var(--gh-fg-subtle);
-  
-  /* Background colors - legacy aliases */
-  --background: var(--gh-canvas);
-  --foreground: var(--gh-fg);
-  --card: var(--gh-canvas);
-  --card-foreground: var(--gh-fg);
-  --popover: var(--gh-canvas-overlay);
-  --popover-foreground: var(--gh-fg);
-  --primary: var(--gh-accent-fg);
-  --primary-foreground: var(--gh-fg-on-emphasis);
-  --secondary: var(--gh-canvas-subtle);
+  --color-text-tertiary:  var(--gh-fg-subtle);
+
+  --background:          var(--gh-canvas);
+  --foreground:          var(--gh-fg);
+  --card:                var(--gh-canvas-subtle);
+  --card-foreground:     var(--gh-fg);
+  --popover:             var(--gh-canvas-overlay);
+  --popover-foreground:  var(--gh-fg);
+  --primary:             var(--gh-accent-fg);
+  --primary-foreground:  var(--gh-fg-on-emphasis);
+  --secondary:           var(--gh-canvas-subtle);
   --secondary-foreground: var(--gh-fg);
-  --muted: var(--gh-canvas-subtle);
-  --muted-foreground: var(--gh-fg-muted);
-  --accent: var(--gh-accent-fg);
-  --accent-foreground: var(--gh-fg-on-emphasis);
-  --destructive: var(--gh-danger-emphasis);
+  --muted:               var(--gh-canvas-subtle);
+  --muted-foreground:    var(--gh-fg-muted);
+  --accent:              var(--gh-accent-fg);
+  --accent-foreground:   var(--gh-fg-on-emphasis);
+  --destructive:         var(--gh-danger-emphasis);
   --destructive-foreground: var(--gh-fg-on-emphasis);
-  --border: var(--gh-border);
-  --input: var(--gh-border);
-  --ring: var(--gh-accent-fg);
-  
-  /* Sidebar colors */
-  --sidebar-bg: var(--gh-canvas-subtle);
-  --sidebar-foreground: var(--gh-fg);
-  --sidebar-border: var(--gh-border);
-  --sidebar-accent: var(--gh-canvas-subtle);
-  --sidebar-accent-foreground: var(--gh-fg);
-  --sidebar-ring: var(--gh-accent-fg);
-  --sidebar-active-bg: var(--gh-neutral-subtle);
-  --sidebar-active-border: var(--gh-accent-fg);
-  --header-bg: var(--gh-canvas);
-  
-  /* Semantic colors */
-  --success: var(--gh-success-emphasis);
-  --success-foreground: var(--gh-fg-on-emphasis);
-  --color-success: var(--gh-success-fg);
+  --border:              var(--gh-border);
+  --input:               var(--gh-border);
+  --ring:                var(--gh-accent-fg);
+  --radius:              0.375rem;  /* 6px */
+
+  /* Sidebar */
+  --sidebar-bg:                  var(--gh-canvas-subtle);
+  --sidebar-foreground:          var(--gh-fg);
+  --sidebar-border:              var(--gh-border);
+  --sidebar-accent:              var(--gh-canvas-subtle);
+  --sidebar-accent-foreground:   var(--gh-fg);
+  --sidebar-ring:                var(--gh-accent-fg);
+  --sidebar-active-bg:           var(--gh-accent-subtle);
+  --sidebar-active-border:       var(--gh-accent-fg);
+
+  /* Header */
+  --header-bg: var(--gh-canvas-subtle);
+
+  /* Semantic */
+  --success:             var(--gh-success-emphasis);
+  --success-foreground:  var(--gh-fg-on-emphasis);
+  --color-success:       var(--gh-success-fg);
   --color-success-light: var(--gh-success-fg);
-  
-  /* GitHub specific */
+
+  /* Aliases */
   --gh-green: var(--gh-success-fg);
-  --gh-blue: var(--gh-accent-fg);
+  --gh-blue:  var(--gh-accent-fg);
   --button-outline: var(--gh-border);
+}
+
+/* ===== DESIGN-SYSTEM SHIMS ===== */
+:root {
+  --color-text-primary:              var(--gh-fg);
+  --color-text-secondary:            var(--gh-fg-muted);
+  --color-text-tertiary:             var(--gh-fg-subtle);
+  --color-border-default:            var(--gh-border);
+  --color-border-subtle:             var(--gh-border-muted);
+  --color-success:                   var(--gh-success-fg);
+  --color-warning:                   var(--gh-attention-fg);
+  --color-error:                     var(--gh-danger-fg);
+  --color-info:                      var(--gh-accent-fg);
+  --color-difficulty-beginner:       var(--gh-diff-beginner);
+  --color-difficulty-intermediate:   var(--gh-diff-intermediate);
+  --color-difficulty-advanced:       var(--gh-diff-advanced);
+}
+
+/* ===== LAYOUT CONSTANTS ===== */
+:root {
+  --breakpoint-sm: 544px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1012px;
+  --breakpoint-xl: 1280px;
+
+  --container-sm:  544px;
+  --container-md:  768px;
+  --container-lg:  1012px;
+  --container-xl:  1280px;
+  --container-max: 1280px;
+
+  --header-height: 52px;
+
+  --icon-sm: 1rem;
+  --icon-md: 1.25rem;
+  --icon-lg: 1.5rem;
+  --icon-xl: 1.75rem;
+
+  --z-base:           0;
+  --z-raised:        10;
+  --z-sticky:        20;
+  --z-header:        50;
+  --z-drawer:        60;
+  --z-overlay:       65;
+  --z-submenu:       70;
+  --z-toast:         80;
+  --z-modal:         90;
+  --z-tooltip:      100;
+  --z-fixed:         55;
+  --z-modal-backdrop: 85;
+  --z-popover:       95;
+
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:  12px;
+  --radius-xl:  20px;
+  --radius-2xl: 32px;
+  --radius-full: 9999px;
+
+  /* Tier colors (light — overridden in .dark above) */
+  --tier-bronze-fg:       #92400e;
+  --tier-bronze-bg:       #fffbeb;
+  --tier-bronze-border:   #fde68a;
+  --tier-silver-fg:       #374151;
+  --tier-silver-bg:       #f9fafb;
+  --tier-silver-border:   #d1d5db;
+  --tier-gold-fg:         #854d0e;
+  --tier-gold-bg:         #fefce8;
+  --tier-gold-border:     #fef08a;
+  --tier-platinum-fg:     #164e63;
+  --tier-platinum-bg:     #ecfeff;
+  --tier-platinum-border: #a5f3fc;
+  --tier-diamond-fg:      #4c1d95;
+  --tier-diamond-bg:      #f5f3ff;
+  --tier-diamond-border:  #ddd6fe;
 }
 
 /* ===== UTILITY CLASSES ===== */
 
-/* Text colors */
-.gh-text { color: var(--gh-fg); }
-.gh-text-muted { color: var(--gh-fg-muted); }
+.gh-text        { color: var(--gh-fg); }
+.gh-text-muted  { color: var(--gh-fg-muted); }
 .gh-text-subtle { color: var(--gh-fg-subtle); }
 .gh-text-accent { color: var(--gh-accent-fg); }
 .gh-text-success { color: var(--gh-success-fg); }
 .gh-text-warning { color: var(--gh-attention-fg); }
-.gh-text-danger { color: var(--gh-danger-fg); }
-.gh-text-done { color: var(--gh-done-fg); }
+.gh-text-danger  { color: var(--gh-danger-fg); }
+.gh-text-done    { color: var(--gh-done-fg); }
 
-/* Background colors */
-.gh-bg { background-color: var(--gh-canvas); }
+.gh-bg        { background-color: var(--gh-canvas); }
 .gh-bg-subtle { background-color: var(--gh-canvas-subtle); }
-.gh-bg-inset { background-color: var(--gh-canvas-inset); }
+.gh-bg-inset  { background-color: var(--gh-canvas-inset); }
 .gh-bg-overlay { background-color: var(--gh-canvas-overlay); }
-.gh-bg-muted { background-color: var(--gh-bg-muted); }
+.gh-bg-muted  { background-color: var(--gh-bg-muted); }
 
-/* Border colors */
-.gh-border { border-color: var(--gh-border); }
+.gh-border      { border-color: var(--gh-border); }
 .gh-border-muted { border-color: var(--gh-border-muted); }
 
-/* Focus states */
 .gh-focus {
   outline: none;
   box-shadow: 0 0 0 3px var(--gh-focus-ring);
 }
-
 .gh-focus:focus-visible {
   outline: 2px solid var(--gh-accent-fg);
   outline-offset: 2px;
 }
 
-/* ===== RESPONSIVE BREAKPOINTS ===== */
-/* GitHub-style responsive breakpoints */
-:root {
-  /* Breakpoints (matching GitHub Primer design system) */
-  --breakpoint-sm: 544px;   /* Mobile landscape */
-  --breakpoint-md: 768px;   /* Tablet */
-  --breakpoint-lg: 1012px; /* Desktop */
-  --breakpoint-xl: 1280px; /* Large desktop */
-  
-  /* Container widths */
-  --container-sm: 544px;
-  --container-md: 768px;
-  --container-lg: 1012px;
-  --container-xl: 1280px;
-  --container-max: 1280px;
+/* ===== GH COMPONENT CLASSES (backward compat) ===== */
 
-  /* ===== LAYOUT DIMENSIONS ===== */
-  /* Single source of truth for fixed heights — change here, works everywhere */
-  --header-height: 56px;
+.gh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 7px 14px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  border-radius: 6px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.12s;
+  text-decoration: none;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.gh-btn:focus-visible {
+  outline: 2px solid var(--gh-accent-fg);
+  outline-offset: 2px;
+}
+.gh-btn-primary {
+  background-color: var(--gh-accent-fg);
+  border-color: var(--gh-accent-fg);
+  color: var(--gh-fg-on-emphasis);
+}
+.gh-btn-primary:hover { background-color: var(--gh-accent-hover); }
+.gh-btn-secondary {
+  background-color: transparent;
+  border-color: var(--gh-border);
+  color: var(--gh-fg-muted);
+}
+.gh-btn-secondary:hover { border-color: #3d4f6e; color: var(--gh-fg); }
+.gh-btn-danger {
+  background-color: transparent;
+  border-color: rgba(255, 92, 92, 0.25);
+  color: var(--gh-danger-fg);
+}
+.gh-btn-danger:hover { background-color: var(--gh-danger-subtle); }
+.gh-btn-outline {
+  background-color: transparent;
+  border-color: var(--gh-border);
+  color: var(--gh-fg-muted);
+}
+.gh-btn-outline:hover { border-color: #3d4f6e; color: var(--gh-fg); }
 
-  /* ===== ICON SIZE SCALE ===== */
-  /* Use these tokens instead of magic w-N h-N values.
-     sm = inline/label icons, md = nav icons, lg = touch-target icons */
-  --icon-sm: 1rem;     /* 16px — inline, secondary */
-  --icon-md: 1.25rem;  /* 20px — primary nav, mobile bottom bar */
-  --icon-lg: 1.5rem;   /* 24px — touch-target, submenu cards */
-  --icon-xl: 1.75rem;  /* 28px — hero, large feature icons */
-
-  /* ===== Z-INDEX SCALE ===== */
-  /* Documented stacking context — use these vars instead of magic numbers */
-  --z-base: 0;
-  --z-raised: 10;
-  --z-sticky: 20;
-  --z-header: 50;
-  --z-drawer: 60;
-  --z-overlay: 65;
-  --z-submenu: 70;
-  --z-toast: 80;
-  --z-modal: 90;
-  --z-tooltip: 100;
-
-  /* ===== BORDER RADIUS SCALE ===== */
-  /* Single scale for the whole app — desktop and mobile share these tiers */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 12px;
-  --radius-xl: 20px;
-  --radius-2xl: 32px;
-  --radius-full: 9999px;
-
-  /* ===== TIER / BADGE SEMANTIC COLORS ===== */
-  /* Achievement badge tier colors — add a new tier here, nowhere else */
-  --tier-bronze-fg:   #92400e;
-  --tier-bronze-bg:   #fffbeb;
-  --tier-bronze-border: #fde68a;
-  --tier-silver-fg:   #374151;
-  --tier-silver-bg:   #f9fafb;
-  --tier-silver-border: #d1d5db;
-  --tier-gold-fg:     #854d0e;
-  --tier-gold-bg:     #fefce8;
-  --tier-gold-border: #fef08a;
-  --tier-platinum-fg: #164e63;
-  --tier-platinum-bg: #ecfeff;
-  --tier-platinum-border: #a5f3fc;
-  --tier-diamond-fg:  #4c1d95;
-  --tier-diamond-bg:  #f5f3ff;
-  --tier-diamond-border: #ddd6fe;
+.gh-card {
+  background-color: var(--gh-canvas-subtle);
+  border: 1px solid var(--gh-border);
+  border-radius: 6px;
 }
 
-/* ===== DESIGN-SYSTEM.CSS SHIMS ===== */
-/*
- * Compatibility aliases — maps old design-system.css variable names to the
- * canonical github-tokens.css names. This allows gradual migration without
- * breaking components that still reference the old names.
- */
-:root {
-  --color-text-primary: var(--gh-fg);
-  --color-text-secondary: var(--gh-fg-muted);
-  --color-text-tertiary: var(--gh-fg-subtle);
-  --color-border-default: var(--gh-border);
-  --color-border-subtle: var(--gh-border-muted);
-  --color-success: var(--gh-success-fg);
-  --color-warning: var(--gh-attention-fg);
-  --color-error: var(--gh-danger-fg);
-  --color-info: var(--gh-accent-fg);
-  --color-difficulty-beginner: var(--gh-diff-beginner);
-  --color-difficulty-intermediate: var(--gh-diff-intermediate);
-  --color-difficulty-advanced: var(--gh-diff-advanced);
+.gh-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  border-radius: 2em;
+  border: 1px solid transparent;
+}
+.gh-label-blue {
+  background-color: var(--gh-accent-subtle);
+  color: var(--gh-accent-fg);
+  border-color: var(--gh-accent-fg);
+}
+.gh-label-green {
+  background-color: var(--gh-success-subtle);
+  color: var(--gh-success-fg);
+  border-color: var(--gh-success-subtle);
+}
+.gh-label-yellow {
+  background-color: var(--gh-attention-subtle);
+  color: var(--gh-attention-fg);
+  border-color: var(--gh-attention-hover);
+}
+.gh-label-red {
+  background-color: var(--gh-danger-subtle);
+  color: var(--gh-danger-fg);
+  border-color: var(--gh-danger-subtle);
+}
+.gh-label-purple {
+  background-color: var(--gh-done-subtle);
+  color: var(--gh-done-fg);
+  border-color: var(--gh-done-subtle);
+}
+.gh-label-gray {
+  background-color: var(--gh-neutral-subtle);
+  color: var(--gh-neutral-emphasis);
+  border-color: var(--gh-border);
 }
 
-/* ===== MEDIA QUERY FOR PREFERENCES ===== */
+.gh-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--gh-border);
+  gap: 0;
+  overflow-x: auto;
+}
+.gh-tab {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gh-fg-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.12s, border-color 0.12s;
+}
+.gh-tab:hover { color: var(--gh-fg); }
+.gh-tab.active {
+  color: var(--gh-accent-fg);
+  border-bottom-color: var(--gh-accent-fg);
+}
 
-/* Respect user's motion preferences */
+.gh-page-header {
+  padding: 1.5rem 1rem 1rem;
+  border-bottom: 1px solid var(--gh-border);
+  background-color: var(--gh-canvas-subtle);
+}
+
+.gh-progress {
+  width: 100%;
+  height: 6px;
+  background-color: var(--gh-neutral-subtle);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.gh-progress-bar {
+  height: 100%;
+  background-color: var(--gh-accent-fg);
+  border-radius: 9999px;
+  transition: width 300ms ease;
+}
+
+/* ===== MOTION PREFERENCES ===== */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

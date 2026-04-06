@@ -21,13 +21,15 @@
 /* ── Base layer ────────────────────────────────────────── */
 @layer base {
   html {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Menlo", monospace;
     overflow-x: hidden;
     width: 100%;
     scroll-behavior: smooth;
   }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Menlo", monospace;
+    font-size: 13px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--background);
@@ -38,6 +40,18 @@
   }
   #root { overflow-x: hidden; width: 100%; min-height: 100dvh; }
   * { border-color: var(--border); }
+}
+
+/* ── Custom scrollbar — terminal aesthetic ─────────────── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(220 20% 22%); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(220 26% 34%); }
+
+/* ── Blink keyframe — cursor / spinner ─────────────────── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
 }
 
 /* ── Custom Tailwind v4 utilities ──────────────────────── */
@@ -99,7 +113,7 @@
   --radius-lg: 12px;
   --radius-xl: 20px;
   --radius-2xl: 28px;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-sans: "JetBrains Mono", "Fira Code", "Cascadia Code", "Menlo", monospace;
   --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, monospace;
 
   /* ── GitHub design system color tokens ─────────────── */
