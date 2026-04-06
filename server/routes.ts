@@ -17,33 +17,57 @@ async function readDataFile(filename: string): Promise<any | null> {
   }
 }
 
-const MAX_CACHE_SIZE = 100;
-const CACHE_TTL = 60_000;
+const MAX_CACHE_SIZE = 500;
+const CACHE_TTL = 3_600_000; // 1 hour in-memory TTL
 
-// LRU cache with max size to prevent memory leaks
-const channelCache = new Map<string, { data: any; timestamp: number }>();
+// LRU cache with ETag support
+const channelCache = new Map<string, { data: any; timestamp: number; etag: string }>();
 
-function getCached<T>(key: string, fetchFn: () => Promise<T>): Promise<T> {
+function makeETag(data: any): string {
+  const str = JSON.stringify(data);
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+  }
+  return `"${(hash >>> 0).toString(36)}"`;
+}
+
+interface CacheResult<T> {
+  data: T;
+  etag: string;
+}
+
+async function getCached<T>(key: string, fetchFn: () => Promise<T>): Promise<CacheResult<T>> {
   const cached = channelCache.get(key);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    // Move to end (most recently used)
     channelCache.delete(key);
     channelCache.set(key, cached);
-    return Promise.resolve(cached.data as T);
+    return { data: cached.data as T, etag: cached.etag };
   }
-  return fetchFn().then(data => {
-    // Evict oldest entries if cache is full (LRU eviction)
-    if (channelCache.size >= MAX_CACHE_SIZE) {
-      const firstKey = channelCache.keys().next().value;
-      if (firstKey) channelCache.delete(firstKey);
-    }
-    channelCache.set(key, { data, timestamp: Date.now() });
-    return data;
-  });
+  const data = await fetchFn();
+  if (channelCache.size >= MAX_CACHE_SIZE) {
+    const firstKey = channelCache.keys().next().value;
+    if (firstKey) channelCache.delete(firstKey);
+  }
+  const etag = makeETag(data);
+  channelCache.set(key, { data, timestamp: Date.now(), etag });
+  return { data, etag };
 }
 
 function invalidateChannelCache(): void {
   channelCache.clear();
+}
+
+// Send JSON with ETag + aggressive HTTP caching; sends 304 if client has current version
+function sendCached(req: any, res: any, result: CacheResult<any>, maxAgeSeconds = 3600) {
+  res.set("ETag", result.etag);
+  res.set("Vary", "Accept-Encoding");
+  if (req.headers["if-none-match"] === result.etag) {
+    res.status(304).end();
+    return;
+  }
+  res.set("Cache-Control", `public, max-age=${maxAgeSeconds}, stale-while-revalidate=86400`);
+  res.json(result.data);
 }
 
 // Safe JSON.parse wrapper to prevent crashes from malformed data
@@ -57,11 +81,6 @@ function safeJsonParse<T>(value: string | null | undefined, fallback: T): T {
   }
 }
 
-// Helper: set aggressive HTTP cache headers for read-only API responses
-function setReadCache(res: any, maxAgeSeconds = 60, staleWhileRevalidate = 300) {
-  res.set("Cache-Control", `public, max-age=${maxAgeSeconds}, stale-while-revalidate=${staleWhileRevalidate}`);
-  res.set("Vary", "Accept-Encoding");
-}
 
 // Helper to parse JSON fields from DB
 function parseQuestion(row: any) {
@@ -159,17 +178,16 @@ export async function registerRoutes(
   });
   
   // Get all channels with question counts (cached)
-  app.get("/api/channels", async (_req, res) => {
+  app.get("/api/channels", async (req, res) => {
     try {
-      const data = await getCached('channels', async () => {
-        const result = await client.execute({
+      const result = await getCached('channels', async () => {
+        const r = await client.execute({
           sql: "SELECT channel, COUNT(*) as count FROM questions WHERE status != 'deleted' GROUP BY channel",
           args: []
         });
-        return result.rows.map((r: any) => ({ id: r.channel, questionCount: r.count }));
+        return r.rows.map((row: any) => ({ id: row.channel, questionCount: row.count }));
       });
-      setReadCache(res, 300, 600);
-      res.json(data);
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching channels:", error);
       res.status(500).json({ error: "Failed to fetch channels" });
