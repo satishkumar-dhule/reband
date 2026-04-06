@@ -65,8 +65,8 @@ test.describe('Navigation', () => {
     await hideMascot(page);
     
     const creditsSelector = isMobile 
-      ? 'nav.fixed.bottom-0 button:has(svg.lucide-coins)'
-      : 'aside button:has(svg.lucide-coins)';
+      ? 'nav.fixed.bottom-0 button:has(svg.lucide-user)'
+      : 'aside button:has(svg.lucide-user)';
     
     await page.locator(creditsSelector).first().click({ force: true });
     await expect(page).toHaveURL(/\/profile/);
