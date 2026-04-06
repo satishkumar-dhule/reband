@@ -12,6 +12,7 @@
 
 import { useLocation, Link } from 'wouter';
 import { useState, useMemo, memo, useCallback, useEffect, useRef } from 'react';
+import { useFocusTrap } from '@/hooks/use-focus-trap';
 import {
   Home,
   GraduationCap,
@@ -99,7 +100,29 @@ export function MobileBottomNav() {
   const [location, setLocation] = useLocation();
   const { preferences } = useUserPreferences();
   const [showMenu, setShowMenu] = useState<string | null>(null);
-  
+  const submenuRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(submenuRef, { enabled: showMenu !== null, returnFocus: true });
+
+  // Escape key closes submenu (issue #109)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showMenu) setShowMenu(null);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showMenu]);
+
+  // History-sync: push a history entry when submenu opens, pop it on back (issue #109)
+  useEffect(() => {
+    if (showMenu) {
+      history.pushState({ submenu: showMenu }, '');
+      const onPop = () => setShowMenu(null);
+      window.addEventListener('popstate', onPop);
+      return () => window.removeEventListener('popstate', onPop);
+    }
+  }, [showMenu]);
+
   // Check for reduced motion preference using media query
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   useEffect(() => {
@@ -165,6 +188,10 @@ export function MobileBottomNav() {
       {/* Full-screen Submenu with Premium UX - CSS-only animation */}
       {showMenu && currentSubNav.length > 0 && (
         <div
+          ref={submenuRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={showMenu === 'learn' ? 'Learn menu' : showMenu === 'practice' ? 'Practice menu' : 'Progress menu'}
           className={`fixed inset-x-0 bottom-0 z-[var(--z-submenu)] glass-card border-t border-border rounded-t-[32px] shadow-2xl overflow-hidden lg:hidden max-h-[80vh] flex flex-col ${prefersReducedMotion ? '' : 'animate-slide-up'}`}
           style={{ 
             background: 'var(--gh-canvas-overlay)',

@@ -1,4 +1,5 @@
-import { ReactNode, useState, useEffect, useCallback } from "react";
+import { ReactNode, useState, useEffect, useCallback, useRef } from "react";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { useLocation } from "wouter";
 import {
   Home, BookOpen, Mic, Code, RotateCcw, BarChart2,
@@ -75,6 +76,9 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [, setLocation] = useLocation();
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(drawerRef, { enabled: mobileOpen, returnFocus: true });
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -90,10 +94,13 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
         e.preventDefault();
         setSearchOpen(true);
       }
+      if (e.key === "Escape") {
+        if (mobileOpen) setMobileOpen(false);
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, []);
+  }, [mobileOpen]);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -203,6 +210,7 @@ export function AppLayout({ children, hideNav = false, fullWidth = false }: AppL
           />
           {/* Drawer panel */}
           <div
+            ref={drawerRef}
             className="relative flex flex-col w-64 border-r shadow-xl"
             style={{ background: "var(--sidebar-bg)", borderColor: "var(--sidebar-border)" }}
             role="document"
