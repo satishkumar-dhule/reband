@@ -155,7 +155,7 @@ export function GenZHomePage() {
       }
       
       // Load custom paths from localStorage
-      const customPathsData = localStorage.getItem('customLearningPaths');
+      const customPathsData = localStorage.getItem('customPaths');
       const customPaths = customPathsData ? JSON.parse(customPathsData) : [];
       
       const paths = pathIds.map((pathId: string) => {
