@@ -4,7 +4,7 @@
  * Part of AICompanion.tsx refactoring (STARTED)
  */
 
-export type AIProvider = 'gemini' | 'openai' | 'groq' | 'cohere' | 'huggingface' | 'browser';
+export type AIProvider = 'gemini' | 'openai' | 'groq' | 'cohere' | 'huggingface' | 'browser' | 'replit';
 export type TTSProvider = 'elevenlabs' | 'openai' | 'webspeech';
 export type Language = 'en' | 'es' | 'fr' | 'de' | 'hi' | 'zh' | 'ja' | 'pt' | 'ar';
 
@@ -55,6 +55,8 @@ export const LANGUAGES = [
  */
 export async function callAI(request: AIRequest): Promise<AIResponse> {
   switch (request.provider) {
+    case 'replit':
+      return callReplitProxy(request);
     case 'gemini':
       return callGemini(request);
     case 'openai':
@@ -70,6 +72,82 @@ export async function callAI(request: AIRequest): Promise<AIResponse> {
     default:
       throw new Error(`Unsupported provider: ${request.provider}`);
   }
+}
+
+/**
+ * Calls AI through the server-side Replit OpenAI proxy.
+ * No API key required — billed via Replit credits.
+ */
+async function callReplitProxy(request: AIRequest): Promise<AIResponse> {
+  const response = await fetch('/api/ai/complete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      messages: request.messages,
+      model: request.model || 'gpt-5.2',
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ error: response.statusText }));
+    throw new Error(err.error || `Replit AI proxy error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return {
+    content: data.content,
+    provider: 'replit',
+    model: data.model || 'gpt-5.2',
+  };
+}
+
+/**
+ * Streams AI responses through the server-side Replit OpenAI proxy.
+ * Calls onChunk for each streamed token, resolves with the full response.
+ * No API key required.
+ */
+export async function streamReplitProxy(
+  messages: Array<{ role: string; content: string }>,
+  onChunk: (token: string) => void,
+  model = 'gpt-5.2'
+): Promise<string> {
+  const response = await fetch('/api/ai/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, model }),
+  });
+
+  if (!response.ok || !response.body) {
+    throw new Error(`Replit AI proxy error: ${response.status}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let fullContent = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    const text = decoder.decode(value, { stream: true });
+    const lines = text.split('\n');
+
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      try {
+        const parsed = JSON.parse(line.slice(6));
+        if (parsed.content) {
+          fullContent += parsed.content;
+          onChunk(parsed.content);
+        }
+        if (parsed.error) throw new Error(parsed.error);
+      } catch {
+        // skip malformed lines
+      }
+    }
+  }
+
+  return fullContent;
 }
 
 // ============ Provider Implementations ============

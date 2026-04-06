@@ -114,8 +114,8 @@ export function AISettings({
         {/* AI Provider */}
         <div>
           <label className="text-xs font-semibold mb-1 block">AI Provider</label>
-          <div className="grid grid-cols-4 gap-1">
-            {(['browser', 'groq', 'gemini', 'openai'] as AIProvider[]).map(p => (
+          <div className="grid grid-cols-3 gap-1">
+            {(['replit', 'browser', 'groq', 'gemini', 'openai'] as AIProvider[]).map(p => (
               <button
                 key={p}
                 onClick={() => onProviderChange(p)}
@@ -125,11 +125,12 @@ export function AISettings({
                     : 'bg-muted hover:bg-muted/80'
                 }`}
               >
-                {p === 'browser' ? '🌐 Browser' : p.charAt(0).toUpperCase() + p.slice(1)}
+                {p === 'browser' ? '🌐 Browser' : p === 'replit' ? '⚡ Replit AI' : p.charAt(0).toUpperCase() + p.slice(1)}
               </button>
             ))}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
+            {provider === 'replit' && '✅ Powered by Replit — no API key needed'}
             {provider === 'browser' && '✅ Free, works offline, no API key needed'}
             {provider === 'groq' && '⚡ Free, fast, recommended'}
             {provider === 'gemini' && '🤖 Google AI'}
@@ -137,8 +138,8 @@ export function AISettings({
           </p>
         </div>
 
-        {/* API Key (only if not browser) */}
-        {provider !== 'browser' && (
+        {/* API Key (only if not browser or replit) */}
+        {provider !== 'browser' && provider !== 'replit' && (
           <div>
             <label className="text-xs font-semibold mb-1 block">API Key</label>
             <input

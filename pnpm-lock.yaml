@@ -40,10 +40,10 @@ importers:
         version: 0.3.31
       '@langchain/core':
         specifier: ^1.1.7
-        version: 1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0))
+        version: 1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0))
       '@langchain/langgraph':
         specifier: ^1.0.7
-        version: 1.2.6(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zod@3.25.76)
+        version: 1.2.6(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zod@3.25.76)
       '@libsql/client':
         specifier: ^0.17.2
         version: 0.17.2(bufferutil@4.1.0)
@@ -218,6 +218,9 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      openai:
+        specifier: ^6.33.0
+        version: 6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76)
       passport:
         specifier: ^0.7.0
         version: 0.7.0
@@ -4670,6 +4673,18 @@ packages:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
 
+  openai@6.33.0:
+    resolution: {integrity: sha512-xAYN1W3YsDXJWA5F277135YfkEk6H7D3D6vWwRhJ3OEkzRgcyK8z/P5P9Gyi/wB4N8kK9kM5ZjprfvyHagKmpw==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
   p-finally@1.0.0:
     resolution: {integrity: sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==}
     engines: {node: '>=4'}
@@ -6513,7 +6528,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0))':
+  '@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0))':
     dependencies:
       '@cfworker/json-schema': 4.1.1
       '@standard-schema/spec': 1.1.0
@@ -6521,7 +6536,7 @@ snapshots:
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.21
-      langsmith: 0.5.15(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0))
+      langsmith: 0.5.15(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0))
       mustache: 4.2.0
       p-queue: 6.6.2
       uuid: 11.1.0
@@ -6533,27 +6548,27 @@ snapshots:
       - openai
       - ws
 
-  '@langchain/langgraph-checkpoint@1.0.1(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0)))':
+  '@langchain/langgraph-checkpoint@1.0.1(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0)))':
     dependencies:
-      '@langchain/core': 1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0))
+      '@langchain/core': 1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0))
       uuid: 10.0.0
 
-  '@langchain/langgraph-sdk@1.8.2(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@langchain/langgraph-sdk@1.8.2(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@types/json-schema': 7.0.15
       p-queue: 9.1.0
       p-retry: 7.1.1
       uuid: 13.0.0
     optionalDependencies:
-      '@langchain/core': 1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0))
+      '@langchain/core': 1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0))
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
 
-  '@langchain/langgraph@1.2.6(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zod@3.25.76)':
+  '@langchain/langgraph@1.2.6(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(zod@3.25.76)':
     dependencies:
-      '@langchain/core': 1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0))
-      '@langchain/langgraph-checkpoint': 1.0.1(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0)))
-      '@langchain/langgraph-sdk': 1.8.2(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@langchain/core': 1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0))
+      '@langchain/langgraph-checkpoint': 1.0.1(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0)))
+      '@langchain/langgraph-sdk': 1.8.2(@langchain/core@1.1.38(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@standard-schema/spec': 1.1.0
       uuid: 10.0.0
       zod: 3.25.76
@@ -10149,7 +10164,7 @@ snapshots:
       vscode-languageserver-textdocument: 1.0.12
       vscode-uri: 3.1.0
 
-  langsmith@0.5.15(@opentelemetry/api@1.9.1)(ws@8.20.0(bufferutil@4.1.0)):
+  langsmith@0.5.15(@opentelemetry/api@1.9.1)(openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76))(ws@8.20.0(bufferutil@4.1.0)):
     dependencies:
       '@types/uuid': 10.0.0
       chalk: 5.6.2
@@ -10159,6 +10174,7 @@ snapshots:
       uuid: 10.0.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
+      openai: 6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76)
       ws: 8.20.0(bufferutil@4.1.0)
 
   layout-base@1.0.2: {}
@@ -10802,6 +10818,11 @@ snapshots:
       define-lazy-prop: 2.0.0
       is-docker: 2.2.1
       is-wsl: 2.2.0
+
+  openai@6.33.0(ws@8.20.0(bufferutil@4.1.0))(zod@3.25.76):
+    optionalDependencies:
+      ws: 8.20.0(bufferutil@4.1.0)
+      zod: 3.25.76
 
   p-finally@1.0.0: {}
 
