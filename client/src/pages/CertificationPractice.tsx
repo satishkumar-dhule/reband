@@ -4,7 +4,7 @@
  * Includes embedded mini-tests with glassmorphism effects
  */
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, lazy, Suspense } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useLocation, useRoute } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,7 +17,6 @@ import { Button, IconButton } from '@/lib/ui';
 import { useCredits } from '../context/CreditsContext';
 import { SEOHead } from '@/lib/ui';
 import { QuestionPanel } from '@/lib/ui';
-import { AnswerPanel } from '@/lib/ui';
 import { ComingSoon } from '@/lib/ui';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
@@ -34,6 +33,10 @@ import {
   ChevronDown, ChevronUp, Lightbulb, BookOpen, Clock, Target,
   Sparkles, ListChecks, GraduationCap
 } from 'lucide-react';
+
+const GenZAnswerPanel = lazy(() =>
+  import('../components/question/GenZAnswerPanel').then(m => ({ default: m.GenZAnswerPanel }))
+);
 
 const SKIP_TEST_PENALTY = 50;
 const QUESTIONS_PER_TEST = 5;
@@ -1019,8 +1022,12 @@ export default function CertificationPractice() {
                 </Panel>
                 <PanelResizeHandle className="w-1.5 bg-border hover:bg-primary/40 active:bg-primary/60 transition-colors cursor-col-resize" />
                 <Panel defaultSize={60} minSize={30}>
-                  <div className="h-full overflow-y-auto momentum-scroll">
-                    {currentQuestion && <AnswerPanel question={currentQuestion} isCompleted={isCompleted} />}
+                  <div className="h-full overflow-y-auto momentum-scroll p-4">
+                    {currentQuestion && (
+                      <Suspense fallback={<div className="animate-pulse space-y-3"><div className="h-4 bg-muted rounded w-3/4" /><div className="h-4 bg-muted rounded w-full" /><div className="h-4 bg-muted rounded w-5/6" /></div>}>
+                        <GenZAnswerPanel question={currentQuestion} isCompleted={isCompleted} />
+                      </Suspense>
+                    )}
                   </div>
                 </Panel>
               </PanelGroup>
@@ -1040,7 +1047,11 @@ export default function CertificationPractice() {
                 {mobileView === 'question' ? (
                   currentQuestion && <QuestionPanel question={currentQuestion} questionNumber={currentIndex + 1} totalQuestions={totalQuestions} isMarked={isMarked} isCompleted={isCompleted} onToggleMark={toggleMark} onTapQuestion={() => setMobileView('answer')} timerEnabled={false} timeLeft={0} />
                 ) : (
-                  currentQuestion && <AnswerPanel question={currentQuestion} isCompleted={isCompleted} />
+                  currentQuestion && (
+                    <Suspense fallback={<div className="animate-pulse space-y-3 p-4"><div className="h-4 bg-muted rounded w-3/4" /><div className="h-4 bg-muted rounded w-full" /><div className="h-4 bg-muted rounded w-5/6" /></div>}>
+                      <GenZAnswerPanel question={currentQuestion} isCompleted={isCompleted} />
+                    </Suspense>
+                  )
                 )}
               </div>
             </div>
