@@ -326,7 +326,7 @@ export function MobileBottomNav() {
               boxShadow: '0 0 20px var(--gh-success-fg)',
               width: `calc(100% / ${mainNavItems.length} - 16px)`,
               marginLeft: `calc(${(mainNavItems.findIndex(i => activeSection === i.id) || 0)} * (100% / ${mainNavItems.length}))`,
-              transform: `translateX(${((mainNavItems.findIndex(i => activeSection === i.id) || 0) - 1) * 4}px)`,
+              transform: `translateX(8px)`,
               maxWidth: '48px',
               marginRight: 'auto'
             }}

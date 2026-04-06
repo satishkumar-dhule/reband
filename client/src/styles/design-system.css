@@ -576,13 +576,6 @@ nav button {
   padding: 0.75rem;
 }
 
-/* Ensure adequate spacing between touch targets */
-button + button,
-a + a,
-input + input {
-  margin-left: 0.5rem; /* 8px minimum spacing */
-}
-
 /* Mobile-specific touch target optimizations */
 @media (max-width: 768px) {
   /* Increase touch targets on mobile */
@@ -591,12 +584,6 @@ input + input {
   input[type="checkbox"],
   input[type="radio"] {
     min-height: 48px; /* Android recommendation */
-  }
-  
-  /* Increase spacing on mobile */
-  button + button,
-  a + a {
-    margin-left: 0.75rem; /* 12px spacing on mobile */
   }
 }
 
