@@ -62,6 +62,182 @@ export const terraformDomains: CertificationDomain[] = [
   { id: 'cloud', name: 'Terraform Cloud', weight: 10, description: 'Remote operations, workspaces' },
 ];
 
+// AWS SAP Domains
+export const awsSapDomains: CertificationDomain[] = [
+  { id: 'org-complex', name: 'Design for Organizational Complexity', weight: 26, description: 'Multi-account, governance, migration' },
+  { id: 'new-solutions', name: 'Design for New Solutions', weight: 29, description: 'Security, strategy, deployment' },
+  { id: 'migration', name: 'Migration Planning', weight: 15, description: 'Workload migration strategies' },
+  { id: 'cost-control', name: 'Cost Control', weight: 10, description: 'Cost optimization at scale' },
+  { id: 'continuous-improvement', name: 'Continuous Improvement', weight: 20, description: 'Operational excellence, performance' },
+];
+
+// AWS DVA Domains
+export const awsDvaDomains: CertificationDomain[] = [
+  { id: 'development', name: 'Development with AWS Services', weight: 32, description: 'Lambda, API Gateway, SDKs' },
+  { id: 'security', name: 'Security', weight: 26, description: 'Authentication, authorization, encryption' },
+  { id: 'deployment', name: 'Deployment', weight: 24, description: 'CI/CD, deployment strategies' },
+  { id: 'troubleshooting', name: 'Troubleshooting and Optimization', weight: 18, description: 'Debugging, performance tuning' },
+];
+
+// AWS SysOps Domains
+export const awsSysopsDomains: CertificationDomain[] = [
+  { id: 'monitoring', name: 'Monitoring, Logging and Remediation', weight: 20, description: 'CloudWatch, X-Ray, alerting' },
+  { id: 'reliability', name: 'Reliability and Business Continuity', weight: 16, description: 'High availability, backup, recovery' },
+  { id: 'deployment', name: 'Deployment, Provisioning and Automation', weight: 18, description: 'CloudFormation, Elastic Beanstalk' },
+  { id: 'security', name: 'Security and Compliance', weight: 16, description: 'IAM, compliance, encryption' },
+  { id: 'networking', name: 'Networking and Content Delivery', weight: 18, description: 'VPC, Route 53, CloudFront' },
+  { id: 'cost', name: 'Cost and Performance Optimization', weight: 12, description: 'Rightsizing, cost explorer' },
+];
+
+// CKAD Domains
+export const ckadDomains: CertificationDomain[] = [
+  { id: 'app-design', name: 'Application Design and Build', weight: 20, description: 'Container images, Jobs, CronJobs' },
+  { id: 'app-deployment', name: 'Application Deployment', weight: 20, description: 'Deployments, rolling updates, Helm' },
+  { id: 'app-observability', name: 'Application Observability and Maintenance', weight: 15, description: 'Probes, logging, debugging' },
+  { id: 'app-env', name: 'Application Environment, Configuration and Security', weight: 25, description: 'ConfigMaps, Secrets, RBAC' },
+  { id: 'services-networking', name: 'Services and Networking', weight: 20, description: 'Services, Ingress, NetworkPolicies' },
+];
+
+// CKS Domains
+export const cksDomains: CertificationDomain[] = [
+  { id: 'cluster-setup', name: 'Cluster Setup', weight: 10, description: 'Network policies, CIS benchmarks, TLS' },
+  { id: 'cluster-hardening', name: 'Cluster Hardening', weight: 15, description: 'RBAC, service accounts, updates' },
+  { id: 'system-hardening', name: 'System Hardening', weight: 15, description: 'OS footprint, kernel, AppArmor' },
+  { id: 'supply-chain', name: 'Minimize Microservice Vulnerabilities', weight: 20, description: 'Pod security, OPA, secrets' },
+  { id: 'supply-chain-security', name: 'Supply Chain Security', weight: 20, description: 'Image scanning, allowlist, signing' },
+  { id: 'monitoring', name: 'Monitoring, Logging and Runtime Security', weight: 20, description: 'Falco, audit logs, immutability' },
+];
+
+// GCP ACE Domains
+export const gcpAceDomains: CertificationDomain[] = [
+  { id: 'cloud-solution', name: 'Setting Up a Cloud Solution Environment', weight: 17, description: 'Projects, billing, IAM' },
+  { id: 'cloud-planning', name: 'Planning and Configuring a Cloud Solution', weight: 17, description: 'Compute, storage, network planning' },
+  { id: 'cloud-deploying', name: 'Deploying and Implementing a Cloud Solution', weight: 22, description: 'GKE, GCE, Cloud Run' },
+  { id: 'cloud-ensuring', name: 'Ensuring Successful Operation', weight: 22, description: 'Monitoring, logging, managing resources' },
+  { id: 'cloud-configuring', name: 'Configuring Access and Security', weight: 22, description: 'IAM, service accounts, auditing' },
+];
+
+// GCP PCA Domains
+export const gcpPcaDomains: CertificationDomain[] = [
+  { id: 'designing', name: 'Designing and Planning', weight: 24, description: 'Solution design, data model, network' },
+  { id: 'managing-infra', name: 'Managing and Provisioning Infrastructure', weight: 15, description: 'Compute, storage, networking resources' },
+  { id: 'security', name: 'Designing for Security and Compliance', weight: 18, description: 'IAM, encryption, compliance' },
+  { id: 'analyzing', name: 'Analyzing and Optimizing Processes', weight: 18, description: 'Business continuity, performance' },
+  { id: 'managing-migration', name: 'Managing Implementation', weight: 11, description: 'Development, APIs, testing' },
+  { id: 'reliability', name: 'Ensuring Solution and Operations Reliability', weight: 14, description: 'Monitoring, SLOs, incident response' },
+];
+
+// AZ-900 Domains
+export const az900Domains: CertificationDomain[] = [
+  { id: 'cloud-concepts', name: 'Cloud Concepts', weight: 25, description: 'Cloud models, benefits, service types' },
+  { id: 'azure-architecture', name: 'Azure Architecture and Services', weight: 35, description: 'Compute, storage, networking, databases' },
+  { id: 'azure-management', name: 'Azure Management and Governance', weight: 30, description: 'Cost management, governance, compliance' },
+];
+
+// AZ-104 Domains
+export const az104Domains: CertificationDomain[] = [
+  { id: 'identity', name: 'Manage Azure Identities and Governance', weight: 20, description: 'Azure AD, RBAC, subscriptions' },
+  { id: 'storage', name: 'Implement and Manage Storage', weight: 15, description: 'Storage accounts, blob, file, access' },
+  { id: 'compute', name: 'Deploy and Manage Azure Compute Resources', weight: 20, description: 'VMs, containers, App Service' },
+  { id: 'networking', name: 'Implement and Manage Virtual Networking', weight: 25, description: 'VNets, NSGs, load balancers' },
+  { id: 'monitoring', name: 'Monitor and Maintain Azure Resources', weight: 10, description: 'Azure Monitor, backup, disaster recovery' },
+];
+
+// AZ-305 Domains
+export const az305Domains: CertificationDomain[] = [
+  { id: 'identity-governance', name: 'Design Identity, Governance, and Monitoring', weight: 25, description: 'Identity, RBAC, monitoring solutions' },
+  { id: 'data-storage', name: 'Design Data Storage Solutions', weight: 25, description: 'Relational, non-relational, data integration' },
+  { id: 'business-continuity', name: 'Design Business Continuity Solutions', weight: 15, description: 'Backup, disaster recovery, HA' },
+  { id: 'infrastructure', name: 'Design Infrastructure Solutions', weight: 35, description: 'Compute, network, migrations' },
+];
+
+// CompTIA Security+ Domains
+export const securityPlusDomains: CertificationDomain[] = [
+  { id: 'general-security', name: 'General Security Concepts', weight: 12, description: 'Security controls, cryptography basics' },
+  { id: 'threats', name: 'Threats, Vulnerabilities and Mitigations', weight: 22, description: 'Attack types, threat intelligence' },
+  { id: 'architecture', name: 'Security Architecture', weight: 18, description: 'Network security, cloud, zero trust' },
+  { id: 'operations', name: 'Security Operations', weight: 28, description: 'Identity, endpoint security, incident response' },
+  { id: 'program-management', name: 'Security Program Management', weight: 20, description: 'Governance, risk, compliance' },
+];
+
+// AWS Security Specialty Domains
+export const awsSecurityDomains: CertificationDomain[] = [
+  { id: 'threat-detection', name: 'Threat Detection and Incident Response', weight: 14, description: 'GuardDuty, Security Hub, incident response' },
+  { id: 'security-logging', name: 'Security Logging and Monitoring', weight: 18, description: 'CloudTrail, Config, Macie' },
+  { id: 'infra-security', name: 'Infrastructure Security', weight: 20, description: 'VPC, WAF, Shield, Network Firewall' },
+  { id: 'iam', name: 'Identity and Access Management', weight: 16, description: 'IAM policies, SCPs, Cognito' },
+  { id: 'data-protection', name: 'Data Protection', weight: 18, description: 'KMS, ACM, Secrets Manager' },
+  { id: 'management-governance', name: 'Management and Security Governance', weight: 14, description: 'Organizations, Control Tower, Config' },
+];
+
+// AWS Data Engineer Domains
+export const awsDataEngineerDomains: CertificationDomain[] = [
+  { id: 'data-ingestion', name: 'Data Ingestion and Transformation', weight: 34, description: 'Kinesis, Glue, DMS, streaming' },
+  { id: 'data-store', name: 'Data Store Management', weight: 26, description: 'S3, Redshift, DynamoDB, Lake Formation' },
+  { id: 'data-operations', name: 'Data Operations and Support', weight: 22, description: 'Monitoring, optimization, automation' },
+  { id: 'data-security', name: 'Data Security and Governance', weight: 18, description: 'Encryption, access control, compliance' },
+];
+
+// AWS ML Specialty Domains
+export const awsMlDomains: CertificationDomain[] = [
+  { id: 'data-engineering', name: 'Data Engineering', weight: 20, description: 'Data collection, storage, feature engineering' },
+  { id: 'exploratory-analysis', name: 'Exploratory Data Analysis', weight: 24, description: 'Sanitize, prepare, analyze data' },
+  { id: 'modeling', name: 'Modeling', weight: 36, description: 'Algorithms, training, evaluation, SageMaker' },
+  { id: 'ml-implementation', name: 'ML Implementation and Operations', weight: 20, description: 'Deployment, monitoring, optimization' },
+];
+
+// Linux+ Domains
+export const linuxPlusDomains: CertificationDomain[] = [
+  { id: 'system-management', name: 'System Management', weight: 32, description: 'Storage, processes, user management' },
+  { id: 'security', name: 'Security', weight: 21, description: 'Permissions, encryption, hardening' },
+  { id: 'scripting', name: 'Scripting, Containers and Automation', weight: 19, description: 'Bash scripting, containers, orchestration' },
+  { id: 'troubleshooting', name: 'Troubleshooting', weight: 28, description: 'Networking, application, storage issues' },
+];
+
+// RHCSA Domains
+export const rhcsaDomains: CertificationDomain[] = [
+  { id: 'essential-tools', name: 'Understand and Use Essential Tools', weight: 20, description: 'Shell, files, grep, tar, ssh' },
+  { id: 'operate-systems', name: 'Operate Running Systems', weight: 20, description: 'Boot, processes, services, logs' },
+  { id: 'storage', name: 'Configure Local Storage', weight: 15, description: 'Partitions, LVM, filesystems' },
+  { id: 'file-systems', name: 'Create and Configure File Systems', weight: 15, description: 'Mount, NFS, permissions, ACLs' },
+  { id: 'deploy-configure', name: 'Deploy, Configure and Maintain Systems', weight: 15, description: 'Install packages, subscriptions, cron' },
+  { id: 'manage-users', name: 'Manage Users and Groups', weight: 15, description: 'User accounts, sudo, SELinux' },
+];
+
+// PSD Domains
+export const psdDomains: CertificationDomain[] = [
+  { id: 'agile-tdd', name: 'Agile and TDD', weight: 40, description: 'Test-driven development, agile practices' },
+  { id: 'software-engineering', name: 'Software Engineering', weight: 35, description: 'Clean code, refactoring, design patterns' },
+  { id: 'devops-practices', name: 'DevOps Practices', weight: 25, description: 'CI/CD, automation, continuous delivery' },
+];
+
+// AWS Database Specialty Domains
+export const awsDatabaseDomains: CertificationDomain[] = [
+  { id: 'workload-specific', name: 'Workload-Specific Database Design', weight: 26, description: 'Choose the right database for workloads' },
+  { id: 'deployment', name: 'Deployment and Migration', weight: 20, description: 'Database deployment, DMS migrations' },
+  { id: 'management', name: 'Management and Operations', weight: 18, description: 'Maintenance, monitoring, automation' },
+  { id: 'monitoring', name: 'Monitoring and Troubleshooting', weight: 18, description: 'Performance, diagnostics, optimization' },
+  { id: 'database-security', name: 'Database Security', weight: 18, description: 'Encryption, access control, auditing' },
+];
+
+// CCNA Domains
+export const ccnaDomains: CertificationDomain[] = [
+  { id: 'network-fundamentals', name: 'Network Fundamentals', weight: 20, description: 'OSI model, Ethernet, TCP/IP' },
+  { id: 'network-access', name: 'Network Access', weight: 20, description: 'VLANs, spanning tree, wireless' },
+  { id: 'ip-connectivity', name: 'IP Connectivity', weight: 25, description: 'Routing protocols, OSPF, static routes' },
+  { id: 'ip-services', name: 'IP Services', weight: 10, description: 'DHCP, DNS, NAT, NTP, QoS' },
+  { id: 'security-fundamentals', name: 'Security Fundamentals', weight: 15, description: 'ACLs, AAA, VPN, threat defense' },
+  { id: 'automation', name: 'Automation and Programmability', weight: 10, description: 'Ansible, REST APIs, JSON' },
+];
+
+// AWS Networking Specialty Domains
+export const awsNetworkingDomains: CertificationDomain[] = [
+  { id: 'network-design', name: 'Network Design', weight: 30, description: 'VPC design, hybrid connectivity, HA' },
+  { id: 'network-implementation', name: 'Network Implementation', weight: 26, description: 'Routing, direct connect, transit gateway' },
+  { id: 'network-management', name: 'Network Management, Operations and Optimization', weight: 20, description: 'Monitoring, automation, optimization' },
+  { id: 'network-security', name: 'Network Security, Compliance and Governance', weight: 24, description: 'WAF, Shield, security groups, firewalls' },
+];
+
 // Exam configurations
 export const examConfigs: Record<string, CertificationExamConfig> = {
   'aws-saa': {
@@ -84,6 +260,146 @@ export const examConfigs: Record<string, CertificationExamConfig> = {
     totalQuestions: 57,
     passingScore: 70,
     timeLimit: 60,
+  },
+  'aws-sap': {
+    certificationId: 'aws-sap',
+    domains: awsSapDomains,
+    totalQuestions: 75,
+    passingScore: 75,
+    timeLimit: 180,
+  },
+  'aws-dva': {
+    certificationId: 'aws-dva',
+    domains: awsDvaDomains,
+    totalQuestions: 65,
+    passingScore: 72,
+    timeLimit: 130,
+  },
+  'aws-sysops': {
+    certificationId: 'aws-sysops',
+    domains: awsSysopsDomains,
+    totalQuestions: 65,
+    passingScore: 72,
+    timeLimit: 130,
+  },
+  'ckad': {
+    certificationId: 'ckad',
+    domains: ckadDomains,
+    totalQuestions: 15,
+    passingScore: 66,
+    timeLimit: 120,
+  },
+  'cks': {
+    certificationId: 'cks',
+    domains: cksDomains,
+    totalQuestions: 15,
+    passingScore: 67,
+    timeLimit: 120,
+  },
+  'gcp-ace': {
+    certificationId: 'gcp-ace',
+    domains: gcpAceDomains,
+    totalQuestions: 50,
+    passingScore: 70,
+    timeLimit: 120,
+  },
+  'gcp-pca': {
+    certificationId: 'gcp-pca',
+    domains: gcpPcaDomains,
+    totalQuestions: 50,
+    passingScore: 70,
+    timeLimit: 120,
+  },
+  'az-900': {
+    certificationId: 'az-900',
+    domains: az900Domains,
+    totalQuestions: 40,
+    passingScore: 70,
+    timeLimit: 45,
+  },
+  'az-104': {
+    certificationId: 'az-104',
+    domains: az104Domains,
+    totalQuestions: 60,
+    passingScore: 70,
+    timeLimit: 120,
+  },
+  'az-305': {
+    certificationId: 'az-305',
+    domains: az305Domains,
+    totalQuestions: 60,
+    passingScore: 70,
+    timeLimit: 120,
+  },
+  'comptia-security-plus': {
+    certificationId: 'comptia-security-plus',
+    domains: securityPlusDomains,
+    totalQuestions: 90,
+    passingScore: 75,
+    timeLimit: 90,
+  },
+  'aws-security': {
+    certificationId: 'aws-security',
+    domains: awsSecurityDomains,
+    totalQuestions: 65,
+    passingScore: 75,
+    timeLimit: 170,
+  },
+  'aws-data-engineer': {
+    certificationId: 'aws-data-engineer',
+    domains: awsDataEngineerDomains,
+    totalQuestions: 65,
+    passingScore: 72,
+    timeLimit: 130,
+  },
+  'aws-ml-specialty': {
+    certificationId: 'aws-ml-specialty',
+    domains: awsMlDomains,
+    totalQuestions: 65,
+    passingScore: 75,
+    timeLimit: 180,
+  },
+  'linux-plus': {
+    certificationId: 'linux-plus',
+    domains: linuxPlusDomains,
+    totalQuestions: 90,
+    passingScore: 72,
+    timeLimit: 90,
+  },
+  'rhcsa': {
+    certificationId: 'rhcsa',
+    domains: rhcsaDomains,
+    totalQuestions: 20,
+    passingScore: 70,
+    timeLimit: 150,
+  },
+  'psd': {
+    certificationId: 'psd',
+    domains: psdDomains,
+    totalQuestions: 80,
+    passingScore: 85,
+    timeLimit: 60,
+  },
+  'aws-database': {
+    certificationId: 'aws-database',
+    domains: awsDatabaseDomains,
+    totalQuestions: 65,
+    passingScore: 75,
+    timeLimit: 180,
+  },
+  'ccna': {
+    certificationId: 'ccna',
+    domains: ccnaDomains,
+    totalQuestions: 100,
+    passingScore: 82,
+    timeLimit: 120,
+  },
+  'aws-networking': {
+    certificationId: 'aws-networking',
+    domains: awsNetworkingDomains,
+    totalQuestions: 65,
+    passingScore: 75,
+    timeLimit: 170,
   },
 };
 
