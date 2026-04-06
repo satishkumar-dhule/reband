@@ -5,6 +5,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useUnifiedToast } from '../../hooks/use-unified-toast';
 import { EnhancedMermaid } from '../EnhancedMermaid';
 import { YouTubePlayer } from '../YouTubePlayer';
 import ReactMarkdown from 'react-markdown';
@@ -42,6 +43,7 @@ function TabbedMediaPanel({
   hasEli5: boolean;
   hasVideo: boolean;
 }) {
+  const { toast } = useUnifiedToast();
   const [diagramRenderSuccess, setDiagramRenderSuccess] = useState<boolean | null>(null);
   const showDiagramTab = hasDiagram && diagramRenderSuccess !== false;
   
@@ -54,13 +56,18 @@ function TabbedMediaPanel({
   const [activeTab, setActiveTab] = useState<MediaTab>('tldr');
   
   useEffect(() => {
-    // Reset to first available tab when question changes or diagram fails
+    // Reset to first available tab when diagram fails, and notify the user
     if (diagramRenderSuccess === false && activeTab === 'diagram') {
+      toast({
+        title: 'Visual diagram unavailable',
+        description: 'The diagram for this question could not be rendered. Switched to the next available tab.',
+        variant: 'default',
+      });
       if (hasTldr) setActiveTab('tldr');
       else if (hasEli5) setActiveTab('eli5');
       else if (hasVideo) setActiveTab('video');
     }
-  }, [diagramRenderSuccess, activeTab, hasTldr, hasEli5, hasVideo]);
+  }, [diagramRenderSuccess, activeTab, hasTldr, hasEli5, hasVideo, toast]);
   
   // Initialize active tab when question loads
   useEffect(() => {

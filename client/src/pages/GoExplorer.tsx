@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import {
   Layers, BookOpen, FlaskConical, FileCheck2, Map, Mic, BarChart3,
-  ChevronLeft, ChevronRight, Search, X, Loader2, Zap, Database,
+  ChevronLeft, ChevronRight, Search, X, Zap, Database,
   SlidersHorizontal, Hash, ArrowUpRight, Code2
 } from "lucide-react";
 import { Badge } from '@/lib/ui';
@@ -70,8 +70,17 @@ function Pagination({ page, totalPages, onPage }: { page: number; totalPages: nu
 // ─── Loading / error states ─────────────────────────────────────────────────
 function Loading() {
   return (
-    <div className="flex justify-center py-16">
-      <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+    <div className="space-y-3 py-4 animate-pulse">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-3 p-3 rounded-md border border-border">
+          <div className="w-8 h-8 rounded bg-muted shrink-0" />
+          <div className="flex-1 space-y-1.5">
+            <div className="h-3 bg-muted rounded w-2/5" />
+            <div className="h-2.5 bg-muted rounded w-3/5" />
+          </div>
+          <div className="h-5 w-16 bg-muted rounded-full shrink-0" />
+        </div>
+      ))}
     </div>
   );
 }

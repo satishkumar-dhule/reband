@@ -419,8 +419,8 @@ export default function Home() {
               </section>
             </div>
 
-            {/* ── Right sidebar ── */}
-            <div className="hidden lg:block w-72 shrink-0 space-y-6">
+            {/* ── Right sidebar ── visible from md (tablet) up, not just lg */}
+            <div className="hidden md:block w-72 shrink-0 space-y-6">
 
               {/* Stats card — includes credits balance inline */}
               <section className="gh-card p-4">

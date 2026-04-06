@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import {
   AppLayout, SEOHead, SkipLink, Button, Badge,
   PageHeader, GenericPageSkeleton, EmptyState,
+  Tooltip, TooltipContent, TooltipTrigger, TooltipProvider,
 } from '@/lib/ui';
 import { useAchievements } from '../hooks/use-achievements';
 import { AchievementProgress } from '../lib/achievements';
@@ -10,34 +11,39 @@ import { Trophy, Lock, Award } from 'lucide-react';
 import { ProgressBar } from '@/lib/ui';
 
 // ─── Tier config ──────────────────────────────────────────────────────────────
+// All colours are driven by CSS variables in github-tokens.css.
+// Adding a new tier only requires a new --tier-<name>-* token definition there.
 
-const DEFAULT_TIER_BADGE = 'text-muted-foreground border-border bg-muted/40';
-const DEFAULT_TIER_ICON  = 'text-muted-foreground';
-const DEFAULT_TIER_BG    = 'bg-muted/30';
-
-const tierBadgeClass: Record<string, string> = {
-  bronze:   'text-amber-700  dark:text-amber-400  border-amber-200  dark:border-amber-800  bg-amber-50  dark:bg-amber-950/40',
-  silver:   'text-slate-600  dark:text-slate-400  border-slate-200  dark:border-slate-700  bg-slate-50  dark:bg-slate-900/40',
-  gold:     'text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/40',
-  platinum: 'text-cyan-700   dark:text-cyan-400   border-cyan-200   dark:border-cyan-800   bg-cyan-50   dark:bg-cyan-950/40',
-  diamond:  'text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/40',
+type TierStyles = {
+  badge: React.CSSProperties;
+  icon: React.CSSProperties;
+  bg: React.CSSProperties;
 };
 
-const tierIconClass: Record<string, string> = {
-  bronze:   'text-amber-500',
-  silver:   'text-slate-400',
-  gold:     'text-yellow-500',
-  platinum: 'text-cyan-500',
-  diamond:  'text-violet-500',
-};
+const KNOWN_TIERS = new Set(['bronze', 'silver', 'gold', 'platinum', 'diamond']);
 
-const tierBgClass: Record<string, string> = {
-  bronze:   'bg-amber-50  dark:bg-amber-950/30',
-  silver:   'bg-slate-50  dark:bg-slate-900/30',
-  gold:     'bg-yellow-50 dark:bg-yellow-950/30',
-  platinum: 'bg-cyan-50   dark:bg-cyan-950/30',
-  diamond:  'bg-violet-50 dark:bg-violet-950/30',
-};
+function getTierStyles(tier: string): TierStyles {
+  if (!KNOWN_TIERS.has(tier)) {
+    return {
+      badge: {},
+      icon:  { color: 'var(--muted-foreground)' },
+      bg:    { backgroundColor: 'var(--muted)' },
+    };
+  }
+  return {
+    badge: {
+      color:           `var(--tier-${tier}-fg)`,
+      backgroundColor: `var(--tier-${tier}-bg)`,
+      borderColor:     `var(--tier-${tier}-border)`,
+    },
+    icon: {
+      color: `var(--tier-${tier}-fg)`,
+    },
+    bg: {
+      backgroundColor: `var(--tier-${tier}-bg)`,
+    },
+  };
+}
 
 // ─── Badge Card ───────────────────────────────────────────────────────────────
 
@@ -45,6 +51,7 @@ const BadgeCard = memo(function BadgeCard({ badgeProgress }: { badgeProgress: Ac
   const badge = badgeProgress.achievement;
   const isUnlocked = badgeProgress.isUnlocked;
   const tier = badge.tier as string;
+  const tierStyle = getTierStyles(tier);
   const progressPct = badgeProgress.progress !== undefined && badgeProgress.target
     ? Math.min(100, Math.round((badgeProgress.progress / badgeProgress.target) * 100))
     : 0;
@@ -56,20 +63,35 @@ const BadgeCard = memo(function BadgeCard({ badgeProgress }: { badgeProgress: Ac
       }`}
       data-testid={`badge-${badge.id}`}
     >
-      <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 ${
-        isUnlocked ? (tierBgClass[tier] ?? DEFAULT_TIER_BG) : 'bg-muted'
-      }`}>
+      <div
+        className="w-14 h-14 rounded-full flex items-center justify-center mb-3"
+        style={isUnlocked ? tierStyle.bg : undefined}
+      >
         {isUnlocked
-          ? <Trophy className={`w-7 h-7 ${tierIconClass[tier] ?? DEFAULT_TIER_ICON}`} />
+          ? <Trophy className="w-7 h-7" style={tierStyle.icon} />
           : <Lock className="w-7 h-7 text-muted-foreground" />
         }
       </div>
 
       <h3 className="text-sm font-semibold leading-snug mb-1 line-clamp-1">{badge.name}</h3>
-      <p className="text-[10px] text-muted-foreground line-clamp-2 mb-3 min-h-[2.5rem]">{badge.description}</p>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <p className="text-[10px] text-muted-foreground line-clamp-2 mb-3 min-h-[2.5rem] cursor-default">
+              {badge.description}
+            </p>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-[220px] text-xs text-center">
+            {badge.description}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
       <div className="mt-auto pt-2 border-t border-border w-full flex flex-col gap-1.5">
-        <Badge className={`text-[10px] uppercase tracking-wider w-fit mx-auto ${tierBadgeClass[tier] ?? DEFAULT_TIER_BADGE}`}>
+        <Badge
+          className="text-[10px] uppercase tracking-wider w-fit mx-auto border"
+          style={tierStyle.badge}
+        >
           {badge.tier}
         </Badge>
 

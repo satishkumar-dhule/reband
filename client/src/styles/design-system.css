@@ -117,15 +117,13 @@
   --safe-area-left: env(safe-area-inset-left, 0px);
   --safe-area-right: env(safe-area-inset-right, 0px);
   
-  /* Z-index scale */
-  --z-base: 0;
-  --z-dropdown: 1000;
-  --z-sticky: 1100;
-  --z-fixed: 1200;
-  --z-modal-backdrop: 1300;
-  --z-modal: 1400;
-  --z-popover: 1500;
-  --z-tooltip: 1600;
+  /* Z-index additions — github-tokens.css owns the primary scale.
+     Only add tokens here that are NOT already defined there.
+     Do NOT redefine --z-base, --z-sticky, --z-modal, --z-tooltip —
+     those live in github-tokens.css and must not be overridden. */
+  --z-fixed: 55;
+  --z-modal-backdrop: 85;
+  --z-popover: 95;
 }
 
 /* ===== UTILITY CLASSES ===== */

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { PullToRefresh, SwipeableCard, SkeletonList } from '../mobile';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { ProgressBar } from '../unified/ProgressBar';
 
 // Learning Paths - Role-based journeys
 const learningPaths = [
@@ -546,13 +547,12 @@ export function GenZHomePage() {
                 <div className="text-xs text-muted-foreground">Next Level</div>
                 <div className="text-sm font-bold">{xpInLevel}/{xpForNextLevel} XP</div>
               </div>
-              <div className="w-48 h-3 bg-muted rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(xpInLevel / xpForNextLevel) * 100}%` }}
-                  className="h-full bg-gradient-to-r from-primary to-cyan-500 motion-reduce:transition-none"
-                />
-              </div>
+              <ProgressBar
+                current={xpInLevel}
+                max={xpForNextLevel}
+                size="lg"
+                className="w-48"
+              />
             </div>
           </div>
         </div>
@@ -835,19 +835,14 @@ export function GenZHomePage() {
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>Progress</span>
-                      <span>{Math.round(resumePath.progress * 100)}% complete</span>
-                    </div>
-                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${resumePath.progress * 100}%` }}
-                        className="h-full bg-gradient-to-r from-amber-500 to-orange-500 motion-reduce:transition-none"
-                      />
-                    </div>
-                  </div>
+                  <ProgressBar
+                    current={Math.round(resumePath.progress * 100)}
+                    max={100}
+                    size="md"
+                    variant="warning"
+                    label="Progress"
+                    showPercentage
+                  />
 
                   {/* CTA */}
                   <motion.button

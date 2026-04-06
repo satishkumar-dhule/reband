@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo, lazy, Suspense } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { useIsMobile } from '../hooks/use-mobile';
 import { useLocation, useRoute, Link } from 'wouter';
 import { getChannel } from '../lib/data';
 import { useQuestionsWithPrefetch, useSubChannels, useCompaniesWithCounts } from '../hooks/use-questions';
@@ -105,6 +106,7 @@ export default function QuestionViewer() {
   const { trackEvent } = useAchievementContext();
   const { completed, markCompleted, saveLastVisitedIndex } = useProgress(channelId || '');
   const { toast } = useUnifiedToast();
+  const isMobile = useIsMobile();
 
   const { question: currentQuestion, questions, totalQuestions, loading, error } = useQuestionsWithPrefetch(
     channelId || '',
@@ -479,7 +481,7 @@ export default function QuestionViewer() {
         </div>
 
         <PanelGroup
-          direction="horizontal"
+          direction={isMobile ? "vertical" : "horizontal"}
           autoSaveId="question-viewer-panels"
           className="panel-group-responsive w-full px-4 py-6"
         >

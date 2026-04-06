@@ -177,6 +177,23 @@
   --gh-diff-advanced: #f85149;
   --gh-diff-advanced-bg: #160b10;
   
+  /* ===== TIER / BADGE SEMANTIC COLORS (dark mode) ===== */
+  --tier-bronze-fg:     #fbbf24;
+  --tier-bronze-bg:     rgba(120, 53, 15, 0.25);
+  --tier-bronze-border: rgba(120, 53, 15, 0.5);
+  --tier-silver-fg:     #94a3b8;
+  --tier-silver-bg:     rgba(30, 41, 59, 0.3);
+  --tier-silver-border: rgba(71, 85, 105, 0.5);
+  --tier-gold-fg:       #facc15;
+  --tier-gold-bg:       rgba(113, 63, 18, 0.25);
+  --tier-gold-border:   rgba(113, 63, 18, 0.5);
+  --tier-platinum-fg:   #22d3ee;
+  --tier-platinum-bg:   rgba(22, 78, 99, 0.25);
+  --tier-platinum-border: rgba(22, 78, 99, 0.5);
+  --tier-diamond-fg:    #a78bfa;
+  --tier-diamond-bg:    rgba(46, 16, 101, 0.25);
+  --tier-diamond-border: rgba(46, 16, 101, 0.5);
+
   /* Focus ring */
   --gh-focus-ring: rgba(88, 166, 255, 0.4);
   
@@ -315,6 +332,14 @@
   /* ===== LAYOUT DIMENSIONS ===== */
   /* Single source of truth for fixed heights — change here, works everywhere */
   --header-height: 56px;
+
+  /* ===== ICON SIZE SCALE ===== */
+  /* Use these tokens instead of magic w-N h-N values.
+     sm = inline/label icons, md = nav icons, lg = touch-target icons */
+  --icon-sm: 1rem;     /* 16px — inline, secondary */
+  --icon-md: 1.25rem;  /* 20px — primary nav, mobile bottom bar */
+  --icon-lg: 1.5rem;   /* 24px — touch-target, submenu cards */
+  --icon-xl: 1.75rem;  /* 28px — hero, large feature icons */
 
   /* ===== Z-INDEX SCALE ===== */
   /* Documented stacking context — use these vars instead of magic numbers */

@@ -105,7 +105,7 @@ function MascotBubble({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -10, scale: 0.9 }}
       transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-      className="fixed bottom-20 z-[60] max-w-xs"
+      className="fixed bottom-20 z-[var(--z-toast)] max-w-xs"
       style={{ left: Math.max(16, Math.min(mascotPosition - 80, window.innerWidth - 280)) }}
     >
         {/* Speech bubble */}
