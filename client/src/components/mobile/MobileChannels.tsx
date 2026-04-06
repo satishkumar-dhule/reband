@@ -74,7 +74,7 @@ export function MobileChannels() {
   })).filter(group => group.channels.length > 0);
 
   return (
-    <div className="pb-20 pb-safe">
+    <div className="pb-nav-safe">
       {/* Search Bar */}
       <div className="sticky top-14 z-30 bg-background px-4 py-3 border-b border-border/50">
         <div className="relative">

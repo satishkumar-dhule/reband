@@ -57,6 +57,7 @@
 /* ── Custom Tailwind v4 utilities ──────────────────────── */
 @utility pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 @utility pb-safe-offset-4 { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+@utility pb-nav-safe { padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
 @utility mb-safe { margin-bottom: env(safe-area-inset-bottom); }
 @utility pt-safe { padding-top: env(safe-area-inset-top); }
 

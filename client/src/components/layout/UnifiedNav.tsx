@@ -228,7 +228,7 @@ export function MobileBottomNav() {
           </div>
           
           {/* Menu Items - Single Column for Better Touch Targets */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-2 pb-28 pb-safe">
+          <div className="flex-1 overflow-y-auto p-4 space-y-2 pb-safe-offset-4">
             {currentSubNav.map((item, index) => {
               const Icon = item.icon;
               const isActive = location === item.path || location.startsWith(item.path + '/');

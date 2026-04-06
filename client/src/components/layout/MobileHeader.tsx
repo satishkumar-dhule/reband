@@ -41,7 +41,6 @@ export function MobileHeader({
           
           <button aria-label="Notifications" className="p-3 hover:bg-primary/10 rounded-xl transition-colors relative touch-manipulation min-w-[44px] min-h-[44px] -m-1.5 flex items-center justify-center">
             <Bell className="w-5 h-5 text-muted-foreground" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
           </button>
         </div>
       </header>
@@ -63,7 +62,7 @@ export function MobileHeader({
         >
           <div className="relative">
             <div className="w-9 h-9 bg-gradient-to-br from-primary via-emerald-500 to-accent rounded-xl flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-all duration-300 group-hover:scale-105">
-              <Brain className="w-4.5 h-4.5 text-primary-foreground" strokeWidth={2.5} />
+              <Brain className="w-4 h-4 text-primary-foreground" strokeWidth={2.5} />
             </div>
             <div className="absolute -inset-0.5 bg-gradient-to-br from-primary to-emerald-500 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity" aria-hidden="true" />
           </div>

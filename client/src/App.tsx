@@ -11,6 +11,7 @@ import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
 import { UnifiedNotificationManager } from "@/components/UnifiedNotificationManager";
 import { LiveRegionProvider } from "@/components/LiveRegion";
 import { SidebarProvider } from "@/context/SidebarContext";
+import { CodeThemeProvider } from "@/hooks/useCodeTheme";
 import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import NotFound from "@/pages/not-found";
@@ -308,6 +309,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
+        <CodeThemeProvider>
         <UserPreferencesProvider>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
@@ -324,6 +326,7 @@ export default function App() {
             </TooltipProvider>
           </QueryClientProvider>
         </UserPreferencesProvider>
+        </CodeThemeProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
