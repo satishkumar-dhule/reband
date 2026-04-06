@@ -10,7 +10,7 @@
  * - Progress: Track achievements (Stats, Badges, Bookmarks, Profile)
  */
 
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { useState, useMemo, memo, useCallback, useEffect, useRef } from 'react';
 import {
   Home,
@@ -75,7 +75,7 @@ const practiceSubNav: NavItem[] = [
 
 // Progress section - Track achievements
 const progressSubNav: NavItem[] = [
-  { id: 'profile', label: 'Profile & Stats', icon: BarChart3, path: '/profile', description: 'Progress & settings' },
+  { id: 'profile', label: 'Profile', icon: BarChart3, path: '/profile', description: 'Progress & settings' },
   { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, path: '/bookmarks', description: 'Saved questions' },
   { id: 'about', label: 'About', icon: Info, path: '/about', description: 'About Open-Interview' },
 ];
@@ -85,7 +85,7 @@ function getActiveSection(location: string): string {
   if (location === '/learning-paths' || location.startsWith('/learning-paths/')) return 'paths';
   if (location === '/channels' || location.startsWith('/channel/') || location === '/certifications' || location.startsWith('/certification/') || location === '/my-path') return 'learn';
   if (location.startsWith('/voice') || location.startsWith('/test') || location.startsWith('/coding') || location === '/review') return 'practice';
-  if (location === '/stats' || location === '/bookmarks' || location === '/profile' || location === '/profile') return 'progress';
+  if (location === '/stats' || location === '/bookmarks' || location === '/profile' || location === '/settings') return 'progress';
   if (location === '/bot-activity') return 'bots';
   return 'home';
 }
@@ -297,8 +297,8 @@ export function MobileBottomNav() {
             style={{ 
               background: 'var(--gh-success-fg)',
               boxShadow: '0 0 20px var(--gh-success-fg)',
-              width: 'calc(100% / 5 - 16px)',
-              marginLeft: `calc(${(mainNavItems.findIndex(i => activeSection === i.id) || 0)} * (100% / 5))`,
+              width: `calc(100% / ${mainNavItems.length} - 16px)`,
+              marginLeft: `calc(${(mainNavItems.findIndex(i => activeSection === i.id) || 0)} * (100% / ${mainNavItems.length}))`,
               transform: `translateX(${((mainNavItems.findIndex(i => activeSection === i.id) || 0) - 1) * 4}px)`,
               maxWidth: '48px',
               marginRight: 'auto'
@@ -342,7 +342,7 @@ export function MobileBottomNav() {
                       "w-9 h-9 rounded-[12px] flex items-center justify-center transition-transform",
                       item.highlight
                         ? isActive || isMenuOpen
-                          ? "bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/50" 
+                          ? "bg-gradient-to-br from-primary to-primary/80" 
                           : "bg-gradient-to-br from-primary/20 to-primary/10"
                         : isActive || isMenuOpen 
                           ? "bg-primary/15" 
@@ -358,7 +358,7 @@ export function MobileBottomNav() {
                   
                   {/* Label */}
                   <span className={cn(
-                    "text-[10px] font-medium leading-none mt-0.5",
+                    "text-xs font-medium leading-none mt-0.5",
                     isActive || isMenuOpen ? "text-primary" : "text-muted-foreground"
                   )}>
                     {item.label}
@@ -385,33 +385,19 @@ interface NavItemProps {
 }
 
 const NavItemComponent = memo(function NavItem({ item, isActive, isCollapsed }: NavItemProps) {
-  const [, setLocation] = useLocation();
   const Icon = item.icon;
   const isVoice = item.id === 'voice';
-  
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      setLocation(item.path);
-    }
-  }, [item.path, setLocation]);
 
-  const handleClick = useCallback(() => {
-    setLocation(item.path);
-  }, [item.path, setLocation]);
-  
-  const button = (
-    <button
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
+  const linkContent = (
+    <Link
+      href={item.path}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
         "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ease-out group overflow-hidden",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
         isCollapsed && "justify-center px-2",
-        isActive 
-          ? "text-primary" 
+        isActive
+          ? "text-primary"
           : "text-muted-foreground hover:text-foreground"
       )}
       style={isActive ? {
@@ -458,21 +444,21 @@ const NavItemComponent = memo(function NavItem({ item, isActive, isCollapsed }: 
           )}
         </>
       )}
-    </button>
+    </Link>
   );
-  
+
   // Use Radix Tooltip when collapsed for keyboard accessibility and collision detection
   if (isCollapsed) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          {button}
+          {linkContent}
         </TooltipTrigger>
-        <TooltipContent 
-          side="right" 
+        <TooltipContent
+          side="right"
           align="center"
           className="gap-1.5 flex items-center"
-          style={{ 
+          style={{
             background: 'hsl(0 0% 8% / 0.95)',
             backdropFilter: 'blur(20px) saturate(180%)',
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
@@ -483,7 +469,7 @@ const NavItemComponent = memo(function NavItem({ item, isActive, isCollapsed }: 
           {item.badge && (
             <span className={cn(
               "text-[10px] px-1.5 py-0.5 rounded font-medium",
-              item.badge === 'NEW' 
+              item.badge === 'NEW'
                 ? "bg-emerald-500/20 text-emerald-400"
                 : "bg-amber-500/20 text-amber-400"
             )}>
@@ -494,8 +480,8 @@ const NavItemComponent = memo(function NavItem({ item, isActive, isCollapsed }: 
       </Tooltip>
     );
   }
-  
-  return <div className="relative">{button}</div>;
+
+  return <div className="relative">{linkContent}</div>;
 });
 
 // ============================================

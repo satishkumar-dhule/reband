@@ -3,7 +3,7 @@ import { Suspense, lazy, useEffect, ReactNode, startTransition, ComponentType } 
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ErrorBoundary } from "./components/ErrorBoundary";
+import { ErrorBoundary, RouteErrorBoundary } from "./components/ErrorBoundary";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { CreditsProvider } from "@/context/CreditsContext";
 import { AchievementProvider } from "@/context/AchievementContext";
@@ -157,16 +157,18 @@ function StatsRedirect() {
   return null;
 }
 
-/** Wrap a lazy component with its own Suspense + per-route skeleton. */
+/** Wrap a lazy component with its own Suspense + per-route ErrorBoundary + skeleton. */
 function S<P extends object>(
   Component: ComponentType<P>,
   Fallback: ComponentType
 ): ComponentType<P> {
   return function SuspenseRoute(props: P) {
     return (
-      <Suspense fallback={<Fallback />}>
-        <Component {...props} />
-      </Suspense>
+      <RouteErrorBoundary>
+        <Suspense fallback={<Fallback />}>
+          <Component {...props} />
+        </Suspense>
+      </RouteErrorBoundary>
     );
   };
 }

@@ -13,7 +13,6 @@ import { Haptics } from '../lib/haptics';
 import { trackQuestionView } from '../hooks/use-analytics';
 import { useUnifiedToast } from '../hooks/use-unified-toast';
 import { AppLayout } from '@/lib/ui';
-import { SkipLink } from '@/lib/ui';
 import { Button, IconButton } from '@/lib/ui';
 import { QuestionViewerSkeleton, ReviewSkeleton } from '@/lib/ui';
 import {
@@ -392,7 +391,6 @@ export default function QuestionViewer() {
 
   return (
     <>
-      <SkipLink />
       <AppLayout>
       <SEOHead 
         title={`${currentQuestion?.question || 'Question'} | DevPrep`}
@@ -401,7 +399,7 @@ export default function QuestionViewer() {
 
       <div className="flex flex-col min-h-screen bg-[var(--gh-canvas-subtle)]">
         {/* Top Breadcrumb & Nav Bar */}
-        <div className="sticky top-12 z-20 bg-[var(--gh-canvas)] border-b border-[var(--gh-border)] px-4 py-2">
+        <div className="sticky top-14 z-20 bg-[var(--gh-canvas)] border-b border-[var(--gh-border)] px-4 py-2">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2 overflow-hidden">
               <Link href="/" className="text-[var(--gh-accent-fg)] hover:underline whitespace-nowrap flex items-center gap-1 text-sm">

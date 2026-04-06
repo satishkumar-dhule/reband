@@ -65,7 +65,7 @@ export function TopBar({ onMenuClick, onSearchClick, title, showBackButton }: To
             target="_blank"
             rel="noopener noreferrer"
             aria-label="View on GitHub"
-            className="p-2 hover:bg-muted rounded-lg transition-colors hidden sm:flex items-center gap-2"
+            className="min-w-[44px] min-h-[44px] p-2.5 hover:bg-muted rounded-lg transition-colors hidden sm:flex items-center gap-2"
           >
             <Star className="w-5 h-5" />
           </a>

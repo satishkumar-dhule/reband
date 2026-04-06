@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { AppLayout } from '@/lib/ui';
 import { SEOHead } from '@/lib/ui';
-import { SkipLink } from '@/lib/ui';
 import { allChannelsConfig } from "../lib/channels-config";
 import { cn } from "../lib/utils";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '@/lib/ui';
@@ -325,7 +324,6 @@ export default function Home() {
         title="DevPrep - Free Technical Interview Prep"
         description="Master technical interviews with 1000+ questions, spaced repetition flashcards, and voice practice. Free forever, no sign-up required."
       />
-      <SkipLink />
       <AppLayout>
       <div className="min-h-screen bg-[var(--gh-canvas-subtle)]" id="main-content">
         <div className="max-w-6xl mx-auto px-4 py-8 lg:px-8">

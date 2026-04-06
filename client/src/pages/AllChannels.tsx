@@ -9,6 +9,7 @@ import {
   AppLayout, SEOHead, SkipLink, ChannelsSkeleton, Button,
   PageHeader, SearchInput, EmptyState,
 } from '@/lib/ui';
+import { ProgressBar } from '@/components/unified/ProgressBar';
 import { allChannelsConfig, ChannelConfig } from '../lib/channels-config';
 import { useChannelStats } from '../hooks/use-stats';
 import { useDebounce, useProgress } from '../hooks';
@@ -16,7 +17,7 @@ import {
   Box, Terminal, Layout, Server, Database, Infinity, Activity, Cloud, Layers,
   Brain, Eye, FileText, Code, Shield, Network, Monitor, Smartphone,
   Zap, Gauge, Users, MessageCircle, Calculator, Cpu, GitBranch, Binary, Puzzle,
-  GitMerge, Workflow, Award, Search, CheckCircle,
+  GitMerge, Workflow, Award, Search, CheckCircle, Sparkles,
 } from 'lucide-react';
 import { Badge } from '@/lib/ui';
 
@@ -28,7 +29,7 @@ const iconMap: Record<string, React.ElementType> = {
   'workflow': Workflow, 'brain': Brain, 'message-circle': MessageCircle, 'eye': Eye,
   'file-text': FileText, 'code': Code, 'shield': Shield, 'network': Network,
   'monitor': Monitor, 'smartphone': Smartphone, 'check-circle': CheckCircle,
-  'zap': Zap, 'gauge': Gauge, 'users': Users, 'award': Award, 'sparkles': Zap,
+  'zap': Zap, 'gauge': Gauge, 'users': Users, 'award': Award, 'sparkles': Sparkles,
 };
 
 const categoryLabels: Record<string, string> = {
@@ -219,12 +220,7 @@ function ChannelCard({ channel, questionCount }: ChannelCardProps) {
       {/* Progress bar */}
       {progress > 0 && (
         <div className="mt-auto">
-          <div className="h-1 bg-muted rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+          <ProgressBar current={progress} max={100} size="xs" variant="success" />
         </div>
       )}
 

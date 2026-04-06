@@ -11,6 +11,10 @@ import { ProgressBar } from '@/lib/ui';
 
 // ─── Tier config ──────────────────────────────────────────────────────────────
 
+const DEFAULT_TIER_BADGE = 'text-muted-foreground border-border bg-muted/40';
+const DEFAULT_TIER_ICON  = 'text-muted-foreground';
+const DEFAULT_TIER_BG    = 'bg-muted/30';
+
 const tierBadgeClass: Record<string, string> = {
   bronze:   'text-amber-700  dark:text-amber-400  border-amber-200  dark:border-amber-800  bg-amber-50  dark:bg-amber-950/40',
   silver:   'text-slate-600  dark:text-slate-400  border-slate-200  dark:border-slate-700  bg-slate-50  dark:bg-slate-900/40',
@@ -53,10 +57,10 @@ const BadgeCard = memo(function BadgeCard({ badgeProgress }: { badgeProgress: Ac
       data-testid={`badge-${badge.id}`}
     >
       <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 ${
-        isUnlocked ? (tierBgClass[tier] ?? 'bg-muted') : 'bg-muted'
+        isUnlocked ? (tierBgClass[tier] ?? DEFAULT_TIER_BG) : 'bg-muted'
       }`}>
         {isUnlocked
-          ? <Trophy className={`w-7 h-7 ${tierIconClass[tier] ?? 'text-muted-foreground'}`} />
+          ? <Trophy className={`w-7 h-7 ${tierIconClass[tier] ?? DEFAULT_TIER_ICON}`} />
           : <Lock className="w-7 h-7 text-muted-foreground" />
         }
       </div>
@@ -65,7 +69,7 @@ const BadgeCard = memo(function BadgeCard({ badgeProgress }: { badgeProgress: Ac
       <p className="text-[10px] text-muted-foreground line-clamp-2 mb-3 min-h-[2.5rem]">{badge.description}</p>
 
       <div className="mt-auto pt-2 border-t border-border w-full flex flex-col gap-1.5">
-        <Badge className={`text-[10px] uppercase tracking-wider w-fit mx-auto ${tierBadgeClass[tier] ?? ''}`}>
+        <Badge className={`text-[10px] uppercase tracking-wider w-fit mx-auto ${tierBadgeClass[tier] ?? DEFAULT_TIER_BADGE}`}>
           {badge.tier}
         </Badge>
 

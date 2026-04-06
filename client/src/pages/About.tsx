@@ -469,7 +469,7 @@ export default function About() {
           </AnimatePresence>
 
           {/* Tab Navigation */}
-          <div className="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-10 mb-6">
+          <div className="border-b border-border sticky top-14 bg-background/95 backdrop-blur z-10 mb-6">
             <div className="flex gap-1 overflow-x-auto scrollbar-hide">
               {(['mission', 'features', 'tech', 'community', 'developer'] as const).map((tab) => (
                 <Button
