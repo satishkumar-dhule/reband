@@ -130,4 +130,4 @@ exposeLocalhost = true
 
 [userenv.shared]
 BETTER_AUTH_SECRET = "Mk+ZBSvYL/o7LSymDNxa3EdS32yubRVDa3I0YiMDB4A="
-BETTER_AUTH_URL = "https://8a0e1743-c340-4897-b924-1643a3c33348-00-3mdujzl36l4nv.spock.replit.dev"
+BETTER_AUTH_URL = "https://10757c09-0734-4a82-81e9-623a9b03fdd0-00-27b58fy13x1mn.janeway.replit.dev"
