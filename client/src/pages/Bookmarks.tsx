@@ -2,9 +2,9 @@ import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  AppLayout, SEOHead, SkipLink, Button, IconButton, Badge,
+  AppLayout, SEOHead, SkipLink, Button, IconButton,
   Select, SelectTrigger, SelectContent, SelectItem, SelectValue,
-  PageHeader, EmptyState, GenericPageSkeleton,
+  PageHeader, EmptyState, GenericPageSkeleton, DifficultyBadge,
 } from '@/lib/ui';
 import { loadChannelQuestions } from '../lib/questions-loader';
 import { useUserPreferences } from '../context/UserPreferencesContext';
@@ -15,11 +15,6 @@ import { Bookmark, Trash2, ChevronRight, Filter, CheckCircle, Building2, X, Book
 
 interface BookmarkedQuestion extends Question { channelId: string; }
 
-const difficultyConfig: Record<string, { label: string; badgeClass: string }> = {
-  beginner:     { label: 'Easy',   badgeClass: 'text-green-700 dark:text-green-400 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/40' },
-  intermediate: { label: 'Medium', badgeClass: 'text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/40' },
-  advanced:     { label: 'Hard',   badgeClass: 'text-red-700 dark:text-red-400 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/40' },
-};
 
 function fmt(id: string) {
   return id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -172,7 +167,6 @@ export default function Bookmarks() {
               ) : (
                 <div className="divide-y divide-border">
                   {filteredQuestions.map(question => {
-                    const diff = difficultyConfig[question.difficulty] ?? difficultyConfig.beginner;
                     const isCompleted = ProgressStorage.getCompleted(question.channelId).includes(question.id);
 
                     return (

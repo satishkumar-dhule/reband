@@ -94,3 +94,6 @@ export {
   LevelDisplay,
   LevelBadge
 } from './LevelDisplay';
+
+export { SessionResults } from './SessionResults';
+export type { SessionResultsProps, DomainResult } from './SessionResults';

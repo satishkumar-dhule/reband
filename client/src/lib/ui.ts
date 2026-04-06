@@ -173,6 +173,8 @@ export {
 export { AchievementCard, AchievementGrid } from '@/components/unified/AchievementCard';
 export { LevelDisplay, LevelBadge } from '@/components/unified/LevelDisplay';
 export { SkipLink } from '@/components/unified/SkipLink';
+export { SessionResults } from '@/components/unified/SessionResults';
+export type { SessionResultsProps, DomainResult } from '@/components/unified/SessionResults';
 export { Box } from '@/components/unified/Box';
 
 // Voice recording

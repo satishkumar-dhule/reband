@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { SEOHead } from '@/lib/ui';
 import { getDifficultyClasses } from '@/lib/difficulty';
-import { DesktopSidebarWrapper } from '@/lib/ui';
+import { DesktopSidebarWrapper, SessionResults } from '@/lib/ui';
 import { GenZCard, GenZButton, GenZProgress, GenZTimer } from '@/lib/ui';
 import { Button } from '@/lib/ui';
 import {
@@ -471,58 +471,29 @@ export default function TestSession() {
         )}
 
         {sessionState === 'review' && result && (
-          <div className="min-h-screen flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="max-w-md w-full"
-            >
-              <GenZCard className="p-8">
-                <div className="text-center">
-                  <div className={`w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 ${
-                    result.passed ? 'bg-primary/20' : 'bg-destructive/20'
-                  }`}>
-                    {result.passed ? (
-                      <Trophy className="w-12 h-12 text-primary" />
-                    ) : (
-                      <XCircle className="w-12 h-12 text-destructive" />
-                    )}
-                  </div>
-                  
-                  <div className="text-6xl font-black text-foreground mb-2">{result.score}%</div>
-                  <p className={`text-xl font-semibold mb-8 ${result.passed ? 'text-primary' : 'text-destructive'}`}>
-                    {result.passed ? 'Passed!' : 'Not Passed'}
-                  </p>
-                  
-                  <div className="grid grid-cols-2 gap-4 mb-8">
-                    <div className="bg-background/50 rounded-xl p-4">
-                      <div className="text-2xl font-bold text-primary">{result.correct}</div>
-                      <div className="text-xs text-muted-foreground">Correct</div>
-                    </div>
-                    <div className="bg-background/50 rounded-xl p-4">
-                      <div className="text-2xl font-bold text-destructive">{result.total - result.correct}</div>
-                      <div className="text-xs text-muted-foreground">Incorrect</div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    {!result.passed && (
-                      <GenZButton onClick={startTest} className="w-full">
-                        Try Again
-                      </GenZButton>
-                    )}
-                    <GenZButton
-                      variant="secondary"
-                      onClick={() => setLocation(`/channel/${channelId}`)}
-                      className="w-full"
-                    >
-                      Back to Channel
-                    </GenZButton>
-                  </div>
-                </div>
-              </GenZCard>
-            </motion.div>
-          </div>
+          <SessionResults
+            score={result.score}
+            correct={result.correct}
+            total={result.total}
+            passed={result.passed}
+            elapsedSeconds={elapsed}
+            actions={
+              <>
+                {!result.passed && (
+                  <GenZButton onClick={startTest} className="w-full">
+                    Try Again
+                  </GenZButton>
+                )}
+                <GenZButton
+                  variant="secondary"
+                  onClick={() => setLocation(`/channel/${channelId}`)}
+                  className="w-full"
+                >
+                  Back to Channel
+                </GenZButton>
+              </>
+            }
+          />
         )}
       </div>
       </DesktopSidebarWrapper>
