@@ -149,7 +149,21 @@
     "fix:duplicates": "node script/fix-duplicate-questions.js",
     "test:job-titles": "node script/test-job-title-relevance.js",
     "backfill:job-titles": "node script/backfill-job-title-relevance.js",
-    "perf:measure": "node scripts/measure-perf.js --urls https://stage-open-interview.github.io,https://stage-open-interview.github.io/channel-browser,https://stage-open-interview.github.io/login,https://stage-open-interview.github.io/channel/algorithms,https://stage-open-interview.github.io/interview"
+    "perf:measure": "node scripts/measure-perf.js --urls https://stage-open-interview.github.io,https://stage-open-interview.github.io/channel-browser,https://stage-open-interview.github.io/login,https://stage-open-interview.github.io/channel/algorithms,https://stage-open-interview.github.io/interview",
+    "ai": "opencode",
+    "ai:run": "opencode run",
+    "ai:serve": "opencode serve",
+    "ai:web": "opencode web",
+    "ai:agent": "opencode run --agent",
+    "ai:supervisor": "opencode run --agent devprep-supervisor",
+    "ai:question": "opencode run --agent devprep-question-expert",
+    "ai:flashcard": "opencode run --agent devprep-flashcard-expert",
+    "ai:bug": "opencode run --agent devprep-bug-fix-supervisor",
+    "ai:ui": "opencode run --agent devprep-frontend-designer",
+    "ai:models": "opencode models",
+    "ai:agents": "opencode agent list",
+    "ai:stats": "opencode stats",
+    "ai:proxy": "python3 anthropic_proxy.py"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
