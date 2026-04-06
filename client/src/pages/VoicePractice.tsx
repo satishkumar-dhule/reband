@@ -16,6 +16,7 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbP
 import { Button } from '@/lib/ui';
 import { SkipLink } from '@/lib/ui';
 import { VoiceSkeleton } from '@/lib/ui';
+import { GHCard } from '../components/shared/GHCard';
 
 type PracticeMode = 'training' | 'interview';
 type RecordingState = 'idle' | 'recording' | 'recorded';
@@ -40,23 +41,6 @@ function GitHubNote({ children, className = "" }: { children: React.ReactNode, c
         <div className="text-sm text-[var(--gh-fg)]">
           {children}
         </div>
-      </div>
-    </div>
-  );
-}
-
-// GitHub Style Card
-function GHCard({ children, className = "", title, subtitle }: { children: React.ReactNode, className?: string, title?: string, subtitle?: string }) {
-  return (
-    <div className={`bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-md overflow-hidden ${className}`}>
-      {(title || subtitle) && (
-        <div className="px-4 py-3 border-b border-[var(--gh-border)] bg-[var(--gh-canvas-subtle)]">
-          {title && <h3 className="font-semibold text-[var(--gh-fg)]">{title}</h3>}
-          {subtitle && <p className="text-xs text-[var(--gh-fg-muted)] mt-0.5">{subtitle}</p>}
-        </div>
-      )}
-      <div className="p-4">
-        {children}
       </div>
     </div>
   );

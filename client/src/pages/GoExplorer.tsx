@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import {
   Layers, BookOpen, FlaskConical, FileCheck2, Map, Mic, BarChart3,
   ChevronLeft, ChevronRight, Search, X, Loader2, Zap, Database,
-  SlidersHorizontal, Hash, ArrowUpRight, Code2, Star
+  SlidersHorizontal, Hash, ArrowUpRight, Code2
 } from "lucide-react";
 import { Badge } from '@/lib/ui';
 import { Button } from '@/lib/ui';
@@ -16,6 +16,7 @@ import {
 import {
   Tabs, TabsContent, TabsList, TabsTrigger,
 } from '@/lib/ui';
+import { DifficultyBadge, type DifficultyLevel } from '@/components/unified/DifficultyBadge';
 
 // ─── API helpers ───────────────────────────────────────────────────────────
 const BASE = "/go-api/api/v1";
@@ -47,23 +48,6 @@ type Certification = { id: string; name: string; category?: string; difficulty?:
 type LearningPath = { id: string; title?: string; name?: string; pathType?: string; difficulty?: string; jobTitle?: string; company?: string };
 type VoiceSession = { id: string; channel: string; prompt: string; difficulty?: string };
 
-// ─── Difficulty badge ───────────────────────────────────────────────────────
-function DiffBadge({ d }: { d?: string }) {
-  if (!d) return null;
-  const lc = d.toLowerCase();
-  const color =
-    lc === "beginner" ? "bg-green-500/15 text-green-700 dark:text-green-400" :
-    lc === "intermediate" ? "bg-yellow-500/15 text-yellow-700 dark:text-yellow-400" :
-    "bg-red-500/15 text-red-600 dark:text-red-400";
-  return (
-    <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md ${color}`}>
-      {lc === "beginner" && <Star className="w-3 h-3" />}
-      {lc === "intermediate" && <Star className="w-3 h-3 fill-current" />}
-      {lc === "advanced" && <Zap className="w-3 h-3" />}
-      {d}
-    </span>
-  );
-}
 
 // ─── Pagination bar ─────────────────────────────────────────────────────────
 function Pagination({ page, totalPages, onPage }: { page: number; totalPages: number; onPage: (p: number) => void }) {
@@ -313,7 +297,7 @@ function QuestionsTab() {
                   <p className="flex-1 text-sm font-medium leading-snug">{q.question}</p>
                   <div className="flex flex-wrap gap-1 flex-shrink-0">
                     <Badge variant="secondary" className="text-[11px]">{q.channel}</Badge>
-                    <DiffBadge d={q.difficulty} />
+                    {q.difficulty && <DifficultyBadge level={q.difficulty as DifficultyLevel} size="sm" />}
                   </div>
                 </div>
                 {expanded === q.id && (
@@ -404,7 +388,7 @@ function FlashcardsTab() {
                 </div>
                 <div className="flex flex-wrap gap-1">
                   <Badge variant="outline" className="text-[10px]">{f.channel}</Badge>
-                  {f.difficulty && <DiffBadge d={f.difficulty} />}
+                  {f.difficulty && <DifficultyBadge level={f.difficulty as DifficultyLevel} size="sm" />}
                 </div>
               </div>
             ))}
@@ -460,7 +444,7 @@ function CertificationsTab() {
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-sm font-semibold flex-1">{c.name || c.id}</p>
                   {c.category && <Badge variant="secondary" className="text-[10px]">{c.category}</Badge>}
-                  <DiffBadge d={c.difficulty} />
+                  {c.difficulty && <DifficultyBadge level={c.difficulty as DifficultyLevel} size="sm" />}
                 </div>
                 {c.description && (
                   <p className="text-xs text-muted-foreground line-clamp-2">{c.description}</p>
@@ -518,7 +502,7 @@ function LearningPathsTab() {
                     {p.pathType && <Badge variant="secondary" className="text-[10px]">{p.pathType}</Badge>}
                     {p.company && <Badge variant="outline" className="text-[10px]">{p.company}</Badge>}
                     {p.jobTitle && <Badge variant="outline" className="text-[10px]">{p.jobTitle}</Badge>}
-                    <DiffBadge d={p.difficulty} />
+                    {p.difficulty && <DifficultyBadge level={p.difficulty as DifficultyLevel} size="sm" />}
                   </div>
                 </CardContent>
               </Card>
@@ -584,7 +568,7 @@ function VoiceSessionsTab() {
                 <p className="text-sm font-medium leading-snug line-clamp-3">{v.prompt}</p>
                 <div className="flex flex-wrap gap-1">
                   <Badge variant="secondary" className="text-[10px]">{v.channel}</Badge>
-                  <DiffBadge d={v.difficulty} />
+                  {v.difficulty && <DifficultyBadge level={v.difficulty as DifficultyLevel} size="sm" />}
                 </div>
               </div>
             ))}

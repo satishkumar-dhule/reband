@@ -29,19 +29,6 @@ interface ExtremeAnswerPanelProps {
   isCompleted: boolean;
 }
 
-// Keep a thin wrapper to preserve the motion entrance used by GenZ aesthetic
-function AnimatedCodeBlock({ code, language }: { code: string; language: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
-      <CodeBlock code={code} language={language} size="full" />
-    </motion.div>
-  );
-}
-
-
 function TabbedMediaPanel({ 
   question,
   hasTldr,

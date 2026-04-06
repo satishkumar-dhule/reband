@@ -7,6 +7,7 @@ import {
   Eye, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { Button } from './unified/Button';
+import { DifficultyBadge, type DifficultyLevel } from './unified/DifficultyBadge';
 import { cn } from '../lib/utils';
 
 interface Flashcard {
@@ -106,20 +107,6 @@ function CodeBlock({ code, language }: { code: string; language?: string }) {
   );
 }
 
-function DifficultyBadge({ difficulty }: { difficulty?: string }) {
-  if (!difficulty) return null;
-  const map: Record<string, string> = {
-    beginner: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-    intermediate: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-    advanced: 'bg-red-500/15 text-red-400 border-red-500/30',
-  };
-  const cls = map[difficulty.toLowerCase()] || 'bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] border-[var(--gh-border)]';
-  return (
-    <span className={cn('px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border', cls)}>
-      {difficulty}
-    </span>
-  );
-}
 
 function StatsBar({ progress, total }: { progress: Record<string, CardProgress>; total: number }) {
   const seen = Object.values(progress).filter(p => p.seen).length;
@@ -452,7 +439,13 @@ export function FlashcardsTab({ channelId, flashcards }: FlashcardsTabProps) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          {currentCard?.difficulty && <DifficultyBadge difficulty={currentCard.difficulty} />}
+          {currentCard?.difficulty && (
+            <DifficultyBadge
+              level={currentCard.difficulty as DifficultyLevel}
+              size="sm"
+              uppercase
+            />
+          )}
           {currentCard?.category && (
             <span className="px-2 py-0.5 rounded-full text-[10px] bg-[var(--gh-canvas-subtle)] text-[var(--gh-fg-muted)] border border-[var(--gh-border)]">
               {currentCard.category}
