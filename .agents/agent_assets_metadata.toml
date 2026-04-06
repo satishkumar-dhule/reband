@@ -6,3 +6,9 @@ id = "EeABgvgvid9S9kkpQK5or"
 uri = "file://CONTENT_STANDARDS.md"
 type = "text"
 title = "DevPrep Content Standards (revised)"
+
+[[outputs]]
+id = "rynhVe7mL_hFppTafVy6B"
+uri = "file://docs/claude-cli-setup.md"
+type = "text"
+title = "Claude CLI + Replit AI Proxy — Setup Guide"
