@@ -81,14 +81,19 @@ export default function LearningPaths() {
     setIsSubmitting(true);
     try {
       const pathId = `custom-${Date.now()}`;
-      const saved: CustomPath[] = JSON.parse(localStorage.getItem('customLearningPaths') || '[]');
-      saved.push({ ...customPath, name: customPath.name.trim() });
-      localStorage.setItem('customLearningPaths', JSON.stringify(saved));
-      const active: string[] = JSON.parse(localStorage.getItem('activeLearningPaths') || '[]');
-      active.push(pathId);
-      localStorage.setItem('activeLearningPaths', JSON.stringify(active));
-      toast({ title: 'Path Created', description: `"${customPath.name.trim()}" is ready to start.` });
+      const newPath = {
+        id: pathId,
+        name: customPath.name.trim(),
+        channels: customPath.channels,
+        certifications: customPath.certifications,
+        createdAt: new Date().toISOString(),
+      };
+      const saved = JSON.parse(localStorage.getItem('customPaths') || '[]');
+      saved.push(newPath);
+      localStorage.setItem('customPaths', JSON.stringify(saved));
+      toast({ title: 'Path Created', description: `"${newPath.name}" is ready to start.` });
       resetCustomPath();
+      setLocation('/my-path');
     } catch { toast({ title: 'Error', description: 'Could not save path.', variant: 'destructive' }); }
     finally { setIsSubmitting(false); }
   };
