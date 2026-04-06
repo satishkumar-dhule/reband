@@ -67,7 +67,7 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "PORT=5000 NODE_ENV=development node --import=tsx/esm server/index.ts",
+    "dev": "PORT=5000 NODE_ENV=development node_modules/.bin/tsx server/index.ts",
     "dev:vite": "vite dev --port 5001",
     "dev:server": "NODE_ENV=development node_modules/.bin/tsx server/index.ts",
     "build": "vite build",
@@ -140,6 +140,7 @@
     "swarm:content:flashcards": "npx tsx scripts/parallel-content-swarm.ts --type=flashcards",
     "swarm:content:voice": "npx tsx scripts/parallel-content-swarm.ts --type=voice",
     "swarm:content:paths": "npx tsx scripts/parallel-content-swarm.ts --type=paths",
+    "swarm:content:challenges": "npx tsx scripts/parallel-content-swarm.ts --type=challenges",
     "swarm:content:fast": "npx tsx scripts/parallel-content-swarm.ts --workers=30",
     "test:bottom-nav": "playwright test e2e/visual/bottom-nav-icon-fix.spec.ts",
     "inspect:bottom-nav": "node script/inspect-bottom-nav.js",

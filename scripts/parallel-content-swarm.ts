@@ -42,7 +42,23 @@ const FREE_MODELS = [
 ];
 const MODEL = arg("--model") ?? FREE_MODELS[0];
 
-const OPENCODE = "/home/runner/workspace/.config/npm/node_global/bin/opencode";
+// Resolve opencode binary — check Replit path first, then fall back to PATH
+function findOpencode(): string {
+  const candidates = [
+    "/home/runner/workspace/.config/npm/node_global/bin/opencode",
+    "/home/runner/.config/npm/node_global/bin/opencode",
+    process.env.OPENCODE_BIN ?? "",
+  ];
+  for (const p of candidates) {
+    if (p && fs.existsSync(p)) return p;
+  }
+  // Fall back to PATH lookup
+  try {
+    const { execSync } = require("child_process");
+    return execSync("which opencode", { encoding: "utf8" }).trim();
+  } catch { return "opencode"; }
+}
+const OPENCODE = findOpencode();
 const DB_PATH = resolve(process.cwd(), "local.db");
 const TIMEOUT_MS = 6 * 60 * 1000;
 const POLL_MS = 3_000;
@@ -72,7 +88,7 @@ async function dbCount(sql: string, args: (string | number | null)[] = []): Prom
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type ContentType = "questions"|"certifications"|"flashcards"|"voice"|"paths";
+type ContentType = "questions"|"certifications"|"flashcards"|"voice"|"paths"|"challenges";
 type Status = "pending"|"running"|"done"|"failed"|"skipped";
 
 interface Task {
@@ -273,7 +289,52 @@ const P_BATCHES = [
   ]},
 ];
 
+const C_CATEGORIES = [
+  { id:"algorithms", ctx:"Sorting, searching, two-pointer, sliding window, divide & conquer." },
+  { id:"data-structures", ctx:"Arrays, linked lists, stacks, queues, hash maps, tries." },
+  { id:"dynamic-programming", ctx:"Memoization, tabulation. Fibonacci, knapsack, LCS, edit distance, coin change." },
+  { id:"graphs", ctx:"BFS, DFS, Dijkstra, topological sort, cycle detection, union-find." },
+  { id:"trees", ctx:"Binary trees, BST, AVL. LCA, path sums, tree traversals, serialization." },
+  { id:"strings", ctx:"Pattern matching, anagram, palindrome, string manipulation." },
+  { id:"arrays", ctx:"Prefix sums, kadane's algorithm, next-permutation, matrix problems." },
+  { id:"math", ctx:"Number theory, bit manipulation, probability, combinatorics." },
+];
+
 // ─── Prompt builders ──────────────────────────────────────────────────────────
+function buildChallengePrompt(cat: typeof C_CATEGORIES[0], n: number): string {
+  return "You are a senior engineering interviewer for DevPrep.\n\n" +
+    "TASK: Generate " + n + " coding challenges for category \"" + cat.id + "\".\n\n" +
+    "IMPORTANT: Output ONLY a valid JSON array. No other text.\n\n" +
+    '[\n' +
+    '  {\n' +
+    '    "id": "<uuid>",\n' +
+    '    "title": "2-5 word title",\n' +
+    '    "description": "Problem statement with constraints and examples",\n' +
+    '    "difficulty": "easy|medium|hard",\n' +
+    '    "category": "' + cat.id + '",\n' +
+    '    "tags": ["' + cat.id + '","subtopic"],\n' +
+    '    "companies": ["Google","Amazon"],\n' +
+    '    "starter_code_js": "function solve(input) {\\n  // your code here\\n}",\n' +
+    '    "starter_code_py": "def solve(input):\\n    # your code here\\n    pass",\n' +
+    '    "test_cases": "[{\\"input\\":\\"...\\\"expected\\":\\"...\\"}]",\n' +
+    '    "hints": "[\\"Think about...\\",\\"Consider...\\"]",\n' +
+    '    "solution_js": "function solve(input) {\\n  // full solution\\n}",\n' +
+    '    "solution_py": "def solve(input):\\n    # full solution",\n' +
+    '    "complexity_time": "O(n)",\n' +
+    '    "complexity_space": "O(1)",\n' +
+    '    "complexity_explanation": "One pass through the array",\n' +
+    '    "time_limit": 15\n' +
+    '  }\n' +
+    ']\n\n' +
+    "CONTEXT: " + cat.ctx + "\n\n" +
+    "RULES:\n" +
+    "- Output ONLY the JSON array\n" +
+    "- Mix easy/medium/hard (30/50/20)\n" +
+    "- Real-world LeetCode-style problems\n" +
+    "- Both JS and Python solutions must be correct and runnable\n" +
+    "- test_cases must be a JSON string of array of {input, expected} objects";
+}
+
 function buildQPrompt(ch: typeof Q_CHANNELS[0], n: number): string {
   const subs = ch.sub.join(", ");
   return "You are a senior engineering interviewer for DevPrep.\n\n" +
@@ -469,6 +530,17 @@ function buildQueue(): Task[] {
       });
     }
   }
+  if (!FILTER_TYPE || FILTER_TYPE === "challenges") {
+    const CHALLENGE_TARGET = 15;
+    for (const cat of C_CATEGORIES) {
+      if (FILTER_CH && cat.id !== FILTER_CH) continue;
+      tasks.push({
+        id: "challenge-" + cat.id, type: "challenges", label: cat.id, agent: "content-challenge-expert",
+        buildPrompt: () => buildChallengePrompt(cat, GENERATE_BATCH),
+        countSql: "SELECT COUNT(*) FROM coding_challenges WHERE category=?", countArgs: [cat.id], minNeeded: CHALLENGE_TARGET
+      });
+    }
+  }
   return tasks;
 }
 
@@ -565,6 +637,31 @@ async function insertFromJson(output: string, type: ContentType): Promise<number
             ]
           });
           inserted++;
+        } else if (type === "challenges") {
+          await db.execute({
+            sql: "INSERT OR IGNORE INTO coding_challenges (id,title,description,difficulty,category,tags,companies,starter_code_js,starter_code_py,test_cases,hints,solution_js,solution_py,complexity_time,complexity_space,complexity_explanation,time_limit,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            args: [
+              item.id || randomUUID(),
+              item.title || "",
+              item.description || "",
+              item.difficulty || "medium",
+              item.category || "",
+              typeof item.tags === "string" ? item.tags : JSON.stringify(item.tags || []),
+              typeof item.companies === "string" ? item.companies : JSON.stringify(item.companies || []),
+              item.starter_code_js || item.starterCodeJs || "",
+              item.starter_code_py || item.starterCodePy || "",
+              typeof item.test_cases === "string" ? item.test_cases : JSON.stringify(item.test_cases || []),
+              typeof item.hints === "string" ? item.hints : JSON.stringify(item.hints || []),
+              item.solution_js || item.solutionJs || "",
+              item.solution_py || item.solutionPy || "",
+              item.complexity_time || item.complexityTime || "O(n)",
+              item.complexity_space || item.complexitySpace || "O(1)",
+              item.complexity_explanation || item.complexityExplanation || "",
+              item.time_limit || item.timeLimit || 15,
+              new Date().toISOString()
+            ]
+          });
+          inserted++;
         }
       } catch (e) { /* skip invalid items */ }
     }
@@ -577,9 +674,11 @@ async function insertFromJson(output: string, type: ContentType): Promise<number
 const TYPE_LABEL: Record<ContentType, string> = {
   questions: "Questions", certifications: "Certifications",
   flashcards: "Flashcards", voice: "Voice Sessions", paths: "Learning Paths",
+  challenges: "Coding Challenges",
 };
 const TYPE_COLOR: Record<ContentType, string> = {
   questions: C.bl, certifications: C.m, flashcards: C.c, voice: C.y, paths: C.g,
+  challenges: C.rd,
 };
 
 function pad(s: string, w: number): string {
@@ -665,7 +764,7 @@ function renderDashboard() {
     lines.push(C.d + "─".repeat(W) + C.r);
   }
 
-  const types: ContentType[] = ["questions", "certifications", "flashcards", "voice", "paths"];
+  const types: ContentType[] = ["questions", "certifications", "flashcards", "voice", "paths", "challenges"];
   for (const t of types) {
     const typeAgents = agents.filter(a => a.task.type === t);
     if (typeAgents.length === 0) continue;
