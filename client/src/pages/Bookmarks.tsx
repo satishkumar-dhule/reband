@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   AppLayout, SEOHead, SkipLink, Button, IconButton,
   Select, SelectTrigger, SelectContent, SelectItem, SelectValue,
-  PageHeader, EmptyState, GenericPageSkeleton, DifficultyBadge,
+  PageHeader, EmptyState, GenericPageSkeleton, DifficultyBadge, Badge,
 } from '@/lib/ui';
 import { loadChannelQuestions } from '../lib/questions-loader';
 import { useUserPreferences } from '../context/UserPreferencesContext';

@@ -65,27 +65,31 @@ function setReadCache(res: any, maxAgeSeconds = 60, staleWhileRevalidate = 300) 
 
 // Helper to parse JSON fields from DB
 function parseQuestion(row: any) {
-  // Sanitize answer field - ensure no JSON/MCQ format
   let answer = row.answer;
-  
-  // Check if answer contains MCQ JSON format
+  let options: { id: string; text: string; isCorrect: boolean }[] | undefined = undefined;
+
+  // Check if answer contains MCQ JSON format — preserve options, extract correct answer text
   if (answer && typeof answer === 'string' && answer.trim().startsWith('[{')) {
     try {
       const parsed = JSON.parse(answer);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        // Extract correct answer text
+      if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]?.text !== undefined) {
         const correctOption = parsed.find((opt: any) => opt.isCorrect === true);
         if (correctOption && correctOption.text) {
+          // Preserve options for frontend MCQ rendering
+          options = parsed.map((opt: any, idx: number) => ({
+            id: opt.id || String.fromCharCode(65 + idx), // A, B, C, D fallback
+            text: opt.text,
+            isCorrect: opt.isCorrect === true,
+          }));
+          // Set answer to the correct option text for contexts that don't support MCQ
           answer = correctOption.text;
-          console.warn(`⚠️  Question ${row.id} had MCQ format in answer - sanitized on-the-fly`);
         }
       }
     } catch (e) {
-      // If parsing fails, leave as is but log warning
       console.warn(`⚠️  Question ${row.id} has malformed answer field`);
     }
   }
-  
+
   return {
     id: row.id,
     question: row.question,
@@ -101,6 +105,7 @@ function parseQuestion(row: any) {
     companies: safeJsonParse(row.companies, null),
     eli5: row.eli5,
     lastUpdated: row.last_updated,
+    ...(options ? { options } : {}),
   };
 }
 

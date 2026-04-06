@@ -13,7 +13,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { 
   BookOpen, Code2, Lightbulb, ExternalLink, ChevronDown, Baby, Copy, Check, Tag,
-  GitBranch, Play, FileText, Sparkles, Zap, Eye, Brain, Layers
+  GitBranch, Play, FileText, Sparkles, Zap, Eye, Brain, Layers, ListChecks, CheckCircle, XCircle
 } from 'lucide-react';
 import type { Question } from '../../lib/data';
 import { GiscusComments } from '../GiscusComments';
@@ -566,6 +566,57 @@ export function ExtremeAnswerPanel({ question }: ExtremeAnswerPanelProps) {
       className="w-full h-full overflow-y-auto overflow-x-hidden bg-gradient-to-br from-background via-muted/10 to-background"
     >
       <div className="w-full px-4 sm:px-6 py-4 sm:py-6 pb-32 space-y-6">
+
+        {/* MCQ Options Review */}
+        {question.options && question.options.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl border border-border bg-card overflow-hidden"
+          >
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-border bg-muted/30">
+              <ListChecks className="w-5 h-5 text-primary" />
+              <span className="font-bold text-base text-foreground">Answer Choices</span>
+            </div>
+            <div className="px-5 py-4 space-y-2">
+              {question.options.map((option, idx) => {
+                const letter = String.fromCharCode(65 + idx);
+                return (
+                  <div
+                    key={option.id}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
+                      option.isCorrect
+                        ? 'bg-green-500/10 border-green-500/40'
+                        : 'bg-muted/30 border-border opacity-70'
+                    }`}
+                  >
+                    <span className={`shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold border ${
+                      option.isCorrect
+                        ? 'bg-green-500/20 border-green-500/40 text-green-600 dark:text-green-400'
+                        : 'bg-muted border-border text-muted-foreground'
+                    }`}>
+                      {option.isCorrect ? (
+                        <CheckCircle className="w-3.5 h-3.5" />
+                      ) : (
+                        letter
+                      )}
+                    </span>
+                    <span className={`text-sm font-medium leading-snug ${
+                      option.isCorrect ? 'text-green-600 dark:text-green-400 font-semibold' : 'text-muted-foreground'
+                    }`}>
+                      {option.text}
+                    </span>
+                    {option.isCorrect && (
+                      <span className="ml-auto shrink-0 text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wider">
+                        Correct
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
 
         {/* Tabbed Media Panel */}
         {hasMediaContent && (

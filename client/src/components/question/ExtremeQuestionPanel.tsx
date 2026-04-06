@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Zap, Target, Flame, Bookmark, Check, Building2, 
-  Hash, Sparkles, Star, Trophy, Brain, Eye, Layers, CheckCircle
+  Hash, Sparkles, Star, Trophy, Brain, Eye, Layers, CheckCircle, XCircle, ListChecks
 } from 'lucide-react';
 import type { Question } from '../../lib/data';
 import { QuestionHistoryIcon } from '../unified/QuestionHistory';
@@ -78,6 +78,8 @@ export function ExtremeQuestionPanel({
   const [hasRated, setHasRated] = useState(false);
   const [showRatingButtons, setShowRatingButtons] = useState(false);
   const [showParticles, setShowParticles] = useState(true);
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [showMCQFeedback, setShowMCQFeedback] = useState(false);
 
   useEffect(() => {
     if (question?.id) {
@@ -85,6 +87,9 @@ export function ExtremeQuestionPanel({
       setSrsCard(card);
       setHasRated(false);
       setShowRatingButtons(card.totalReviews > 0);
+      // Reset MCQ selection when question changes
+      setSelectedOptionId(null);
+      setShowMCQFeedback(false);
     }
   }, [question?.id, question?.channel, question?.difficulty]);
 
@@ -320,6 +325,74 @@ export function ExtremeQuestionPanel({
             {renderWithInlineCode(question.question)}
           </motion.h1>
 
+          {/* MCQ Options */}
+          {question.options && question.options.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mb-5 space-y-2"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <ListChecks className="w-4 h-4 text-primary" />
+                <span className="text-xs font-bold text-primary uppercase tracking-wider">
+                  {showMCQFeedback ? 'See answer panel for explanation' : 'Select the correct answer'}
+                </span>
+              </div>
+              {question.options.map((option, idx) => {
+                const letter = String.fromCharCode(65 + idx);
+                const isSelected = selectedOptionId === option.id;
+                const isCorrect = option.isCorrect;
+                let optionStyle = 'bg-card border-border text-foreground hover:bg-muted/50';
+                if (showMCQFeedback) {
+                  if (isCorrect) {
+                    optionStyle = 'bg-green-500/10 border-green-500/40 text-green-600 dark:text-green-400';
+                  } else if (isSelected && !isCorrect) {
+                    optionStyle = 'bg-red-500/10 border-red-500/40 text-red-600 dark:text-red-400';
+                  } else {
+                    optionStyle = 'bg-card border-border text-muted-foreground opacity-60';
+                  }
+                } else if (isSelected) {
+                  optionStyle = 'bg-primary/10 border-primary/50 text-primary';
+                }
+                return (
+                  <motion.button
+                    key={option.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (showMCQFeedback) return;
+                      setSelectedOptionId(option.id);
+                      setShowMCQFeedback(true);
+                    }}
+                    disabled={showMCQFeedback}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left ${optionStyle}`}
+                    whileHover={showMCQFeedback ? {} : { scale: 1.01 }}
+                    whileTap={showMCQFeedback ? {} : { scale: 0.99 }}
+                  >
+                    <span className={`shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold border ${
+                      showMCQFeedback && isCorrect
+                        ? 'bg-green-500/20 border-green-500/40 text-green-600 dark:text-green-400'
+                        : showMCQFeedback && isSelected && !isCorrect
+                        ? 'bg-red-500/20 border-red-500/40 text-red-600 dark:text-red-400'
+                        : isSelected && !showMCQFeedback
+                        ? 'bg-primary/20 border-primary/40 text-primary'
+                        : 'bg-muted border-border text-muted-foreground'
+                    }`}>
+                      {showMCQFeedback && isCorrect ? (
+                        <CheckCircle className="w-3.5 h-3.5" />
+                      ) : showMCQFeedback && isSelected && !isCorrect ? (
+                        <XCircle className="w-3.5 h-3.5" />
+                      ) : (
+                        letter
+                      )}
+                    </span>
+                    <span className="text-sm font-medium leading-snug">{option.text}</span>
+                  </motion.button>
+                );
+              })}
+            </motion.div>
+          )}
+
           {/* Sub-channel */}
           <motion.div 
             initial={{ opacity: 0 }}
@@ -362,9 +435,15 @@ export function ExtremeQuestionPanel({
           transition={{ delay: 0.4 }}
           className="text-center pt-4 border-t border-border mt-4"
         >
-          <p className="text-[10px] text-muted-foreground">
-            Press <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[9px] font-mono mx-1">→</kbd> or tap to reveal answer
-          </p>
+          {question.options && question.options.length > 0 ? (
+            <p className="text-[10px] text-muted-foreground">
+              Select an option above, then press <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[9px] font-mono mx-1">→</kbd> for full explanation
+            </p>
+          ) : (
+            <p className="text-[10px] text-muted-foreground">
+              Press <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-[9px] font-mono mx-1">→</kbd> or tap to reveal answer
+            </p>
+          )}
         </motion.div>
       </div>
     </button>

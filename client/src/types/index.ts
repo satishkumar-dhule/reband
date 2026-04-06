@@ -8,6 +8,12 @@ import { DIFFICULTY, NOTIFICATION_TYPES } from '../lib/constants';
 // ============================================
 // QUESTION TYPES
 // ============================================
+export interface MCQOption {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+}
+
 export interface Question {
   id: string;
   question: string;
@@ -31,6 +37,7 @@ export interface Question {
   isNew?: boolean; // Whether question is new (less than 7 days old)
   lastUpdated?: string;
   createdAt?: string;
+  options?: MCQOption[]; // Multiple choice options (if question is MCQ type)
 }
 
 export interface QuestionListItem {
