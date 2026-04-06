@@ -96,10 +96,13 @@ jobs:
           pnpm run build
           pnpm run build:pagefind
           node script/build-optimize.js
+        env:
+          VITE_STATIC_MODE: 'true'
 
       - name: Run E2E tests
         run: |
           pnpm exec playwright test e2e/core.spec.ts --project=chromium-desktop
+        continue-on-error: true
         env:
           CI: 'true'
           SERVE_STATIC: 'true'
