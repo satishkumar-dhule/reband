@@ -33,6 +33,14 @@ import {
 } from '@/lib/ui';
 import { cn } from '../lib/utils';
 
+// ─── Helpers ─────────────────────────────────────────────────
+/** Safely converts any value (including objects like {n, edges}) to a display string */
+function toStr(val: unknown): string {
+  if (val === undefined || val === null) return '—';
+  if (typeof val === 'string') return val;
+  return JSON.stringify(val, null, 2);
+}
+
 // ─── Constants ───────────────────────────────────────────────
 const CODING_LANGUAGE_KEY = 'coding-preferred-language';
 const CODING_PROGRESS_PREFIX = 'coding-progress-';
@@ -278,11 +286,11 @@ function ChallengeView({
                           <div className="p-3 grid grid-cols-2 gap-2 text-xs font-mono">
                             <div>
                               <span className="text-[var(--gh-fg-muted)] font-sans text-[9px] uppercase font-bold">Input</span>
-                              <div className="mt-1 p-2 bg-[var(--gh-canvas-subtle)] rounded border border-[var(--gh-border)] text-[var(--gh-fg)]">{ex.input}</div>
+                              <div className="mt-1 p-2 bg-[var(--gh-canvas-subtle)] rounded border border-[var(--gh-border)] text-[var(--gh-fg)] whitespace-pre-wrap break-all">{toStr(ex.input)}</div>
                             </div>
                             <div>
                               <span className="text-[var(--gh-fg-muted)] font-sans text-[9px] uppercase font-bold">Output</span>
-                              <div className="mt-1 p-2 bg-[var(--gh-canvas-subtle)] rounded border border-[var(--gh-border)] text-emerald-300">{ex.expectedOutput}</div>
+                              <div className="mt-1 p-2 bg-[var(--gh-canvas-subtle)] rounded border border-[var(--gh-border)] text-emerald-300 whitespace-pre-wrap break-all">{toStr(ex.expectedOutput)}</div>
                             </div>
                           </div>
                         </div>

@@ -7,6 +7,13 @@ import { ScrollArea } from '../ui/scroll-area';
 import { cn } from '../../lib/utils';
 import type { TestResult } from '../../lib/coding-challenges';
 
+/** Safely converts any value (including objects like {n, edges}) to a display string */
+function toStr(val: unknown): string {
+  if (val === undefined || val === null) return '—';
+  if (typeof val === 'string') return val;
+  return JSON.stringify(val, null, 2);
+}
+
 export interface TestOutputPanelProps {
   results: TestResult[];
   isExpanded: boolean;
@@ -115,12 +122,12 @@ export const TestOutputPanel = React.memo(function TestOutputPanel({
                         <div key={label} className="bg-[var(--gh-canvas-inset)] px-3 py-2">
                           <p className="text-[9px] font-bold uppercase tracking-wider text-[var(--gh-fg-muted)] mb-1">{label}</p>
                           <p className={cn(
-                            'break-all',
+                            'break-all whitespace-pre-wrap',
                             highlight && !result.passed ? 'text-red-300' :
                             highlight && result.passed ? 'text-emerald-300' :
                             'text-[var(--gh-fg)]'
                           )}>
-                            {val ?? '—'}
+                            {toStr(val)}
                           </p>
                         </div>
                       ))}
