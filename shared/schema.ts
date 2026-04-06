@@ -225,25 +225,87 @@ export const insertUserSessionSchema = createInsertSchema(userSessions);
 export const insertLearningPathSchema = createInsertSchema(learningPaths);
 export const insertFlashcardSchema = createInsertSchema(flashcards);
 
-// Coding challenges table
+// Coding challenges table (enhanced with multiple languages and solution explanations)
 export const codingChallenges = sqliteTable("coding_challenges", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  difficulty: text("difficulty").notNull(), // easy, medium
+  difficulty: text("difficulty").notNull(), // easy, medium, hard
   category: text("category").notNull(),
+  subcategory: text("subcategory"), // e.g., two-pointer, hash-map
   tags: text("tags"), // JSON array
   companies: text("companies"), // JSON array
+  constraints: text("constraints"), // JSON array of constraints
+  examples: text("examples"), // JSON array with input/output/explanation
   starterCodeJs: text("starter_code_js"),
+  starterCodeTs: text("starter_code_ts"),
   starterCodePy: text("starter_code_py"),
-  testCases: text("test_cases"), // JSON array
-  hints: text("hints"), // JSON array
   solutionJs: text("solution_js"),
+  solutionTs: text("solution_ts"),
   solutionPy: text("solution_py"),
+  solutionExplanation: text("solution_explanation"), // JSON: {approach, timeComplexity, spaceComplexity, steps, whyWorks, commonMistakes}
+  testCases: text("test_cases"), // JSON array: [{id, input, expected, isHidden, type}]
+  hints: text("hints"), // JSON array
   complexityTime: text("complexity_time"),
   complexitySpace: text("complexity_space"),
-  complexityExplanation: text("complexity_explanation"),
+  difficultyVariants: text("difficulty_variants"), // JSON: {easy: id, hard: id}
+  followUp: text("follow_up"), // JSON: {topic, hint}
   timeLimit: integer("time_limit").default(15),
+  status: text("status").default("active"),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
+  lastUpdated: text("last_updated"),
+});
+
+// Mock exams table - structured exam sessions
+export const mockExams = sqliteTable("mock_exams", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  certificationId: text("certification_id").notNull().references(() => certifications.id),
+  examType: text("exam_type").notNull(), // quick, domain-focused, mixed, full-length, challenge
+  difficulty: text("difficulty").notNull(), // beginner, intermediate, advanced
+  questionCount: integer("question_count").notNull(),
+  questions: text("questions").notNull(), // JSON array of full question objects
+  questionIds: text("question_ids"), // JSON array of question IDs
+  domains: text("domains"), // JSON array: [{id, name, weight, questionCount, questions}]
+  timeLimit: integer("time_limit").notNull(), // minutes
+  passingScore: integer("passing_score").default(72), // percentage
+  instructions: text("instructions"),
+  metadata: text("metadata"), // JSON: {examType, typeName, typeDescription, createdBy}
+  status: text("status").default("active"), // active, draft, archived
+  attemptCount: integer("attempt_count").default(0),
+  averageScore: integer("average_score").default(0),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
+  lastUpdated: text("last_updated"),
+});
+
+// Exam attempts - track user progress on mock exams
+export const examAttempts = sqliteTable("exam_attempts", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  examId: text("exam_id").notNull().references(() => mockExams.id),
+  userId: text("user_id"), // Optional for future auth
+  answers: text("answers"), // JSON: [{questionId, selectedOption, isCorrect}]
+  score: integer("score").notNull(), // percentage
+  passed: integer("passed").default(0), // 1 = passed, 0 = failed
+  timeSpent: integer("time_spent"), // seconds
+  startedAt: text("started_at").$defaultFn(() => new Date().toISOString()),
+  completedAt: text("completed_at"),
+  flaggedQuestions: text("flagged_questions"), // JSON array of question IDs
+  status: text("status").default("in-progress"), // in-progress, completed, abandoned
+});
+
+// Coding problem variants - different difficulty versions of same problem
+export const codingVariants = sqliteTable("coding_variants", {
+  id: text("id").primaryKey(),
+  parentId: text("parent_id").references(() => codingChallenges.id),
+  title: text("title").notNull(),
+  difficulty: text("difficulty").notNull(), // easy, medium, hard
+  description: text("description").notNull(),
+  relationship: text("relationship").notNull(), // simplified, extended, follow-up, alternative
+  starterCode: text("starter_code"), // JSON with language-specific code
+  solution: text("solution"), // JSON with language-specific solutions
+  testCases: text("test_cases"),
+  hints: text("hints"),
   createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 });
 
@@ -262,3 +324,17 @@ export type InsertLearningPath = typeof learningPaths.$inferInsert;
 export type LearningPath = typeof learningPaths.$inferSelect;
 export type InsertFlashcard = typeof flashcards.$inferInsert;
 export type Flashcard = typeof flashcards.$inferSelect;
+export type InsertCodingChallenge = typeof codingChallenges.$inferInsert;
+export type CodingChallenge = typeof codingChallenges.$inferSelect;
+export type InsertMockExam = typeof mockExams.$inferInsert;
+export type MockExam = typeof mockExams.$inferSelect;
+export type InsertExamAttempt = typeof examAttempts.$inferInsert;
+export type ExamAttempt = typeof examAttempts.$inferSelect;
+export type InsertCodingVariant = typeof codingVariants.$inferInsert;
+export type CodingVariant = typeof codingVariants.$inferSelect;
+
+// Zod schemas for insert validation
+export const insertCodingChallengeSchema = createInsertSchema(codingChallenges);
+export const insertMockExamSchema = createInsertSchema(mockExams);
+export const insertExamAttemptSchema = createInsertSchema(examAttempts);
+export const insertCodingVariantSchema = createInsertSchema(codingVariants);

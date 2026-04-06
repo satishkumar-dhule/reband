@@ -1,11 +1,24 @@
 ---
 name: pipeline-generator
-description: Orchestrate parallel content generation across all content types. Use when generating multiple content types (questions, challenges, certifications, flashcards, voice sessions, blogs) simultaneously. Manages worker allocation, rate limiting, and result aggregation.
+description: Orchestrate parallel content generation across all content types. Use when generating multiple content types (questions, challenges, coding-problems, mock-exams, certifications, flashcards, voice sessions, blogs) simultaneously. Manages worker allocation, rate limiting, and result aggregation.
 ---
 
 # Pipeline Generator Coordinator
 
 Orchestrates parallel content generation across all specialized content skills.
+
+## Supported Content Types
+
+| Type | Description | Generator |
+|------|-------------|-----------|
+| `question` | Interview Q&A questions | `creator-bot.js` |
+| `challenge` | Coding challenges | `coding-challenge-graph.js` |
+| `problem` | Enhanced coding problems | `coding-problem-graph.js` |
+| `exam` | Mock exams | `mock-exam-graph.js` |
+| `certification` | Certification MCQs | `certification-question-graph.js` |
+| `flashcard` | SRS flashcards | `flashcard-bot.js` |
+| `voice` | Voice sessions | `session-builder-bot.js` |
+| `blog` | Blog posts | `blog-graph.js` |
 
 ## Responsibilities
 
@@ -32,7 +45,7 @@ interface GeneratorConfig {
   };
 }
 
-type ContentType = 'question' | 'challenge' | 'certification' | 'flashcard' | 'voice' | 'blog';
+type ContentType = 'question' | 'challenge' | 'problem' | 'exam' | 'certification' | 'flashcard' | 'voice' | 'blog';
 ```
 
 ## Parallel Execution Strategy
@@ -136,6 +149,8 @@ node script/bots/creator-bot.js --types=question --channel=react --difficulty=ad
 |--------------|-------|
 | question | content-question-expert |
 | challenge | content-challenge-expert |
+| problem | content-challenge-expert (enhanced) |
+| exam | Mock exam generation |
 | certification | content-certification-expert |
 | flashcard | content-flashcard-expert |
 | voice | content-voice-expert |

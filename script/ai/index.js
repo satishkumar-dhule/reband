@@ -25,6 +25,7 @@ import improveTemplate from './prompts/templates/improve.js';
 import generateTemplate from './prompts/templates/generate.js';
 import relevanceTemplate from './prompts/templates/relevance.js';
 import codingChallengeTemplate from './prompts/templates/coding-challenge.js';
+import codingProblemTemplate from './prompts/templates/coding-problem.js';
 import blogTemplate from './prompts/templates/blog.js';
 import intakeTemplate from './prompts/templates/intake.js';
 import videoTemplate from './prompts/templates/video.js';
@@ -39,6 +40,7 @@ import citationBlogTemplate from './prompts/templates/citation-blog.js';
 import blogImageTemplate from './prompts/templates/blog-image.js';
 import illustrationSceneTemplate from './prompts/templates/illustration-scene.js';
 import certificationQuestionTemplate from './prompts/templates/certification-question.js';
+import mockExamTemplate from './prompts/templates/mock-exam.js';
 import linkedinPollMcqTemplate from './prompts/templates/linkedin-poll-mcq.js';
 
 // Template registry
@@ -52,6 +54,8 @@ const templates = {
   generate: generateTemplate,
   relevance: relevanceTemplate,
   'coding-challenge': codingChallengeTemplate,
+  'coding-problem': codingProblemTemplate,
+  'mock-exam': mockExamTemplate,
   blog: blogTemplate,
   intake: intakeTemplate,
   video: videoTemplate,

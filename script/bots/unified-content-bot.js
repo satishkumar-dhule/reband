@@ -4,7 +4,9 @@
  * 
  * Orchestrates content generation across ALL content types:
  * - Questions (interview Q&A)
- * - Coding Challenges (with test cases)
+ * - Coding Challenges (with test cases, multiple languages, solutions)
+ * - Coding Problems (enhanced with explanations, variants, hints)
+ * - Mock Exams (structured exam sessions with domains, timing, scoring)
  * - Certification MCQs (exam-aligned)
  * - Tests (quick quiz MCQs)
  * - Voice Sessions (from related questions)
@@ -13,6 +15,8 @@
  * Usage:
  *   node script/bots/unified-content-bot.js --type=question --channel=system-design
  *   node script/bots/unified-content-bot.js --type=challenge --category=arrays
+ *   node script/bots/unified-content-bot.js --type=problem --difficulty=medium
+ *   node script/bots/unified-content-bot.js --type=exam --cert=aws-saa --exam-type=full-length
  *   node script/bots/unified-content-bot.js --type=certification --cert=aws-saa
  *   node script/bots/unified-content-bot.js --type=test --channel=devops
  *   node script/bots/unified-content-bot.js --type=all --count=5
@@ -42,9 +46,27 @@ const CONTENT_TYPES = {
   challenge: {
     name: 'Coding Challenge',
     generator: '../ai/graphs/coding-challenge-graph.js',
-    verifier: 'verifier', // TODO: Add challenge-specific verification
+    verifier: 'verifier',
     processor: 'processor',
     categories: ['arrays', 'strings', 'trees', 'graphs', 'dp', 'sorting', 'searching']
+  },
+  problem: {
+    name: 'Coding Problem (Enhanced)',
+    generator: '../ai/graphs/coding-problem-graph.js',
+    verifier: 'verifier',
+    processor: 'processor',
+    categories: ['arrays', 'strings', 'linked-lists', 'trees', 'graphs', 'dynamic-programming', 'sorting', 'searching'],
+    difficulties: ['easy', 'medium', 'hard'],
+    description: 'Enhanced coding problems with solution explanations, variants, and detailed test cases'
+  },
+  exam: {
+    name: 'Mock Exam',
+    generator: '../ai/graphs/mock-exam-graph.js',
+    verifier: 'verifier',
+    processor: 'processor',
+    certifications: ['aws-saa', 'aws-sap', 'cka', 'ckad', 'cks', 'terraform-associate', 'gcp-ace', 'azure-fundamentals'],
+    examTypes: ['quick', 'domain-focused', 'mixed', 'full-length', 'challenge'],
+    description: 'Structured mock exams with domains, timing, and scoring'
   },
   certification: {
     name: 'Certification MCQ',
@@ -94,6 +116,28 @@ async function generateChallenge(options) {
     category: options.category || 'arrays',
     companies: options.companies || ['Google', 'Meta', 'Amazon'],
     existingTitles: []
+  });
+}
+
+async function generateCodingProblem(options) {
+  const { generateCodingProblem } = await import('../ai/graphs/coding-problem-graph.js');
+  return generateCodingProblem({
+    difficulty: options.difficulty || 'medium',
+    category: options.category || 'arrays',
+    companies: options.companies || ['Google', 'Meta', 'Amazon'],
+    includeVariants: options.includeVariants || false
+  });
+}
+
+async function generateMockExam(options) {
+  const { generateMockExam } = await import('../ai/graphs/mock-exam-graph.js');
+  return generateMockExam({
+    certificationId: options.certification || 'aws-saa',
+    examType: options.examType || 'full-length',
+    difficulty: options.difficulty || 'intermediate',
+    domain: options.domain,
+    questionCount: options.questionCount,
+    passingScore: options.passingScore
   });
 }
 
@@ -179,6 +223,63 @@ async function generateBlogPost(options) {
 }
 
 // ============================================
+// BATCH GENERATION
+// ============================================
+
+async function runBatchGeneration(options = {}) {
+  const { types = ['question'], count = 1 } = options;
+  const results = { success: 0, failed: 0, byType: {} };
+  
+  console.log(`\n${'═'.repeat(60)}`);
+  console.log('🔄 BATCH CONTENT GENERATION');
+  console.log(`${'═'.repeat(60)}`);
+  console.log(`Types: ${types.join(', ')}`);
+  console.log(`Count per type: ${count}`);
+  
+  for (const type of types) {
+    results.byType[type] = { success: 0, failed: 0 };
+    
+    for (let i = 0; i < count; i++) {
+      try {
+        const typeOptions = { ...options };
+        
+        // Randomize options for variety
+        if (type === 'question') {
+          const channels = CONTENT_TYPES.question.channels;
+          typeOptions.channel = typeOptions.channel || channels[Math.floor(Math.random() * channels.length)];
+        } else if (type === 'challenge' || type === 'problem') {
+          const categories = CONTENT_TYPES[type].categories;
+          typeOptions.category = typeOptions.category || categories[Math.floor(Math.random() * categories.length)];
+        } else if (type === 'certification' || type === 'exam') {
+          const certs = CONTENT_TYPES[type].certifications;
+          typeOptions.certification = typeOptions.certification || certs[Math.floor(Math.random() * certs.length)];
+        }
+        
+        const result = await runUnifiedPipeline(type, typeOptions);
+        
+        if (result.success) {
+          results.success++;
+          results.byType[type].success++;
+        } else {
+          results.failed++;
+          results.byType[type].failed++;
+        }
+        
+        // Rate limiting
+        await new Promise(r => setTimeout(r, 2000));
+        
+      } catch (error) {
+        console.error(`Error generating ${type}: ${error.message}`);
+        results.failed++;
+        results.byType[type].failed++;
+      }
+    }
+  }
+  
+  return results;
+}
+
+// ============================================
 // UNIFIED PIPELINE
 // ============================================
 
@@ -201,6 +302,12 @@ async function runUnifiedPipeline(contentType, options = {}) {
       break;
     case 'challenge':
       result = await generateChallenge(options);
+      break;
+    case 'problem':
+      result = await generateCodingProblem(options);
+      break;
+    case 'exam':
+      result = await generateMockExam(options);
       break;
     case 'certification':
       result = await generateCertificationMCQ(options);
@@ -249,63 +356,6 @@ async function runUnifiedPipeline(contentType, options = {}) {
 }
 
 // ============================================
-// BATCH GENERATION
-// ============================================
-
-async function runBatchGeneration(options = {}) {
-  const { types = ['question'], count = 1 } = options;
-  const results = { success: 0, failed: 0, byType: {} };
-  
-  console.log(`\n${'═'.repeat(60)}`);
-  console.log('🔄 BATCH CONTENT GENERATION');
-  console.log(`${'═'.repeat(60)}`);
-  console.log(`Types: ${types.join(', ')}`);
-  console.log(`Count per type: ${count}`);
-  
-  for (const type of types) {
-    results.byType[type] = { success: 0, failed: 0 };
-    
-    for (let i = 0; i < count; i++) {
-      try {
-        const typeOptions = { ...options };
-        
-        // Randomize options for variety
-        if (type === 'question') {
-          const channels = CONTENT_TYPES.question.channels;
-          typeOptions.channel = typeOptions.channel || channels[Math.floor(Math.random() * channels.length)];
-        } else if (type === 'challenge') {
-          const categories = CONTENT_TYPES.challenge.categories;
-          typeOptions.category = typeOptions.category || categories[Math.floor(Math.random() * categories.length)];
-        } else if (type === 'certification') {
-          const certs = CONTENT_TYPES.certification.certifications;
-          typeOptions.certification = typeOptions.certification || certs[Math.floor(Math.random() * certs.length)];
-        }
-        
-        const result = await runUnifiedPipeline(type, typeOptions);
-        
-        if (result.success) {
-          results.success++;
-          results.byType[type].success++;
-        } else {
-          results.failed++;
-          results.byType[type].failed++;
-        }
-        
-        // Rate limiting
-        await new Promise(r => setTimeout(r, 2000));
-        
-      } catch (error) {
-        console.error(`Error generating ${type}: ${error.message}`);
-        results.failed++;
-        results.byType[type].failed++;
-      }
-    }
-  }
-  
-  return results;
-}
-
-// ============================================
 // MAIN
 // ============================================
 
@@ -332,6 +382,11 @@ async function main() {
     const certification = getArg('cert');
     const difficulty = getArg('difficulty');
     const topic = getArg('topic');
+    const examType = getArg('exam-type');
+    const domain = getArg('domain');
+    const questionCount = parseInt(getArg('question-count') || '0') || undefined;
+    const passingScore = parseInt(getArg('passing-score') || '72');
+    const includeVariants = getArg('include-variants') === 'true';
     
     const options = {
       channel,
@@ -339,6 +394,11 @@ async function main() {
       certification,
       difficulty,
       topic,
+      examType,
+      domain,
+      questionCount,
+      passingScore,
+      includeVariants,
       count
     };
     
@@ -347,7 +407,7 @@ async function main() {
     if (contentType === 'all') {
       // Generate all content types
       results = await runBatchGeneration({
-        types: ['question', 'challenge', 'certification', 'test'],
+        types: ['question', 'challenge', 'problem', 'exam', 'certification', 'test'],
         count,
         ...options
       });
