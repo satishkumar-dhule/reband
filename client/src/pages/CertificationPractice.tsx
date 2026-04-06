@@ -25,6 +25,7 @@ import { ChannelService } from '../services/api.service';
 import { loadTests, getSessionQuestions, TestQuestion, Test } from '../lib/tests';
 import { generateProgressiveSequence } from '../lib/progressive-quiz';
 import { spendCredits } from '../lib/credits';
+import { getQuestionsForCertification } from '../lib/certification-questions';
 import type { Question } from '../types';
 import {
   ChevronLeft, ChevronRight, Award, ExternalLink,
@@ -201,7 +202,29 @@ export default function CertificationPractice() {
         const allTests = await loadTests();
         setAvailableTests(allTests.filter(t => channelIds.includes(t.channelId)));
 
-        const uniqueQuestions = Array.from(new Map(allQuestions.map(q => [q.id, q])).values());
+        // Also load certification-specific MCQ questions
+        const certSpecificRaw = getQuestionsForCertification(certificationId!);
+        const certSpecificQuestions: Question[] = certSpecificRaw.map(cq => {
+          const correctOption = cq.options.find(o => o.isCorrect);
+          return {
+            id: `cert-${cq.id}`,
+            question: cq.question,
+            answer: correctOption ? correctOption.text : '',
+            explanation: cq.explanation,
+            tags: cq.tags,
+            difficulty: cq.difficulty,
+            channel: certificationId!,
+            subChannel: cq.domain,
+            options: cq.options,
+          } as Question;
+        });
+
+        // Merge: use channel questions first, then add cert-specific ones not already present
+        const existingIds = new Set(allQuestions.map(q => q.id));
+        const newCertQuestions = certSpecificQuestions.filter(q => !existingIds.has(q.id));
+        const merged = [...allQuestions, ...newCertQuestions];
+
+        const uniqueQuestions = Array.from(new Map(merged.map(q => [q.id, q])).values());
         const seed = sessionStorage.getItem(`cert-seed-${certificationId}`) || Date.now().toString();
         sessionStorage.setItem(`cert-seed-${certificationId}`, seed);
         
