@@ -202,54 +202,39 @@ export async function registerRoutes(
     }
     try {
       const { subChannel, difficulty } = req.query;
-      const cacheKey = `questions-${channel}-${subChannel}-${difficulty}`;
-      const data = await getCached(cacheKey, async () => {
+      const cacheKey = `questions-${channel}-${subChannel ?? 'all'}-${difficulty ?? 'all'}`;
+      const result = await getCached(cacheKey, async () => {
         let sql = "SELECT id, question, answer, explanation, difficulty, sub_channel, tags, channel, diagram, eli5, videos, companies, source_url FROM questions WHERE channel = ? AND status != 'deleted'";
         const args: any[] = [channel];
         if (subChannel && subChannel !== "all") { sql += " AND sub_channel = ?"; args.push(subChannel); }
         if (difficulty && difficulty !== "all") { sql += " AND difficulty = ?"; args.push(difficulty); }
         sql += " ORDER BY created_at ASC";
-        const result = await client.execute({ sql, args });
-        return result.rows.map((r: any) => parseQuestion(r));
+        const r = await client.execute({ sql, args });
+        return r.rows.map((row: any) => parseQuestion(row));
       });
-      setReadCache(res, 60, 120);
-      res.json(data);
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching questions:", error);
       res.status(500).json({ error: "Failed to fetch questions" });
     }
   });
 
-  // Get question IDs for a channel with filters (cached)
+  // Get questions for a channel (cached)
   app.get("/api/questions/:channelId", async (req, res) => {
     try {
       const { channelId } = req.params;
       const { subChannel, difficulty } = req.query;
-      
-      const cacheKey = `questions-${channelId}-${subChannel}-${difficulty}`;
-      
-      const data = await getCached(cacheKey, async () => {
+      const cacheKey = `questions-${channelId}-${subChannel ?? 'all'}-${difficulty ?? 'all'}`;
+      const result = await getCached(cacheKey, async () => {
         let sql = "SELECT id, question, answer, explanation, difficulty, sub_channel, tags, channel, diagram, eli5, videos, companies, source_url FROM questions WHERE channel = ? AND status != 'deleted'";
         const args: any[] = [channelId];
-
-        if (subChannel && subChannel !== "all") {
-          sql += " AND sub_channel = ?";
-          args.push(subChannel);
-        }
-        
-        if (difficulty && difficulty !== "all") {
-          sql += " AND difficulty = ?";
-          args.push(difficulty);
-        }
-
+        if (subChannel && subChannel !== "all") { sql += " AND sub_channel = ?"; args.push(subChannel); }
+        if (difficulty && difficulty !== "all") { sql += " AND difficulty = ?"; args.push(difficulty); }
         sql += " ORDER BY created_at ASC";
-
-        const result = await client.execute({ sql, args });
-        return result.rows.map((r: any) => parseQuestion(r));
+        const r = await client.execute({ sql, args });
+        return r.rows.map((row: any) => parseQuestion(row));
       });
-      
-      setReadCache(res, 60, 120);
-      res.json(data);
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching questions:", error);
       res.status(500).json({ error: "Failed to fetch questions" });
@@ -288,59 +273,53 @@ export async function registerRoutes(
     }
   });
 
-  // Get a single question by ID
+  // Get a single question by ID (cached)
   app.get("/api/question/:questionId", async (req, res) => {
     try {
       const { questionId } = req.params;
-      
-      const result = await client.execute({
-        sql: "SELECT * FROM questions WHERE id = ? LIMIT 1",
-        args: [questionId]
+      const cacheKey = `question-${questionId}`;
+      const result = await getCached(cacheKey, async () => {
+        const r = await client.execute({
+          sql: "SELECT * FROM questions WHERE id = ? LIMIT 1",
+          args: [questionId]
+        });
+        if (r.rows.length === 0) return null;
+        return parseQuestion(r.rows[0]);
       });
-
-      if (result.rows.length === 0) {
+      if (result.data === null) {
         return res.status(404).json({ error: "Question not found" });
       }
-
-      res.json(parseQuestion(result.rows[0]));
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching question:", error);
       res.status(500).json({ error: "Failed to fetch question" });
     }
   });
 
-  // Get channel stats
-  app.get("/api/stats", async (_req, res) => {
+  // Get channel stats (cached)
+  app.get("/api/stats", async (req, res) => {
     try {
-      const result = await client.execute(
-        "SELECT channel, difficulty, COUNT(*) as count FROM questions WHERE status != 'deleted' GROUP BY channel, difficulty"
-      );
-
-      // Aggregate by channel
-      const statsMap = new Map<string, { total: number; beginner: number; intermediate: number; advanced: number }>();
-      
-      for (const row of result.rows) {
-        const channel = row.channel as string;
-        const difficulty = row.difficulty as string;
-        const count = Number(row.count);
-        
-        if (!statsMap.has(channel)) {
-          statsMap.set(channel, { total: 0, beginner: 0, intermediate: 0, advanced: 0 });
+      const result = await getCached('stats', async () => {
+        const r = await client.execute(
+          "SELECT channel, difficulty, COUNT(*) as count FROM questions WHERE status != 'deleted' GROUP BY channel, difficulty"
+        );
+        const statsMap = new Map<string, { total: number; beginner: number; intermediate: number; advanced: number }>();
+        for (const row of r.rows) {
+          const channel = row.channel as string;
+          const difficulty = row.difficulty as string;
+          const count = Number(row.count);
+          if (!statsMap.has(channel)) {
+            statsMap.set(channel, { total: 0, beginner: 0, intermediate: 0, advanced: 0 });
+          }
+          const stat = statsMap.get(channel)!;
+          stat.total += count;
+          if (difficulty === 'beginner') stat.beginner = count;
+          if (difficulty === 'intermediate') stat.intermediate = count;
+          if (difficulty === 'advanced') stat.advanced = count;
         }
-        const stat = statsMap.get(channel)!;
-        stat.total += count;
-        if (difficulty === 'beginner') stat.beginner = count;
-        if (difficulty === 'intermediate') stat.intermediate = count;
-        if (difficulty === 'advanced') stat.advanced = count;
-      }
-
-      const stats = Array.from(statsMap.entries()).map(([id, stat]) => ({
-        id,
-        ...stat
-      }));
-
-      setReadCache(res, 120, 300);
-      res.json(stats);
+        return Array.from(statsMap.entries()).map(([id, stat]) => ({ id, ...stat }));
+      });
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching stats:", error);
       res.status(500).json({ error: "Failed to fetch stats" });
@@ -351,17 +330,14 @@ export async function registerRoutes(
   app.get("/api/subchannels/:channelId", async (req, res) => {
     try {
       const { channelId } = req.params;
-      const cacheKey = `subchannels-${channelId}`;
-      
-      const data = await getCached(cacheKey, async () => {
-        const result = await client.execute({
+      const result = await getCached(`subchannels-${channelId}`, async () => {
+        const r = await client.execute({
           sql: "SELECT DISTINCT sub_channel FROM questions WHERE channel = ? ORDER BY sub_channel",
           args: [channelId]
         });
-        return result.rows.map((r: any) => r.sub_channel);
+        return r.rows.map((row: any) => row.sub_channel);
       });
-
-      res.json(data);
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching subchannels:", error);
       res.status(500).json({ error: "Failed to fetch subchannels" });
@@ -372,25 +348,23 @@ export async function registerRoutes(
   app.get("/api/companies/:channelId", async (req, res) => {
     try {
       const { channelId } = req.params;
-      const cacheKey = `companies-${channelId}`;
-      
-      const data = await getCached(cacheKey, async () => {
-        const result = await client.execute({
+      const result = await getCached(`companies-${channelId}`, async () => {
+        const r = await client.execute({
           sql: "SELECT companies FROM questions WHERE channel = ? AND companies IS NOT NULL",
           args: [channelId]
         });
-
         const companiesSet = new Set<string>();
-        for (const row of result.rows) {
+        for (const row of r.rows) {
           if (row.companies) {
-            const parsed = JSON.parse(row.companies as string);
-            parsed.forEach((c: string) => companiesSet.add(c));
+            try {
+              const parsed = JSON.parse(row.companies as string);
+              parsed.forEach((c: string) => companiesSet.add(c));
+            } catch {}
           }
         }
         return Array.from(companiesSet).sort();
       });
-
-      res.json(data);
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching companies:", error);
       res.status(500).json({ error: "Failed to fetch companies" });
@@ -437,9 +411,9 @@ export async function registerRoutes(
   app.get("/api/coding/challenges", async (req, res) => {
     try {
       const { difficulty, category } = req.query;
-      const cacheKey = `challenges-${difficulty}-${category}`;
+      const cacheKey = `challenges-${difficulty ?? 'all'}-${category ?? 'all'}`;
       
-      const data = await getCached(cacheKey, async () => {
+      const result = await getCached(cacheKey, async () => {
         let sql = "SELECT * FROM coding_challenges WHERE 1=1";
         const args: any[] = [];
 
@@ -454,12 +428,11 @@ export async function registerRoutes(
 
         sql += " ORDER BY created_at DESC";
 
-        const result = await client.execute({ sql, args });
-        return result.rows.map(parseCodingChallenge);
+        const r = await client.execute({ sql, args });
+        return r.rows.map(parseCodingChallenge);
       });
 
-      setReadCache(res, 120, 300);
-      res.json(data);
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching coding challenges:", error);
       res.status(500).json({ error: "Failed to fetch coding challenges" });
@@ -845,9 +818,9 @@ export async function registerRoutes(
   app.get("/api/certifications", async (req, res) => {
     try {
       const { category, difficulty, provider, status = 'active' } = req.query;
-      const cacheKey = `certifications-${category}-${difficulty}-${provider}-${status}`;
+      const cacheKey = `certifications-${category ?? 'all'}-${difficulty ?? 'all'}-${provider ?? 'all'}-${status}`;
       
-      const data = await getCached(cacheKey, async () => {
+      const result = await getCached(cacheKey, async () => {
         let sql = "SELECT * FROM certifications WHERE status = ?";
         const args: any[] = [status];
 
@@ -866,12 +839,11 @@ export async function registerRoutes(
 
         sql += " ORDER BY name ASC";
 
-        const result = await client.execute({ sql, args });
-        return result.rows.map(parseCertification);
+        const r = await client.execute({ sql, args });
+        return r.rows.map(parseCertification);
       });
 
-      setReadCache(res, 120, 300);
-      res.json(data);
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching certifications:", error);
       res.status(500).json({ error: "Failed to fetch certifications" });
@@ -941,7 +913,7 @@ export async function registerRoutes(
       
       const cacheKey = `cert-questions-${id}-${domain}-${difficulty}-${limit}`;
       
-      const data = await getCached(cacheKey, async () => {
+      const result = await getCached(cacheKey, async () => {
         let sql = "SELECT * FROM questions WHERE channel = ? AND status != 'deleted'";
         const args: any[] = [id];
 
@@ -957,12 +929,11 @@ export async function registerRoutes(
         sql += " ORDER BY RANDOM() LIMIT ?";
         args.push(parseInt(limit as string));
 
-        const result = await client.execute({ sql, args });
-        return result.rows.map(parseQuestion);
+        const r = await client.execute({ sql, args });
+        return r.rows.map(parseQuestion);
       });
 
-      setReadCache(res, 60, 120);
-      res.json(data);
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching certification questions:", error);
       res.status(500).json({ error: "Failed to fetch certification questions" });
@@ -1415,12 +1386,12 @@ export async function registerRoutes(
       const { channelId } = req.params;
       const cacheKey = `flashcards-${channelId}`;
       
-      const data = await getCached(cacheKey, async () => {
-        const result = await client.execute({
+      const result = await getCached(cacheKey, async () => {
+        const r = await client.execute({
           sql: "SELECT * FROM flashcards WHERE channel = ? AND status = 'active' ORDER BY created_at ASC",
           args: [channelId],
         });
-        return result.rows.map((row: any) => ({
+        return r.rows.map((row: any) => ({
           id: row.id,
           channel: row.channel,
           front: row.front,
@@ -1434,8 +1405,7 @@ export async function registerRoutes(
         }));
       });
 
-      setReadCache(res, 60, 120);
-      res.json(data);
+      sendCached(req, res, result);
     } catch (error) {
       console.error("Error fetching flashcards:", error);
       res.status(500).json({ error: "Failed to fetch flashcards" });
