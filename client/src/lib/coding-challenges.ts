@@ -993,6 +993,16 @@ async function loadChallengesFromJson(): Promise<CodingChallenge[]> {
         timeLimit: c.timeLimit || 15
       }));
       
+      // If the DB is empty, fall back to built-in templates so the page always has content
+      if (challenges.length === 0) {
+        const fallback: CodingChallenge[] = challengeTemplates.map((template, index) => ({
+          ...template,
+          id: `challenge-${index}`
+        }));
+        loadedChallenges = fallback;
+        return fallback;
+      }
+
       loadedChallenges = challenges;
       return challenges;
     } catch (error) {
@@ -1000,7 +1010,7 @@ async function loadChallengesFromJson(): Promise<CodingChallenge[]> {
       console.error('Failed to load challenges data:', error);
       loadError = errorMsg;
       
-      // Fallback to hardcoded templates if JSON fails
+      // Fallback to hardcoded templates if API fails
       const fallback: CodingChallenge[] = challengeTemplates.map((template, index) => ({
         ...template,
         id: `challenge-${index}`

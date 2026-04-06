@@ -477,7 +477,7 @@ export default function CodingChallenge() {
   const [startTime, setStartTime] = useState<number>(Date.now());
   const [resultsPanelExpanded, setResultsPanelExpanded] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [diffFilter, setDiffFilter] = useState<'all' | 'easy' | 'medium'>('all');
+  const [diffFilter, setDiffFilter] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   const stats = getCodingStats();
@@ -572,7 +572,7 @@ export default function CodingChallenge() {
 
   const filtered = useMemo(() => challenges.filter(c => {
     const q = searchQuery.toLowerCase();
-    const matchSearch = !q || c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q);
+    const matchSearch = !q || c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q) || c.tags?.some(t => t.toLowerCase().includes(q));
     const matchDiff = diffFilter === 'all' || c.difficulty === diffFilter;
     const matchCat = categoryFilter === 'all' || c.category === categoryFilter;
     return matchSearch && matchDiff && matchCat;
@@ -620,20 +620,20 @@ export default function CodingChallenge() {
               subtitle="Solve real interview problems with instant test execution in JavaScript and Python."
               actions={
                 <div className="flex items-center gap-3 flex-wrap">
-                  <button
+                  <Button
+                    variant="primary"
                     onClick={() => startRandom('easy')}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--gh-success-emphasis)] hover:bg-[var(--gh-success-hover)] text-white text-sm font-bold transition-all active:scale-95"
                     data-testid="button-quick-start"
                   >
                     <Play className="w-4 h-4" /> Quick Start (Easy)
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
                     onClick={() => startRandom()}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--gh-border)] text-sm font-semibold text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)] transition-all"
                     data-testid="button-random-challenge"
                   >
-                    <Zap className="w-4 h-4 text-amber-400" /> Random
-                  </button>
+                    <Zap className="w-4 h-4" /> Random
+                  </Button>
                 </div>
               }
               className="mb-0"
@@ -699,7 +699,7 @@ export default function CodingChallenge() {
 
             {/* Difficulty filter */}
             <div className="flex items-center gap-1 p-1 bg-[var(--gh-canvas)] border border-[var(--gh-border)] rounded-lg">
-              {(['all', 'easy', 'medium'] as const).map(d => (
+              {(['all', 'easy', 'medium', 'hard'] as const).map(d => (
                 <button
                   key={d}
                   onClick={() => setDiffFilter(d)}
@@ -708,6 +708,7 @@ export default function CodingChallenge() {
                     'px-3 py-1.5 rounded-md text-xs font-semibold capitalize transition-all',
                     diffFilter === d
                       ? d === 'easy' ? 'bg-[var(--gh-success-subtle)] text-[var(--gh-success-fg)] border border-[var(--gh-success-fg)]/30'
+                        : d === 'hard' ? 'bg-red-500/10 text-red-400 border border-red-500/30'
                         : d === 'medium' ? 'bg-[var(--gh-attention-subtle)] text-[var(--gh-attention-fg)] border border-[var(--gh-attention-fg)]/30'
                         : 'bg-[var(--gh-accent-fg)]/15 text-[var(--gh-accent-fg)] border border-[var(--gh-accent-fg)]/30'
                       : 'text-[var(--gh-fg-muted)] hover:text-[var(--gh-fg)] hover:bg-[var(--gh-canvas-subtle)]'
