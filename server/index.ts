@@ -3,6 +3,7 @@ import compression from "compression";
 import { registerRoutes } from "./routes";
 import { registerAuthRoutes } from "./src/auth-routes";
 import { registerAIRoutes } from "./ai-routes";
+import { setupCodexBridge } from "./codex-bridge";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { ensureTablesExist } from "./db-init";
@@ -203,6 +204,7 @@ app.use((req, res, next) => {
   await registerRoutes(httpServer, app);
   await registerAuthRoutes(httpServer, app);
   registerAIRoutes(app);
+  setupCodexBridge(httpServer);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
