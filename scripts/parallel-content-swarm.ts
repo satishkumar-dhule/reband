@@ -14,7 +14,7 @@
  */
 
 import { createClient } from "@libsql/client";
-import { spawn } from "child_process";
+import { spawn, execSync } from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import { resolve } from "path";
@@ -72,6 +72,15 @@ const C = {
 };
 const SPIN = ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"];
 let spinIdx = 0;
+
+// ─── Git commit ───────────────────────────────────────────────────────────────
+function gitCommit(type: ContentType, label: string, count: number): void {
+  try {
+    execSync("git add -A", { cwd: process.cwd(), stdio: "ignore" });
+    const msg = `content: add ${count} ${type} for ${label} [swarm]`;
+    execSync(`git commit -m "${msg}" --no-verify`, { cwd: process.cwd(), stdio: "ignore" });
+  } catch (_) { /* non-fatal — repo may have no changes or no git */ }
+}
 
 // ─── DB ───────────────────────────────────────────────────────────────────────
 const db = createClient({ url: `file:${DB_PATH}` });
@@ -425,6 +434,7 @@ function buildCertPrompt(cert: typeof CERTIFICATIONS[0], n: number): string {
     '    "question": "Scenario with A) B) C) D) options",\n' +
     '    "answer": "The correct answer is X because...",\n' +
     '    "explanation": "Why correct, why others wrong",\n' +
+    '    "eli5": "Simple one-sentence explanation",\n' +
     '    "difficulty": "beginner|intermediate|advanced",\n' +
     '    "tags": ["' + cert.id + '","' + cert.cat + '"],\n' +
     '    "channel": "' + cert.maps[0] + '",\n' +
@@ -632,6 +642,25 @@ async function insertFromJson(output: string, type: ContentType): Promise<number
               typeof item.milestones === "string" ? item.milestones : JSON.stringify(item.milestones || []),
               typeof item.metadata === "string" ? item.metadata : JSON.stringify(item.metadata || {}),
               "active",
+              new Date().toISOString(),
+              new Date().toISOString()
+            ]
+          });
+          inserted++;
+        } else if (type === "certifications") {
+          await db.execute({
+            sql: "INSERT OR IGNORE INTO questions (id,question,answer,explanation,eli5,difficulty,tags,channel,sub_channel,status,is_new,created_at,last_updated) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            args: [
+              item.id || randomUUID(),
+              item.question || "",
+              item.answer || "",
+              item.explanation || "",
+              item.eli5 || "",
+              item.difficulty || "intermediate",
+              typeof item.tags === "string" ? item.tags : JSON.stringify(item.tags || []),
+              item.channel || "",
+              item.sub_channel || item.subChannel || "domain",
+              "active", 1,
               new Date().toISOString(),
               new Date().toISOString()
             ]
@@ -888,6 +917,7 @@ async function launchAgent(agent: Agent): Promise<void> {
     if (agent.generated > 0) {
       agent.status = "done";
       releaseSlot(slot);
+      gitCommit(agent.task.type, agent.task.label, agent.generated);
     } else if (shouldRetry) {
       agent.retries++;
       agent.status = "pending";
