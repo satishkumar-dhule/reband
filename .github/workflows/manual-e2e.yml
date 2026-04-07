@@ -18,6 +18,11 @@ on:
         required: false
         default: '2'
         type: string
+      base_url:
+        description: 'Base URL to test against (default: local build). Use https://devprep-pages.pages.dev for production.'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -33,7 +38,8 @@ jobs:
 
       - name: Validate inputs
         run: |
-          if [[ "${{ inputs.pattern }}" =~ ['`$] ]]; then
+          PATTERN='${{ inputs.pattern }}'
+          if echo "$PATTERN" | grep -qE '[`$\\]'; then
             echo "❌ Pattern contains unsafe characters"
             exit 1
           fi
@@ -56,12 +62,14 @@ jobs:
           fi
 
       - name: Build application
+        if: ${{ inputs.base_url == '' }}
         run: pnpm run build && pnpm run build:pagefind
 
-      - name: Run tests
+      - name: Run tests (local build)
+        if: ${{ inputs.base_url == '' }}
         run: |
           BROWSER_FLAG=""
-          [ "${{ inputs.browser }}" != "all" ] && BROWSER_FLAG="--project=${{ inputs.browser }}"
+          [ "${{ inputs.browser }}" != "all" ] && BROWSER_FLAG="--project=${{ inputs.browser }}-desktop"
 
           PATTERN="${{ inputs.pattern }}"
           if [[ "$PATTERN" == *".spec.ts"* ]] || [[ "$PATTERN" == *"e2e/"* ]]; then
@@ -73,6 +81,26 @@ jobs:
           fi
         env:
           CI: 'true'
+          SERVE_STATIC: 'true'
+          PLAYWRIGHT_BASE_URL: 'http://localhost:5001'
+
+      - name: Run tests (remote URL)
+        if: ${{ inputs.base_url != '' }}
+        run: |
+          BROWSER_FLAG=""
+          [ "${{ inputs.browser }}" != "all" ] && BROWSER_FLAG="--project=${{ inputs.browser }}-desktop"
+
+          PATTERN="${{ inputs.pattern }}"
+          if [[ "$PATTERN" == *".spec.ts"* ]] || [[ "$PATTERN" == *"e2e/"* ]]; then
+            pnpm exec playwright test "$PATTERN" $BROWSER_FLAG \
+              --retries=${{ inputs.retries }}
+          else
+            pnpm exec playwright test --grep "$PATTERN" $BROWSER_FLAG \
+              --retries=${{ inputs.retries }}
+          fi
+        env:
+          CI: 'true'
+          PLAYWRIGHT_BASE_URL: '${{ inputs.base_url }}'
 
       - name: Compress & upload results
         if: always()
@@ -88,10 +116,12 @@ jobs:
       - name: Summary
         if: always()
         run: |
+          TARGET="${{ inputs.base_url != '' && inputs.base_url || 'local build' }}"
           {
             echo "## 🧪 E2E Test Results"
             echo ""
             echo "**Pattern:** \`${{ inputs.pattern }}\`"
             echo "**Browser:** ${{ inputs.browser }}"
             echo "**Retries:** ${{ inputs.retries }}"
+            echo "**Target:** $TARGET"
           } >> "$GITHUB_STEP_SUMMARY"
