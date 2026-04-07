@@ -6,7 +6,7 @@
 export default {
   // Default provider and model
   defaultProvider: 'opencode',
-  defaultModel: process.env.OPENCODE_MODEL || 'opencode/gpt-5-nano',
+  defaultModel: process.env.OPENCODE_MODEL || 'opencode/qwen3.6-plus-free',
   
   // Retry settings
   retry: {

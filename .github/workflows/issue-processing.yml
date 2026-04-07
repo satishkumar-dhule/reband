@@ -86,7 +86,8 @@ jobs:
                 core.setOutput('run_cleanup',             'false');
                 return;
               }
-              if (labels.includes('bot:processor')) {
+              // Process issues with bot:processor OR bug labels
+              if (labels.includes('bot:processor') || labels.includes('bug')) {
                 core.setOutput('should_process_local',    'true');
                 core.setOutput('should_process_external', 'false');
                 core.setOutput('run_cleanup',             'false');
@@ -155,6 +156,7 @@ jobs:
           GITHUB_REPO:    ${{ github.repository }}
           MAX_ISSUES:     ${{ inputs.max_issues || '10' }}
           SINGLE_ISSUE:   ${{ needs.check-trigger.outputs.issue_number }}
+          OPENCODE_MODEL: 'opencode/qwen3.6-plus-free'
         run: node script/bots/processor-bot.js
 
       - name: Sync to Vector DB (incremental)
@@ -218,6 +220,7 @@ jobs:
           QDRANT_API_KEY:         ${{ secrets.QDRANT_API_KEY }}
           OLLAMA_URL:             ${{ secrets.OLLAMA_URL }}
           EXTERNAL_ISSUES_FILE:   /tmp/external-issues.json
+          OPENCODE_MODEL:         'opencode/qwen3.6-plus-free'
         run: node script/bots/processor-bot.js --external-issues
 
       - name: Update external issue labels & close

@@ -111,14 +111,21 @@ app.get("/api/channels", async (c) => {
   const result = await getCached("channels", async () => {
     const db = createDB(c.env);
     return await db.query<any[]>(
-      `SELECT cm.id, cm.channel_id, cm.channel_name, cm.label, cm.description,
-              cm.icon, cm.color, cm.order_index, cm.is_active,
+      `SELECT cm.channel_id as id,
+              cm.channel_id,
+              MIN(cm.channel_name) as channel_name,
+              MIN(cm.label) as label,
+              MIN(cm.description) as description,
+              MIN(cm.icon) as icon,
+              MIN(cm.color) as color,
+              MIN(cm.order_index) as order_index,
+              MIN(cm.is_active) as is_active,
               COUNT(DISTINCT q.id) as questionCount
        FROM channel_mappings cm
        LEFT JOIN questions q ON q.id = cm.question_id AND q.is_active = 1
        WHERE cm.is_active = 1
-       GROUP BY cm.id
-       ORDER BY cm.order_index ASC`,
+       GROUP BY cm.channel_id
+       ORDER BY MIN(cm.order_index) ASC`,
     );
   });
   return sendCachedResponse(c.req.raw, result);

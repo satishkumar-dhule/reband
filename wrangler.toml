@@ -15,7 +15,7 @@ LOG_LEVEL = "info"
 [[d1_databases]]
 binding = "DB"
 database_name = "devprep"
-database_id = "__D1_DATABASE_ID__"
+database_id = "a469f158-2dc4-47dd-b859-b756f75e391e"
 migrations_dir = "worker/migrations"
 
 # ─── Routes (custom domain) ──────────────────────────────────────────────────

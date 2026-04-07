@@ -269,6 +269,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
+    "@cloudflare/workers-types": "^4.20250529.0",
     "@playwright/test": "^1.57.0",
     "@replit/vite-plugin-cartographer": "^0.4.4",
     "@replit/vite-plugin-dev-banner": "^0.1.1",
@@ -285,9 +286,6 @@
     "@types/react-dom": "^19.2.0",
     "@types/ws": "^8.5.13",
     "@vitejs/plugin-react": "^5.0.4",
-    "wrangler": "^4.19.0",
-    "hono": "^4.8.5",
-    "@cloudflare/workers-types": "^4.20250529.0",
     "@vitest/ui": "^4.0.16",
     "autoprefixer": "^10.4.21",
     "axe-core": "^4.11.1",
@@ -295,6 +293,7 @@
     "esbuild": "^0.25.0",
     "fast-check": "^4.5.3",
     "gh-pages": "^6.1.1",
+    "hono": "^4.12.12",
     "jsdom": "^27.4.0",
     "pagefind": "^1.4.0",
     "playwright": "^1.57.0",
@@ -306,7 +305,8 @@
     "typescript": "5.6.3",
     "vite": "^7.1.9",
     "vite-bundle-visualizer": "^1.2.1",
-    "vitest": "^4.0.16"
+    "vitest": "^4.0.16",
+    "wrangler": "^4.19.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"

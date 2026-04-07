@@ -1,0 +1,21 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/:all*",
+      "mountPath": "/api",
+      "method": "",
+      "module": [
+        "api/[[all]].ts:onRequest"
+      ]
+    },
+    {
+      "routePath": "/go-api/:all*",
+      "mountPath": "/go-api",
+      "method": "",
+      "module": [
+        "go-api/[[all]].ts:onRequest"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}
