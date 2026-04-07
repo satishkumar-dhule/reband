@@ -1,1 +1,1 @@
-{"chunked":true,"totalChunks":2,"subChannels":["config","networking","pods","rbac","scaling","storage"],"companies":[],"stats":{"total":6,"beginner":1,"intermediate":2,"advanced":3,"newThisWeek":6}}
+{"chunked":true,"totalChunks":3,"subChannels":["app-delivery","cloud-native","config","container-orchestration","kubernetes-fundamentals","networking","observability","pods","rbac","scaling","storage"],"companies":[],"stats":{"total":11,"beginner":4,"intermediate":4,"advanced":3,"newThisWeek":11}}

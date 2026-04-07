@@ -1,5 +1,7 @@
 {pkgs}: {
   deps = [
+    pkgs.sqlite
+    pkgs.lynx
     pkgs.chromium
     pkgs.libglvnd
     pkgs.libGL

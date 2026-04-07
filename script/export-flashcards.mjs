@@ -65,7 +65,7 @@ async function main() {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
   console.log('📥 Fetching all active flashcards...');
-  const result = await client.execute('SELECT * FROM flashcards WHERE status = "active" ORDER BY channel, id');
+  const result = await client.execute("SELECT * FROM flashcards WHERE status = 'active' ORDER BY channel, id");
   const allFlashcards = result.rows.map(parseFlashcardRow);
   console.log(`   Found ${allFlashcards.length} flashcards`);
 
