@@ -204,7 +204,25 @@ jobs:
           # Substitute into wrangler.toml so wrangler knows the DB ID
           sed -i "s/__D1_DATABASE_ID__/$D1_ID/" wrangler.toml
 
-          # Apply migrations
+          # Ensure wrangler migration tracking table exists
+          curl -s -X POST \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"sql":"CREATE TABLE IF NOT EXISTS d1_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE NOT NULL, applied_at TEXT NOT NULL DEFAULT (datetime(\"now\")))"}' \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/d1/database/$D1_ID/query" | python3 -c "import json,sys; r=json.load(sys.stdin); print('Migration table ready:', r.get('success'))"
+
+          # Mark migrations that were already applied manually (outside of wrangler) so wrangler skips them
+          ALREADY_APPLIED_MIGRATIONS="0002_add_missing_columns.sql"
+          for migration in $ALREADY_APPLIED_MIGRATIONS; do
+            RESULT=$(curl -s -X POST \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data "{\"sql\":\"INSERT OR IGNORE INTO d1_migrations (name) VALUES ('$migration')\"}" \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/d1/database/$D1_ID/query")
+            echo "Pre-seeded migration $migration: $(echo $RESULT | python3 -c 'import json,sys; r=json.load(sys.stdin); print("ok" if r.get("success") else r)' 2>/dev/null || echo "$RESULT")"
+          done
+
+          # Apply any remaining migrations
           echo "Applying D1 migrations..."
           npx wrangler d1 migrations apply devprep --remote
           echo "✅ Migrations applied"
