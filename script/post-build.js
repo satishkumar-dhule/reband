@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Post-build script to ensure all static data files are copied to dist
+ * Post-build script to ensure all static data files and CF Pages routing
+ * config files are copied to dist
  */
 import fs from 'fs';
 import path from 'path';
@@ -11,6 +12,8 @@ const rootDir = path.resolve(__dirname, '..');
 
 const SOURCE_DIR = path.join(rootDir, 'client/public/data');
 const DEST_DIR = path.join(rootDir, 'dist/public/data');
+const PUBLIC_SRC = path.join(rootDir, 'client/public');
+const PUBLIC_DEST = path.join(rootDir, 'dist/public');
 
 console.log('📦 Post-build: Copying static data files...');
 
@@ -47,6 +50,18 @@ try {
 } catch (error) {
   console.error('   ❌ Error copying data files:', error.message);
   process.exit(1);
+}
+
+// Copy CF Pages routing files (_redirects, _routes.json)
+// Vite may not copy underscore-prefixed files in all configurations.
+const CF_FILES = ['_redirects', '_routes.json', '_headers'];
+for (const file of CF_FILES) {
+  const src = path.join(PUBLIC_SRC, file);
+  const dest = path.join(PUBLIC_DEST, file);
+  if (fs.existsSync(src)) {
+    fs.copyFileSync(src, dest);
+    console.log(`   ✓ Copied ${file} to dist/public/`);
+  }
 }
 
 console.log('✅ Post-build complete!');

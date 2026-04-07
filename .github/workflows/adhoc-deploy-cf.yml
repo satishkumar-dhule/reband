@@ -1,0 +1,168 @@
+name: 🚀 Ad-Hoc Deploy to Cloudflare Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'GitHub Actions run ID to pull the build artifact from (leave blank to use latest successful build from deploy-cloudflare.yml)'
+        required: false
+        default: ''
+      branch:
+        description: 'Cloudflare Pages branch to deploy to'
+        required: false
+        default: 'main'
+        type: choice
+        options:
+          - main
+          - staging
+      environment:
+        description: 'Deployment environment'
+        required: false
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: adhoc-deploy-cf-${{ github.event.inputs.branch }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: 🌐 Deploy to Cloudflare Pages (${{ github.event.inputs.branch }})
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+      url: ${{ github.event.inputs.branch == 'main' && 'https://devprep-pages.pages.dev' || 'https://staging.devprep-pages.pages.dev' }}
+    steps:
+      - name: Checkout (for wrangler.toml only)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            wrangler.toml
+          sparse-checkout-cone-mode: false
+
+      - name: Resolve run ID
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_RUN_ID: ${{ github.event.inputs.run_id }}
+        run: |
+          if [ -n "$INPUT_RUN_ID" ]; then
+            echo "run_id=$INPUT_RUN_ID" >> "$GITHUB_OUTPUT"
+            echo "Using specified run ID: $INPUT_RUN_ID"
+          else
+            echo "No run ID specified — finding latest successful run from deploy-cloudflare.yml..."
+            RUN_ID=$(gh run list \
+              --workflow=deploy-cloudflare.yml \
+              --status=success \
+              --limit=1 \
+              --json databaseId \
+              --jq '.[0].databaseId')
+            if [ -z "$RUN_ID" ]; then
+              echo "❌ Could not find a successful run for deploy-cloudflare.yml"
+              exit 1
+            fi
+            echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+            echo "Using latest successful run ID: $RUN_ID"
+          fi
+
+      - name: Download build artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Downloading cf-build artifact from run ${{ steps.resolve.outputs.run_id }}..."
+          gh run download ${{ steps.resolve.outputs.run_id }} \
+            --name cf-build \
+            --dir ./artifact-download
+          echo "✅ Artifact downloaded"
+          ls -la ./artifact-download/
+
+      - name: Extract build
+        run: |
+          mkdir -p dist/public
+          tar -xzf ./artifact-download/build.tar.gz -C dist/public
+          rm -rf ./artifact-download
+          echo "✅ Build extracted"
+          echo "Contents:"
+          ls dist/public/
+
+      - name: Ensure CF Pages routing files are present
+        run: |
+          # Guarantee _redirects and _routes.json exist for proper SPA routing
+          if [ ! -f dist/public/_redirects ]; then
+            echo "⚠️  _redirects missing — creating fallback"
+            cat > dist/public/_redirects << 'EOF'
+          /api/*  /api/:splat  200
+          /go-api/*  /go-api/:splat  200
+          /assets/*  /assets/:splat  200
+          /data/*  /data/:splat  200
+          /*.png  /*.png  200
+          /*.jpg  /*.jpg  200
+          /*.svg  /*.svg  200
+          /*.ico  /*.ico  200
+          /*.css  /*.css  200
+          /*.js  /*.js  200
+          /robots.txt  /robots.txt  200
+          /sitemap.xml  /sitemap.xml  200
+          /*  /index.html  200
+          EOF
+          else
+            echo "✅ _redirects present"
+          fi
+
+          if [ ! -f dist/public/_routes.json ]; then
+            echo "⚠️  _routes.json missing — creating fallback"
+            cat > dist/public/_routes.json << 'EOF'
+          {
+            "version": 1,
+            "include": ["/api/*", "/go-api/*"],
+            "exclude": ["/assets/*", "/data/*", "/*.png", "/*.jpg", "/*.svg", "/*.ico", "/*.css", "/*.js", "/robots.txt", "/sitemap.xml"]
+          }
+          EOF
+          else
+            echo "✅ _routes.json present"
+          fi
+
+      - name: Deploy to Cloudflare Pages
+        run: |
+          npx wrangler@latest pages deploy dist/public \
+            --project-name=devprep-pages \
+            --branch=${{ github.event.inputs.branch }} \
+            --commit-dirty=true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Verify deployment
+        run: |
+          TARGET_URL="${{ github.event.inputs.branch == 'main' && 'https://devprep-pages.pages.dev' || 'https://staging.devprep-pages.pages.dev' }}"
+          echo "Waiting 20s for deployment to propagate..."
+          sleep 20
+          echo "Checking: $TARGET_URL"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 --retry 3 --retry-delay 5 "$TARGET_URL")
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ Deployment verified — site is live at $TARGET_URL"
+          else
+            echo "⚠️  Site returned HTTP $STATUS — may still be propagating"
+          fi
+
+      - name: Summary
+        run: |
+          BRANCH="${{ github.event.inputs.branch }}"
+          URL="${{ github.event.inputs.branch == 'main' && 'https://devprep-pages.pages.dev' || 'https://staging.devprep-pages.pages.dev' }}"
+          {
+            echo "## 🚀 Ad-Hoc CF Pages Deployment"
+            echo ""
+            echo "| Field | Value |"
+            echo "|-------|-------|"
+            echo "| Branch | \`$BRANCH\` |"
+            echo "| URL | $URL |"
+            echo "| Source run | \`${{ steps.resolve.outputs.run_id }}\` |"
+            echo "| Triggered by | @${{ github.actor }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
