@@ -1,5 +1,3 @@
-import { GraphQLClient } from "graphql-request";
-
 function getGraphQLEndpoint(): string {
   if (typeof window !== "undefined") {
     return `${window.location.origin}/graphql`;
@@ -7,14 +5,30 @@ function getGraphQLEndpoint(): string {
   return "/graphql";
 }
 
-export const gqlClient = new GraphQLClient(getGraphQLEndpoint(), {
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
 export async function gql<T = any>(query: string, variables?: Record<string, any>): Promise<T> {
-  return gqlClient.request<T>(query, variables);
+  const response = await fetch(getGraphQLEndpoint(), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`GraphQL request failed: ${response.status} ${response.statusText}`);
+  }
+
+  const json = await response.json();
+
+  if (json.errors && json.errors.length > 0) {
+    throw new Error(json.errors.map((e: any) => e.message).join(", "));
+  }
+
+  return json.data as T;
 }
+
+export const gqlClient = {
+  request: gql,
+};
 
 export default gqlClient;

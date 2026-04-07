@@ -85,7 +85,39 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
-packages = ["glib", "nss", "nspr", "atk", "cups", "dbus", "libdrm", "xorg.libX11", "xorg.libXcomposite", "xorg.libXdamage", "xorg.libXext", "xorg.libXfixes", "xorg.libXrandr", "libgbm", "libxkbcommon", "pango", "cairo", "alsa-lib", "gh", "chromium", "chromium-xorg-conf", "firefox", "firefox-esr", "act", "containerd", "vim-full", "ollama", "gotrue-supabase", "plan9port", "tmux", "zip"]
+packages = [
+  "glib",
+  "nss",
+  "nspr",
+  "atk",
+  "cups",
+  "dbus",
+  "libdrm",
+  "xorg.libX11",
+  "xorg.libXcomposite",
+  "xorg.libXdamage",
+  "xorg.libXext",
+  "xorg.libXfixes",
+  "xorg.libXrandr",
+  "libgbm",
+  "libxkbcommon",
+  "pango",
+  "cairo",
+  "alsa-lib",
+  "gh",
+  "chromium",
+  "chromium-xorg-conf",
+  "firefox",
+  "firefox-esr",
+  "act",
+  "containerd",
+  "vim-full",
+  "ollama",
+  "gotrue-supabase",
+  "plan9port",
+  "tmux",
+  "zip",
+]
 
 [[ports]]
 localPort = 3001
@@ -94,6 +126,11 @@ externalPort = 6000
 [[ports]]
 localPort = 3128
 externalPort = 3002
+exposeLocalhost = true
+
+[[ports]]
+localPort = 4000
+externalPort = 3003
 exposeLocalhost = true
 
 [[ports]]
@@ -158,5 +195,3 @@ OPENAI_API_KEY = "_DUMMY_API_KEY_"
 [userenv.shared]
 BETTER_AUTH_SECRET = "Mk+ZBSvYL/o7LSymDNxa3EdS32yubRVDa3I0YiMDB4A="
 BETTER_AUTH_URL = "https://10757c09-0734-4a82-81e9-623a9b03fdd0-00-27b58fy13x1mn.janeway.replit.dev"
-CLOUDFLARE_API_TOKEN = "cfat_07aROGFM3YdSJLxNJe3HsbJi8Mpjxma7db9v0bFN4ba40923"
-CLOUDFLARE_ACCOUNT_ID = "2939581c5612c4494560f98177722f70"
