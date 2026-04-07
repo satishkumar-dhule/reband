@@ -611,7 +611,7 @@ app.get("/api/user/sessions", async (c) => {
   if (!userId) return c.json({ sessions: [] });
   const result = await getCached(`sessions:${userId}`, async () => {
     const db = createDB(c.env);
-    return await db.query<any[]>("SELECT * FROM user_sessions WHERE user_id = ? ORDER BY created_at DESC LIMIT 50", [userId]);
+    return await db.query<any[]>("SELECT * FROM user_sessions WHERE user_id = ? ORDER BY started_at DESC LIMIT 50", [userId]);
   });
   return sendCachedResponse(c.req.raw, result);
 });
@@ -619,18 +619,21 @@ app.get("/api/user/sessions", async (c) => {
 app.post("/api/user/sessions", async (c) => {
   const body = await c.req.json();
   const db = createDB(c.env);
+  const now = new Date().toISOString();
+  const sessionKey = body.sessionKey || `anon:${Date.now()}`;
+  const sessionType = body.sessionType || body.type || "interview";
   // Upsert by sessionKey if provided
   if (body.sessionKey) {
     await db.run(
-      `INSERT OR REPLACE INTO user_sessions (session_key, user_id, title, status, data, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [body.sessionKey, body.userId, body.title || "New Session", "active", JSON.stringify(body.data || {}), new Date().toISOString(), new Date().toISOString()],
+      `INSERT OR REPLACE INTO user_sessions (session_key, user_id, session_type, title, status, session_data, total_items, started_at, last_accessed_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [sessionKey, body.userId || null, sessionType, body.title || "New Session", "active", JSON.stringify(body.data || {}), body.totalItems || 0, now, now],
     );
     return c.json({ success: true, sessionKey: body.sessionKey });
   }
   const result = await db.run(
-    "INSERT INTO user_sessions (user_id, title, status, data) VALUES (?, ?, ?, ?)",
-    [body.userId, body.title || "New Session", "active", JSON.stringify(body.data || {})],
+    "INSERT INTO user_sessions (session_key, user_id, session_type, title, status, session_data, total_items, started_at, last_accessed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [sessionKey, body.userId || null, sessionType, body.title || "New Session", "active", JSON.stringify(body.data || {}), body.totalItems || 0, now, now],
   );
   return c.json({ success: true, id: result.changes });
 });
@@ -648,7 +651,7 @@ app.put("/api/user/sessions/:sessionId", async (c) => {
   const body = await c.req.json();
   const db = createDB(c.env);
   await db.run(
-    "UPDATE user_sessions SET data = ?, updated_at = ? WHERE id = ?",
+    "UPDATE user_sessions SET session_data = ?, last_accessed_at = ? WHERE id = ?",
     [JSON.stringify(body.data || {}), new Date().toISOString(), sessionId],
   );
   return c.json({ success: true });
@@ -678,11 +681,12 @@ app.post("/api/sync", async (c) => {
   const results: { action: string; count: number }[] = [];
 
   if (body.sessions) {
+    const now = new Date().toISOString();
     for (const session of body.sessions) {
       await db.run(
-        `INSERT OR REPLACE INTO user_sessions (id, user_id, title, status, data, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [session.id, session.userId, session.title, session.status, JSON.stringify(session.data || {}), session.createdAt || new Date().toISOString(), session.updatedAt || new Date().toISOString()],
+        `INSERT OR REPLACE INTO user_sessions (id, user_id, session_type, session_key, title, status, session_data, total_items, started_at, last_accessed_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [session.id, session.userId || null, session.sessionType || "interview", session.sessionKey || `sync:${session.id}`, session.title || "Session", session.status || "active", JSON.stringify(session.data || {}), session.totalItems || 0, session.createdAt || now, session.updatedAt || now],
       );
     }
     results.push({ action: "sessions", count: body.sessions.length });
@@ -691,8 +695,8 @@ app.post("/api/sync", async (c) => {
   if (body.history) {
     for (const record of body.history) {
       await db.run(
-        "INSERT INTO question_history (question_id, action, data, changed_at) VALUES (?, ?, ?, ?)",
-        [record.questionId, record.action, JSON.stringify(record.data || {}), record.changedAt || new Date().toISOString()],
+        "INSERT INTO question_history (question_id, event_type, event_source, changes_summary, created_at) VALUES (?, ?, ?, ?, ?)",
+        [record.questionId, record.action || "update", record.source || "sync", JSON.stringify(record.data || {}), record.changedAt || new Date().toISOString()],
       );
     }
     results.push({ action: "history", count: body.history.length });
@@ -705,7 +709,7 @@ app.post("/api/sync", async (c) => {
 app.get("/api/history/index", async (c) => {
   const result = await getCached("history:index", async () => {
     const db = createDB(c.env);
-    return await db.query<any[]>("SELECT question_id, COUNT(*) as change_count, MAX(changed_at) as last_changed FROM question_history GROUP BY question_id ORDER BY last_changed DESC LIMIT 100");
+    return await db.query<any[]>("SELECT question_id, COUNT(*) as change_count, MAX(created_at) as last_changed FROM question_history GROUP BY question_id ORDER BY last_changed DESC LIMIT 100");
   });
   return sendCachedResponse(c.req.raw, result);
 });
@@ -720,10 +724,10 @@ app.get("/api/history", async (c) => {
     const db = createDB(c.env);
     let sql = "SELECT * FROM question_history WHERE 1=1";
     const params: any[] = [];
-    if (type) { sql += " AND action = ?"; params.push(type); }
+    if (type) { sql += " AND event_type = ?"; params.push(type); }
     if (eventType) { sql += " AND event_type = ?"; params.push(eventType); }
-    if (source) { sql += " AND source = ?"; params.push(source); }
-    sql += ` ORDER BY changed_at DESC LIMIT ${limit}`;
+    if (source) { sql += " AND event_source = ?"; params.push(source); }
+    sql += ` ORDER BY created_at DESC LIMIT ${limit}`;
     return await db.query(sql, params);
   });
   return sendCachedResponse(c.req.raw, result);
@@ -733,8 +737,8 @@ app.post("/api/history", async (c) => {
   const body = await c.req.json();
   const db = createDB(c.env);
   await db.run(
-    "INSERT INTO question_history (question_id, action, data) VALUES (?, ?, ?)",
-    [body.questionId, body.action, JSON.stringify(body.data || {})],
+    "INSERT INTO question_history (question_id, event_type, event_source, changes_summary) VALUES (?, ?, ?, ?)",
+    [body.questionId, body.action || "update", body.source || "api", JSON.stringify(body.data || {})],
   );
   return c.json({ success: true });
 });
@@ -747,8 +751,8 @@ app.get("/api/history/:questionId", async (c) => {
     const db = createDB(c.env);
     let sql = "SELECT * FROM question_history WHERE question_id = ?";
     const params: any[] = [questionId];
-    if (type) { sql += " AND action = ?"; params.push(type); }
-    sql += ` ORDER BY changed_at DESC LIMIT ${limit}`;
+    if (type) { sql += " AND event_type = ?"; params.push(type); }
+    sql += ` ORDER BY created_at DESC LIMIT ${limit}`;
     return await db.query(sql, params);
   });
   return sendCachedResponse(c.req.raw, result);
@@ -758,7 +762,7 @@ app.get("/api/history/:questionId/summary", async (c) => {
   const questionId = c.req.param("questionId");
   const result = await getCached(`history:${questionId}:summary`, async () => {
     const db = createDB(c.env);
-    return await db.query<any[]>("SELECT action, COUNT(*) as count FROM question_history WHERE question_id = ? GROUP BY action", [questionId]);
+    return await db.query<any[]>("SELECT event_type as action, COUNT(*) as count FROM question_history WHERE question_id = ? GROUP BY event_type", [questionId]);
   });
   return sendCachedResponse(c.req.raw, result);
 });
@@ -767,8 +771,8 @@ app.get("/api/history/:questionId/full", async (c) => {
   const questionId = c.req.param("questionId");
   const result = await getCached(`history:${questionId}:full`, async () => {
     const db = createDB(c.env);
-    const summary = await db.query<any[]>("SELECT action, COUNT(*) as count FROM question_history WHERE question_id = ? GROUP BY action", [questionId]);
-    const records = await db.query<any[]>("SELECT * FROM question_history WHERE question_id = ? ORDER BY changed_at DESC LIMIT 50", [questionId]);
+    const summary = await db.query<any[]>("SELECT event_type as action, COUNT(*) as count FROM question_history WHERE question_id = ? GROUP BY event_type", [questionId]);
+    const records = await db.query<any[]>("SELECT * FROM question_history WHERE question_id = ? ORDER BY created_at DESC LIMIT 50", [questionId]);
     return { summary, records };
   });
   return sendCachedResponse(c.req.raw, result);
@@ -796,9 +800,10 @@ app.get("/api/voice-sessions", async (c) => {
   const channel = c.req.query("channel");
   const result = await getCached(`voice-sessions:${channel}`, async () => {
     const db = createDB(c.env);
-    let sql = "SELECT * FROM voice_sessions ORDER BY created_at DESC LIMIT 20";
-    if (channel) sql = `SELECT * FROM voice_sessions WHERE channel = '${channel}' ORDER BY created_at DESC LIMIT 20`;
-    return await db.query<any[]>(sql);
+    if (channel) {
+      return await db.query<any[]>("SELECT * FROM voice_sessions WHERE channel = ? ORDER BY created_at DESC LIMIT 20", [channel]);
+    }
+    return await db.query<any[]>("SELECT * FROM voice_sessions ORDER BY created_at DESC LIMIT 20");
   });
   return sendCachedResponse(c.req.raw, result);
 });
@@ -809,7 +814,7 @@ app.get("/api/similar-questions/:questionId", async (c) => {
   const result = await getCached(`similar:${questionId}`, async () => {
     const db = createDB(c.env);
     return await db.query<any[]>(
-      `SELECT q.* FROM questions q JOIN question_relationships qr ON q.id = qr.related_question_id WHERE qr.question_id = ? AND q.is_active = 1 ORDER BY qr.relationship_type ASC LIMIT 6`,
+      `SELECT q.* FROM questions q JOIN question_relationships qr ON q.id = qr.target_question_id WHERE qr.source_question_id = ? AND q.is_active = 1 ORDER BY qr.relationship_type ASC LIMIT 6`,
       [questionId],
     );
   });
@@ -825,14 +830,18 @@ app.get("/api/changelog", async (c) => {
 
 // ─── Bot Activity ───
 app.get("/api/bot-activity", async (c) => {
-  if (!hasDB(c.env)) return c.json({ stats: {}, recentRuns: [], workQueue: [], ledger: [] });
+  if (!hasDB(c.env)) return c.json({ stats: [], recentRuns: [], workQueue: [], ledger: [] });
   const result = await getCached("bot-activity", async () => {
     const db = createDB(c.env);
-    const stats = await db.query<any[]>("SELECT type, COUNT(*) as count, MAX(created_at) as last_run FROM bot_runs GROUP BY type");
-    const recentRuns = await db.query<any[]>("SELECT * FROM bot_runs ORDER BY created_at DESC LIMIT 20");
-    const workQueue = await db.query<any[]>("SELECT * FROM work_queue WHERE status = 'pending' ORDER BY priority ASC LIMIT 50");
-    const ledger = await db.query<any[]>("SELECT * FROM bot_ledger ORDER BY created_at DESC LIMIT 50");
-    return { stats, recentRuns, workQueue, ledger };
+    try {
+      const stats = await db.query<any[]>("SELECT bot_name as type, COUNT(*) as count, MAX(started_at) as last_run FROM bot_runs GROUP BY bot_name");
+      const recentRuns = await db.query<any[]>("SELECT * FROM bot_runs ORDER BY started_at DESC LIMIT 20");
+      const workQueue = await db.query<any[]>("SELECT * FROM work_queue WHERE status = 'pending' ORDER BY priority ASC LIMIT 50");
+      const ledger = await db.query<any[]>("SELECT * FROM bot_ledger ORDER BY created_at DESC LIMIT 50");
+      return { stats, recentRuns, workQueue, ledger };
+    } catch {
+      return { stats: [], recentRuns: [], workQueue: [], ledger: [] };
+    }
   });
   return sendCachedResponse(c.req.raw, result);
 });
