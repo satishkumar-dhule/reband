@@ -1,8 +1,13 @@
 import { GraphQLClient } from "graphql-request";
 
-const GRAPHQL_ENDPOINT = "/graphql";
+function getGraphQLEndpoint(): string {
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}/graphql`;
+  }
+  return "/graphql";
+}
 
-export const gqlClient = new GraphQLClient(GRAPHQL_ENDPOINT, {
+export const gqlClient = new GraphQLClient(getGraphQLEndpoint(), {
   headers: {
     "Content-Type": "application/json",
   },

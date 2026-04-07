@@ -980,14 +980,16 @@ async function loadChallengesFromJson(): Promise<CodingChallenge[]> {
         starterCode: c.starterCode || { javascript: '', python: '' },
         testCases: (c.testCases || []).map((tc: RawTestCase) => ({
           id: tc.id || String(Math.random()),
-          input: tc.input,
-          expectedOutput: tc.expectedOutput,
+          input: tc.input ?? '',
+          expectedOutput: tc.expectedOutput ?? '',
           isHidden: tc.isHidden,
           description: tc.description
         })),
         hints: c.hints || [],
         sampleSolution: c.solution || c.sampleSolution || { javascript: '', python: '' },
-        complexity: c.complexity || { time: 'O(n)', space: 'O(1)', explanation: '' },
+        complexity: c.complexity
+          ? { time: c.complexity.time ?? 'O(n)', space: c.complexity.space ?? 'O(1)', explanation: c.complexity.explanation ?? '' }
+          : { time: 'O(n)', space: 'O(1)', explanation: '' },
         timeLimit: c.timeLimit || 15
       }));
       
