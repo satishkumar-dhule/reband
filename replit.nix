@@ -1,5 +1,9 @@
 {pkgs}: {
   deps = [
+    pkgs.chromium
+    pkgs.libglvnd
+    pkgs.libGL
+    pkgs.llvmPackages.libllvm
     pkgs.xterm
     pkgs.python3
     pkgs.cups
