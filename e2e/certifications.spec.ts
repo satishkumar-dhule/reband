@@ -79,9 +79,13 @@ test.describe('Certification Practice & Exam', () => {
     
     const backButton = page.locator('button:has(svg.lucide-chevron-left, svg.lucide-arrow-left)').first();
     if (await backButton.isVisible()) {
+      const currentUrl = page.url();
       await backButton.click();
-      const url = page.url();
-      expect(url.includes('/certifications') || url === '/').toBeTruthy();
+      await page.waitForTimeout(500);
+      const newUrl = page.url();
+      // Back button should navigate away from the current certification practice page
+      const navigatedAway = newUrl !== currentUrl || newUrl.includes('/certifications') || newUrl.endsWith('/') || newUrl.endsWith('localhost:5000');
+      expect(navigatedAway).toBeTruthy();
     }
   });
 

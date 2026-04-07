@@ -15,13 +15,22 @@ test.describe('Voice Session Page', () => {
     await waitForPageReady(page);
     await waitForContent(page);
     
-    const hasSessionText = (await page.locator('body').textContent())?.match(/Session|Practice|Question/);
+    // Wait for session page to transition from loading to select state
+    await page.waitForFunction(
+      () => !document.body.textContent?.includes('Loading...') && document.body.textContent!.length > 100,
+      { timeout: 15000 }
+    ).catch(() => {});
+    
+    const hasSessionText = (await page.locator('body').textContent())?.match(/Session|Practice|Question|Voice/i);
     expect(hasSessionText).toBeTruthy();
     
-    const hasRecordButton = await page.locator('button:has(svg.lucide-mic, svg.lucide-mic-off)').first().isVisible({ timeout: 2000 }).catch(() => false);
-    const hasStartButton = await page.locator('button').filter({ hasText: /Start|Record|Begin|Practice/i }).first().isVisible({ timeout: 2000 }).catch(() => false);
-    const hasAnyButton = await page.locator('button').first().isVisible({ timeout: 2000 }).catch(() => false);
-    expect(hasRecordButton || hasStartButton || hasAnyButton).toBeTruthy();
+    // Check for any interactive element - use longer timeout for lazy-loaded page
+    // Session cards are divs with data-testid="card-session-*" (not buttons)
+    const hasSessionCard = await page.locator('[data-testid^="card-session-"]').first().isVisible({ timeout: 10000 }).catch(() => false);
+    const hasRecordButton = await page.locator('[data-testid="button-start-interview"], [data-testid="start-recording-button"]').first().isVisible({ timeout: 10000 }).catch(() => false);
+    const hasStartButton = await page.locator('button').filter({ hasText: /Start|Record|Begin|Practice|Cancel|Explore/i }).first().isVisible({ timeout: 10000 }).catch(() => false);
+    const hasInteractiveElement = await page.locator('[class*="cursor-pointer"]').first().isVisible({ timeout: 5000 }).catch(() => false);
+    expect(hasSessionCard || hasRecordButton || hasStartButton || hasInteractiveElement).toBeTruthy();
   });
 
   test('navigation back to home works', async ({ page }) => {

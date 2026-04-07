@@ -37,14 +37,15 @@ export default defineConfig({
   use: {
     // Use dynamic port - the webServer will print the actual port
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5001',
-    trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    trace: 'off',
+    screenshot: 'off',
+    video: 'off',
     actionTimeout: 30000,
     navigationTimeout: 60000, // Increased for lazy-loaded heavy components (Mermaid, SyntaxHighlighter, etc.)
     
     // Performance optimizations
     launchOptions: {
+      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
       args: [
         '--disable-gpu',
         '--no-sandbox',
