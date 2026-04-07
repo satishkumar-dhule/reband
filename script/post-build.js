@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /**
- * Post-build script to ensure all static data files and CF Pages routing
- * config files are copied to dist
+ * Post-build script to ensure all static data files, CF Pages routing
+ * config files are copied to dist, and the CF Pages _worker.js is compiled.
  */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
@@ -17,10 +18,8 @@ const PUBLIC_DEST = path.join(rootDir, 'dist/public');
 
 console.log('📦 Post-build: Copying static data files...');
 
-// Ensure destination directory exists
 fs.mkdirSync(DEST_DIR, { recursive: true });
 
-// Copy all files from source to destination
 function copyRecursive(src, dest) {
   const entries = fs.readdirSync(src, { withFileTypes: true });
   
@@ -40,8 +39,6 @@ function copyRecursive(src, dest) {
 try {
   if (fs.existsSync(SOURCE_DIR)) {
     copyRecursive(SOURCE_DIR, DEST_DIR);
-    
-    // Count files
     const files = fs.readdirSync(DEST_DIR);
     console.log(`   ✓ Copied ${files.length} data files to dist/public/data/`);
   } else {
@@ -52,8 +49,6 @@ try {
   process.exit(1);
 }
 
-// Copy CF Pages routing files (_redirects, _routes.json)
-// Vite may not copy underscore-prefixed files in all configurations.
 const CF_FILES = ['_redirects', '_routes.json', '_headers'];
 for (const file of CF_FILES) {
   const src = path.join(PUBLIC_SRC, file);
@@ -62,6 +57,17 @@ for (const file of CF_FILES) {
     fs.copyFileSync(src, dest);
     console.log(`   ✓ Copied ${file} to dist/public/`);
   }
+}
+
+console.log('⚙️  Building CF Pages worker (_worker.js)...');
+try {
+  execSync('node script/build-cf-worker.js', {
+    cwd: rootDir,
+    stdio: 'inherit',
+  });
+} catch (err) {
+  console.error('   ❌ CF Pages worker build failed:', err.message);
+  console.warn('   ⚠️ Continuing without _worker.js — API routes may not work on CF Pages');
 }
 
 console.log('✅ Post-build complete!');
