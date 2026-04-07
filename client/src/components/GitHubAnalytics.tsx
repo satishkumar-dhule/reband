@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Eye, GitFork, Star, Download, ExternalLink, TrendingUp, Users } from "lucide-react";
+import { gql } from "../lib/graphql-client";
+import { GET_GITHUB_ANALYTICS } from "../lib/graphql-queries";
 
 interface GitHubAnalyticsData {
   views: { date: string; count: number; uniques: number }[];
@@ -15,9 +17,8 @@ export function GitHubAnalytics() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/github-analytics')
-      .then(res => res.ok ? res.json() : null)
-      .then(setData)
+    gql<{ githubAnalytics: GitHubAnalyticsData | null }>(GET_GITHUB_ANALYTICS)
+      .then(data => setData(data.githubAnalytics))
       .catch(() => setData(null))
       .finally(() => setLoading(false));
   }, []);

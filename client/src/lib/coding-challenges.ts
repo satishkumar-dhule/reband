@@ -4,6 +4,9 @@
  * Auto-calculates complexity and provides sample answers
  */
 
+import { gql } from './graphql-client';
+import { GET_CODING_CHALLENGES } from './graphql-queries';
+
 export type Difficulty = 'easy' | 'medium';
 export type Language = 'javascript' | 'python';
 
@@ -960,16 +963,11 @@ async function loadChallengesFromJson(): Promise<CodingChallenge[]> {
   loadPromise = (async (): Promise<CodingChallenge[]> => {
     try {
       loadError = null;
-      const response = await fetch('/api/coding/challenges');
-      
-      if (!response.ok) {
-        throw new Error('Failed to load challenges data (HTTP error)');
-      }
-
-      const rawData = await response.json();
+      const result = await gql<{ codingChallenges: RawChallenge[] }>(GET_CODING_CHALLENGES);
+      const rawData = result.codingChallenges;
       
       // Support both array and object formats
-      const data = Array.isArray(rawData) ? rawData : (rawData.challenges || []);
+      const data = Array.isArray(rawData) ? rawData : [];
       
       // Transform database format to app format
       const challenges: CodingChallenge[] = data.map((c: RawChallenge) => ({

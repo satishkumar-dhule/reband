@@ -1,11 +1,8 @@
 /**
- * Unified API Service
- * 
- * Environment-aware: switches between:
- * - Dev mode (import.meta.env.DEV): Express server API at /api/*
- * - Production mode: Static JSON files at /data/*
- * 
- * Uses the existing api-client.ts for static mode.
+ * Unified API Service — GraphQL Edition
+ *
+ * All data fetching goes through the /graphql endpoint in dev mode.
+ * Static JSON files at /data/* are used in production (static build).
  */
 
 import type {
@@ -19,7 +16,6 @@ import type {
   CodingFilters,
 } from '../types';
 
-// Import static client (works in both dev and prod)
 import {
   fetchChannels,
   fetchChannelQuestions,
@@ -29,20 +25,33 @@ import {
   fetchSubChannels,
   fetchCompanies,
   clearCache as clearApiClientCache,
-  fetchQuestionIds,
   type Question as StaticQuestion,
 } from '../lib/api-client';
 
-// Type cast helper for static questions (relevanceDetails is string in api-client, RelevanceDetails in types)
+import { gql } from '../lib/graphql-client';
+import {
+  GET_CHANNELS,
+  GET_QUESTIONS,
+  GET_QUESTION,
+  GET_RANDOM_QUESTION,
+  SEARCH_QUESTIONS,
+  GET_SUBCHANNELS,
+  GET_COMPANIES,
+  GET_STATS,
+  GET_CODING_CHALLENGES,
+  GET_CODING_CHALLENGE,
+  GET_RANDOM_CODING_CHALLENGE,
+  GET_CODING_STATS,
+} from '../lib/graphql-queries';
+
 function castQuestion(q: StaticQuestion): Question {
   return q as unknown as Question;
 }
 
-// Check if we're in development mode
 const IS_DEV = import.meta.env.DEV;
 
 // ============================================
-// CACHE (used only in dev mode for API caching)
+// SIMPLE IN-MEMORY CACHE (dev mode)
 // ============================================
 interface CacheEntry<T> {
   data: T;
@@ -51,7 +60,6 @@ interface CacheEntry<T> {
 
 class CacheManager<T> {
   private cache = new Map<string, CacheEntry<T>>();
-  // Default TTL: 5 minutes in development, 1 hour in production
   private ttl: number;
 
   constructor(ttl: number = 5 * 60 * 1000) {
@@ -61,13 +69,10 @@ class CacheManager<T> {
   get(key: string): T | undefined {
     const entry = this.cache.get(key);
     if (!entry) return undefined;
-    
-    // Check if entry is stale
     if (Date.now() - entry.timestamp > this.ttl) {
       this.cache.delete(key);
       return undefined;
     }
-    
     return entry.data;
   }
 
@@ -94,55 +99,11 @@ class CacheManager<T> {
       this.cache.clear();
     }
   }
-
-  setTTL(ttl: number): void {
-    this.ttl = ttl;
-  }
 }
 
-// Cache with TTL: 5 minutes in dev mode
 const channelDataCache = new CacheManager<ChannelData>(5 * 60 * 1000);
 const statsCache = new CacheManager<ChannelDetailedStats[]>(5 * 60 * 1000);
 const questionsCache = new CacheManager<Question>(10 * 60 * 1000);
-
-// ============================================
-// HTTP UTILITIES (dev mode only)
-// ============================================
-class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public url: string
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
-
-async function fetchJson<T>(url: string, timeoutMs = 10000): Promise<T> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  
-  try {
-    const response = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeoutId);
-    
-    if (!response.ok) {
-      throw new ApiError(
-        `HTTP ${response.status}: ${response.statusText}`,
-        response.status,
-        url
-      );
-    }
-    return response.json();
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new ApiError(`Request timeout after ${timeoutMs}ms`, 408, url);
-    }
-    throw error;
-  }
-}
 
 // ============================================
 // CHANNEL SERVICE
@@ -150,35 +111,27 @@ async function fetchJson<T>(url: string, timeoutMs = 10000): Promise<T> {
 export const ChannelService = {
   async getAll(): Promise<ChannelStats[]> {
     if (IS_DEV) {
-      // Dev mode: fetch from Express API
-      const data = await fetchJson<{ id: string; questionCount: number }[]>('/api/channels');
-      return data;
+      const data = await gql<{ channels: { id: string; questionCount: number }[] }>(GET_CHANNELS);
+      return data.channels;
     } else {
-      // Production mode: fetch from static JSON
       return fetchChannels();
     }
   },
 
   async getData(channelId: string): Promise<ChannelData> {
     if (IS_DEV) {
-      // Dev mode: use cache and fetch from API
       const cached = channelDataCache.get(channelId);
       if (cached) return cached;
 
-      const [questions, subChannels, companies] = await Promise.all([
-        fetchJson<Question[]>(`/api/questions/${channelId}`).catch((err) => {
-          console.warn(`Failed to fetch questions for channel ${channelId}:`, err);
-          return [] as Question[];
-        }),
-        fetchJson<string[]>(`/api/subchannels/${channelId}`).catch((err) => {
-          console.warn(`Failed to fetch subchannels for ${channelId}:`, err);
-          return [] as string[];
-        }),
-        fetchJson<string[]>(`/api/companies/${channelId}`).catch((err) => {
-          console.warn(`Failed to fetch companies for ${channelId}:`, err);
-          return [] as string[];
-        }),
+      const [questionsData, subChannelsData, companiesData] = await Promise.all([
+        gql<{ questions: Question[] }>(GET_QUESTIONS, { channelId }).catch(() => ({ questions: [] as Question[] })),
+        gql<{ subchannels: string[] }>(GET_SUBCHANNELS, { channelId }).catch(() => ({ subchannels: [] })),
+        gql<{ companies: string[] }>(GET_COMPANIES, { channelId }).catch(() => ({ companies: [] })),
       ]);
+
+      const questions = questionsData.questions;
+      const subChannels = subChannelsData.subchannels;
+      const companies = companiesData.companies;
 
       const stats = {
         total: questions.length,
@@ -187,17 +140,15 @@ export const ChannelService = {
         advanced: questions.filter(q => q.difficulty === 'advanced').length,
       };
 
-      const data: ChannelData = { questions, subChannels, companies, stats };
-      channelDataCache.set(channelId, data);
+      const result: ChannelData = { questions, subChannels, companies, stats };
+      channelDataCache.set(channelId, result);
 
-      // Also cache individual questions
       for (const q of questions) {
         questionsCache.set(q.id, q);
       }
 
-      return data;
+      return result;
     } else {
-      // Production mode: use static client
       const [questions, subChannels, companies] = await Promise.all([
         fetchChannelQuestions(channelId),
         fetchSubChannels(channelId),
@@ -211,7 +162,6 @@ export const ChannelService = {
         advanced: questions.filter(q => q.difficulty === 'advanced').length,
       };
 
-      // Cache questions for later retrieval (cast to app Question type)
       const typedQuestions = questions.map(castQuestion);
       for (const q of typedQuestions) {
         questionsCache.set(q.id, q);
@@ -239,7 +189,6 @@ export const ChannelService = {
     }
   },
 
-  // Invalidate cache for a specific channel or all channels
   invalidate(channelId?: string): void {
     if (channelId) {
       channelDataCache.delete(channelId);
@@ -273,9 +222,7 @@ export const QuestionService = {
 
       return questions;
     } else {
-      // Production: use static client - fetch all questions once and filter in memory
       const allQuestions = await fetchChannelQuestions(channelId);
-      
       let questions = allQuestions;
 
       if (filters.subChannel && filters.subChannel !== 'all') {
@@ -297,23 +244,21 @@ export const QuestionService = {
       const cached = questionsCache.get(questionId);
       if (cached) return cached;
 
-      const question = await fetchJson<Question>(`/api/question/${questionId}`);
-      questionsCache.set(questionId, question);
-      return question;
+      const data = await gql<{ question: Question }>(GET_QUESTION, { id: questionId });
+      if (data.question) {
+        questionsCache.set(questionId, data.question);
+      }
+      return data.question;
     } else {
-      // Production mode: use static client
       return castQuestion(await fetchStaticQuestion(questionId));
     }
   },
 
   async getRandom(channel?: string, difficulty?: string): Promise<Question> {
     if (IS_DEV) {
-      const params = new URLSearchParams();
-      if (channel && channel !== 'all') params.set('channel', channel);
-      if (difficulty && difficulty !== 'all') params.set('difficulty', difficulty);
-      return fetchJson<Question>(`/api/question/random?${params}`);
+      const data = await gql<{ randomQuestion: Question }>(GET_RANDOM_QUESTION, { channel, difficulty });
+      return data.randomQuestion;
     } else {
-      // Production mode: use static client
       return castQuestion(await fetchStaticRandomQuestion(channel, difficulty));
     }
   },
@@ -322,31 +267,12 @@ export const QuestionService = {
     if (!query.trim()) return [];
 
     if (IS_DEV) {
-      const channels = await ChannelService.getAll();
-      const results: Question[] = [];
-      const q = query.toLowerCase();
-
-      for (const ch of channels) {
-        try {
-          const data = await ChannelService.getData(ch.id);
-          const matches = data.questions.filter(question =>
-            question.question.toLowerCase().includes(q) ||
-            question.tags?.some(t => t.toLowerCase().includes(q))
-          );
-          results.push(...matches);
-          if (results.length >= limit) break;
-        } catch {
-          // skip
-        }
-      }
-
-      return results.slice(0, limit);
+      const data = await gql<{ search: { results: Question[] } }>(SEARCH_QUESTIONS, { query: query.trim(), limit });
+      return data.search.results as unknown as Question[];
     } else {
-      // Production mode: search through all channels (parallel with bounded concurrency)
       const channels = await fetchChannels();
       const searchQuery = query.toLowerCase();
 
-      // Process in batches of 5 to avoid overwhelming the browser
       const BATCH_SIZE = 5;
       const results: Question[] = [];
 
@@ -357,9 +283,9 @@ export const QuestionService = {
             try {
               const questions = await fetchChannelQuestions(ch.id);
               return questions.filter(
-                (question) =>
-                  question.question.toLowerCase().includes(searchQuery) ||
-                  question.tags?.some((t) => t.toLowerCase().includes(searchQuery))
+                (q) =>
+                  q.question.toLowerCase().includes(searchQuery) ||
+                  q.tags?.some((t) => t.toLowerCase().includes(searchQuery))
               );
             } catch {
               return [];
@@ -385,14 +311,13 @@ export const StatsService = {
       if (cached) return cached;
 
       try {
-        const data = await fetchJson<ChannelDetailedStats[]>('/api/stats');
-        statsCache.set('all', data);
-        return data;
+        const data = await gql<{ stats: ChannelDetailedStats[] }>(GET_STATS);
+        statsCache.set('all', data.stats);
+        return data.stats;
       } catch {
         return [];
       }
     } else {
-      // Production mode: use static client
       return fetchStaticStats();
     }
   },
@@ -400,24 +325,20 @@ export const StatsService = {
 
 // ============================================
 // CODING SERVICE
-// NOTE: Coding challenges don't have static JSON files yet.
-// In production, this returns empty array. To fix, add static coding data.
 // ============================================
 export const CodingService = {
   async getAll(filters: CodingFilters = {}): Promise<CodingChallenge[]> {
     if (IS_DEV) {
-      const params = new URLSearchParams();
-      if (filters.difficulty) params.set('difficulty', filters.difficulty);
-      if (filters.category) params.set('category', filters.category);
       try {
-        return fetchJson<CodingChallenge[]>(`/api/coding/challenges?${params}`);
+        const data = await gql<{ codingChallenges: CodingChallenge[] }>(GET_CODING_CHALLENGES, {
+          difficulty: filters.difficulty,
+          category: filters.category,
+        });
+        return data.codingChallenges;
       } catch {
         return [];
       }
     } else {
-      // Production: coding challenges not yet supported in static mode
-      // TODO: Generate static coding challenge data
-      // Note: Coding challenges currently require backend API and don't work in static mode
       console.warn('Coding challenges not available in production static mode');
       return [];
     }
@@ -425,7 +346,8 @@ export const CodingService = {
 
   async getById(id: string): Promise<CodingChallenge> {
     if (IS_DEV) {
-      return fetchJson<CodingChallenge>(`/api/coding/challenge/${id}`);
+      const data = await gql<{ codingChallenge: CodingChallenge }>(GET_CODING_CHALLENGE, { id });
+      return data.codingChallenge;
     } else {
       throw new Error('Coding challenges not available in production static mode');
     }
@@ -433,9 +355,8 @@ export const CodingService = {
 
   async getRandom(difficulty?: string): Promise<CodingChallenge> {
     if (IS_DEV) {
-      const params = new URLSearchParams();
-      if (difficulty) params.set('difficulty', difficulty);
-      return fetchJson<CodingChallenge>(`/api/coding/random?${params}`);
+      const data = await gql<{ randomCodingChallenge: CodingChallenge }>(GET_RANDOM_CODING_CHALLENGE, { difficulty });
+      return data.randomCodingChallenge;
     } else {
       throw new Error('Coding challenges not available in production static mode');
     }
@@ -443,7 +364,8 @@ export const CodingService = {
 
   async getStats(): Promise<CodingStats> {
     if (IS_DEV) {
-      return fetchJson<CodingStats>('/api/coding/stats');
+      const data = await gql<{ codingStats: CodingStats }>(GET_CODING_STATS);
+      return data.codingStats;
     } else {
       return { total: 0, byDifficulty: { easy: 0, medium: 0 }, byCategory: {} };
     }
@@ -451,7 +373,7 @@ export const CodingService = {
 };
 
 // ============================================
-// BLOG SERVICE (stub - no server endpoint)
+// BLOG SERVICE (stub)
 // ============================================
 export const BlogService = {
   async getAll(): Promise<Record<string, { title: string; slug: string; url: string }>> {
@@ -472,7 +394,6 @@ export const CacheUtils = {
       statsCache.clear();
       questionsCache.clear();
     }
-    // Also clear static client cache
     clearApiClientCache();
   },
 
@@ -480,7 +401,6 @@ export const CacheUtils = {
     if (IS_DEV) {
       channelDataCache.delete(channelId);
     }
-    // Also invalidate in static client
     clearApiClientCache();
   },
 
@@ -489,14 +409,13 @@ export const CacheUtils = {
     const results = await Promise.allSettled(
       channels.map(ch => ChannelService.getData(ch.id))
     );
-    
+
     const failedCount = results.filter(r => r.status === 'rejected').length;
     if (failedCount > 0) {
       console.warn(`Cache preload: ${failedCount}/${channels.length} channels failed to load`);
     }
   },
 
-  // Force refresh a specific channel
   async refreshChannel(channelId: string): Promise<ChannelData | null> {
     CacheUtils.invalidateChannel(channelId);
     try {
@@ -508,7 +427,7 @@ export const CacheUtils = {
 };
 
 // ============================================
-// EXPORT DEFAULT API OBJECT
+// EXPORT
 // ============================================
 export const api = {
   channels: ChannelService,

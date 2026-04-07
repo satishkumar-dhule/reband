@@ -6,6 +6,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Sparkles, ChevronRight, Loader2 } from 'lucide-react';
+import { gql } from '../lib/graphql-client';
+import { GET_SIMILAR_QUESTIONS } from '../lib/graphql-queries';
 
 interface SimilarQuestion {
   id: string;
@@ -31,14 +33,8 @@ export function SimilarQuestions({ questionId, currentChannel }: SimilarQuestion
       setError(false);
       
       try {
-        const response = await fetch(`/api/similar-questions/${questionId}`);
-        if (!response.ok) {
-          setError(true);
-          return;
-        }
-        
-        const questions = await response.json();
-        setSimilar((questions || []).slice(0, 4));
+        const data = await gql<{ similarQuestions: SimilarQuestion[] }>(GET_SIMILAR_QUESTIONS, { questionId });
+        setSimilar((data.similarQuestions || []).slice(0, 4));
       } catch {
         setError(true);
       } finally {

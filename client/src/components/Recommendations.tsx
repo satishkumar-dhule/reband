@@ -18,6 +18,8 @@ import {
 import { RecommendationService, type Recommendation } from '../services/recommendation.service';
 import { allChannelsConfig } from '../lib/channels-config';
 import type { HistoryIndex } from './unified/QuestionHistory';
+import { gql } from '../lib/graphql-client';
+import { GET_HISTORY_INDEX } from '../lib/graphql-queries';
 
 interface RecommendationsProps {
   channelQuestionCounts?: Record<string, number>;
@@ -33,11 +35,9 @@ async function loadHistoryIndex(): Promise<HistoryIndex | null> {
   if (historyIndexCache) return historyIndexCache;
   
   try {
-    const res = await fetch('/api/history/index');
-    if (res.ok) {
-      historyIndexCache = await res.json();
-      return historyIndexCache;
-    }
+    const data = await gql<{ historyIndex: HistoryIndex }>(GET_HISTORY_INDEX);
+    historyIndexCache = data.historyIndex;
+    return historyIndexCache;
   } catch {
     // API not available
   }

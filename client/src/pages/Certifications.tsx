@@ -7,6 +7,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery } from "@tanstack/react-query";
+import { gql } from '../lib/graphql-client';
+import { GET_CERTIFICATIONS } from '../lib/graphql-queries';
 import { getDifficultyClasses, getDifficultyLabel } from '@/lib/difficulty';
 import {
   AppLayout, SEOHead, SkipLink, Button, Badge,
@@ -60,11 +62,9 @@ function useCertifications() {
     staleTime: Infinity,
     gcTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const res = await fetch('/api/certifications');
-      if (!res.ok) throw new Error(`Failed to fetch certifications (${res.status})`);
-      const data = await res.json();
-      if (!Array.isArray(data)) throw new Error('Invalid certifications data');
-      return data;
+      const data = await gql<{ certifications: Certification[] }>(GET_CERTIFICATIONS);
+      if (!Array.isArray(data.certifications)) throw new Error('Invalid certifications data');
+      return data.certifications;
     },
   });
 }

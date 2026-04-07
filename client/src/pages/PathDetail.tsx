@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useLocation } from 'wouter';
+import { gql } from '../lib/graphql-client';
+import { GET_CHANNELS, GET_CERTIFICATIONS } from '../lib/graphql-queries';
 import { motion } from 'framer-motion';
 import { AppLayout } from '@/lib/ui';
 import { SEOHead } from '@/lib/ui';
@@ -132,11 +134,10 @@ export default function PathDetail() {
 
   // Fetch channel question counts
   useEffect(() => {
-    fetch('/api/channels')
-      .then(r => r.json())
-      .then((data: ChannelCount[]) => {
+    gql<{ channels: ChannelCount[] }>(GET_CHANNELS)
+      .then(data => {
         const counts: Record<string, number> = {};
-        for (const ch of data) counts[ch.id] = Number(ch.questionCount);
+        for (const ch of (data.channels || [])) counts[ch.id] = Number(ch.questionCount);
         setChannelCounts(counts);
         setCountsLoaded(true);
       })
@@ -146,9 +147,8 @@ export default function PathDetail() {
   // Fetch certification details (for names/providers)
   useEffect(() => {
     if (!path || path.certifications.length === 0) return;
-    fetch('/api/certifications')
-      .then(r => r.json())
-      .then((data: CertificationData[]) => setCertDetails(data))
+    gql<{ certifications: CertificationData[] }>(GET_CERTIFICATIONS)
+      .then(data => setCertDetails(data.certifications || []))
       .catch(() => {});
   }, [path]);
 

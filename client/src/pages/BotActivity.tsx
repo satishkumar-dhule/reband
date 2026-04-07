@@ -10,6 +10,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
+import { gql } from "../lib/graphql-client";
+import { GET_BOT_ACTIVITY } from "../lib/graphql-queries";
 import { 
   Bot, Sparkles, CheckCircle, RefreshCw,
   Activity, Clock, Trash2, FileText, ListTodo, History, Zap, Eye, Wrench,
@@ -229,21 +231,12 @@ export default function BotActivity() {
   const fetchData = useCallback(async () => {
     try {
       setError(null);
-      const res = await fetch('/api/bot-activity');
-      if (res.ok) {
-        const data = await res.json();
-        setBotStats(data.stats || []);
-        setRecentRuns(data.runs || []);
-        setWorkQueue(data.queue || []);
-        setLedger(data.ledger || []);
-      } else {
-        // Use mock data for development when API not available
-        setBotStats([
-          { botName: 'creator', totalRuns: 45, successfulRuns: 42, totalCreated: 156, totalUpdated: 0, totalDeleted: 0, lastRun: new Date().toISOString() },
-          { botName: 'verifier', totalRuns: 38, successfulRuns: 38, totalCreated: 0, totalUpdated: 0, totalDeleted: 0, lastRun: new Date().toISOString() },
-          { botName: 'processor', totalRuns: 22, successfulRuns: 20, totalCreated: 0, totalUpdated: 45, totalDeleted: 12, lastRun: new Date().toISOString() }
-        ]);
-      }
+      const result = await gql<{ botActivity: { stats: BotStats[]; runs: BotRun[]; queue: WorkItem[]; ledger: LedgerEntry[] } }>(GET_BOT_ACTIVITY);
+      const data = result.botActivity;
+      setBotStats(data.stats || []);
+      setRecentRuns(data.runs || []);
+      setWorkQueue(data.queue || []);
+      setLedger(data.ledger || []);
     } catch (error) {
       console.error('Failed to fetch bot data:', error);
       setError(error instanceof Error ? error.message : 'Failed to load bot data');

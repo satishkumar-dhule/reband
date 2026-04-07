@@ -13,6 +13,8 @@
  */
 
 import type { Question } from '../types';
+import { gql } from './graphql-client';
+import { GET_VOICE_SESSIONS } from './graphql-queries';
 
 // ============================================
 // TYPES
@@ -95,14 +97,8 @@ export async function loadVoiceSessions(): Promise<VoiceSession[]> {
   if (cachedSessions.length > 0) return cachedSessions;
   
   try {
-    const response = await fetch('/api/voice-sessions');
-    if (!response.ok) {
-      console.warn('Voice sessions not found, will generate from questions');
-      return [];
-    }
-    
-    const data = await response.json();
-    cachedSessions = data.sessions || [];
+    const data = await gql<{ voiceSessions: { sessions: VoiceSession[] } }>(GET_VOICE_SESSIONS);
+    cachedSessions = data.voiceSessions?.sessions || [];
     return cachedSessions;
   } catch (e) {
     console.error('Failed to load voice sessions:', e);

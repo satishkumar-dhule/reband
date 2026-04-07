@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { gql } from '../lib/graphql-client';
+import { GET_CERTIFICATIONS } from '../lib/graphql-queries';
 import { useLocation } from 'wouter';
 import {
   AppLayout, SEOHead, SkipLink, Button, Badge,
@@ -82,9 +84,8 @@ export default function LearningPaths() {
       setCertsLoading(true);
       setCertsError(null);
       try {
-        const res = await fetch('/api/certifications');
-        if (res.ok) setCertifications(await res.json());
-        else setCertsError('Failed to load certifications');
+        const data = await gql<{ certifications: Certification[] }>(GET_CERTIFICATIONS);
+        setCertifications(data.certifications || []);
       } catch { setCertsError('Failed to load certifications'); }
       finally { setCertsLoading(false); }
     }

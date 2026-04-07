@@ -1,7 +1,10 @@
 /**
- * Changelog data - fetched from generated JSON file
+ * Changelog data - fetched via GraphQL
  * Updated automatically by bots during build
  */
+
+import { gql } from './graphql-client';
+import { GET_CHANGELOG } from './graphql-queries';
 
 export interface ChangelogEntry {
   date: string;
@@ -27,7 +30,6 @@ export interface ChangelogData {
   };
 }
 
-// Default changelog data - used as fallback
 export const defaultChangelog: ChangelogData = {
   entries: [
     {
@@ -51,19 +53,15 @@ export const defaultChangelog: ChangelogData = {
   }
 };
 
-// Fetch changelog from generated JSON file
 export async function fetchChangelog(): Promise<ChangelogData> {
   try {
-    const response = await fetch('/api/changelog');
-    if (response.ok) {
-      return await response.json();
-    }
+    const data = await gql<{ changelog: ChangelogData }>(GET_CHANGELOG);
+    if (data?.changelog) return data.changelog;
   } catch {
     // Use default if fetch fails
   }
   return defaultChangelog;
 }
 
-// Export default for backward compatibility (static fallback)
 export const changelog = defaultChangelog;
 export default changelog;
