@@ -35,7 +35,7 @@ async function loadStaticJSON(filename: string): Promise<unknown | null> {
   try {
     // In Cloudflare Pages Functions, /data/* is served as static assets
     // We can fetch them via the same origin
-    const res = await fetch(`https://__WORKER__.pages.dev/data/${filename}`);
+    const res = await fetch(`https://devprep-pages.pages.dev/data/${filename}`);
     if (!res.ok) return null;
     const data = await res.json();
     STATIC_CACHE.set(filename, { data, ts: Date.now() });

@@ -96,8 +96,6 @@ jobs:
           pnpm run build
           pnpm run build:pagefind
           node script/build-optimize.js
-        env:
-          VITE_STATIC_MODE: 'true'
 
       - name: Run E2E tests
         run: |
@@ -170,11 +168,46 @@ jobs:
               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
               -H "Content-Type: application/json" \
               --data '{"name":"devprep-pages","production_branch":"main"}' \
-              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" | jq '.success'
-            echo "Project created."
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" | python3 -c "import json,sys; r=json.load(sys.stdin); print('Created:', r.get('success'))"
           else
             echo "Project devprep-pages already exists (HTTP $STATUS)."
           fi
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Setup D1 database and apply migrations
+        run: |
+          # Create D1 database (no-op if it already exists)
+          CREATE_RESP=$(curl -s -X POST \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"name":"devprep"}' \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/d1/database")
+          D1_ID=$(echo "$CREATE_RESP" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r['result']['uuid'] if r.get('success') else '')" 2>/dev/null || true)
+
+          # If creation returned no ID (already exists), look it up
+          if [ -z "$D1_ID" ]; then
+            echo "Database may already exist, fetching ID..."
+            LIST_RESP=$(curl -s \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/d1/database?name=devprep")
+            D1_ID=$(echo "$LIST_RESP" | python3 -c "import json,sys; r=json.load(sys.stdin); dbs=r.get('result',[]); print(dbs[0]['uuid'] if dbs else '')" 2>/dev/null || true)
+          fi
+
+          if [ -z "$D1_ID" ]; then
+            echo "❌ Could not create or find D1 database"
+            exit 1
+          fi
+          echo "✅ D1 Database ID: $D1_ID"
+
+          # Substitute into wrangler.toml so wrangler knows the DB ID
+          sed -i "s/__D1_DATABASE_ID__/$D1_ID/" wrangler.toml
+
+          # Apply migrations
+          echo "Applying D1 migrations..."
+          npx wrangler d1 migrations apply devprep --remote
+          echo "✅ Migrations applied"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -212,6 +245,22 @@ jobs:
 
       - name: Setup Node & pnpm
         uses: ./.github/actions/setup-node-pnpm
+
+      - name: Resolve D1 database ID
+        run: |
+          LIST_RESP=$(curl -s \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/d1/database?name=devprep")
+          D1_ID=$(echo "$LIST_RESP" | python3 -c "import json,sys; r=json.load(sys.stdin); dbs=r.get('result',[]); print(dbs[0]['uuid'] if dbs else '')" 2>/dev/null || true)
+          if [ -z "$D1_ID" ]; then
+            echo "❌ Could not resolve D1 database ID"
+            exit 1
+          fi
+          echo "✅ D1 Database ID: $D1_ID"
+          sed -i "s/__D1_DATABASE_ID__/$D1_ID/" wrangler.toml
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy to Cloudflare Pages (production)
         run: |
@@ -258,21 +307,21 @@ jobs:
             exit 1
           fi
           echo "✅ Both sites are accessible"
-      
-      - name: Verify content integrity
+
+      - name: Verify API health (Pages Functions + D1)
         run: |
-          echo "Checking for expected content..."
-          content=$(curl -s --max-time 30 "https://devprep-pages.pages.dev")
-          if echo "$content" | grep -q "Error"; then
-            echo "❌ Site contains error messages"
+          echo "Checking API health endpoint..."
+          api_response=$(curl -s --max-time 30 --retry 3 --retry-delay 5 \
+            -H "Accept: application/json" \
+            "https://devprep-pages.pages.dev/api/health")
+          echo "Response: $api_response"
+          if echo "$api_response" | python3 -c "import json,sys; r=json.load(sys.stdin); exit(0 if r.get('status')=='ok' else 1)"; then
+            echo "✅ API health check passed"
+          else
+            echo "❌ API health check failed"
             exit 1
           fi
-          if echo "$content" | grep -q "404"; then
-            echo "❌ Site contains 404 references"
-            exit 1
-          fi
-          echo "✅ Content integrity verified"
-      
+
       - name: Verify critical pages
         run: |
           echo "Checking critical pages..."
@@ -289,14 +338,3 @@ jobs:
             fi
           done
           echo "✅ All critical pages accessible"
-      
-      - name: Verify static data assets
-        run: |
-          echo "Checking static data files (CF Pages has no backend)..."
-          status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "https://devprep-pages.pages.dev/data/questions.json")
-          if [ "$status" = "200" ]; then
-            echo "✅ Static data file accessible (HTTP $status)"
-          else
-            echo "ℹ️ Static data file returned HTTP $status — may not be generated yet, skipping"
-          fi
-          echo "✅ Static site verification complete"

@@ -1,18 +1,15 @@
 /**
- * API Switcher - Routes to static JSON or Express API based on environment
+ * API Switcher - Routes to static JSON or API based on environment
  * 
- * VITE_STATIC_MODE=true, running on github.io, or pages.dev -> use static JSON
- * otherwise -> use Express API (development mode)
+ * VITE_STATIC_MODE=true or running on github.io -> use static JSON files
+ * otherwise (dev, Cloudflare Pages+Workers) -> use /api/* endpoints
  */
 
 import { fetchChannels, fetchQuestionIds, fetchQuestion, fetchRandomQuestion, fetchStats, fetchSubChannels, fetchCompanies, fetchChannelQuestions, clearCache, invalidateChannel, type Question, type QuestionListItem, type ChannelStats, type ChannelDetailedStats } from './api-client';
 
 const IS_STATIC = import.meta.env.VITE_STATIC_MODE === 'true' ||
-                  (typeof window !== 'undefined' && (
-                    window.location.hostname.includes('github.io') ||
-                    window.location.hostname.includes('pages.dev') ||
-                    window.location.hostname.includes('cloudflare')
-                  ));
+                  (typeof window !== 'undefined' &&
+                    window.location.hostname.includes('github.io'));
 
 const API_BASE = '/api';
 
