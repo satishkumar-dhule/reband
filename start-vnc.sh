@@ -16,6 +16,7 @@ NOVNC_PORT=6080
 SESSION="vnc"
 NOVNC_PATH="/nix/store/0a18wyirbc3ls9yvlw33lrmql94n2hmc-novnc-1.5.0/share/webapps/novnc"
 WEBSOCKIFY="/nix/store/031kfpijr04xpfkps46n3qhqinapw5bi-python3.11-websockify-0.12.0/bin/websockify"
+KIRO_PATH="/home/runner/kiro/kiro"
 DEV_DOMAIN="${REPLIT_DEV_DOMAIN:-localhost}"
 
 # ---- If already running, just re-attach ----
@@ -57,8 +58,8 @@ sleep 3
 # ---- Start window manager + terminal in window 2 ----
 tmux new-window -t "${SESSION}" -n "desktop"
 tmux send-keys -t "${SESSION}:desktop" \
-  "export DISPLAY=:${DISPLAY_NUM} && openbox & xterm -geometry 140x40+10+10 -fa 'DejaVu Sans Mono' -fs 10 -title 'Desktop Terminal' && wait" Enter
-sleep 1
+  "export DISPLAY=:${DISPLAY_NUM} && fluxbox &" Enter
+sleep 2
 
 # ---- Start x11vnc in window 3 ----
 tmux new-window -t "${SESSION}" -n "x11vnc"
@@ -72,10 +73,11 @@ tmux send-keys -t "${SESSION}:novnc" \
   "echo 'Starting noVNC on port ${NOVNC_PORT}...' && '${WEBSOCKIFY}' --web '${NOVNC_PATH}' --heartbeat 30 0.0.0.0:${NOVNC_PORT} localhost:${VNC_PORT}" Enter
 sleep 2
 
-# ---- Install Kiro helper window ----
+# ---- Launch Kiro IDE in window 5 ----
 tmux new-window -t "${SESSION}" -n "kiro"
 tmux send-keys -t "${SESSION}:kiro" \
-  "echo 'Kiro download commands (run these):'; echo '  wget https://desktop-release.kiro.dev/latest/linux/Kiro.AppImage -O ~/Kiro.AppImage'; echo '  chmod +x ~/Kiro.AppImage'; echo '  DISPLAY=:1 ~/Kiro.AppImage --no-sandbox --disable-gpu'" Enter
+  "echo 'Launching Kiro IDE...' && sleep 1 && DISPLAY=:${DISPLAY_NUM} '${KIRO_PATH}' --no-sandbox --disable-gpu --disable-gpu-sandbox --disable-dev-shm-usage 2>&1" Enter
+sleep 3
 
 # ---- Back to status window ----
 tmux select-window -t "${SESSION}:status"
@@ -94,8 +96,8 @@ echo "║                                                          ║"
 echo "╠══════════════════════════════════════════════════════════╣"
 echo "║  VNC port: 5901 (no password)                            ║"
 echo "║                                                          ║"
-echo "║  Inside the VNC desktop, open xterm and run:            ║"
-echo "║    wget .../Kiro.AppImage && chmod +x && ./Kiro.AppImage ║"
+echo "║  Kiro IDE is launching automatically in the desktop.    ║"
+echo "║  Path: /home/runner/kiro/kiro                           ║"
 echo "╠══════════════════════════════════════════════════════════╣"
 echo "║  tmux tips:                                              ║"
 echo "║    Ctrl+B, D   - detach (desktop keeps running)          ║"

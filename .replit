@@ -35,6 +35,10 @@ args = "Start application"
 task = "workflow.run"
 args = "artifacts/mockup-sandbox: Component Preview Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Kiro IDE (VNC)"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -59,6 +63,17 @@ waitForPort = 5173
 [workflows.workflow.metadata]
 outputType = "webview"
 isCanvasWorkflow = true
+
+[[workflows.workflow]]
+name = "Kiro IDE (VNC)"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "bash start-kiro.sh"
+
+[workflows.workflow.metadata]
+outputType = "vnc"
 
 [agent]
 stack = "PNPM_WORKSPACE"

@@ -1,0 +1,27 @@
+{pkgs}: {
+  deps = [
+    pkgs.xterm
+    pkgs.python3
+    pkgs.cups
+    pkgs.xorg.libxcb
+    pkgs.gtk3
+    pkgs.alsa-lib
+    pkgs.libgbm
+    pkgs.mesa
+    pkgs.libdrm
+    pkgs.at-spi2-atk
+    pkgs.atk
+    pkgs.nss
+    pkgs.xorg.libXcomposite
+    pkgs.xorg.libXrandr
+    pkgs.xorg.libX11
+    pkgs.xdotool
+    pkgs.novnc
+    pkgs.tigervnc
+    pkgs.xorg.xorgserver
+    pkgs.xorg.xauth
+    pkgs.fluxbox
+    pkgs.x11vnc
+    pkgs.xvfb-run
+  ];
+}
