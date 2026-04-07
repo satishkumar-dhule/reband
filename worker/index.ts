@@ -18,7 +18,14 @@ const app = new Hono<{ Bindings: Bindings }>();
 
 // Middleware
 app.use("*", cors());
-app.use("*", compress());
+app.use((c, next) => {
+  // Skip compression for health/keep-alive endpoints
+  const path = c.req.path;
+  if (path === "/api/health" || path === "/api/keep-alive") {
+    return next();
+  }
+  return compress()(c, next);
+});
 app.use("*", secureHeaders());
 
 // ─── Static JSON fallback helpers ───
